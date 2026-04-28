@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->foreignUuid('mini_task_id')->constrained('mini_tasks')->cascadeOnDelete();
             $table->timestamp('started_at');
-            $table->timestamp('completed_at');
+            $table->timestamp('completed_at')->nullable();
             $table->string('description', 250);
             $table->timestamps();
             $table->softDeletes();

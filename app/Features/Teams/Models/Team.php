@@ -31,6 +31,6 @@ class Team extends Model
 
     public function miniTasks()
     {
-        return $this->belongsToMany(MiniTask::class, 'mini_task_workers_teams', 'team_id', 'mini_task_id');
+        return $this->belongsToMany(MiniTask::class, 'mini_tasks_workers_teams', 'team_id', 'mini_task_id');
     }
 }

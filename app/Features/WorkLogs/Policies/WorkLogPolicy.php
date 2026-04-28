@@ -10,15 +10,15 @@ class WorkLogPolicy extends BasePolicy
 {
     public function viewAny(User $user): bool
     {
-        return clone $this->hasPermission($user, 'view', 'work_logs');
+        return $this->hasPermission($user, 'view', 'work_logs');
     }
 
     public function view(User $user, WorkLog $workLog): bool
     {
         $isAssignedWorker = $workLog->workers()->where('user_id', $user->id)->exists();
         
-        return $this->hasPermission($user, 'view', 'work_logs') 
-            || $isAssignedWorker 
+        return $this->hasPermission($user, 'view', 'work_logs')
+            || $isAssignedWorker
             || $this->isOwner($user, $workLog->miniTask->supervisor);
     }
 
@@ -38,5 +38,19 @@ class WorkLogPolicy extends BasePolicy
     {
         $isAssignedWorker = $workLog->workers()->where('user_id', $user->id)->exists();
         return $this->hasPermission($user, 'complete', 'work_logs') || $isAssignedWorker;
+    }
+
+    public function approve(User $user, WorkLog $workLog): bool
+    {
+        // Only the mini-task supervisor or manager can approve
+        $isSupervisor = $this->isOwner($user, $workLog->miniTask->supervisor);
+        return $this->hasPermission($user, 'approve', 'work_logs') || $isSupervisor || $this->isAdmin($user);
+    }
+
+    public function reject(User $user, WorkLog $workLog): bool
+    {
+        // Only the mini-task supervisor or manager can reject
+        $isSupervisor = $this->isOwner($user, $workLog->miniTask->supervisor);
+        return $this->hasPermission($user, 'reject', 'work_logs') || $isSupervisor || $this->isAdmin($user);
     }
 }

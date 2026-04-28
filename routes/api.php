@@ -23,8 +23,17 @@ Route::prefix('materials')->group(base_path('routes/api/materials.php'));
 Route::prefix('service-types')->group(base_path('routes/api/service-types.php'));
 Route::prefix('attachments')->group(base_path('routes/api/attachments.php'));
 
+// Register Notifications Routes
+Route::prefix('notifications')->group(base_path('routes/api/notifications.php'));
+
 // Register Admin Routes
 Route::prefix('admin')->group(base_path('routes/api/admin.php'));
+
+// Register Export Routes
+Route::prefix('exports')->group(base_path('routes/api/exports.php'));
+
+// Register Unit Routes
+Route::prefix('units')->group(base_path('routes/api/units.php'));
 
 // Register Geographic Routes
 Route::prefix('districts')->group(base_path('routes/api/districts.php'));

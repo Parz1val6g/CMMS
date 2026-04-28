@@ -20,4 +20,10 @@ class DistrictController extends Controller
 
         return DistrictResource::collection($query->orderBy('name')->get());
     }
+
+    public function show(District $district): DistrictResource
+    {
+        $district->load(['municipalities']);
+        return new DistrictResource($district);
+    }
 }

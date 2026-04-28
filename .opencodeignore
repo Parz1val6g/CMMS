@@ -1,6 +1,0 @@
-# Cria um ficheiro para o OpenCode ignorar pastas pesadas
-"node_modules/
-vendor/
-.git/
-storage/
-public/build/" | Out-File -FilePath .opencodeignore -Encoding utf8

@@ -5,6 +5,7 @@ use App\Features\ServiceOrders\Requests\StoreServiceOrderRequest;
 use App\Features\ServiceOrders\Requests\UpdateServiceOrderRequest;
 use App\Features\ServiceOrders\Resources\ServiceOrderResource;
 use App\Features\ServiceOrders\Services\ServiceOrderService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Controllers\Controller;
@@ -69,5 +70,13 @@ class ServiceOrderController extends Controller
         $completedOrder = $this->serviceOrderService->complete($serviceOrder);
         $completedOrder->load(['client.user', 'manager', 'location', 'serviceType']);
         return new ServiceOrderResource($completedOrder);
+    }
+
+    public function destroy(ServiceOrder $serviceOrder): JsonResponse
+    {
+        $this->authorize('delete', $serviceOrder);
+
+        $serviceOrder->delete();
+        return response()->json(['message' => 'Service order deleted successfully']);
     }
 }

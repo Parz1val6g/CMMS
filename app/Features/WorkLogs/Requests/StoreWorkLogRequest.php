@@ -1,11 +1,12 @@
 <?php
 namespace App\Features\WorkLogs\Requests;
+use App\Features\WorkLogs\Models\WorkLog;
 use Illuminate\Foundation\Http\FormRequest;
 class StoreWorkLogRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', WorkLog::class);
     }
     public function rules(): array
     {

@@ -20,6 +20,8 @@ class AttachmentController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Attachment::class);
+
         $request->validate([
             'file' => ['required', 'file', 'max:10240', 'mimes:jpeg,png,jpg,webp,pdf,doc,docx,xls,xlsx,csv'], // 10MB max + Strict Mimes
             'service_order_id' => ['nullable', 'exists:service_orders,id', 'prohibits:mini_task_id'],
@@ -51,6 +53,8 @@ class AttachmentController extends Controller
      */
     public function destroy(Attachment $attachment): JsonResponse
     {
+        $this->authorize('delete', $attachment);
+
         $this->attachmentService->delete($attachment);
 
         return response()->json(['message' => 'Attachment deleted successfully']);

@@ -10,28 +10,12 @@ class DistrictSeeder extends Seeder
 {
     public function run(): void
     {
-        $districts = [
-            'Aveiro',
-            'Beja',
-            'Braga',
-            'Bragança',
-            'Castelo Branco',
-            'Covilhã',
-            'Covilhã',
-            'Faro',
-            'Guarda',
-            'Leiria',
-            'Lisboa',
-            'Madeira',
-            'Portalegre',
-            'Porto',
-            'Santarém',
-            'Setúbal',
-            'Viana do Castelo',
-            'Vila Real',
-            'Viseu',
-            'Açores',
-        ];
+        // Read JSON file and extract unique districts
+        $jsonPath = database_path('dados_portugal.json');
+        $data = json_decode(file_get_contents($jsonPath), true);
+
+        $districts = array_unique(array_column($data, 'distrito'));
+        sort($districts);
 
         foreach ($districts as $district) {
             DB::table('districts')->insert([
@@ -41,5 +25,7 @@ class DistrictSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
+
+        echo "✓ Inserted " . count($districts) . " districts\n";
     }
 }

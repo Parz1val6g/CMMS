@@ -26,7 +26,7 @@ class Sector extends Model
         return $this->hasMany(Team::class);
     }
 
-    public function tasks(){
-        return $this->belongsToMany(Task::class,'task_sectors', 'sector_id', 'task_id');
+    public function tasks() {
+        return $this->belongsToMany(Task::class, 'tasks_sectors', 'sector_id', 'task_id');
     }
 }

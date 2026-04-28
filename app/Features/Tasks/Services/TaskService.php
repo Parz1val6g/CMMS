@@ -10,6 +10,25 @@ class TaskService
     public function __construct(
         private TransactionHandler $transactions
     ) {}
+
+    public function create(array $data, string $managerId): Task
+    {
+        return $this->transactions->execute(function () use ($data, $managerId) {
+            $task = Task::create([
+                'service_order_id' => $data['service_order_id'],
+                'manager_id' => $managerId,
+                'name' => $data['name'],
+                'status' => TaskStatus::PENDING->value,
+            ]);
+
+            if (isset($data['sector_ids'])) {
+                $task->sectors()->attach($data['sector_ids']);
+            }
+
+            return $task;
+        });
+    }
+
     public function update(Task $task, array $data): Task
     {
         if (in_array($task->status, [TaskStatus::COMPLETED->value, 'cancelled'])) {

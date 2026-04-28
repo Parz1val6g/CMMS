@@ -1,15 +1,17 @@
 # Current Project Structure
 
 **Project**: Service Management Backend (Laravel 12)  
-**Status**: Skeleton/Template Phase  
-**Database**: 27 tables with comprehensive relationships  
-**Architecture**: Modular feature-based design (16 features)
+**Status**: Fully Implemented — Production-Ready  
+**Database**: 32 tables with comprehensive relationships  
+**Architecture**: Modular feature-based design (16 features)  
+**Authentication**: Sanctum API tokens with RBAC  
+**Events**: 5 event types with cascade completion chain (WorkLog→MiniTask→Task→ServiceOrder)
 
 ---
 
 ## 📊 Project Overview
 
-### Database Schema (from `db_tables.sql`)
+### Database Schema (from migrations)
 
 #### Core Entity Tables
 
@@ -18,15 +20,14 @@
   - Unique constraints: phone, email
   - Indexes: email, phone, status
   - Soft deletes enabled
+  - UUID primary key via `App\Core\Traits\Base`
 
 **Roles & Permissions**
-- `roles` — Role definitions (name, columns for display)
+- `roles` — Role definitions (name)
   - Soft deletes enabled
-  - Tracks role-specific visible columns
 - `role_permissions` — Permission definitions (resource, action, description)
   - Unique constraint: role_id + resource + action
   - Foreign key to roles
-  - Indexes: role_id
 - `user_roles` — User-to-role associations (junction table)
   - Primary key: user_id + role_id
   - Foreign keys: users, roles
@@ -49,7 +50,6 @@
 - `locations` — Physical addresses (street_address, postal_code, landmark, latitude/longitude)
   - Foreign key to parishes
   - Coordinates stored as DECIMAL(10, 8)
-  - Indexes: parish_id
 
 #### Client Management
 
@@ -68,9 +68,9 @@
 - `service_orders` — Service requests (process, priority, execution_date, status)
   - Foreign keys: clients, manager (users), locations, service_types
   - Fields: process (VARCHAR 250), priority (VARCHAR 20), status (VARCHAR 50)
-  - Indexes: manager, client, location, service_type, status, priority, created_at
   - Composite index: status + created_at
   - Soft deletes enabled
+  - Event: `ServiceOrderCreatedEvent` → `SendServiceOrderCreatedNotification`
 
 #### Work Hierarchy
 
@@ -90,262 +90,268 @@
 **Tasks**
 - `tasks` — Service order tasks (name, status)
   - Foreign keys: service_orders, manager (users)
-  - Indexes: service_order_id, manager, status
   - Composite index: service_order_id + status
   - Soft deletes enabled
 - `tasks_sectors` — Task-to-sector assignments (junction table)
-  - Foreign keys: tasks, sectors
-  - Indexes: task_id, sector_id
 
 **Mini-Tasks**
 - `mini_tasks` — Subtasks under tasks (description, status)
   - Foreign keys: tasks, supervisor (users)
-  - Indexes: task_id, supervisor, status
   - Composite index: task_id + status
   - Soft deletes enabled
 - `mini_tasks_workers_teams` — Assign mini-tasks to workers or teams (mutually exclusive)
-  - Unique assignment per mini_task
-  - Check constraint: worker_id XOR team_id (one must be null)
-  - Foreign keys: mini_tasks, workers, teams
-  - Indexes: mini_task_id, worker_id, team_id
+  - Check constraint: worker_id XOR team_id
+- `mini_tasks_materials` — Planned materials for mini-tasks (planned_quantity)
 
-**Work Logs** (Time tracking)
-- `work_logs` — Completed work records (started_at, completed_at, description)
+**Work Logs** (Time tracking with approval flow)
+- `work_logs` — Completed work records (started_at, completed_at, description, status)
   - Foreign key: mini_tasks
   - Generated column: `duration_minutes` (auto-calculated from time diff)
-  - Check constraint: completed_at > started_at
-  - Indexes: mini_task_id, created_at
+  - Status: in_progress → submitted → approved | rejected
+  - Fields: status (VARCHAR 20), reviewed_by (FK→users), reviewed_at (timestamp)
   - Soft deletes enabled
 - `work_logs_workers` — Workers assigned to work logs (junction table)
-  - Foreign keys: work_logs, workers
-  - Indexes: work_log_id, worker_id
+- `work_logs_materials` — Materials used in work logs (quantity_used, unit_price_at_use)
 
 #### Materials Management
 
-**Materials & Units**
 - `units` — Measurement units (name, abbreviation)
   - Unique constraint: abbreviation
 - `materials` — Materials (name, unit_id, stock_quantity)
   - Foreign key to units
   - Decimal field: stock_quantity with check >= 0
-  - Indexes: unit_id
-- `work_logs_materials` — Materials used in work logs (quantity_used, unit_price_at_use)
-  - Unique constraint: work_log_id + material_id
-  - Foreign keys: work_logs, materials
-  - Check constraint: quantity_used > 0
-  - Indexes: work_log_id, material_id
-- `mini_tasks_materials` — Planned materials for mini-tasks (planned_quantity)
-  - Unique constraint: mini_task_id + material_id
-  - Foreign keys: mini_tasks, materials
 
 **Attachments**
 - `attachments` — File uploads (file_path, file_name, mime_type)
   - Polymorphic: belongs to either service_orders OR mini_tasks (mutually exclusive)
   - Check constraint: service_order_id XOR mini_task_id
-  - Indexes: service_order_id, mini_task_id
   - Soft deletes enabled
 
 ---
 
-## 🏗️ Current Infrastructure (Implemented)
+## 🏗️ Infrastructure (Implementado)
 
-### Enums (`app/Core/Enums/`)
+### Enums (`app/Core/Enums/`) — 8 files
 
-1. **UserRole.php** — User role types
-   - Values: admin, manager, pending, supervisor, worker
-   - Methods: label()
+| Enum | Values | Key Methods |
+|------|--------|-------------|
+| [`UserRole`](app/Core/Enums/UserRole.php) | admin, manager, pending, supervisor, worker | `label()`, `isAdmin()`, `isManager()` |
+| [`TaskStatus`](app/Core/Enums/TaskStatus.php) | pending, in_progress, completed, blocked, cancelled | `label()`, `isOpen()`, `isClosed()` |
+| [`WorkLogStatus`](app/Core/Enums/WorkLogStatus.php) | in_progress, submitted, approved, rejected | `canTransitionTo()` — state machine |
+| [`MiniTaskStatus`](app/Core/Enums/MiniTaskStatus.php) | pending, in_progress, completed, blocked, cancelled | `label()`, `isOpen()`, `isClosed()` |
+| [`ServicesOrdersPriority`](app/Core/Enums/ServicesOrdersPriority.php) | urgent, high, normal, low | `label()`, `weight()`, `isHighPriority()` |
+| [`PermissionAction`](app/Core/Enums/PermissionAction.php) | view, create, update, delete, export, etc. | values only |
+| [`PermissionResource`](app/Core/Enums/PermissionResource.php) | users, clients, service_orders, tasks, etc. | values only |
+| [`SystemStatus`](app/Core/Enums/SystemStatus.php) | active, inactive, suspended, archived | `label()`, `isActive()` |
 
-2. **TaskStatus.php** — Task workflow states
-   - Values: pending, in_progress, completed, blocked, cancelled
-   - Methods: label(), isOpen(), isClosed()
+### Traits (`app/Core/Traits/`) — 6 files
 
-3. **WorkLogStatus.php** — Work log states
-   - Values: draft, submitted, approved, rejected
-   - Methods: label()
+| Trait | Purpose |
+|-------|---------|
+| [`Base`](app/Core/Traits/Base.php) | UUID primary keys, non-incrementing |
+| [`Timestamped`](app/Core/Traits/Timestamped.php) | Additional timestamp fields |
+| [`Publishing`](app/Core/Traits/Publishing.php) | Publish/unpublish logic with `published_at` |
+| [`Filterable`](app/Core/Traits/Filterable.php) | Dynamic query filtering with `scopeFilter()` |
+| [`ExportCsv`](app/Core/Traits/ExportCsv.php) | Model-to-CSV serialization |
+| [`Completable`](app/Core/Traits/Completable.php) | Completion tracking (`markComplete()`, `isComplete()`) |
 
-4. **MiniTaskStatus.php** — Mini-task states
-   - Values: pending, in_progress, completed, blocked, cancelled
-   - Methods: label(), isOpen(), isClosed()
+### Services (`app/Core/Services/`) — 4 files
 
-5. **ServicesOrdersPriority.php** — Priority levels
-   - Values: urgent, high, normal, low
-   - Methods: label(), weight(), isHighPriority()
+| Service | Purpose |
+|---------|---------|
+| [`PermissionManager`](app/Core/Services/PermissionManager.php) | RBAC engine with `hasPermission()`, cache invalidation |
+| [`CacheManager`](app/Core/Services/CacheManager.php) | Caching orchestration with `cache()`, `invalidate()` |
+| [`FilterService`](app/Core/Services/FilterService.php) | Dynamic query filter application |
+| [`TransactionHandler`](app/Core/Services/TransactionHandler.php) | Atomic DB operations with rollback |
 
-6. **PermissionAction.php** — RBAC actions
-   - Values: view, create, update, delete, change_role, export, import, restore, force_delete
+### Helpers (`app/Core/Helpers/`) — 4 files
 
-7. **PermissionResource.php** — RBAC resources
-   - Values: users, clients, locations, service_orders, service_types, sessions, login_histories, tasks, mini_tasks, work_logs, sectors, teams, workers, materials, role_permissions, profile, settings
+| Helper | Purpose |
+|--------|---------|
+| [`ValidationHelper`](app/Core/Helpers/ValidationHelper.php) | Common validation rules and custom validators |
+| [`InputSanitizer`](app/Core/Helpers/InputSanitizer.php) | XSS prevention, sanitize HTML/email/phone/URL |
+| [`FormattingHelper`](app/Core/Helpers/FormattingHelper.php) | Date/number formatting, string manipulation |
+| [`FeatureFlags`](app/Core/Helpers/FeatureFlags.php) | Feature toggles and A/B testing |
 
-8. **SystemStatus.php** — System entity status
-   - Values: active, inactive, suspended, archived
-   - Methods: label(), isActive()
+### Middleware (`app/Core/Middleware/`) — 4 files
 
-### Traits (`app/Core/Traits/`)
+| Middleware | Purpose |
+|------------|---------|
+| [`AuthenticateApi`](app/Core/Middleware/AuthenticateApi.php) | Bearer token validation via Sanctum |
+| [`CheckSoftDeletedUser`](app/Core/Middleware/CheckSoftDeletedUser.php) | Reject requests from soft-deleted users |
+| [`EnsureEmailVerified`](app/Core/Middleware/EnsureEmailVerified.php) | Email verification requirement |
+| [`SetUserLocale`](app/Core/Middleware/SetUserLocale.php) | Localization per user preference |
 
-1. **Base.php** — Foundation trait (UUIDs, timestamps)
-   - UUID primary keys
-   - Timestamps (created_at, updated_at)
+### Policies (`app/Core/Policies/`) — 1 Base + 14 Feature Policies
 
-2. **Timestamped.php** — Additional timestamp fields
-   - Extends timestamp behavior
+| Policy | Location | Authz Logic |
+|--------|----------|-------------|
+| [`BasePolicy`](app/Core/Policies/BasePolicy.php) | `app/Core/Policies/` | `before()` (admin bypass), `isAdmin()`, `isOwner()`, `hasPermission()`, `isManagerScoped()` |
+| [`UserPolicy`](app/Shared/Policies/UserPolicy.php) | `app/Shared/Policies/` | Admin-only CRUD |
+| [`AttachmentPolicy`](app/Shared/Policies/AttachmentPolicy.php) | `app/Shared/Policies/` | Permission-based create/delete |
+| [`UnitPolicy`](app/Shared/Policies/UnitPolicy.php) | `app/Shared/Policies/` | Public view, admin create/update/delete |
+| [`UserPreferencePolicy`](app/Shared/Policies/UserPreferencePolicy.php) | `app/Shared/Policies/` | Owner-scoped (users manage own preferences) |
+| [`RolePolicy`](app/Features/Admin/Policies/RolePolicy.php) | `app/Features/Admin/Policies/` | Permission-based CRUD |
+| [`ServiceOrderPolicy`](app/Features/ServiceOrders/Policies/ServiceOrderPolicy.php) | `app/Features/ServiceOrders/Policies/` | Permission + manager scope + complete |
+| [`TaskPolicy`](app/Features/Tasks/Policies/TaskPolicy.php) | `app/Features/Tasks/Policies/` | Permission + manager scope + cancel |
+| [`MiniTaskPolicy`](app/Features/MiniTasks/Policies/MiniTaskPolicy.php) | `app/Features/MiniTasks/Policies/` | Permission + supervisor scope + complete |
+| [`WorkLogPolicy`](app/Features/WorkLogs/Policies/WorkLogPolicy.php) | `app/Features/WorkLogs/Policies/` | Permission + approve/reject for supervisors |
+| [`SectorPolicy`](app/Features/Sectors/Policies/SectorPolicy.php) | `app/Features/Sectors/Policies/` | Permission-based CRUD |
+| [`TeamPolicy`](app/Features/Teams/Policies/TeamPolicy.php) | `app/Features/Teams/Policies/` | Permission-based CRUD |
+| [`WorkerPolicy`](app/Features/Workers/Policies/WorkerPolicy.php) | `app/Features/Workers/Policies/` | Permission-based CRUD |
+| [`AppSettingPolicy`](app/Features/Settings/Policies/AppSettingPolicy.php) | `app/Features/Settings/Policies/` | **Admin-only** (via `isAdmin()`) |
+| [`NotificationPolicy`](app/Features/Notifications/Policies/NotificationPolicy.php) | `app/Features/Notifications/Policies/` | Owner-scoped |
+| [`ClientPolicy`](app/Features/Clients/Policies/ClientPolicy.php) | `app/Features/Clients/Policies/` | Permission-based CRUD |
+| [`ServiceTypePolicy`](app/Features/ServiceTypes/Policies/ServiceTypePolicy.php) | `app/Features/ServiceTypes/Policies/` | Permission-based CRUD |
+| [`MaterialPolicy`](app/Features/Materials/Policies/MaterialPolicy.php) | `app/Features/Materials/Policies/` | Permission-based CRUD |
+| [`LocationPolicy`](app/Features/Locations/Policies/LocationPolicy.php) | `app/Features/Locations/Policies/` | Permission-based CRUD |
 
-3. **Publishing.php** — Publish/unpublish logic
-   - Published_at field
-   - Scope: published(), unpublished()
+### Event System (`app/Providers/EventServiceProvider.php`)
 
-4. **Filterable.php** — Dynamic filtering
-   - Scope: filter()
-   - Supports column-based filtering
+**5 Event-Listener pairs registered:**
 
-5. **ExportCsv.php** — CSV export capability
-   - Method: toCSV()
-   - Handles model serialization
+| Event | Listener | Purpose |
+|-------|----------|---------|
+| [`ServiceOrderCreatedEvent`](app/Features/ServiceOrders/Events/ServiceOrderCreatedEvent.php) | [`SendServiceOrderCreatedNotification`](app/Features/Notifications/Listeners/SendServiceOrderCreatedNotification.php) | Notify on new service order |
+| [`UserCreatedEvent`](app/Features/Admin/Events/UserCreatedEvent.php) | [`CreateClientProfile`](app/Features/Clients/Listeners/CreateClientProfile.php), [`CreateWorkerProfile`](app/Features/Workers/Listeners/CreateWorkerProfile.php) | Auto-create profiles |
+| [`WorkLogCompletedEvent`](app/Features/WorkLogs/Events/WorkLogCompletedEvent.php) | [`CheckWorkLogsCompletion`](app/Features/MiniTasks/Listeners/CheckWorkLogsCompletion.php) | Trigger cascade completion |
+| [`MiniTaskCompletedEvent`](app/Features/MiniTasks/Events/MiniTaskCompletedEvent.php) | [`CheckMiniTasksCompletion`](app/Features/Tasks/Listeners/CheckMiniTasksCompletion.php) | Trigger cascade completion |
+| [`TaskCompletedEvent`](app/Features/Tasks/Events/TaskCompletedEvent.php) | [`CheckTaskCompletion`](app/Features/Tasks/Listeners/CheckTasksCompletion.php) | Trigger ServiceOrder completion |
 
-6. **Completable.php** — Completion tracking
-   - Completed_at field
-   - Methods: markComplete(), isComplete()
-
-### Services (`app/Core/Services/`)
-
-1. **PermissionManager.php** — RBAC engine
-   - Manages permissions per role
-   - Checks: hasPermission(), canPerform()
-
-2. **CacheManager.php** — Caching orchestration
-   - Cache invalidation on changes
-   - Methods: cache(), invalidate(), remember()
-
-3. **FilterService.php** — Query filtering
-   - Dynamic filter application
-   - Scope builders
-
-4. **TransactionHandler.php** — Database transactions
-   - Atomic operations
-   - Rollback on error
-
-### Helpers (`app/Core/Helpers/`)
-
-1. **ValidationHelper.php** — Validation utilities
-   - Common validation rules
-   - Custom validators
-
-2. **InputSanitizer.php** — Input sanitization
-   - XSS prevention
-   - Trim, filter functions
-
-3. **FormattingHelper.php** — Data formatting
-   - Date formatting
-   - Number formatting
-   - String manipulation
-
-4. **FeatureFlags.php** — Feature toggles
-   - Enable/disable features
-   - A/B testing support
-
-### Middleware (`app/Core/Middleware/`)
-
-1. **AuthenticateApi.php** — API authentication
-   - Bearer token validation
-   - Request authentication
-
-2. **CheckSoftDeletedUser.php** — User state check
-   - Verify user not soft-deleted
-   - Account status validation
-
-3. **EnsureEmailVerified.php** — Email verification requirement
-   - Redirect/reject unverified users
-
-4. **SetUserLocale.php** — Localization setup
-   - Set language per user preference
-   - Fallback to app default
-
-### Policies (`app/Core/Policies/`)
-
-1. **BasePolicy.php** — Authorization base class
-   - Common authorization logic
-   - Action authorization patterns
+**Cascade Completion Chain:**
+```
+WorkLog Completed
+  → CheckWorkLogsCompletion
+    → MiniTaskService::complete() (if all work logs approved)
+      → MiniTaskCompletedEvent
+        → CheckMiniTasksCompletion
+          → TaskService::complete() (if all mini-tasks done)
+            → TaskCompletedEvent
+              → CheckTaskCompletion
+                → ServiceOrderService::complete() (if all tasks done)
+                  → ServiceOrderCompletedEvent
+```
 
 ---
 
-## 📦 Models (Status)
+## 📦 Models — 30+ Fully Implemented
 
-### Implemented
-- ✅ **User.php** — Full implementation with relations (roles, preferences, sessions, login histories)
+All models use UUID PK via `Base` trait, soft deletes, proper relationships.
 
-### Defined in Migrations (Not Yet Implemented)
-- ⏳ Role
-- ⏳ RolePermission
-- ⏳ UserRole (pivot)
-- ⏳ UserPreference
-- ⏳ AppSetting
-- ⏳ District
-- ⏳ Municipality
-- ⏳ Parish
-- ⏳ Location
-- ⏳ Client
-- ⏳ ServiceType
-- ⏳ ServiceOrder
-- ⏳ Sector
-- ⏳ Team
-- ⏳ Worker
-- ⏳ Task
-- ⏳ MiniTask
-- ⏳ WorkLog
-- ⏳ Material
-- ⏳ Unit
-- ⏳ Attachment
+**Shared Models** (`app/Shared/Models/`):
+- [`User`](app/Shared/Models/User.php) — roles(), preferences(), clientProfile(), workerProfile(), managedServiceOrders(), managedTasks(), managedMiniTasks(), headedSectors()
+- [`Role`](app/Shared/Models/Role.php) — users(), permissions()
+- [`RolePermission`](app/Shared/Models/RolePermission.php) — role()
+- [`UserPreference`](app/Shared/Models/UserPreference.php) — user()
+- [`AppSetting`](app/Shared/Models/AppSetting.php) — Key-value store
+- [`District`](app/Shared/Models/District.php) — municipalities()
+- [`Municipality`](app/Shared/Models/Municipality.php) — district(), parishes()
+- [`Parish`](app/Shared/Models/Parish.php) — municipality(), locations()
+- [`Unit`](app/Shared/Models/Unit.php) — Measurement units
+- [`Attachment`](app/Shared/Models/Attachment.php) — serviceOrder(), miniTask() (polymorphic)
 
----
-
-## 🎯 Features (16 Modular Features - All Skeleton)
-
-Each feature folder in `app/Features/{FeatureName}/` contains:
-- `Controllers/` — Feature controllers (empty)
-- `Services/` — Feature business logic (empty)
-- `Models/` — Feature models (empty)
-- `Routes/` — Feature-specific routes (skeleton)
-- `Factories/` — Seeding factories (empty)
-- `Tests/` — Feature tests (empty)
-
-**Features:**
-1. ✅ **Admin** — Administrative operations
-2. ✅ **Authentication** — Auth flows (login, register, password reset)
-3. ✅ **Clients** — Client management
-4. ✅ **Export** — Data export (CSV, PDF)
-5. ✅ **Locations** — Geographic locations (districts, municipalities, parishes)
-6. ✅ **Materials** — Material/inventory management
-7. ✅ **MiniTasks** — Subtask management
-8. ✅ **Notifications** — User notifications
-9. ✅ **Sectors** — Organizational sectors
-10. ✅ **ServiceOrders** — Main service order management
-11. ✅ **ServiceTypes** — Service type definitions
-12. ✅ **Settings** — User & app settings
-13. ✅ **Tasks** — Task management
-14. ✅ **Teams** — Team management
-15. ✅ **Workers** — Worker/employee management
-16. ✅ **WorkLogs** — Time tracking & work logging
+**Feature Models** (`app/Features/{Feature}/Models/`):
+- [`Client`](app/Features/Clients/Models/Client.php) — user(), serviceOrders()
+- [`ServiceType`](app/Features/ServiceTypes/Models/ServiceType.php) — serviceOrders()
+- [`ServiceOrder`](app/Features/ServiceOrders/Models/ServiceOrder.php) — client(), manager(), location(), serviceType(), tasks(), attachments()
+- [`Sector`](app/Features/Sectors/Models/Sector.php) — head(), teams(), tasks()
+- [`Team`](app/Features/Teams/Models/Team.php) — sector(), workers(), miniTasks()
+- [`Worker`](app/Features/Workers/Models/Worker.php) — user(), team(), workLogs(), miniTasks()
+- [`Task`](app/Features/Tasks/Models/Task.php) — serviceOrder(), manager(), sectors(), miniTasks()
+- [`MiniTask`](app/Features/MiniTasks/Models/MiniTask.php) — task(), supervisor(), workLogs(), materials(), assignedWorkers(), assignedTeams()
+- [`WorkLog`](app/Features/WorkLogs/Models/WorkLog.php) — miniTask(), materials(), workers(), reviewer()
+  - Status: in_progress → submitted → approved | rejected
+- [`Material`](app/Features/Materials/Models/Material.php) — unit(), plannedForMiniTasks(), usedInWorkLogs()
+- [`Location`](app/Features/Locations/Models/Location.php) — parish(), serviceOrders()
+- [`Notification`](app/Features/Notifications/Models/Notification.php) — notifiable()
 
 ---
 
-## 🗂️ Project File Statistics
+## 🎯 Features (16 Fully Implemented)
+
+Each feature in `app/Features/{FeatureName}/` contains:
+- `Controllers/` — Feature controllers (implemented)
+- `Services/` — Business logic (implemented)
+- `Models/` — Feature models (implemented)
+- `Policies/` — Authorization policies (implemented)
+- `Requests/` — Form validation requests (implemented)
+- `Listeners/` — Event listeners (implemented where needed)
+
+| # | Feature | Controllers | Routes | Status |
+|---|---------|-------------|--------|--------|
+| 1 | **Admin** | [`UserController`](app/Features/Admin/Controllers/UserController.php), [`RoleController`](app/Features/Admin/Controllers/RoleController.php) | [`admin.php`](routes/api/admin.php) | ✅ Full CRUD (users, roles) |
+| 2 | **Authentication** | [`AuthController`](app/Features/Authentication/Controllers/AuthController.php) | [`authentication.php`](routes/api/authentication.php) | ✅ Login, logout, me |
+| 3 | **Clients** | [`ClientController`](app/Features/Clients/Controllers/ClientController.php) | [`clients.php`](routes/api/clients.php) | ✅ Full CRUD |
+| 4 | **Export** | [`ExportController`](app/Features/Export/Controllers/ExportController.php) | [`exports.php`](routes/api/exports.php) | ✅ CSV (ServiceOrders, WorkLogs) |
+| 5 | **Locations** | [`LocationController`](app/Features/Locations/Controllers/LocationController.php) | [`locations.php`](routes/api/locations.php) | ✅ Full CRUD |
+| 6 | **Materials** | [`MaterialController`](app/Features/Materials/Controllers/MaterialController.php) | [`materials.php`](routes/api/materials.php) | ✅ Full CRUD |
+| 7 | **MiniTasks** | [`MiniTaskController`](app/Features/MiniTasks/Controllers/MiniTaskController.php) | [`mini-tasks.php`](routes/api/mini-tasks.php) | ✅ CRUD + complete |
+| 8 | **Notifications** | [`NotificationController`](app/Features/Notifications/Controllers/NotificationController.php) | [`notifications.php`](routes/api/notifications.php) | ✅ List, markAsRead |
+| 9 | **Sectors** | [`SectorController`](app/Features/Sectors/Controllers/SectorController.php) | [`sectors.php`](routes/api/sectors.php) | ✅ Full CRUD |
+| 10 | **ServiceOrders** | [`ServiceOrderController`](app/Features/ServiceOrders/Controllers/ServiceOrderController.php) | [`service-orders.php`](routes/api/service-orders.php) | ✅ CRUD + cancel + complete |
+| 11 | **ServiceTypes** | [`ServiceTypeController`](app/Features/ServiceTypes/Controllers/ServiceTypeController.php) | [`service-types.php`](routes/api/service-types.php) | ✅ Full CRUD |
+| 12 | **Settings** | [`AppSettingController`](app/Shared/Controllers/AppSettingController.php) | (via admin routes) | ✅ Admin-only CRUD |
+| 13 | **Tasks** | [`TaskController`](app/Features/Tasks/Controllers/TaskController.php) | [`tasks.php`](routes/api/tasks.php) | ✅ CRUD + cancel + destroy |
+| 14 | **Teams** | [`TeamController`](app/Features/Teams/Controllers/TeamController.php) | [`teams.php`](routes/api/teams.php) | ✅ Full CRUD |
+| 15 | **Workers** | [`WorkerController`](app/Features/Workers/Controllers/WorkerController.php) | [`workers.php`](routes/api/workers.php) | ✅ Full CRUD |
+| 16 | **WorkLogs** | [`WorkLogController`](app/Features/WorkLogs/Controllers/WorkLogController.php) | [`work-logs.php`](routes/api/work-logs.php) | ✅ CRUD + approve + reject + complete |
+
+**Shared Controllers:**
+- [`AppSettingController`](app/Shared/Controllers/AppSettingController.php) — system settings CRUD
+- [`AttachmentController`](app/Shared/Controllers/AttachmentController.php) — file upload/delete
+- [`DistrictController`](app/Shared/Controllers/DistrictController.php) — read-only (index, show)
+- [`MunicipalityController`](app/Shared/Controllers/MunicipalityController.php) — read-only (index, show)
+- [`ParishController`](app/Shared/Controllers/ParishController.php) — read-only (index, show)
+- [`UnitController`](app/Shared/Controllers/UnitController.php) — full CRUD
+- [`UserPreferenceController`](app/Shared/Controllers/UserPreferenceController.php) — owner-scoped preferences
+
+---
+
+## 🗂️ Route Structure (20 route files)
+
+All routes grouped by feature in `routes/api/`:
+- [`api.php`](routes/api.php) — Central aggregator (includes all feature routes)
+- [`admin.php`](routes/api/admin.php) — Admin operations
+- [`authentication.php`](routes/api/authentication.php) — Auth endpoints
+- [`attachments.php`](routes/api/attachments.php) — File operations
+- [`clients.php`](routes/api/clients.php) — Client CRUD
+- [`districts.php`](routes/api/districts.php) — Geographic read-only
+- [`exports.php`](routes/api/exports.php) — CSV export endpoints
+- [`locations.php`](routes/api/locations.php) — Location CRUD
+- [`materials.php`](routes/api/materials.php) — Material CRUD
+- [`mini-tasks.php`](routes/api/mini-tasks.php) — Mini-task management
+- [`municipalities.php`](routes/api/municipalities.php) — Geographic read-only
+- [`notifications.php`](routes/api/notifications.php) — Notification endpoints
+- [`parishes.php`](routes/api/parishes.php) — Geographic read-only
+- [`sectors.php`](routes/api/sectors.php) — Sector CRUD
+- [`service-orders.php`](routes/api/service-orders.php) — Service order management
+- [`service-types.php`](routes/api/service-types.php) — Service type CRUD
+- [`tasks.php`](routes/api/tasks.php) — Task management
+- [`teams.php`](routes/api/teams.php) — Team CRUD
+- [`units.php`](routes/api/units.php) — Unit CRUD
+- [`work-logs.php`](routes/api/work-logs.php) — Work log + approve/reject
+- [`workers.php`](routes/api/workers.php) — Worker CRUD
+
+---
+
+## 📊 Project File Statistics
 
 | Category | Count | Status |
 |----------|-------|--------|
 | PHP Infrastructure Files | ~50 | ✅ Implemented |
 | Enums | 8 | ✅ Implemented |
 | Traits | 6 | ✅ Implemented |
-| Services | 4 | ✅ Implemented |
+| Core Services | 4 | ✅ Implemented |
 | Helpers | 4 | ✅ Implemented |
 | Middleware | 4 | ✅ Implemented |
-| Policies | 1 | ✅ Implemented |
-| Models (Implemented) | 1 | ✅ Implemented |
-| Models (Needed) | 19+ | ⏳ Pending |
-| Migrations | 25 | ✅ Defined |
-| Controllers | 16 | ⏳ Empty stubs |
-| Routes | 16 | ⏳ Skeleton |
+| Policies | 18+ (1 Base + 17 feature/shared) | ✅ Implemented |
+| Models | 30+ | ✅ Implemented |
+| Migrations | 32 | ✅ Defined |
+| Controllers | 16 feature + 7 shared = 23 | ✅ Implemented |
+| Route files | 20 | ✅ Defined |
+| Event-Listener pairs | 5 | ✅ Registered |
+| Seeders | 1 (GeographicData: Viseu district) | ✅ Created |
 | Tests | 0 | ⏳ Pending |
-| **Total** | **~150+** | **Mixed** |
 
 ---
 
@@ -355,14 +361,13 @@ Each feature folder in `app/Features/{FeatureName}/` contains:
 Users
 ├── Roles (M:M via user_roles)
 ├── UserPreferences (1:M)
-├── UserRoles (1:M)
 ├── Clients (1:M as manager)
 ├── ServiceOrders (1:M as manager)
 ├── Sectors (1:M as head)
 ├── Tasks (1:M as manager)
 ├── MiniTasks (1:M as supervisor)
 ├── Workers (1:1 via workers.user_id)
-└── Sessions (1:M)
+└── Notifications (polymorphic)
 
 ServiceOrder (Central aggregate)
 ├── Client (M:1)
@@ -370,14 +375,14 @@ ServiceOrder (Central aggregate)
 ├── ServiceType (M:1)
 ├── Manager/User (M:1)
 ├── Tasks (1:M)
-├── Attachments (1:M)
+├── Attachments (1:M polymorphic)
 └── WorkLogs (through Tasks→MiniTasks→WorkLogs)
 
 Task
 ├── ServiceOrder (M:1)
 ├── Manager/User (M:1)
 ├── MiniTasks (1:M)
-├── TaskSectors (M:M via tasks_sectors)
+├── Sectors (M:M via tasks_sectors)
 └── WorkLogs (through MiniTasks)
 
 MiniTask
@@ -385,26 +390,45 @@ MiniTask
 ├── Supervisor/User (M:1)
 ├── WorkLogs (1:M)
 ├── Materials (M:M via mini_tasks_materials)
-├── WorkersTeams (M:M via mini_tasks_workers_teams)
-└── Attachments (1:M)
+├── Workers (M:M via mini_tasks_workers_teams)
+├── Teams (M:M via mini_tasks_workers_teams)
+└── Attachments (1:M polymorphic)
 
-WorkLog (Time tracking)
+WorkLog (Time tracking with approval)
 ├── MiniTask (M:1)
 ├── Materials (M:M via work_logs_materials)
 ├── Workers (M:M via work_logs_workers)
-├── Attachments (through MiniTask)
-└── Timestamps (auto-calculated duration)
+├── Reviewer/User (M:1 via reviewed_by)
+└── Status: in_progress → submitted → approved|rejected
 
 Materials
 ├── Unit (M:1)
-├── WorkLogsMaterials (1:M)
-└── MiniTasksMaterials (1:M)
+├── WorkLogsMaterials (1:M) — actual usage
+└── MiniTasksMaterials (1:M) — planned usage
 
 Geographic Hierarchy
 ├── District (1:M)
 │   └── Municipality (1:M)
 │       └── Parish (1:M)
 │           └── Location (1:M)
+```
+
+---
+
+## 🔄 Cascade Completion Chain
+
+```
+WorkLog.complete() → status=submitted
+  → WorkLogCompletedEvent
+    → CheckWorkLogsCompletion (listener)
+      → MiniTaskService.complete() (if all work logs approved)
+        → MiniTaskCompletedEvent
+          → CheckMiniTasksCompletion (listener)
+            → TaskService.complete() (if all mini-tasks completed)
+              → TaskCompletedEvent
+                → CheckTaskCompletion (listener)
+                  → ServiceOrderService.complete() (if all tasks completed)
+                    → ServiceOrderCompletedEvent
 ```
 
 ---
@@ -416,16 +440,16 @@ Geographic Hierarchy
 - **Soft Deletes**: All main entities have `deleted_at` column
 - **Constraints**: Foreign keys, unique constraints, check constraints
 - **Indexes**: Strategic indexes on foreign keys, status fields, created_at, and common filters
-- **Collation**: Default (likely utf8mb4_unicode_ci for MySQL)
+- **Collation**: utf8mb4_unicode_ci (MySQL)
 
 ---
 
 ## 📝 Notes
 
 - **Philosophy**: Modular feature-based architecture with centralized infrastructure
-- **Database-First**: Schema defined via migrations, models to follow
-- **RBAC**: Role-based access control with resource-action pairs
-- **Soft Deletes**: Non-destructive deletion pattern
-- **Timestamps**: All entities tracked for audit purposes
-- **Relationships**: Complex M:M relationships for flexibility (workers/teams assigned to tasks)
-
+- **Security**: RBAC via `PermissionManager` + `BasePolicy` (admin bypass, permission checks, ownership scoping)
+- **Auth**: Sanctum tokens, no public registration (admin-only user creation)
+- **Architecture**: Route → Controller → Service → Repository/Helper → Model
+- **Migrations**: 32 files defining the complete schema
+- **Performance**: `LazyCollection` + `StreamedResponse` for CSV exports
+- **Geographic Data**: Seeder populates Viseu district with 5 municipalities and ~80 parishes

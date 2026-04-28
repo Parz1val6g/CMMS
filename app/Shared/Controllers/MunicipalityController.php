@@ -24,4 +24,10 @@ class MunicipalityController extends Controller
 
         return MunicipalityResource::collection($query->orderBy('name')->get());
     }
+
+    public function show(Municipality $municipality): MunicipalityResource
+    {
+        $municipality->load(['district', 'parishes']);
+        return new MunicipalityResource($municipality);
+    }
 }

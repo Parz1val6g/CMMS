@@ -7,4 +7,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/{workLog}', [WorkLogController::class, 'show']);
     Route::put('/{workLog}', [WorkLogController::class, 'update']);
     Route::post('/{workLog}/complete', [WorkLogController::class, 'complete']);
+    Route::post('/{workLog}/approve', [WorkLogController::class, 'approve']);
+    Route::post('/{workLog}/reject', [WorkLogController::class, 'reject']);
 });

@@ -19,8 +19,4 @@ class AppSetting extends Model
         'value' => 'array',
     ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 }

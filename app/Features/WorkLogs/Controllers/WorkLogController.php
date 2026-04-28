@@ -4,6 +4,7 @@ use App\Features\WorkLogs\Models\WorkLog;
 use App\Features\WorkLogs\Requests\StoreWorkLogRequest;
 use App\Features\WorkLogs\Resources\WorkLogResource;
 use App\Features\WorkLogs\Services\WorkLogService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Controllers\Controller;
@@ -91,5 +92,23 @@ class WorkLogController extends Controller
         $completedWorkLog = $this->workLogService->complete($workLog, $request->completed_at, $materials);
         $completedWorkLog->load(['workers.user', 'materials']);
         return new WorkLogResource($completedWorkLog);
+    }
+
+    public function approve(Request $request, WorkLog $workLog): WorkLogResource
+    {
+        $this->authorize('approve', $workLog);
+
+        $approved = $this->workLogService->approve($workLog, $request->user()->id);
+        $approved->load(['workers.user', 'materials', 'reviewer']);
+        return new WorkLogResource($approved);
+    }
+
+    public function reject(Request $request, WorkLog $workLog): WorkLogResource
+    {
+        $this->authorize('reject', $workLog);
+
+        $rejected = $this->workLogService->reject($workLog, $request->user()->id);
+        $rejected->load(['workers.user', 'materials', 'reviewer']);
+        return new WorkLogResource($rejected);
     }
 }

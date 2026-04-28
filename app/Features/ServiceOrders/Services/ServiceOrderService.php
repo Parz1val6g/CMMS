@@ -1,10 +1,11 @@
 <?php
 namespace App\Features\ServiceOrders\Services;
 use App\Features\Tasks\Models\Task;
-use App\Core\Enums\ServiceOrderStatus; 
+use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Enums\TaskStatus;
 use App\Core\Services\TransactionHandler;
 use App\Features\ServiceOrders\Events\ServiceOrderCompletedEvent;
+use App\Features\ServiceOrders\Events\ServiceOrderCreatedEvent;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use InvalidArgumentException;
 class ServiceOrderService
@@ -26,6 +27,7 @@ class ServiceOrderService
                 'execution_date' => $data['execution_date'] ?? null,
                 'status' => ServiceOrderStatus::PENDING->value,
             ]);
+            ServiceOrderCreatedEvent::dispatch($serviceOrder);
             foreach ($data['tasks'] as $taskData) {
                 $task = Task::create([
                     'service_order_id' => $serviceOrder->id,

@@ -1,0 +1,14 @@
+# Pastas pesadas (proibidas para a IA)
+node_modules/
+vendor/
+.git/
+.history/
+dist/
+build/
+bin/
+obj/
+
+# Ficheiros de log e temporários
+*.log
+*.tmp
+.DS_Store

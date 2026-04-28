@@ -10,131 +10,31 @@ class ParishSeeder extends Seeder
 {
     public function run(): void
     {
-        $lisbonMunicipality = DB::table('municipalities')->where('name', 'Lisboa')->first();
+        // Get all municipalities mapping
+        $municipalities = DB::table('municipalities')->pluck('id', 'name');
 
-        $parishes = [
-            'Alcântara',
-            'Alvalade',
-            'Amadora',
-            'Areeiro',
-            'Arroios',
-            'Belém',
-            'Benfica',
-            'Campo de Ourique',
-            'Campolide',
-            'Carnide',
-            'Castelo',
-            'Chelas',
-            'Colares',
-            'Encarnação',
-            'Graça',
-            'Lapa',
-            'Liberdade',
-            'Madalena',
-            'Marvila',
-            'Misericórdia',
-            'Moinhos',
-            'Monsanto',
-            'Moraria',
-            'Murtosa',
-            'Muzzarellos',
-            'Olivais',
-            'Parque das Nações',
-            'Pena',
-            'Penha de França',
-            'Peniche',
-            'Príncipe Real',
-            'Rato',
-            'Ribeira',
-            'Sacramento',
-            'Santa Apolónia',
-            'Santa Catarina',
-            'Santa Engrácia',
-            'Santa Isabel',
-            'Santa Justa',
-            'Santa Maria Maior',
-            'Santa Marta',
-            'Santa Minha',
-            'Santiago',
-            'Santo Aleixo',
-            'Santo André',
-            'Santo Estêvão',
-            'Santo Ildefonso',
-            'Santos-o-Velho',
-            'São Bento',
-            'São Cristóvão',
-            'São Domingos',
-            'São Francisco',
-            'São Genésio',
-            'São Gião',
-            'São Gregório',
-            'São Jaime',
-            'São João',
-            'São João de Deus',
-            'São João da Talha',
-            'São Joaquim',
-            'São Jorge',
-            'São José',
-            'São Julião',
-            'São Lourenço',
-            'São Luis',
-            'São Mamede',
-            'São Marcos',
-            'São Martinho',
-            'São Miguel',
-            'São Nicolau',
-            'São Paulo',
-            'São Pedro',
-            'São Sebastião da Pedreira',
-            'São Tomás',
-            'São Vicente',
-            'Sé',
-            'Sebastião',
-            'Seco',
-            'Serafina',
-            'Serpins',
-            'Sete Rios',
-            'Setúbal',
-            'Sever do Vouga',
-            'Silva',
-            'Silves',
-            'Silvestre',
-            'Sinha',
-            'Sintra',
-            'Sisando',
-            'Soajo',
-            'Sobral',
-            'Sobreda',
-            'Sobreda',
-            'Socorridos',
-            'Socorro',
-            'Soeira',
-            'Soeska',
-            'Sofala',
-            'Sofás',
-            'Sofina',
-            'Sofrás',
-            'Sofregana',
-            'Sofregela',
-            'Sofregema',
-            'Sofregena',
-            'Sofregena',
-            'Sofregenia',
-            'Sofreginia',
-            'Sofreginia',
-            'Sofreginia',
-        ];
+        // Read JSON file
+        $jsonPath = database_path('dados_portugal.json');
+        $data = json_decode(file_get_contents($jsonPath), true);
 
-        $parishes = array_slice(array_unique($parishes), 0, 20); // Limitar a 20 para exemplo
+        $count = 0;
+        foreach ($data as $municipality) {
+            $municipalityName = $municipality['nome'];
 
-        foreach ($parishes as $parish) {
-            DB::table('parishes')->insert([
-                'id' => Str::uuid(),
-                'municipality_id' => $lisbonMunicipality->id,
-                'name' => $parish,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            if (isset($municipalities[$municipalityName]) && isset($municipality['freguesias'])) {
+                foreach ($municipality['freguesias'] as $parish) {
+                    DB::table('parishes')->insert([
+                        'id' => Str::uuid(),
+                        'municipality_id' => $municipalities[$municipalityName],
+                        'name' => $parish['nome'],
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    $count++;
+                }
+            }
         }
+
+        echo "✓ Inserted " . $count . " parishes\n";
     }
 }

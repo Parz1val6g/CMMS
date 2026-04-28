@@ -37,4 +37,19 @@ class ServiceOrderPolicy extends BasePolicy
     {
         return $this->hasPermission($user, 'complete', 'service_orders') || $this->isOwner($user, $serviceOrder->manager);
     }
+
+    public function delete(User $user, ServiceOrder $serviceOrder): bool
+    {
+        return $this->hasPermission($user, 'delete', 'service_orders');
+    }
+
+    public function restore(User $user, ServiceOrder $serviceOrder): bool
+    {
+        return $this->hasPermission($user, 'restore', 'service_orders');
+    }
+
+    public function forceDelete(User $user, ServiceOrder $serviceOrder): bool
+    {
+        return $this->hasPermission($user, 'force_delete', 'service_orders');
+    }
 }

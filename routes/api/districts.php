@@ -5,4 +5,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/', [DistrictController::class, 'index']);
+    Route::get('/{district}', [DistrictController::class, 'show']);
 });

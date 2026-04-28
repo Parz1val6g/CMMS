@@ -10,14 +10,6 @@ trait Base
     use HasUuids;
     use SoftDeletes;
 
-    protected $guarded = [];
-
-    protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
-    ];
-
     public function getIncrementing(): bool
     {
         return false;

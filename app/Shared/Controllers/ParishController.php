@@ -24,4 +24,10 @@ class ParishController extends Controller
 
         return ParishResource::collection($query->orderBy('name')->get());
     }
+
+    public function show(Parish $parish): ParishResource
+    {
+        $parish->load(['municipality', 'locations']);
+        return new ParishResource($parish);
+    }
 }

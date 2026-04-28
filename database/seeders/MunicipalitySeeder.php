@@ -10,39 +10,29 @@ class MunicipalitySeeder extends Seeder
 {
     public function run(): void
     {
-        $lisboaDistrict = DB::table('districts')->where('name', 'Lisboa')->first();
+        // Get districts mapping
+        $districts = DB::table('districts')->pluck('id', 'name');
 
-        $municipalities = [
-            'Alcântara',
-            'Almada',
-            'Amadora',
-            'Aveiro',
-            'Barreiro',
-            'Caparica',
-            'Cascais',
-            'Lisboa',
-            'Loures',
-            'Mafra',
-            'Odivelas',
-            'Oeiras',
-            'Sesimbra',
-            'Setúbal',
-            'Sintra',
-            'Sobral Monte Agraço',
-            'Tavira',
-            'Tejo',
-            'Tortosendo',
-            'Torres Vedras',
-        ];
+        // Read JSON file
+        $jsonPath = database_path('dados_portugal.json');
+        $data = json_decode(file_get_contents($jsonPath), true);
 
-        foreach ($municipalities as $municipality) {
-            DB::table('municipalities')->insert([
-                'id' => Str::uuid(),
-                'district_id' => $lisboaDistrict->id,
-                'name' => $municipality,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        $count = 0;
+        foreach ($data as $municipality) {
+            $districtName = $municipality['distrito'];
+
+            if (isset($districts[$districtName])) {
+                DB::table('municipalities')->insert([
+                    'id' => Str::uuid(),
+                    'district_id' => $districts[$districtName],
+                    'name' => $municipality['nome'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $count++;
+            }
         }
+
+        echo "✓ Inserted " . $count . " municipalities\n";
     }
 }

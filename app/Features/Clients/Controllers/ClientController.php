@@ -3,15 +3,25 @@
 namespace App\Features\Clients\Controllers;
 
 use App\Features\Clients\Models\Client;
+use App\Features\Clients\Requests\StoreClientRequest;
+use App\Features\Clients\Requests\UpdateClientRequest;
 use App\Features\Clients\Resources\ClientResource;
+use App\Features\Clients\Services\ClientService;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Routing\Controller;
+use Illuminate\Http\JsonResponse;
 
 class ClientController extends Controller
 {
+    public function __construct(
+        private ClientService $clientService
+    ) {}
+
     public function index(Request $request): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', Client::class);
+
         $query = Client::with(['user']);
 
         if ($request->has('search')) {
@@ -27,5 +37,43 @@ class ClientController extends Controller
         $clients = $query->latest()->paginate(50);
 
         return ClientResource::collection($clients);
+    }
+
+    public function store(StoreClientRequest $request): ClientResource
+    {
+        $this->authorize('create', Client::class);
+
+        $client = $this->clientService->create($request->validated());
+        $client->load(['user']);
+
+        return new ClientResource($client);
+    }
+
+    public function show(Client $client): ClientResource
+    {
+        $this->authorize('view', $client);
+
+        $client->load(['user']);
+
+        return new ClientResource($client);
+    }
+
+    public function update(UpdateClientRequest $request, Client $client): ClientResource
+    {
+        $this->authorize('update', $client);
+
+        $updated = $this->clientService->update($client, $request->validated());
+        $updated->load(['user']);
+
+        return new ClientResource($updated);
+    }
+
+    public function destroy(Client $client): JsonResponse
+    {
+        $this->authorize('delete', $client);
+
+        $this->clientService->delete($client);
+
+        return response()->json(['message' => 'Client deleted successfully.']);
     }
 }

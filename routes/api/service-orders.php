@@ -9,4 +9,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/{serviceOrder}', [ServiceOrderController::class, 'show']);
     Route::put('/{serviceOrder}', [ServiceOrderController::class, 'update']);
     Route::post('/{serviceOrder}/cancel', [ServiceOrderController::class, 'cancel']);
+    Route::delete('/{serviceOrder}', [ServiceOrderController::class, 'destroy']);
 });

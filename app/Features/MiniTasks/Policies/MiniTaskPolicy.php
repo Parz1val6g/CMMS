@@ -10,7 +10,7 @@ class MiniTaskPolicy extends BasePolicy
 {
     public function viewAny(User $user): bool
     {
-        return clone $this->hasPermission($user, 'view', 'mini_tasks'); // Just true for roles that have it
+        return $this->hasPermission($user, 'view', 'mini_tasks'); // Just true for roles that have it
     }
 
     public function view(User $user, MiniTask $miniTask): bool

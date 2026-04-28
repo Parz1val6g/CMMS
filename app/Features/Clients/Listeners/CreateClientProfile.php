@@ -1,5 +1,5 @@
 <?php
-namespace App\Features\Workers\Listeners;
+namespace App\Features\Clients\Listeners;
 use App\Features\Admin\Events\UserCreatedEvent;
 use App\Features\Clients\Models\Client;
 class CreateClientProfile

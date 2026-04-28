@@ -3,9 +3,11 @@
 namespace App\Features\Tasks\Controllers;
 
 use App\Features\Tasks\Models\Task;
+use App\Features\Tasks\Requests\StoreTaskRequest;
 use App\Features\Tasks\Requests\UpdateTaskRequest;
 use App\Features\Tasks\Resources\TaskResource;
 use App\Features\Tasks\Services\TaskService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Controllers\Controller;
@@ -36,6 +38,19 @@ class TaskController extends Controller
         return TaskResource::collection($tasks);
     }
 
+    public function store(StoreTaskRequest $request): TaskResource
+    {
+        $this->authorize('create', Task::class);
+
+        $task = $this->taskService->create(
+            $request->validated(),
+            $request->user()->id
+        );
+
+        $task->load(['sectors', 'manager']);
+        return new TaskResource($task);
+    }
+
     public function show(Task $task): TaskResource
     {
         $this->authorize('view', $task);
@@ -60,5 +75,13 @@ class TaskController extends Controller
         $cancelledTask = $this->taskService->cancel($task);
         $cancelledTask->load(['sectors', 'manager']);
         return new TaskResource($cancelledTask);
+    }
+
+    public function destroy(Task $task): JsonResponse
+    {
+        $this->authorize('delete', $task);
+
+        $task->delete();
+        return response()->json(['message' => 'Task deleted successfully']);
     }
 }
