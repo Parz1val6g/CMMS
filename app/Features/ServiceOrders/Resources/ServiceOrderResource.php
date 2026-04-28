@@ -13,6 +13,7 @@ class ServiceOrderResource extends JsonResource
             'execution_date' => $this->execution_date ? $this->execution_date->format('Y-m-d') : null,
             'status' => $this->status,
             'created_at' => $this->created_at->toIso8601String(),
+            'photo_url' => $this->photo_url,
 
             // Eager-loaded Relationships (Only included if they were loaded in the controller query!)
             'client' => $this->whenLoaded('client', function () {

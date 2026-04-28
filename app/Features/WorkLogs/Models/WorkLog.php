@@ -17,10 +17,10 @@ class WorkLog extends Model
         'started_at',
         'completed_at',
         'description',
+        'duration_minutes',
         'status',
         'reviewed_by',
         'reviewed_at',
-        // 'duration_minutes' is intentionally excluded because MySQL generates it!
     ];
     protected $casts = [
         'started_at' => 'datetime',

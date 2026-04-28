@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->foreignUuid('role_id')->constrained('roles')->cascadeOnDelete();
             $table->string('resource', 50);
-            $table->string('action', 10);
+            $table->string('action', 20);
             $table->string('description', 250)->nullable();
             $table->timestamps();
             $table->softDeletes();

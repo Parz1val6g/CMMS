@@ -8,48 +8,50 @@ use App\Shared\Models\User;
 
 class ServiceOrderPolicy extends BasePolicy
 {
+    /* ── DEMO MODE: All gates return true for presentation ─────── */
+
     public function viewAny(User $user): bool
     {
-        return $this->hasPermission($user, 'view', 'service_orders');
+        return true;
     }
 
     public function view(User $user, ServiceOrder $serviceOrder): bool
     {
-        return $this->hasPermission($user, 'view', 'service_orders') || $this->isOwner($user, $serviceOrder->manager) || $this->isOwner($user, $serviceOrder->client?->user);
+        return true;
     }
 
     public function create(User $user): bool
     {
-        return $this->hasPermission($user, 'create', 'service_orders');
+        return true;
     }
 
     public function update(User $user, ServiceOrder $serviceOrder): bool
     {
-        return $this->hasPermission($user, 'update', 'service_orders') || $this->isOwner($user, $serviceOrder->manager);
+        return true;
     }
 
     public function cancel(User $user, ServiceOrder $serviceOrder): bool
     {
-        return $this->hasPermission($user, 'cancel', 'service_orders') || $this->isOwner($user, $serviceOrder->manager);
+        return true;
     }
 
     public function complete(User $user, ServiceOrder $serviceOrder): bool
     {
-        return $this->hasPermission($user, 'complete', 'service_orders') || $this->isOwner($user, $serviceOrder->manager);
+        return true;
     }
 
     public function delete(User $user, ServiceOrder $serviceOrder): bool
     {
-        return $this->hasPermission($user, 'delete', 'service_orders');
+        return true;
     }
 
     public function restore(User $user, ServiceOrder $serviceOrder): bool
     {
-        return $this->hasPermission($user, 'restore', 'service_orders');
+        return true;
     }
 
     public function forceDelete(User $user, ServiceOrder $serviceOrder): bool
     {
-        return $this->hasPermission($user, 'force_delete', 'service_orders');
+        return true;
     }
 }

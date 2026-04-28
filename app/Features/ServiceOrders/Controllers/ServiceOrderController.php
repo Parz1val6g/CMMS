@@ -34,6 +34,8 @@ class ServiceOrderController extends Controller
         $serviceOrder = $this->serviceOrderService->create($request->validated(), $managerId);
         
         $serviceOrder->load(['client.user', 'manager', 'location', 'serviceType']);
+
+        session()->flash('success', 'Service order created successfully.');
         return new ServiceOrderResource($serviceOrder);
     }
 
@@ -51,6 +53,8 @@ class ServiceOrderController extends Controller
 
         $updatedOrder = $this->serviceOrderService->update($serviceOrder, $request->validated());
         $updatedOrder->load(['client.user', 'manager', 'location', 'serviceType']);
+
+        session()->flash('success', 'Service order updated successfully.');
         return new ServiceOrderResource($updatedOrder);
     }
 
@@ -77,6 +81,8 @@ class ServiceOrderController extends Controller
         $this->authorize('delete', $serviceOrder);
 
         $serviceOrder->delete();
+
+        session()->flash('success', 'Service order deleted successfully.');
         return response()->json(['message' => 'Service order deleted successfully']);
     }
 }

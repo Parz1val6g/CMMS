@@ -14,6 +14,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Register model policies
         Gate::policy(\App\Features\ServiceOrders\Models\ServiceOrder::class, \App\Features\ServiceOrders\Policies\ServiceOrderPolicy::class);
         Gate::policy(\App\Features\Tasks\Models\Task::class, \App\Features\Tasks\Policies\TaskPolicy::class);
         Gate::policy(\App\Features\MiniTasks\Models\MiniTask::class, \App\Features\MiniTasks\Policies\MiniTaskPolicy::class);
@@ -32,5 +33,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(\App\Shared\Models\Unit::class, \App\Shared\Policies\UnitPolicy::class);
         Gate::policy(\App\Shared\Models\Role::class, \App\Features\Admin\Policies\RolePolicy::class);
         Gate::policy(\App\Shared\Models\UserPreference::class, \App\Shared\Policies\UserPreferencePolicy::class);
+
+        // Dashboard access: any active authenticated user can view
+        Gate::define('viewDashboard', function ($user) {
+            return $user->status === 'active';
+        });
     }
 }

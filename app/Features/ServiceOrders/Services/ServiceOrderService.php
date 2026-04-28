@@ -4,9 +4,11 @@ use App\Features\Tasks\Models\Task;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Enums\TaskStatus;
 use App\Core\Services\TransactionHandler;
+use App\Features\Locations\Models\Location;
 use App\Features\ServiceOrders\Events\ServiceOrderCompletedEvent;
 use App\Features\ServiceOrders\Events\ServiceOrderCreatedEvent;
 use App\Features\ServiceOrders\Models\ServiceOrder;
+use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 class ServiceOrderService
 {
@@ -17,26 +19,34 @@ class ServiceOrderService
     public function create(array $data, string $managerId): ServiceOrder
     {
         return $this->transactions->execute(function () use ($data, $managerId) {
+            // 1. Create Location on-the-fly from inline fields
+            $location = Location::create([
+                'parish_id' => $data['parish_id'],
+                'street_address' => $data['street'],
+                'landmark' => $data['reference_point'] ?? null,
+                'latitude' => $data['latitude'] ?? null,
+                'longitude' => $data['longitude'] ?? null,
+            ]);
+
+            // 2. Handle photo upload
+            $photoPath = null;
+            if (isset($data['photo']) && $data['photo'] instanceof UploadedFile) {
+                $photoPath = $data['photo']->store('service-orders', 'public');
+            }
+
+            // 3. Create ServiceOrder
             $serviceOrder = ServiceOrder::create([
                 'process' => $data['process'],
                 'client_id' => $data['client_id'] ?? null,
                 'manager_id' => $managerId,
-                'location_id' => $data['location_id'],
+                'location_id' => $location->id,
                 'service_type_id' => $data['service_type_id'] ?? null,
                 'priority' => $data['priority'],
-                'execution_date' => $data['execution_date'] ?? null,
+                'photo_path' => $photoPath,
                 'status' => ServiceOrderStatus::PENDING->value,
             ]);
             ServiceOrderCreatedEvent::dispatch($serviceOrder);
-            foreach ($data['tasks'] as $taskData) {
-                $task = Task::create([
-                    'service_order_id' => $serviceOrder->id,
-                    'manager_id' => $managerId, 
-                    'name' => $taskData['name'],
-                    'status' => TaskStatus::PENDING->value,
-                ]);
-                $task->sectors()->attach($taskData['sector_id']);
-            }
+
             return $serviceOrder;
         });
     }

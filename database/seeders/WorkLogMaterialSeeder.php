@@ -15,7 +15,12 @@ class WorkLogMaterialSeeder extends Seeder
 
         if ($workLogs->isEmpty() || $materials->isEmpty()) return;
 
-        $used = [];
+        // Load existing pairs from DB to avoid unique constraint violations
+        $used = DB::table('work_logs_materials')
+            ->get(['work_log_id', 'material_id'])
+            ->map(fn($row) => "{$row->work_log_id}-{$row->material_id}")
+            ->toArray();
+
         foreach ($workLogs as $wlId) {
             // Pick a random material not yet linked to this work log
             $candidates = $materials->reject(fn($m) => in_array("{$wlId}-{$m}", $used))->shuffle();

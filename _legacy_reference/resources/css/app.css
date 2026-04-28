@@ -1,0 +1,84 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+body {
+    margin: 0;
+    overflow: hidden;
+    /* Tranca o ecrã mestre */
+}
+
+.hover-logout {
+    color: var(--bs-secondary-color) !important;
+}
+
+.hover-logout:hover {
+    background-color: var(--bs-danger-bg-subtle) !important;
+    color: var(--bs-danger) !important;
+}
+
+/* #region data-manager */
+/* Força o container principal a ocupar o máximo de altura possível */
+.flex-grow-1 {
+    flex: 1 1 auto;
+}
+
+/* Garante que o painel não cresce mais que o ecrã disponível */
+#sm-table-panel {
+    height: 100%;
+    min-height: 0;
+    /* CRUCIAL: Diz ao painel que ele está proibido de transbordar */
+}
+
+/* A div que envolve a tabela e que leva com a scrollbar se necessário */
+.sm-table-responsive {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+    /* CRUCIAL: Impede as linhas de empurrarem o footer */
+    background-color: var(--bs-body-bg);
+}
+
+.card-footer {
+    margin-top: auto;
+}
+
+/* Transições suaves para ambos os painéis */
+.panel-transition {
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estado partilhado (50% menos o gap de 1rem entre eles) */
+.w-50-gap {
+    width: calc(50% - 0.5rem) !important;
+}
+
+/* O estado escondido perfeito (substitui o d-none para a animação funcionar) */
+.form-panel-collapsed {
+    width: 0 !important;
+    opacity: 0;
+    margin-left: 0 !important;
+    border: none !important;
+    padding: 0 !important;
+    pointer-events: none;
+    /* Impede cliques fantasma enquanto está invisível */
+}
+
+/* Custom thin scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* #endregion */

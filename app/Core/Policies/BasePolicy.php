@@ -20,7 +20,7 @@ class BasePolicy
 
     protected function isAdmin(User $user): bool
     {
-        return $user->roles()->where('name', 'Admin')->exists();
+        return $user->roles()->where('name', 'admin')->exists();
     }
 
     protected function isOwner(User $user, ?User $owner): bool
@@ -50,7 +50,6 @@ class BasePolicy
             return false;
         }
 
-        // Assuming a role named 'Manager'
-        return $user->id === $manager->id && $user->roles()->where('name', 'Manager')->exists();
+        return $user->id === $manager->id && $user->roles()->where('name', 'manager')->exists();
     }
 }

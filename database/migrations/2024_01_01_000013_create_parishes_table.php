@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('parishes', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('municipality_id')->constrained('municipalities')->cascadeOnDelete();
-            $table->string('name', 50);
+            $table->string('name', 255);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -7,7 +7,6 @@ class StoreServiceOrderRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // For now, allow any authenticated user. Later, you can check roles here!
         return true;
     }
     public function rules(): array
@@ -15,15 +14,15 @@ class StoreServiceOrderRequest extends FormRequest
         return [
             'process' => ['required', 'string', 'max:250'],
             'client_id' => ['nullable', 'exists:clients,id'],
-            // Manager ID is automatically taken from the logged-in user in the controller
-            'location_id' => ['required', 'exists:locations,id'],
             'service_type_id' => ['nullable', 'exists:service_types,id'],
-            // Validate against the Enum we saw in your Core folder!
             'priority' => ['required', Rule::enum(ServicesOrdersPriority::class)],
-            'execution_date' => ['nullable', 'date'],            
-            'tasks' => ['required', 'array', 'min:1'], // Must assign at least 1 task
-            'tasks.*.sector_id' => ['required', 'exists:sectors,id'],
-            'tasks.*.name' => ['required', 'string', 'max:150'],
+            'photo' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:5120'],
+            // Smart Location Group — created on-the-fly
+            'parish_id' => ['required', 'exists:parishes,id'],
+            'street' => ['required', 'string', 'max:255'],
+            'reference_point' => ['nullable', 'string', 'max:255'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];
     }
 }

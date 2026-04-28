@@ -26,18 +26,25 @@ class WorkerSeeder extends Seeder
             ['first_name' => 'Mariana', 'last_name' => 'Alves'],
             ['first_name' => 'Paulo', 'last_name' => 'Ribeiro'],
             ['first_name' => 'Conceição', 'last_name' => 'Teixeira'],
+            ['first_name' => 'Luís', 'last_name' => 'Fonseca'],
+            ['first_name' => 'Carla', 'last_name' => 'Neves'],
+            ['first_name' => 'André', 'last_name' => 'Pinto'],
+            ['first_name' => 'Teresa', 'last_name' => 'Araújo'],
+            ['first_name' => 'Nuno', 'last_name' => 'Almeida'],
+            ['first_name' => 'Sandra', 'last_name' => 'Rodrigues'],
+            ['first_name' => 'Hélder', 'last_name' => 'Gomes'],
+            ['first_name' => 'Patrícia', 'last_name' => 'Guimarães'],
+            ['first_name' => 'Ricardo', 'last_name' => 'Vieira'],
+            ['first_name' => 'Mónica', 'last_name' => 'Barbosa'],
         ];
 
-        $index = 0;
+        $phoneBase = 900000000;
         foreach ($teams as $team) {
             for ($i = 0; $i < 3; $i++) {
-                if ($index >= count($workerNames))
-                    $index = 0;
-
-                $name = $workerNames[$index];
+                $name = $workerNames[($phoneBase - 900000000) % count($workerNames)];
                 $counter = rand(1000, 9999);
                 $email = strtolower($name['first_name']) . '.' . strtolower($name['last_name']) . $counter . '@workers.cm.pt';
-                $phone = '+351' . (900000000 + ($index * 100000));
+                $phone = '+351' . $phoneBase;
 
                 $userId = Str::uuid();
                 $workerId = Str::uuid();
@@ -70,7 +77,7 @@ class WorkerSeeder extends Seeder
                     'updated_at' => now(),
                 ]);
 
-                $index++;
+                $phoneBase++;
             }
         }
     }
