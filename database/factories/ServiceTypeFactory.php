@@ -16,7 +16,7 @@ class ServiceTypeFactory extends Factory
     {
         return [
             'name' => fake()->unique()->word(),
-            'description' => fake()->optional()->sentence(8),
+            'description' => fake()->sentence(8),
         ];
     }
 }

@@ -10,6 +10,7 @@ use App\Features\Locations\Services\LocationService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 
 class LocationController extends Controller
 {
@@ -19,7 +20,7 @@ class LocationController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', Location::class);
+        Gate::authorize('viewAny', Location::class);
 
         $query = Location::with(['parish.municipality']);
 
@@ -36,7 +37,7 @@ class LocationController extends Controller
 
     public function store(StoreLocationRequest $request): LocationResource
     {
-        $this->authorize('create', Location::class);
+        Gate::authorize('create', Location::class);
 
         $location = $this->locationService->create($request->validated());
         $location->load(['parish.municipality']);
@@ -46,7 +47,7 @@ class LocationController extends Controller
 
     public function show(Location $location): LocationResource
     {
-        $this->authorize('view', $location);
+        Gate::authorize('view', $location);
 
         $location->load(['parish.municipality']);
 
@@ -55,7 +56,7 @@ class LocationController extends Controller
 
     public function update(UpdateLocationRequest $request, Location $location): LocationResource
     {
-        $this->authorize('update', $location);
+        Gate::authorize('update', $location);
 
         $updated = $this->locationService->update($location, $request->validated());
         $updated->load(['parish.municipality']);
@@ -65,7 +66,7 @@ class LocationController extends Controller
 
     public function destroy(Location $location): \Illuminate\Http\JsonResponse
     {
-        $this->authorize('delete', $location);
+        Gate::authorize('delete', $location);
 
         $this->locationService->delete($location);
 

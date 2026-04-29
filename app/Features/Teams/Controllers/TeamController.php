@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 
 class TeamController extends Controller
 {
@@ -20,7 +21,7 @@ class TeamController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', Team::class);
+        Gate::authorize('viewAny', Team::class);
 
         $query = Team::with(['sector']);
 
@@ -39,7 +40,7 @@ class TeamController extends Controller
 
     public function store(StoreTeamRequest $request): TeamResource
     {
-        $this->authorize('create', Team::class);
+        Gate::authorize('create', Team::class);
 
         $team = $this->teamService->create($request->validated());
         $team->load(['sector']);
@@ -49,7 +50,7 @@ class TeamController extends Controller
 
     public function show(Team $team): TeamResource
     {
-        $this->authorize('view', $team);
+        Gate::authorize('view', $team);
 
         $team->load(['sector']);
 
@@ -58,7 +59,7 @@ class TeamController extends Controller
 
     public function update(UpdateTeamRequest $request, Team $team): TeamResource
     {
-        $this->authorize('update', $team);
+        Gate::authorize('update', $team);
 
         $updated = $this->teamService->update($team, $request->validated());
         $updated->load(['sector']);
@@ -68,7 +69,7 @@ class TeamController extends Controller
 
     public function destroy(Team $team): JsonResponse
     {
-        $this->authorize('delete', $team);
+        Gate::authorize('delete', $team);
 
         $this->teamService->delete($team);
 

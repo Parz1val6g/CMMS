@@ -5,13 +5,14 @@ namespace App\Features\Materials\Controllers;
 use App\Features\Materials\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class MaterialPageController extends Controller
 {
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Material::class);
+        Gate::authorize('viewAny', Material::class);
 
         $materials = Material::with(['unit'])
             ->latest()

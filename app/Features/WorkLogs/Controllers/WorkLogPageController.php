@@ -5,15 +5,16 @@ namespace App\Features\WorkLogs\Controllers;
 use App\Features\WorkLogs\Models\WorkLog;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class WorkLogPageController extends Controller
 {
     public function index(Request $request)
     {
-        $this->authorize('viewAny', WorkLog::class);
+        Gate::authorize('viewAny', WorkLog::class);
 
-        $workLogs = WorkLog::with(['miniTask.task', 'workers.user', 'materials.material'])
+        $workLogs = WorkLog::with(['miniTask.task', 'workers.user', 'materials'])
             ->latest()
             ->paginate(15)
             ->through(fn ($wl) => [
@@ -30,8 +31,8 @@ class WorkLogPageController extends Controller
                 ] : null,
                 'workers' => $wl->workers->map(fn ($w) => $w->user?->first_name . ' ' . $w->user?->last_name)->join(', '),
                 'materials' => $wl->materials->map(fn ($m) => [
-                    'name' => $m->material?->name,
-                    'quantity' => $m->quantity_used,
+                    'name' => $m->name,
+                    'quantity' => $m->pivot->quantity_used,
                 ]),
             ]);
 
@@ -66,6 +67,7 @@ class WorkLogPageController extends Controller
                 'index' => url('/api/work-logs'),
                 'store' => url('/api/work-logs'),
                 'update' => url('/api/work-logs/__ID__'),
+                'destroy' => url('/api/work-logs/__ID__'),
                 'show' => url('/api/work-logs/__ID__'),
             ],
             'filterSchema' => [

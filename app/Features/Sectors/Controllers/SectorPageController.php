@@ -5,13 +5,14 @@ namespace App\Features\Sectors\Controllers;
 use App\Features\Sectors\Models\Sector;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class SectorPageController extends Controller
 {
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Sector::class);
+        Gate::authorize('viewAny', Sector::class);
 
         $sectors = Sector::with(['head'])
             ->latest()

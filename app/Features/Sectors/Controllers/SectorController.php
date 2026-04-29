@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 
 class SectorController extends Controller
 {
@@ -20,7 +21,7 @@ class SectorController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', Sector::class);
+        Gate::authorize('viewAny', Sector::class);
 
         $query = Sector::with(['head']);
 
@@ -35,7 +36,7 @@ class SectorController extends Controller
 
     public function store(StoreSectorRequest $request): SectorResource
     {
-        $this->authorize('create', Sector::class);
+        Gate::authorize('create', Sector::class);
 
         $sector = $this->sectorService->create($request->validated());
         $sector->load(['head']);
@@ -45,7 +46,7 @@ class SectorController extends Controller
 
     public function show(Sector $sector): SectorResource
     {
-        $this->authorize('view', $sector);
+        Gate::authorize('view', $sector);
 
         $sector->load(['head']);
 
@@ -54,7 +55,7 @@ class SectorController extends Controller
 
     public function update(UpdateSectorRequest $request, Sector $sector): SectorResource
     {
-        $this->authorize('update', $sector);
+        Gate::authorize('update', $sector);
 
         $updated = $this->sectorService->update($sector, $request->validated());
         $updated->load(['head']);
@@ -64,7 +65,7 @@ class SectorController extends Controller
 
     public function destroy(Sector $sector): JsonResponse
     {
-        $this->authorize('delete', $sector);
+        Gate::authorize('delete', $sector);
 
         $this->sectorService->delete($sector);
 

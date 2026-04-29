@@ -6,6 +6,7 @@ use App\Shared\Models\User;
 use App\Shared\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class AdminPageController extends Controller
@@ -17,7 +18,7 @@ class AdminPageController extends Controller
 
     public function users(Request $request)
     {
-        $this->authorize('viewAny', User::class);
+        Gate::authorize('viewAny', User::class);
 
         $users = User::with(['roles'])
             ->latest()
@@ -88,7 +89,7 @@ class AdminPageController extends Controller
 
     public function series(Request $request)
     {
-        $this->authorize('viewAny', Role::class);
+        Gate::authorize('viewAny', Role::class);
 
         $roles = Role::latest()->paginate(50)->through(fn ($r) => [
             'id' => $r->id,

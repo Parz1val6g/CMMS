@@ -9,11 +9,21 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->singleton(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \App\Exceptions\Handler::class
+        );
     }
 
     public function boot(): void
     {
+        // Override factory resolution for feature/shared namespaced models
+        // Models: App\Shared\Models\{Name}, App\Features\{Feature}\Models\{Name}
+        // Factories: Database\Factories\{Name}Factory (flat namespace, $model property set per factory)
+        \Illuminate\Database\Eloquent\Factories\Factory::guessFactoryNamesUsing(function (string $modelClass): string {
+            return 'Database\\Factories\\' . class_basename($modelClass) . 'Factory';
+        });
+
         // Register model policies
         Gate::policy(\App\Features\ServiceOrders\Models\ServiceOrder::class, \App\Features\ServiceOrders\Policies\ServiceOrderPolicy::class);
         Gate::policy(\App\Features\Tasks\Models\Task::class, \App\Features\Tasks\Policies\TaskPolicy::class);

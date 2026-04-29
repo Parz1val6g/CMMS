@@ -10,12 +10,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 
 class RoleController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', Role::class);
+        Gate::authorize('viewAny', Role::class);
 
         $roles = Role::with(['permissions'])->orderBy('name')->get();
         return RoleResource::collection($roles);
@@ -30,7 +31,7 @@ class RoleController extends Controller
 
     public function show(Role $role): RoleResource
     {
-        $this->authorize('view', $role);
+        Gate::authorize('view', $role);
 
         $role->load(['permissions']);
         return new RoleResource($role);
@@ -45,7 +46,7 @@ class RoleController extends Controller
 
     public function destroy(Role $role): JsonResponse
     {
-        $this->authorize('delete', $role);
+        Gate::authorize('delete', $role);
 
         $role->delete();
         return response()->json(['message' => 'Role deleted successfully']);

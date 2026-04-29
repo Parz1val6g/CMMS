@@ -5,13 +5,14 @@ namespace App\Features\Clients\Controllers;
 use App\Features\Clients\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ClientPageController extends Controller
 {
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Client::class);
+        Gate::authorize('viewAny', Client::class);
 
         $clients = Client::with(['user'])
             ->latest()

@@ -24,14 +24,14 @@ class RoleSeeder extends Seeder
             DB::table('roles')->insert($role);
         }
 
-        // Assign all permissions to admin role only
         $adminRole = DB::table('roles')->where('name', 'admin')->first();
+        $managerRole = DB::table('roles')->where('name', 'manager')->first();
         $resources = PermissionResource::cases();
         $actions = PermissionAction::cases();
 
+        // Admin gets ALL permissions on ALL resources
         foreach ($resources as $resource) {
             foreach ($actions as $action) {
-                // Check if permission already exists before inserting
                 $exists = DB::table('role_permissions')
                     ->where('role_id', $adminRole->id)
                     ->where('resource', $resource->value)
@@ -42,6 +42,38 @@ class RoleSeeder extends Seeder
                     DB::table('role_permissions')->insert([
                         'id' => Str::uuid(),
                         'role_id' => $adminRole->id,
+                        'resource' => $resource->value,
+                        'action' => $action->value,
+                        'description' => null,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+        }
+
+        // Manager gets view + create on core operational resources
+        $managerResources = [
+            PermissionResource::SERVICE_ORDERS,
+            PermissionResource::TASKS,
+            PermissionResource::MINI_TASKS,
+            PermissionResource::WORK_LOGS,
+            PermissionResource::CLIENTS,
+            PermissionResource::LOCATIONS,
+        ];
+        $managerActions = [PermissionAction::VIEW, PermissionAction::CREATE];
+        foreach ($managerResources as $resource) {
+            foreach ($managerActions as $action) {
+                $exists = DB::table('role_permissions')
+                    ->where('role_id', $managerRole->id)
+                    ->where('resource', $resource->value)
+                    ->where('action', $action->value)
+                    ->exists();
+
+                if (!$exists) {
+                    DB::table('role_permissions')->insert([
+                        'id' => Str::uuid(),
+                        'role_id' => $managerRole->id,
                         'resource' => $resource->value,
                         'action' => $action->value,
                         'description' => null,

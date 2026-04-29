@@ -8,6 +8,7 @@ use App\Features\ServiceOrders\Services\ServiceOrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 
 class ServiceOrderController extends Controller
@@ -18,7 +19,7 @@ class ServiceOrderController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', ServiceOrder::class);
+        Gate::authorize('viewAny', ServiceOrder::class);
 
         $orders = ServiceOrder::with(['client.user', 'manager', 'location', 'serviceType'])
             ->latest()
@@ -28,7 +29,7 @@ class ServiceOrderController extends Controller
 
     public function store(StoreServiceOrderRequest $request): ServiceOrderResource
     {
-        $this->authorize('create', ServiceOrder::class);
+        Gate::authorize('create', ServiceOrder::class);
 
         $managerId = $request->user()->id;
         $serviceOrder = $this->serviceOrderService->create($request->validated(), $managerId);
@@ -41,7 +42,7 @@ class ServiceOrderController extends Controller
 
     public function show(ServiceOrder $serviceOrder): ServiceOrderResource
     {
-        $this->authorize('view', $serviceOrder);
+        Gate::authorize('view', $serviceOrder);
 
         $serviceOrder->load(['client.user', 'manager', 'location.parish.municipality.district', 'serviceType', 'tasks.sectors', 'attachments']);
         return new ServiceOrderResource($serviceOrder);
@@ -49,7 +50,7 @@ class ServiceOrderController extends Controller
 
     public function update(UpdateServiceOrderRequest $request, ServiceOrder $serviceOrder): ServiceOrderResource
     {
-        $this->authorize('update', $serviceOrder);
+        Gate::authorize('update', $serviceOrder);
 
         $updatedOrder = $this->serviceOrderService->update($serviceOrder, $request->validated());
         $updatedOrder->load(['client.user', 'manager', 'location', 'serviceType']);
@@ -60,7 +61,7 @@ class ServiceOrderController extends Controller
 
     public function cancel(ServiceOrder $serviceOrder): ServiceOrderResource
     {
-        $this->authorize('cancel', $serviceOrder);
+        Gate::authorize('cancel', $serviceOrder);
 
         $cancelledOrder = $this->serviceOrderService->cancel($serviceOrder);
         $cancelledOrder->load(['client.user', 'manager', 'location', 'serviceType']);
@@ -69,7 +70,7 @@ class ServiceOrderController extends Controller
 
     public function complete(ServiceOrder $serviceOrder): ServiceOrderResource
     {
-        $this->authorize('complete', $serviceOrder);
+        Gate::authorize('complete', $serviceOrder);
 
         $completedOrder = $this->serviceOrderService->complete($serviceOrder);
         $completedOrder->load(['client.user', 'manager', 'location', 'serviceType']);
@@ -78,7 +79,7 @@ class ServiceOrderController extends Controller
 
     public function destroy(ServiceOrder $serviceOrder): JsonResponse
     {
-        $this->authorize('delete', $serviceOrder);
+        Gate::authorize('delete', $serviceOrder);
 
         $serviceOrder->delete();
 

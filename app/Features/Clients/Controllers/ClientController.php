@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 
 class ClientController extends Controller
 {
@@ -20,7 +21,7 @@ class ClientController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', Client::class);
+        Gate::authorize('viewAny', Client::class);
 
         $query = Client::with(['user']);
 
@@ -41,7 +42,7 @@ class ClientController extends Controller
 
     public function store(StoreClientRequest $request): ClientResource
     {
-        $this->authorize('create', Client::class);
+        Gate::authorize('create', Client::class);
 
         $client = $this->clientService->create($request->validated());
         $client->load(['user']);
@@ -51,7 +52,7 @@ class ClientController extends Controller
 
     public function show(Client $client): ClientResource
     {
-        $this->authorize('view', $client);
+        Gate::authorize('view', $client);
 
         $client->load(['user']);
 
@@ -60,7 +61,7 @@ class ClientController extends Controller
 
     public function update(UpdateClientRequest $request, Client $client): ClientResource
     {
-        $this->authorize('update', $client);
+        Gate::authorize('update', $client);
 
         $updated = $this->clientService->update($client, $request->validated());
         $updated->load(['user']);
@@ -70,7 +71,7 @@ class ClientController extends Controller
 
     public function destroy(Client $client): JsonResponse
     {
-        $this->authorize('delete', $client);
+        Gate::authorize('delete', $client);
 
         $this->clientService->delete($client);
 

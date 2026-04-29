@@ -21,6 +21,7 @@ class StoreServiceOrderRequest extends FormRequest
             'parish_id' => ['required', 'exists:parishes,id'],
             'street' => ['required', 'string', 'max:255'],
             'reference_point' => ['nullable', 'string', 'max:255'],
+            'postal_code' => ['nullable', 'string', 'max:20'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];

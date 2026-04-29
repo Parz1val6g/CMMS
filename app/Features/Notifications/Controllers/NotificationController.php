@@ -7,6 +7,7 @@ use App\Features\Notifications\Services\NotificationService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 
 class NotificationController extends Controller
 {
@@ -25,7 +26,7 @@ class NotificationController extends Controller
 
     public function markAsRead(Notification $notification): JsonResponse
     {
-        $this->authorize('update', $notification);
+        Gate::authorize('update', $notification);
 
         $this->notificationService->markAsRead($notification);
 

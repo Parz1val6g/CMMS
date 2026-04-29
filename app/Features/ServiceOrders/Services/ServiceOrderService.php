@@ -22,8 +22,9 @@ class ServiceOrderService
             // 1. Create Location on-the-fly from inline fields
             $location = Location::create([
                 'parish_id' => $data['parish_id'],
+                'postal_code' => $data['postal_code'] ?? '',
                 'street_address' => $data['street'],
-                'landmark' => $data['reference_point'] ?? null,
+                'landmark' => $data['reference_point'] ?? '',
                 'latitude' => $data['latitude'] ?? null,
                 'longitude' => $data['longitude'] ?? null,
             ]);

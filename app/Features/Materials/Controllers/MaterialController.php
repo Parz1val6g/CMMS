@@ -10,6 +10,7 @@ use App\Features\Materials\Services\MaterialService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 
 class MaterialController extends Controller
 {
@@ -19,7 +20,7 @@ class MaterialController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', Material::class);
+        Gate::authorize('viewAny', Material::class);
 
         $query = Material::with(['unit']);
 
@@ -34,7 +35,7 @@ class MaterialController extends Controller
 
     public function store(StoreMaterialRequest $request): MaterialResource
     {
-        $this->authorize('create', Material::class);
+        Gate::authorize('create', Material::class);
 
         $material = $this->materialService->create($request->validated());
         $material->load(['unit']);
@@ -44,7 +45,7 @@ class MaterialController extends Controller
 
     public function show(Material $material): MaterialResource
     {
-        $this->authorize('view', $material);
+        Gate::authorize('view', $material);
 
         $material->load(['unit']);
 
@@ -53,7 +54,7 @@ class MaterialController extends Controller
 
     public function update(UpdateMaterialRequest $request, Material $material): MaterialResource
     {
-        $this->authorize('update', $material);
+        Gate::authorize('update', $material);
 
         $updated = $this->materialService->update($material, $request->validated());
         $updated->load(['unit']);
@@ -63,7 +64,7 @@ class MaterialController extends Controller
 
     public function destroy(Material $material): \Illuminate\Http\JsonResponse
     {
-        $this->authorize('delete', $material);
+        Gate::authorize('delete', $material);
 
         $this->materialService->delete($material);
 

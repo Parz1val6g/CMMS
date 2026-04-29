@@ -10,6 +10,7 @@ use App\Features\Tasks\Services\TaskService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 
 class TaskController extends Controller
@@ -20,7 +21,7 @@ class TaskController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', Task::class);
+        Gate::authorize('viewAny', Task::class);
 
         $query = Task::with(['sectors', 'manager']);
 
@@ -40,7 +41,7 @@ class TaskController extends Controller
 
     public function store(StoreTaskRequest $request): TaskResource
     {
-        $this->authorize('create', Task::class);
+        Gate::authorize('create', Task::class);
 
         $task = $this->taskService->create(
             $request->validated(),
@@ -53,7 +54,7 @@ class TaskController extends Controller
 
     public function show(Task $task): TaskResource
     {
-        $this->authorize('view', $task);
+        Gate::authorize('view', $task);
 
         $task->load(['sectors', 'manager', 'miniTasks', 'serviceOrder']);
         return new TaskResource($task);
@@ -61,7 +62,7 @@ class TaskController extends Controller
 
     public function update(UpdateTaskRequest $request, Task $task): TaskResource
     {
-        $this->authorize('update', $task);
+        Gate::authorize('update', $task);
 
         $updatedTask = $this->taskService->update($task, $request->validated());
         $updatedTask->load(['sectors', 'manager']);
@@ -70,7 +71,7 @@ class TaskController extends Controller
 
     public function cancel(Task $task): TaskResource
     {
-        $this->authorize('cancel', $task);
+        Gate::authorize('cancel', $task);
 
         $cancelledTask = $this->taskService->cancel($task);
         $cancelledTask->load(['sectors', 'manager']);
@@ -79,7 +80,7 @@ class TaskController extends Controller
 
     public function destroy(Task $task): JsonResponse
     {
-        $this->authorize('delete', $task);
+        Gate::authorize('delete', $task);
 
         $task->delete();
         return response()->json(['message' => 'Task deleted successfully']);

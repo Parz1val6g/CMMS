@@ -5,13 +5,14 @@ namespace App\Features\ServiceTypes\Controllers;
 use App\Features\ServiceTypes\Models\ServiceType;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ServiceTypePageController extends Controller
 {
     public function index(Request $request)
     {
-        $this->authorize('viewAny', ServiceType::class);
+        Gate::authorize('viewAny', ServiceType::class);
 
         $serviceTypes = ServiceType::latest()
             ->paginate(15)

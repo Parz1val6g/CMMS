@@ -5,13 +5,14 @@ namespace App\Features\Tasks\Controllers;
 use App\Features\Tasks\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class TaskPageController extends Controller
 {
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Task::class);
+        Gate::authorize('viewAny', Task::class);
 
         $tasks = Task::with(['serviceOrder', 'manager', 'sectors'])
             ->latest()

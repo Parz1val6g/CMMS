@@ -7,6 +7,7 @@ use App\Features\WorkLogs\Services\WorkLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 
 class WorkLogController extends Controller
@@ -17,7 +18,7 @@ class WorkLogController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', WorkLog::class);
+        Gate::authorize('viewAny', WorkLog::class);
 
         $request->validate(['mini_task_id' => 'required|exists:mini_tasks,id']);
         $workLogs = WorkLog::with(['workers.user', 'materials'])
@@ -29,7 +30,7 @@ class WorkLogController extends Controller
 
     public function store(StoreWorkLogRequest $request): WorkLogResource
     {
-        $this->authorize('create', WorkLog::class);
+        Gate::authorize('create', WorkLog::class);
 
         $data = $request->validated();
         
@@ -47,7 +48,7 @@ class WorkLogController extends Controller
 
     public function show(WorkLog $workLog): WorkLogResource
     {
-        $this->authorize('view', $workLog);
+        Gate::authorize('view', $workLog);
 
         $workLog->load(['workers.user', 'materials']);
         return new WorkLogResource($workLog);
@@ -55,7 +56,7 @@ class WorkLogController extends Controller
 
     public function update(Request $request, WorkLog $workLog): WorkLogResource
     {
-        $this->authorize('update', $workLog);
+        Gate::authorize('update', $workLog);
 
         if ($workLog->completed_at !== null) {
             throw new \InvalidArgumentException('Cannot update an already completed work log.');
@@ -73,7 +74,7 @@ class WorkLogController extends Controller
 
     public function complete(Request $request, WorkLog $workLog): WorkLogResource
     {
-        $this->authorize('complete', $workLog);
+        Gate::authorize('complete', $workLog);
 
         $request->validate([
             'completed_at' => ['required', 'date', 'after:' . $workLog->started_at],
@@ -96,7 +97,7 @@ class WorkLogController extends Controller
 
     public function approve(Request $request, WorkLog $workLog): WorkLogResource
     {
-        $this->authorize('approve', $workLog);
+        Gate::authorize('approve', $workLog);
 
         $approved = $this->workLogService->approve($workLog, $request->user()->id);
         $approved->load(['workers.user', 'materials', 'reviewer']);
@@ -105,7 +106,7 @@ class WorkLogController extends Controller
 
     public function reject(Request $request, WorkLog $workLog): WorkLogResource
     {
-        $this->authorize('reject', $workLog);
+        Gate::authorize('reject', $workLog);
 
         $rejected = $this->workLogService->reject($workLog, $request->user()->id);
         $rejected->load(['workers.user', 'materials', 'reviewer']);

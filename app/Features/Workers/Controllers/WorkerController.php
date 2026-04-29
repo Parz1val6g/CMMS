@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 
 class WorkerController extends Controller
 {
@@ -20,7 +21,7 @@ class WorkerController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', Worker::class);
+        Gate::authorize('viewAny', Worker::class);
 
         $query = Worker::with(['user', 'team']);
 
@@ -43,7 +44,7 @@ class WorkerController extends Controller
 
     public function store(StoreWorkerRequest $request): WorkerResource
     {
-        $this->authorize('create', Worker::class);
+        Gate::authorize('create', Worker::class);
 
         $worker = $this->workerService->create($request->validated());
         $worker->load(['user', 'team']);
@@ -53,7 +54,7 @@ class WorkerController extends Controller
 
     public function show(Worker $worker): WorkerResource
     {
-        $this->authorize('view', $worker);
+        Gate::authorize('view', $worker);
 
         $worker->load(['user', 'team']);
 
@@ -62,7 +63,7 @@ class WorkerController extends Controller
 
     public function update(UpdateWorkerRequest $request, Worker $worker): WorkerResource
     {
-        $this->authorize('update', $worker);
+        Gate::authorize('update', $worker);
 
         $updated = $this->workerService->update($worker, $request->validated());
         $updated->load(['user', 'team']);
@@ -72,7 +73,7 @@ class WorkerController extends Controller
 
     public function destroy(Worker $worker): JsonResponse
     {
-        $this->authorize('delete', $worker);
+        Gate::authorize('delete', $worker);
 
         $this->workerService->delete($worker);
 

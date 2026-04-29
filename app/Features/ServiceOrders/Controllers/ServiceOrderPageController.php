@@ -9,7 +9,7 @@ use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Enums\ServicesOrdersPriority;
 use App\Shared\Models\Parish;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
@@ -120,7 +120,7 @@ class ServiceOrderPageController extends Controller
 
                 // ── Map Picker ──
                 ['key' => 'section-map', 'label' => 'Map Coordinates', 'type' => 'section-header'],
-                ['key' => 'map_picker', 'label' => 'Select on Map', 'type' => 'map-picker', 'apiKey' => env('GOOGLE_MAPS_API_KEY')],
+                ['key' => 'map_picker', 'label' => 'Select on Map', 'type' => 'map-picker', 'apiKey' => config('services.google_maps_api_key')],
                 ['key' => 'latitude', 'label' => 'Latitude', 'type' => 'map_input'],
                 ['key' => 'longitude', 'label' => 'Longitude', 'type' => 'map_input'],
             ],
@@ -147,7 +147,7 @@ class ServiceOrderPageController extends Controller
                 ]],
             ],
             'parishOptions' => $parishOptions,
-            'googleMapsApiKey' => env('GOOGLE_MAPS_API_KEY'),
+            'googleMapsApiKey' => config('services.google_maps_api_key'),
         ]);
     }
 }

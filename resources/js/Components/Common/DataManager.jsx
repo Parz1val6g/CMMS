@@ -4,6 +4,10 @@ import EmptyState from '@/Components/Common/EmptyState';
 import FormField from '@/Components/Common/FormField';
 
 /* ── Helpers ──────────────────────────────────────────────────── */
+function replaceId(url, id) {
+  return url.replace(':id', id).replace('__ID__', id);
+}
+
 function buildQuery(params) {
   const s = new URLSearchParams(window.location.search);
   Object.entries(params).forEach(([k, v]) => {
@@ -332,7 +336,7 @@ function EditPanel({ title, formSchema, routes, selectedItem, onClose }) {
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
 
     try {
-      const url = routes.update.replace(':id', selectedItem.id);
+      const url = replaceId(routes.update, selectedItem.id);
       const res = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -365,7 +369,7 @@ function EditPanel({ title, formSchema, routes, selectedItem, onClose }) {
 
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
     try {
-      const url = routes.destroy.replace(':id', selectedItem.id);
+      const url = replaceId(routes.destroy, selectedItem.id);
       const res = await fetch(url, {
         method: 'DELETE',
         headers: {
@@ -481,7 +485,7 @@ export default function DataManager({ title, items, columns = [], formSchema = [
 
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
     try {
-      const url = routes.destroy.replace(':id', id);
+      const url = replaceId(routes.destroy, id);
       const res = await fetch(url, {
         method: 'DELETE',
         headers: { 'X-CSRF-TOKEN': token ?? '', 'X-Requested-With': 'XMLHttpRequest' },
@@ -599,6 +603,9 @@ function resolveValue(item, key) {
   for (const p of parts) {
     if (val === null || val === undefined) return '';
     val = val[p];
+  }
+  if (val !== null && val !== undefined && typeof val === 'object' && !Array.isArray(val)) {
+    return val.name ?? val.process ?? val.label ?? '';
   }
   return val ?? '';
 }

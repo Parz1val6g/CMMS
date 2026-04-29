@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 
 class ServiceTypeController extends Controller
 {
@@ -20,7 +21,7 @@ class ServiceTypeController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', ServiceType::class);
+        Gate::authorize('viewAny', ServiceType::class);
 
         $query = ServiceType::query();
 
@@ -36,7 +37,7 @@ class ServiceTypeController extends Controller
 
     public function store(StoreServiceTypeRequest $request): ServiceTypeResource
     {
-        $this->authorize('create', ServiceType::class);
+        Gate::authorize('create', ServiceType::class);
 
         $serviceType = $this->serviceTypeService->create($request->validated());
 
@@ -45,14 +46,14 @@ class ServiceTypeController extends Controller
 
     public function show(ServiceType $serviceType): ServiceTypeResource
     {
-        $this->authorize('view', $serviceType);
+        Gate::authorize('view', $serviceType);
 
         return new ServiceTypeResource($serviceType);
     }
 
     public function update(UpdateServiceTypeRequest $request, ServiceType $serviceType): ServiceTypeResource
     {
-        $this->authorize('update', $serviceType);
+        Gate::authorize('update', $serviceType);
 
         $updated = $this->serviceTypeService->update($serviceType, $request->validated());
 
@@ -61,7 +62,7 @@ class ServiceTypeController extends Controller
 
     public function destroy(ServiceType $serviceType): JsonResponse
     {
-        $this->authorize('delete', $serviceType);
+        Gate::authorize('delete', $serviceType);
 
         $this->serviceTypeService->delete($serviceType);
 

@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -19,7 +20,7 @@ class UserController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', User::class);
+        Gate::authorize('viewAny', User::class);
         $query = User::with(['roles']);
 
         if ($request->has('search')) {
@@ -35,7 +36,7 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request): UserResource
     {
-        $this->authorize('create', User::class);
+        Gate::authorize('create', User::class);
         $data = $request->validated();
         
         // Internal Creation: Generate a random secure password for new employees/clients
@@ -59,14 +60,14 @@ class UserController extends Controller
 
     public function show(User $user): UserResource
     {
-        $this->authorize('view', $user);
+        Gate::authorize('view', $user);
         $user->load('roles');
         return new UserResource($user);
     }
 
     public function update(Request $request, User $user): UserResource
     {
-        $this->authorize('update', $user);
+        Gate::authorize('update', $user);
         $data = $request->validate([
             'first_name' => ['sometimes', 'string', 'max:250'],
             'last_name' => ['sometimes', 'string', 'max:250'],
@@ -89,7 +90,7 @@ class UserController extends Controller
 
     public function destroy(User $user): JsonResponse
     {
-        $this->authorize('delete', $user);
+        Gate::authorize('delete', $user);
 
         $user->delete();
         return response()->json(['message' => 'User deleted successfully']);

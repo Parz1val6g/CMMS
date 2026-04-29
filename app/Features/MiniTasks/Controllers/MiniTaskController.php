@@ -6,6 +6,7 @@ use App\Features\MiniTasks\Resources\MiniTaskResource;
 use App\Features\MiniTasks\Services\MiniTaskService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 
 class MiniTaskController extends Controller
@@ -16,7 +17,7 @@ class MiniTaskController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', MiniTask::class);
+        Gate::authorize('viewAny', MiniTask::class);
 
         $request->validate(['task_id' => 'required|exists:tasks,id']);
         $miniTasks = MiniTask::with(['supervisor', 'workers.user', 'teams', 'materials.unit'])
@@ -28,7 +29,7 @@ class MiniTaskController extends Controller
 
     public function store(StoreMiniTaskRequest $request): MiniTaskResource
     {
-        $this->authorize('create', MiniTask::class);
+        Gate::authorize('create', MiniTask::class);
 
         $supervisorId = $request->user()->id;
         $miniTask = $this->miniTaskService->create($request->validated(), $supervisorId);
@@ -38,7 +39,7 @@ class MiniTaskController extends Controller
 
     public function show(MiniTask $miniTask): MiniTaskResource
     {
-        $this->authorize('view', $miniTask);
+        Gate::authorize('view', $miniTask);
 
         $miniTask->load(['supervisor', 'workers.user', 'teams', 'materials.unit', 'task', 'workLogs']);
         return new MiniTaskResource($miniTask);
@@ -46,7 +47,7 @@ class MiniTaskController extends Controller
 
     public function update(Request $request, MiniTask $miniTask): MiniTaskResource
     {
-        $this->authorize('update', $miniTask);
+        Gate::authorize('update', $miniTask);
 
         if ($miniTask->status === \App\Core\Enums\MiniTaskStatus::COMPLETED->value) {
             throw new \InvalidArgumentException('Cannot update a completed mini-task.');
@@ -64,7 +65,7 @@ class MiniTaskController extends Controller
 
     public function complete(MiniTask $miniTask): MiniTaskResource
     {
-        $this->authorize('complete', $miniTask);
+        Gate::authorize('complete', $miniTask);
 
         $completedMiniTask = $this->miniTaskService->complete($miniTask);
         $completedMiniTask->load(['supervisor', 'workers.user', 'teams', 'materials.unit']);

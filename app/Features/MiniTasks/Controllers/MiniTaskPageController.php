@@ -5,13 +5,14 @@ namespace App\Features\MiniTasks\Controllers;
 use App\Features\MiniTasks\Models\MiniTask;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class MiniTaskPageController extends Controller
 {
     public function index(Request $request)
     {
-        $this->authorize('viewAny', MiniTask::class);
+        Gate::authorize('viewAny', MiniTask::class);
 
         $miniTasks = MiniTask::with(['task.serviceOrder', 'supervisor', 'workers', 'teams'])
             ->latest()

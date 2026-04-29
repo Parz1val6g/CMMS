@@ -5,13 +5,14 @@ namespace App\Features\Locations\Controllers;
 use App\Features\Locations\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class LocationPageController extends Controller
 {
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Location::class);
+        Gate::authorize('viewAny', Location::class);
 
         $locations = Location::with(['parish.municipality.district'])
             ->latest()

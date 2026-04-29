@@ -16,7 +16,7 @@ class MiniTaskPolicy extends BasePolicy
     public function view(User $user, MiniTask $miniTask): bool
     {
         // A worker assigned to the minitask can view it
-        $isAssignedWorker = $miniTask->workers()->where('user_id', $user->id)->exists();
+        $isAssignedWorker = $miniTask->workers()->where('workers.user_id', $user->id)->exists();
         // Or if their team is assigned
         $isAssignedTeam = $miniTask->teams()->whereHas('workers', function($q) use ($user) {
             $q->where('user_id', $user->id);

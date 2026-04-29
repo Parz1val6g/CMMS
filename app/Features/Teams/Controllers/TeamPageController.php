@@ -5,13 +5,14 @@ namespace App\Features\Teams\Controllers;
 use App\Features\Teams\Models\Team;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class TeamPageController extends Controller
 {
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Team::class);
+        Gate::authorize('viewAny', Team::class);
 
         $teams = Team::with(['sector'])
             ->latest()

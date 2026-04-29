@@ -5,13 +5,14 @@ namespace App\Features\Workers\Controllers;
 use App\Features\Workers\Models\Worker;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class WorkerPageController extends Controller
 {
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Worker::class);
+        Gate::authorize('viewAny', Worker::class);
 
         $workers = Worker::with(['user', 'team.sector'])
             ->latest()

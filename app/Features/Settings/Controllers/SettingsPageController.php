@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -81,7 +82,7 @@ class SettingsPageController extends Controller
      */
     public function updateAdmin(Request $request): RedirectResponse
     {
-        $this->authorize('update', AppSetting::class);
+        Gate::authorize('update', AppSetting::class);
 
         $validated = $request->validate([
             'app_name' => 'nullable|string|max:250',

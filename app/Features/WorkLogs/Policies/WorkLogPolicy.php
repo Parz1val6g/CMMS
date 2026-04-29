@@ -15,11 +15,11 @@ class WorkLogPolicy extends BasePolicy
 
     public function view(User $user, WorkLog $workLog): bool
     {
-        $isAssignedWorker = $workLog->workers()->where('user_id', $user->id)->exists();
+        $isAssignedWorker = $workLog->workers()->where('workers.user_id', $user->id)->exists();
         
         return $this->hasPermission($user, 'view', 'work_logs')
             || $isAssignedWorker
-            || $this->isOwner($user, $workLog->miniTask->supervisor);
+            || $this->isOwner($user, $workLog->miniTask?->supervisor);
     }
 
     public function create(User $user): bool
@@ -30,20 +30,20 @@ class WorkLogPolicy extends BasePolicy
 
     public function update(User $user, WorkLog $workLog): bool
     {
-        $isAssignedWorker = $workLog->workers()->where('user_id', $user->id)->exists();
+        $isAssignedWorker = $workLog->workers()->where('workers.user_id', $user->id)->exists();
         return $this->hasPermission($user, 'update', 'work_logs') || $isAssignedWorker;
     }
 
     public function complete(User $user, WorkLog $workLog): bool
     {
-        $isAssignedWorker = $workLog->workers()->where('user_id', $user->id)->exists();
+        $isAssignedWorker = $workLog->workers()->where('workers.user_id', $user->id)->exists();
         return $this->hasPermission($user, 'complete', 'work_logs') || $isAssignedWorker;
     }
 
     public function approve(User $user, WorkLog $workLog): bool
     {
         // Only the mini-task supervisor or manager can approve
-        $isSupervisor = $this->isOwner($user, $workLog->miniTask->supervisor);
+        $isSupervisor = $this->isOwner($user, $workLog->miniTask?->supervisor);
         return $this->hasPermission($user, 'approve', 'work_logs') || $isSupervisor || $this->isAdmin($user);
     }
 
