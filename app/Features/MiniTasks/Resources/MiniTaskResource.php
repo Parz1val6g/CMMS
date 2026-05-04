@@ -8,6 +8,7 @@ class MiniTaskResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'task_id' => $this->task_id,
             'description' => $this->description,
             'status' => $this->status,
             'created_at' => $this->created_at->toIso8601String(),

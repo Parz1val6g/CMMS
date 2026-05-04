@@ -3,6 +3,7 @@
 namespace App\Features\MiniTasks\Controllers;
 
 use App\Features\MiniTasks\Models\MiniTask;
+use App\Features\MiniTasks\Schemas\MiniTaskFormSchema;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
@@ -14,7 +15,7 @@ class MiniTaskPageController extends Controller
     {
         Gate::authorize('viewAny', MiniTask::class);
 
-        $miniTasks = MiniTask::with(['task.serviceOrder', 'supervisor', 'workers', 'teams'])
+        $miniTasks = MiniTask::with(['task.serviceOrder', 'supervisor', 'workers.user', 'teams'])
             ->latest()
             ->paginate(15)
             ->through(fn ($mt) => [
@@ -31,9 +32,14 @@ class MiniTaskPageController extends Controller
                     'id' => $mt->supervisor->id,
                     'name' => $mt->supervisor->first_name . ' ' . $mt->supervisor->last_name,
                 ] : null,
-                'assigned_workers' => $mt->workers->pluck('user.first_name')->join(', '),
-                'assigned_teams' => $mt->teams->pluck('name')->join(', '),
+                'workers_list' => $mt->workers->pluck('user.first_name')->join(', '),
+                'teams_list' => $mt->teams->pluck('name')->join(', '),
+                'workers' => $mt->workers->map(fn($w) => ['id' => $w->id]),
+                'teams' => $mt->teams->map(fn($t) => ['id' => $t->id]),
             ]);
+
+        $createSchema = MiniTaskFormSchema::create();
+        $updateSchema = MiniTaskFormSchema::update();
 
         return Inertia::render('MiniTasks/Pages/Index', [
             'mini_tasks' => $miniTasks,
@@ -41,26 +47,13 @@ class MiniTaskPageController extends Controller
                 ['key' => 'description', 'label' => 'Description'],
                 ['key' => 'task', 'label' => 'Task'],
                 ['key' => 'supervisor', 'label' => 'Supervisor'],
-                ['key' => 'assigned_workers', 'label' => 'Workers'],
-                ['key' => 'assigned_teams', 'label' => 'Teams'],
+                ['key' => 'workers_list', 'label' => 'Workers'],
+                ['key' => 'teams_list', 'label' => 'Teams'],
                 ['key' => 'status', 'label' => 'Status', 'sortable' => true],
                 ['key' => 'created_at', 'label' => 'Created', 'sortable' => true],
             ],
-            'formSchema' => [
-                ['key' => 'description', 'label' => 'Description', 'type' => 'text', 'rules' => 'required|max:250'],
-                ['key' => 'task_id', 'label' => 'Task', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-                ['key' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [
-                    ['value' => 'pending', 'label' => 'Pending'],
-                    ['value' => 'in_progress', 'label' => 'In Progress'],
-                    ['value' => 'completed', 'label' => 'Completed'],
-                ]],
-            ],
-            'createFormSchema' => [
-                ['key' => 'description', 'label' => 'Description', 'type' => 'text', 'rules' => 'required|max:250'],
-                ['key' => 'task_id', 'label' => 'Task', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-                ['key' => 'worker_id', 'label' => 'Worker', 'type' => 'select', 'options' => []],
-                ['key' => 'team_id', 'label' => 'Team', 'type' => 'select', 'options' => []],
-            ],
+            'formSchema' => $updateSchema->toArray(),
+            'createFormSchema' => $createSchema->toArray(),
             'routes' => [
                 'index' => url('/api/mini-tasks'),
                 'store' => url('/api/mini-tasks'),

@@ -241,11 +241,12 @@ export default function Settings({ user, preferences, appSettings, isAdmin, rout
   const inputClassInvalid = 'is-invalid border-red-500 focus:border-red-500 focus:ring-red-500';
 
   return (
-    <AppLayout title="Settings" breadcrumbs={breadcrumbs}>
+    <AppLayout title="Settings">
       {/* Toast */}
       <Toast message={toast.message} type={toast.type} show={toast.show} onClose={() => setToast({ ...toast, show: false })} />
 
-      <div className="flex h-full flex-col">
+      <div className="h-full overflow-y-auto w-full">
+        <div className="max-w-7xl mx-auto py-8 px-6">
         {/* Page Header */}
         <div className="mb-4 shrink-0">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Account Settings</h2>
@@ -284,17 +285,17 @@ export default function Settings({ user, preferences, appSettings, isAdmin, rout
                 <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content ?? ''} />
                 <div className="max-w-md space-y-4">
                   <div>
-                    <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">First Name</label>
+                    <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">First Name <span className="text-red-500">*</span></label>
                     <input type="text" name="first_name" defaultValue={user.first_name} className={inputClass} required />
                     <div className="form-feedback mt-1 hidden text-xs text-red-600" />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">Last Name</label>
+                    <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">Last Name <span className="text-red-500">*</span></label>
                     <input type="text" name="last_name" defaultValue={user.last_name} className={inputClass} required />
                     <div className="form-feedback mt-1 hidden text-xs text-red-600" />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">Email Address</label>
+                    <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">Email Address <span className="text-red-500">*</span></label>
                     <input type="email" name="email" defaultValue={user.email} className={inputClass} required />
                     <div className="form-feedback mt-1 hidden text-xs text-red-600" />
                   </div>
@@ -335,18 +336,18 @@ export default function Settings({ user, preferences, appSettings, isAdmin, rout
                 <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content ?? ''} />
                 <div className="max-w-md space-y-4">
                   <div>
-                    <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">Current Password</label>
+                    <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">Current Password <span className="text-red-500">*</span></label>
                     <input type="password" name="current_password" className={inputClass} required />
                     <div className="form-feedback mt-1 hidden text-xs text-red-600" />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">New Password</label>
+                    <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">New Password <span className="text-red-500">*</span></label>
                     <input type="password" name="password" className={inputClass} required />
                     <p className="mt-1 text-xs text-gray-400">Must be more than 8 characters</p>
                     <div className="form-feedback mt-1 hidden text-xs text-red-600" />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">Confirm New Password</label>
+                    <label className="mb-1 block text-xs font-bold text-gray-500 dark:text-gray-400">Confirm New Password <span className="text-red-500">*</span></label>
                     <input type="password" name="password_confirmation" className={inputClass} required />
                     <div className="form-feedback mt-1 hidden text-xs text-red-600" />
                   </div>
@@ -544,6 +545,7 @@ export default function Settings({ user, preferences, appSettings, isAdmin, rout
               </div>
             </FormSection>
           </TabPanel>
+        </div>
         </div>
       </div>
 

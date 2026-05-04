@@ -3,8 +3,6 @@
 namespace Database\Factories;
 
 use App\Features\Workers\Models\Worker;
-use App\Shared\Models\User;
-use App\Features\Teams\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,8 +15,7 @@ class WorkerFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
-            'team_id' => Team::factory(),
+            // user_id and team_id must be provided via state() or seeder
         ];
     }
 }

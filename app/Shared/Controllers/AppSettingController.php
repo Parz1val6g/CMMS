@@ -20,11 +20,13 @@ class AppSettingController extends Controller
     {
         $this->authorize('create', AppSetting::class);
 
+        $data = $request->validated();
+
         $setting = AppSetting::create([
-            'id'    => Str::uuid(),
-            'key'   => $request->key,
-            'value' => $request->value,
-            'section' => $request->section,
+            'id'      => Str::uuid(),
+            'key'     => $data['key'],
+            'value'   => $data['value'],
+            'section' => $data['section'],
         ]);
 
         return response()->json($setting, 201);

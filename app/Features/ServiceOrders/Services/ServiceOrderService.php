@@ -1,13 +1,17 @@
 <?php
 namespace App\Features\ServiceOrders\Services;
-use App\Features\Tasks\Models\Task;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Enums\TaskStatus;
+use App\Core\Enums\WorkflowType;
+use App\Core\Helpers\InputSanitizer;
 use App\Core\Services\TransactionHandler;
+use App\Exceptions\EquipmentUnavailableException;
+use App\Features\Equipments\Models\Equipment;
 use App\Features\Locations\Models\Location;
 use App\Features\ServiceOrders\Events\ServiceOrderCompletedEvent;
 use App\Features\ServiceOrders\Events\ServiceOrderCreatedEvent;
 use App\Features\ServiceOrders\Models\ServiceOrder;
+use App\Features\Tasks\Models\Task;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 class ServiceOrderService
@@ -19,15 +23,21 @@ class ServiceOrderService
     public function create(array $data, string $managerId): ServiceOrder
     {
         return $this->transactions->execute(function () use ($data, $managerId) {
-            // 1. Create Location on-the-fly from inline fields
-            $location = Location::create([
-                'parish_id' => $data['parish_id'],
-                'postal_code' => $data['postal_code'] ?? '',
-                'street_address' => $data['street'],
-                'landmark' => $data['reference_point'] ?? '',
-                'latitude' => $data['latitude'] ?? null,
-                'longitude' => $data['longitude'] ?? null,
-            ]);
+            $isLoan = ($data['workflow_type'] ?? WorkflowType::STANDARD->value) === WorkflowType::LOAN->value;
+
+            // 1. Create Location only for STANDARD workflow
+            $locationId = null;
+            if (!$isLoan && !empty($data['parish_id'])) {
+                $location = Location::create([
+                    'parish_id' => $data['parish_id'],
+                    'postal_code' => $data['postal_code'] ?? '',
+                    'street_address' => InputSanitizer::sanitize($data['street'] ?? ''),
+                    'landmark' => isset($data['reference_point']) ? InputSanitizer::sanitize($data['reference_point']) : '',
+                    'latitude' => $data['latitude'] ?? null,
+                    'longitude' => $data['longitude'] ?? null,
+                ]);
+                $locationId = $location->id;
+            }
 
             // 2. Handle photo upload
             $photoPath = null;
@@ -35,14 +45,26 @@ class ServiceOrderService
                 $photoPath = $data['photo']->store('service-orders', 'public');
             }
 
-            // 3. Create ServiceOrder
+            // 3. Validate equipment availability for LOAN
+            if ($isLoan) {
+                $equipment = Equipment::findOrFail($data['equipment_id']);
+                if (!$equipment->isAvailableForLoan()) {
+                    throw new EquipmentUnavailableException(
+                        'Equipment is not available for loan. It must be active and loanable.'
+                    );
+                }
+            }
+
+            // 4. Create ServiceOrder
             $serviceOrder = ServiceOrder::create([
-                'process' => $data['process'],
+                'process' => InputSanitizer::sanitize($data['process']),
                 'client_id' => $data['client_id'] ?? null,
                 'manager_id' => $managerId,
-                'location_id' => $location->id,
+                'location_id' => $locationId,
                 'service_type_id' => $data['service_type_id'] ?? null,
-                'priority' => $data['priority'],
+                'workflow_type' => $data['workflow_type'] ?? WorkflowType::STANDARD->value,
+                'equipment_id' => $data['equipment_id'] ?? null,
+                'priority' => $data['priority'] ?? null,
                 'photo_path' => $photoPath,
                 'status' => ServiceOrderStatus::PENDING->value,
             ]);
@@ -53,7 +75,7 @@ class ServiceOrderService
     }
     public function update(ServiceOrder $serviceOrder, array $data): ServiceOrder
     {
-        if (in_array($serviceOrder->status, [ServiceOrderStatus::COMPLETED->value, 'cancelled'])) {
+        if (in_array($serviceOrder->status, [ServiceOrderStatus::COMPLETED->value, ServiceOrderStatus::CANCELLED->value])) {
             throw new InvalidArgumentException('Cannot update a completed or cancelled service order.');
         }
         return $this->transactions->execute(function () use ($serviceOrder, $data) {
@@ -67,7 +89,7 @@ class ServiceOrderService
             throw new InvalidArgumentException('Cannot cancel an already completed service order.');
         }
         return $this->transactions->execute(function () use ($serviceOrder) {
-            $serviceOrder->update(['status' => 'cancelled']);
+            $serviceOrder->update(['status' => ServiceOrderStatus::CANCELLED->value]);
             return $serviceOrder;
         });
     }

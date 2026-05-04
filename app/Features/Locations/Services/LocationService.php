@@ -2,6 +2,7 @@
 
 namespace App\Features\Locations\Services;
 
+use App\Core\Helpers\InputSanitizer;
 use App\Core\Services\TransactionHandler;
 use App\Features\Locations\Models\Location;
 
@@ -17,8 +18,8 @@ class LocationService
             return Location::create([
                 'parish_id' => $data['parish_id'],
                 'postal_code' => $data['postal_code'],
-                'street_address' => $data['street_address'],
-                'landmark' => $data['landmark'] ?? null,
+                'street_address' => InputSanitizer::sanitize($data['street_address']),
+                'landmark' => isset($data['landmark']) ? InputSanitizer::sanitize($data['landmark']) : null,
                 'latitude' => $data['latitude'] ?? null,
                 'longitude' => $data['longitude'] ?? null,
             ]);

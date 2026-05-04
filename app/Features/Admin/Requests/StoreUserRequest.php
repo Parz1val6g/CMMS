@@ -5,12 +5,13 @@ namespace App\Features\Admin\Requests;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Core\Enums\SystemStatus;
+use App\Shared\Models\User;
 
 class StoreUserRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // Policies will secure the Controller
+        return $this->user()->can('create', User::class);
     }
 
     public function rules(): array

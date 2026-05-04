@@ -26,9 +26,16 @@ class Handler extends ExceptionHandler
      */
     public function context(): array
     {
+        $requestId = request()->header('X-Request-ID');
+
+        // Only log valid UUIDs — ignore user-injected values
+        if ($requestId && !preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $requestId)) {
+            $requestId = '(invalid)';
+        }
+
         return array_merge(parent::context(), [
             'userId' => auth('sanctum')->id(),
-            'requestId' => request()->header('X-Request-ID'),
+            'requestId' => $requestId,
             'ip' => request()->ip(),
         ]);
     }
@@ -84,6 +91,7 @@ class Handler extends ExceptionHandler
             $e instanceof HttpException => $e->getStatusCode(),
             $e instanceof ValidationException => 422,
             $e instanceof \InvalidArgumentException => 422,
+            $e instanceof \App\Exceptions\EquipmentUnavailableException => 409,
             $e instanceof \Illuminate\Auth\AuthenticationException => 401,
             $e instanceof \Illuminate\Auth\Access\AuthorizationException => 403,
             $e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException => 404,
@@ -124,6 +132,7 @@ class Handler extends ExceptionHandler
     {
         return match (true) {
             $e instanceof ValidationException => 'VALIDATION_ERROR',
+            $e instanceof \App\Exceptions\EquipmentUnavailableException => 'EQUIPMENT_UNAVAILABLE',
             $e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException => 'NOT_FOUND',
             $e instanceof \Illuminate\Auth\AuthenticationException => 'AUTH_REQUIRED',
             $e instanceof \Illuminate\Auth\Access\AuthorizationException => 'ACCESS_DENIED',

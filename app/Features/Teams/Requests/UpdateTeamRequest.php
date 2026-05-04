@@ -2,20 +2,20 @@
 
 namespace App\Features\Teams\Requests;
 
+use App\Core\Forms\FormValidator;
+use App\Features\Teams\Models\Team;
+use App\Features\Teams\Schemas\TeamFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTeamRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('update', $this->route('team'));
     }
 
     public function rules(): array
     {
-        return [
-            'sector_id' => ['sometimes', 'exists:sectors,id'],
-            'name' => ['sometimes', 'string', 'max:150'],
-        ];
+        return (new FormValidator())->fromSchema(TeamFormSchema::update(), $this->all());
     }
 }

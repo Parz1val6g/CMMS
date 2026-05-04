@@ -3,6 +3,7 @@ namespace App\Shared\Services;
 use App\Shared\Models\Attachment;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 class AttachmentService
 {
@@ -21,11 +22,16 @@ class AttachmentService
         // Keep local storage highly organized
         $folder = $serviceOrderId ? "service-orders/{$serviceOrderId}" : "mini-tasks/{$miniTaskId}";
         $path = $file->store("attachments/{$folder}", 'public');
+
+        // Use server-generated UUID filename — never trust client-supplied names
+        $ext = $file->getClientOriginalExtension();
+        $safeName = Str::uuid() . '.' . $ext;
+
         return Attachment::create([
             'service_order_id' => $serviceOrderId,
             'mini_task_id' => $miniTaskId,
             'file_path' => $path,
-            'file_name' => $file->getClientOriginalName(),
+            'file_name' => $safeName,
             'mime_type' => $file->getMimeType(),
         ]);
     }

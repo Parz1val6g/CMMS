@@ -2,6 +2,30 @@
 
 ---
 
+## 🔄 Workflow Types
+
+The Service Order module supports two distinct workflow types, determined by the [`workflow_type`](database/migrations/2026_05_04_090300_add_equipment_id_and_workflow_type_to_service_orders_table.php:13) column (`VARCHAR(50)`, default `'regular'`) on the `service_orders` table.
+
+### Regular Workflow
+
+- Standard SO for general maintenance, repairs, and construction work.
+- No restriction on the number or naming of tasks — any task name and count is allowed.
+- Materials are tracked via `work_logs_materials` with quantity-based deductions from stock.
+- The [`equipment_id`](database/migrations/2026_05_04_090300_add_equipment_id_and_workflow_type_to_service_orders_table.php:18) column is `NULL`.
+
+### Loan (Empréstimo) Workflow
+
+- Specialized SO for equipment loan/commodato agreements.
+- **Binary Task Rule**: A Loan SO MUST have exactly two tasks:
+  1. **"Empréstimo de Equipamento"** — Tracks the loan-out of equipment.
+  2. **"Devolução de Equipamento"** — Tracks the return of equipment.
+- No additional tasks may be created on a Loan SO.
+- Materials tab is treated as **priority** — equipment is tracked via `work_log_equipment` instead of `work_logs_materials`.
+- The [`equipment_id`](database/migrations/2026_05_04_090300_add_equipment_id_and_workflow_type_to_service_orders_table.php:18) references the loaned equipment.
+- The completion of the **"Devolução de Equipamento"** task is the trigger for closing the SO (see [State Machine — Loan Flow](documentation/user_stories/diagrams/state_machines/01_SERVICE_ORDER_LIFECYCLE.md)).
+
+---
+
 ## 📋 US-081: Criar Ordem de Serviço (Service Order)
 
 **Como** manager,  

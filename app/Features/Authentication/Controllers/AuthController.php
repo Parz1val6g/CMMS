@@ -17,15 +17,16 @@ class AuthController extends Controller
     public function login(LoginRequest $request): JsonResponse
     {
         $user = User::where('email', $request->email)->first();
-        // Check if user exists, password is correct, and user is active
+
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['As credenciais fornecidas estão incorretas.'],
             ]);
         }
+
         if ($user->status !== SystemStatus::ACTIVE->value) {
             throw ValidationException::withMessages([
-                'email' => ['A sua conta encontra-se inativa.'],
+                'email' => ['As credenciais fornecidas estão incorretas.'],
             ]);
         }
         // Generate the Bearer Token for Vue / Mobile App

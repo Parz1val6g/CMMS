@@ -3,6 +3,7 @@
 namespace App\Features\Sectors\Controllers;
 
 use App\Features\Sectors\Models\Sector;
+use App\Features\Sectors\Schemas\SectorFormSchema;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
@@ -27,6 +28,9 @@ class SectorPageController extends Controller
                 'created_at' => $s->created_at->format('Y-m-d'),
             ]);
 
+        $createSchema = SectorFormSchema::create();
+        $updateSchema = SectorFormSchema::update();
+
         return Inertia::render('Sectors/Pages/Index', [
             'sectors' => $sectors,
             'columns' => [
@@ -34,14 +38,8 @@ class SectorPageController extends Controller
                 ['key' => 'head', 'label' => 'Head'],
                 ['key' => 'created_at', 'label' => 'Created', 'sortable' => true],
             ],
-            'formSchema' => [
-                ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|max:100'],
-                ['key' => 'head_id', 'label' => 'Head', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-            ],
-            'createFormSchema' => [
-                ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|max:100'],
-                ['key' => 'head_id', 'label' => 'Head', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-            ],
+            'formSchema' => $updateSchema->toArray(),
+            'createFormSchema' => $createSchema->toArray(),
             'routes' => [
                 'index' => url('/api/sectors'),
                 'store' => url('/api/sectors'),

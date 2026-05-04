@@ -1,6 +1,7 @@
 <?php
 namespace App\Features\MiniTasks\Services;
 use App\Core\Enums\MiniTaskStatus;
+use App\Core\Helpers\InputSanitizer;
 use App\Core\Services\TransactionHandler;
 use App\Features\MiniTasks\Events\MiniTaskCompletedEvent;
 use App\Features\MiniTasks\Models\MiniTask;
@@ -13,7 +14,7 @@ class MiniTaskService
     }
 
     /**
-     * Create a new MiniTask and assign the worker/team and materials.
+     * Create a new MiniTask and assign workers, teams, and materials.
      */
     public function create(array $data, string $supervisorId): MiniTask
     {
@@ -23,16 +24,13 @@ class MiniTaskService
             $miniTask = MiniTask::create([
                 'task_id' => $data['task_id'],
                 'supervisor_id' => $supervisorId,
-                'description' => $data['description'],
+                'description' => InputSanitizer::sanitize($data['description']),
                 'status' => MiniTaskStatus::PENDING->value,
             ]);
-            // 2. Attach Worker OR Team (Our FormRequest guaranteed only one is present)
-            if (!empty($data['worker_id'])) {
-                $miniTask->workers()->attach($data['worker_id']);
-            } elseif (!empty($data['team_id'])) {
-                $miniTask->teams()->attach($data['team_id']);
-            }
-            // 3. Attach Planned Materials
+            // 2. Sync Workers and Teams (many-to-many via custom pivot)
+            $miniTask->workers()->sync($data['worker_ids'] ?? []);
+            $miniTask->teams()->sync($data['team_ids'] ?? []);
+            // 3. Sync Planned Materials
             if (!empty($data['materials'])) {
                 $materialsSync = [];
                 foreach ($data['materials'] as $material) {

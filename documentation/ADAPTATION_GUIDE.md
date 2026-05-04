@@ -323,3 +323,36 @@ WorkLog → CheckWorkLogsCompletion → MiniTaskService::complete()
 **Security First**: Prepared Statements (ORM), explicit input whitelisting, policy-based authorization
 **Architecture**: Route → Controller → Service → Helper/Model (clean separation)
 **Database**: Transactions for multi-step writes, UUID PKs, soft deletes, strategic indexes
+
+---
+
+## 🤖 AI Development Guidelines
+
+The following rules MUST be followed by any AI assistant working on this codebase:
+
+### Loan Workflow Constraint
+
+When dealing with **'loan'** type Service Orders ([`workflow_type`](database/migrations/2026_05_04_090300_add_equipment_id_and_workflow_type_to_service_orders_table.php:13) = `'loan'`):
+
+1. **Binary Task Rule**: Never allow more than two specific tasks:
+   - `"Empréstimo de Equipamento"` — Tracks the equipment loan-out.
+   - `"Devolução de Equipamento"` — Tracks the equipment return.
+2. **No additional tasks** may be created on a Loan SO beyond these two.
+3. **Materials Tab Priority**: The Materials tab is treated as priority for inventory tracking, but uses [`work_log_equipment`](database/seeders/DevelopmentTestSeeder.php:247) instead of `work_logs_materials` for tracking.
+4. **Closure Trigger**: Completion of the "Devolução de Equipamento" task is the sole trigger for closing the SO (see [State Machine](documentation/user_stories/diagrams/state_machines/01_SERVICE_ORDER_LIFECYCLE.md)).
+5. **Database**: The [`equipment_id`](database/migrations/2026_05_04_090300_add_equipment_id_and_workflow_type_to_service_orders_table.php:18) column on `service_orders` references the loaned equipment.
+6. **Enforcement Directive**: Always enforce the 2-task rule (`"Empréstimo de Equipamento"` / `"Devolução de Equipamento"`) when managing or generating `'loan'` type Service Orders. No additional tasks may be created beyond these two.
+
+### Form Schema Import Pattern
+
+When creating or modifying Form Schema files in `app/Features/*/Schemas/`:
+
+1. **`FormSchema`** is imported from the root Forms namespace:
+   ```php
+   use App\Core\Forms\FormSchema;
+   ```
+2. **All field/input classes** (`TextInput`, `SelectInput`, `EmailInput`, etc.) are imported from the `Fields` sub-namespace:
+   ```php
+   use App\Core\Forms\Fields\{TextInput, SelectInput, EmailInput};
+   ```
+3. **Never** import field classes from the root `App\Core\Forms\` namespace — they will not resolve and cause runtime errors.

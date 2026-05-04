@@ -1,37 +1,39 @@
 <?php
+
 namespace App\Features\MiniTasks\Requests;
+
+use App\Core\Forms\FormValidator;
+use App\Features\MiniTasks\Models\MiniTask;
+use App\Features\MiniTasks\Schemas\MiniTaskFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
+
 class StoreMiniTaskRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', MiniTask::class);
     }
+
     public function rules(): array
     {
-        return [
-            'task_id' => ['required', 'exists:tasks,id'],
-            'description' => ['required', 'string', 'max:250'],
+        $rules = (new FormValidator())->fromSchema(MiniTaskFormSchema::create(), $this->all());
 
-            // XOR Logic: Must have one, cannot have both!
-            'worker_id' => ['nullable', 'exists:workers,id', 'prohibits:team_id'],
-            'team_id' => ['nullable', 'exists:teams,id', 'prohibits:worker_id'],
+        // Worker/Team array validation
+        $rules['worker_ids'] = ['nullable', 'array'];
+        $rules['worker_ids.*'] = ['exists:workers,id'];
+        $rules['team_ids'] = ['nullable', 'array'];
+        $rules['team_ids.*'] = ['exists:teams,id'];
 
-            // // Required without forces them to pick at least one
-            // 'worker_id' => ['required_without:team_id'],
+        // Materials array: [{ material_id: "uuid", planned_quantity: 5.5 }]
+        $rules['materials'] = ['nullable', 'array'];
+        $rules['materials.*.material_id'] = ['required', 'exists:materials,id'];
+        $rules['materials.*.planned_quantity'] = ['required', 'numeric', 'min:0.01'];
 
-            // Optional Materials array: [{ material_id: "uuid", planned_quantity: 5.5 }]
-            'materials' => ['nullable', 'array'],
-            'materials.*.material_id' => ['required', 'exists:materials,id'],
-            'materials.*.planned_quantity' => ['required', 'numeric', 'min:0.01'],
-        ];
+        return $rules;
     }
+
     public function messages(): array
     {
-        return [
-            'worker_id.prohibits' => 'Cannot assign both a worker and a team.',
-            'team_id.prohibits' => 'Cannot assign both a team and a worker.',
-            'worker_id.required_without' => 'You must assign either a worker or a team.',
-        ];
+        return [];
     }
 }

@@ -12,9 +12,13 @@ return new class extends Migration {
             $table->foreignUuid('service_order_id')->constrained('service_orders')->cascadeOnDelete();
             $table->foreignUuid('manager_id')->constrained('users')->cascadeOnDelete();
             $table->string('name', 150);
+            $table->text('description')->nullable();
             $table->string('status', 50);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index('status');
+            $table->index(['service_order_id', 'status']);
         });
     }
 

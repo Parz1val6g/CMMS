@@ -9,7 +9,7 @@ use App\Features\WorkLogs\Models\WorkLog;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Enums\TaskStatus;
 use App\Core\Enums\MiniTaskStatus;
-use App\Core\Enums\ServicesOrdersPriority;
+use App\Core\Enums\Priority;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
@@ -30,7 +30,7 @@ class DashboardController extends Controller
         ];
 
         $criticalOrders = ServiceOrder::with(['location.parish'])
-            ->where('priority', ServicesOrdersPriority::HIGH->value)
+            ->where('priority', Priority::HIGH->value)
             ->where('status', '!=', ServiceOrderStatus::COMPLETED->value)
             ->latest()
             ->take(5)

@@ -1,5 +1,6 @@
 <?php
 namespace App\Features\Tasks\Models;
+use App\Core\Enums\TaskStatus;
 use App\Core\Traits\Base;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,7 +16,11 @@ class Task extends Model
         'service_order_id',
         'manager_id',
         'name',
+        'description',
         'status',
+    ];
+    protected $casts = [
+        'status' => TaskStatus::class,
     ];
     public function serviceOrder()
     {

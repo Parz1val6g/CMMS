@@ -3,6 +3,7 @@
 namespace App\Features\Teams\Controllers;
 
 use App\Features\Teams\Models\Team;
+use App\Features\Teams\Schemas\TeamFormSchema;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
@@ -24,6 +25,9 @@ class TeamPageController extends Controller
                 'created_at' => $t->created_at->format('Y-m-d'),
             ]);
 
+        $createSchema = TeamFormSchema::create();
+        $updateSchema = TeamFormSchema::update();
+
         return Inertia::render('Teams/Pages/Index', [
             'teams' => $teams,
             'columns' => [
@@ -31,14 +35,8 @@ class TeamPageController extends Controller
                 ['key' => 'sector', 'label' => 'Sector'],
                 ['key' => 'created_at', 'label' => 'Created', 'sortable' => true],
             ],
-            'formSchema' => [
-                ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|max:100'],
-                ['key' => 'sector_id', 'label' => 'Sector', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-            ],
-            'createFormSchema' => [
-                ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|max:100'],
-                ['key' => 'sector_id', 'label' => 'Sector', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-            ],
+            'formSchema' => $updateSchema->toArray(),
+            'createFormSchema' => $createSchema->toArray(),
             'routes' => [
                 'index' => url('/api/teams'),
                 'store' => url('/api/teams'),

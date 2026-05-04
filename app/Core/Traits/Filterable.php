@@ -38,11 +38,20 @@ trait Filterable
             ? explode(':', $sort)
             : [$sort, 'asc'];
 
+        $allowed = $this->getSortableColumns();
+        $column = in_array($column, $allowed, true) ? $column : 'created_at';
+        $direction = in_array($direction, ['asc', 'desc'], true) ? $direction : 'asc';
+
         return $query->orderBy($column, $direction);
     }
 
     protected function getSearchableColumns(): array
     {
         return [];
+    }
+
+    protected function getSortableColumns(): array
+    {
+        return ['created_at', 'updated_at', 'status', 'priority'];
     }
 }

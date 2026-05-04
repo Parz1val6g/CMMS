@@ -5,7 +5,7 @@ namespace Tests\Feature\Api;
 use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use App\Features\ServiceOrders\Models\ServiceOrder;
-use App\Core\Enums\ServicesOrdersPriority;
+use App\Core\Enums\Priority;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Features\Locations\Models\Location;
 use App\Features\ServiceTypes\Models\ServiceType;
@@ -47,7 +47,7 @@ class ServiceOrderApiTest extends TestCase
             ->post('/api/service-orders', [
                 'process' => 'Fix road damage - Rua da Paz',
                 'service_type_id' => $serviceType->id,
-                'priority' => ServicesOrdersPriority::HIGH->value,
+                'priority' => Priority::HIGH->value,
                 'photo' => $photo,
                 'parish_id' => $parish->id,
                 'street' => 'Rua da Paz, nº 123',
@@ -70,7 +70,7 @@ class ServiceOrderApiTest extends TestCase
     {
         $response = $this->actingAs($this->manager, 'sanctum')
             ->postJson('/api/service-orders', [
-                'priority' => ServicesOrdersPriority::HIGH->value,
+                'priority' => Priority::HIGH->value,
             ]);
 
         $this->assertEquals(422, $response->status());

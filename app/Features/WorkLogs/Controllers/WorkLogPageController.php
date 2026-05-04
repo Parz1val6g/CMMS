@@ -3,6 +3,7 @@
 namespace App\Features\WorkLogs\Controllers;
 
 use App\Features\WorkLogs\Models\WorkLog;
+use App\Features\WorkLogs\Schemas\WorkLogFormSchema;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
@@ -36,6 +37,9 @@ class WorkLogPageController extends Controller
                 ]),
             ]);
 
+        $createSchema = WorkLogFormSchema::create();
+        $updateSchema = WorkLogFormSchema::update();
+
         return Inertia::render('WorkLogs/Pages/Index', [
             'work_logs' => $workLogs,
             'columns' => [
@@ -46,23 +50,8 @@ class WorkLogPageController extends Controller
                 ['key' => 'status', 'label' => 'Status', 'sortable' => true],
                 ['key' => 'completed_at', 'label' => 'Completed', 'sortable' => true],
             ],
-            'formSchema' => [
-                ['key' => 'description', 'label' => 'Description', 'type' => 'textarea', 'rules' => 'required|max:250'],
-                ['key' => 'mini_task_id', 'label' => 'Mini-Task', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-                ['key' => 'started_at', 'label' => 'Started At', 'type' => 'datetime-local', 'rules' => 'required'],
-                ['key' => 'completed_at', 'label' => 'Completed At', 'type' => 'datetime-local', 'rules' => 'required'],
-                ['key' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [
-                    ['value' => 'pending', 'label' => 'Pending'],
-                    ['value' => 'approved', 'label' => 'Approved'],
-                    ['value' => 'rejected', 'label' => 'Rejected'],
-                ]],
-            ],
-            'createFormSchema' => [
-                ['key' => 'description', 'label' => 'Description', 'type' => 'textarea', 'rules' => 'required|max:250'],
-                ['key' => 'mini_task_id', 'label' => 'Mini-Task', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-                ['key' => 'started_at', 'label' => 'Started At', 'type' => 'datetime-local', 'rules' => 'required'],
-                ['key' => 'completed_at', 'label' => 'Completed At', 'type' => 'datetime-local', 'rules' => 'required'],
-            ],
+            'formSchema' => $updateSchema->toArray(),
+            'createFormSchema' => $createSchema->toArray(),
             'routes' => [
                 'index' => url('/api/work-logs'),
                 'store' => url('/api/work-logs'),

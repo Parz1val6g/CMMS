@@ -18,6 +18,8 @@ return new class extends Migration {
             $table->string('locale', 10)->default('pt');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index('status');
         });
     }
 

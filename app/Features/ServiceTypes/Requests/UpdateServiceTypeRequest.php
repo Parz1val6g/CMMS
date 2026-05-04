@@ -2,20 +2,20 @@
 
 namespace App\Features\ServiceTypes\Requests;
 
+use App\Core\Forms\FormValidator;
+use App\Features\ServiceTypes\Models\ServiceType;
+use App\Features\ServiceTypes\Schemas\ServiceTypeFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateServiceTypeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('update', $this->route('service_type'));
     }
 
     public function rules(): array
     {
-        return [
-            'name' => ['sometimes', 'string', 'max:150'],
-            'description' => ['nullable', 'string', 'max:500'],
-        ];
+        return (new FormValidator())->fromSchema(ServiceTypeFormSchema::update(), $this->all());
     }
 }

@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Features\Materials\Models\Material;
-use App\Features\Materials\Models\Unit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,9 +15,9 @@ class MaterialFactory extends Factory
     public function definition(): array
     {
         return [
+            // unit_id must be provided via state() or seeder
             'name' => fake()->unique()->word(),
-            'unit_id' => Unit::factory(),
-            'stock_quantity' => fake()->randomFloat(2, 0, 1000),
+            'stock_quantity' => fake()->randomFloat(2, 10, 500),
         ];
     }
 }

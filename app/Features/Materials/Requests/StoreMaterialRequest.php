@@ -2,21 +2,20 @@
 
 namespace App\Features\Materials\Requests;
 
+use App\Core\Forms\FormValidator;
+use App\Features\Materials\Models\Material;
+use App\Features\Materials\Schemas\MaterialFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreMaterialRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', Material::class);
     }
 
     public function rules(): array
     {
-        return [
-            'name' => ['required', 'string', 'max:150'],
-            'unit_id' => ['required', 'exists:units,id'],
-            'stock_quantity' => ['nullable', 'numeric', 'min:0'],
-        ];
+        return (new FormValidator())->fromSchema(MaterialFormSchema::create(), $this->all());
     }
 }

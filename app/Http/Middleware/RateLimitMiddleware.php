@@ -12,11 +12,14 @@ class RateLimitMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $key = $request->user()?->id ?? $request->ip();
+        $route = $request->route()?->getName() ?? 'unknown';
         $limit = 60;
         $decay = 60;
 
-        if (! RateLimiter::attempt("global:{$key}", $limit, fn () => true, $decay)) {
-            $retryAfter = RateLimiter::availableIn("global:{$key}");
+        $rateKey = "{$route}:{$key}";
+
+        if (! RateLimiter::attempt($rateKey, $limit, fn () => true, $decay)) {
+            $retryAfter = RateLimiter::availableIn($rateKey);
 
             return response()->json([
                 'message' => 'Too many requests',

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import DataManager from '@/Components/Common/DataManager';
+import DataManager from '@/Components/DataManager';
 import Modal from '@/Components/Common/Modal';
 
 export default function ServiceTypesIndex({ service_types, columns, formSchema, createFormSchema, routes, filterSchema }) {
@@ -27,6 +27,7 @@ export default function ServiceTypesIndex({ service_types, columns, formSchema, 
         columns={columns}
         formSchema={formSchema}
         filterSchema={filterSchema ?? []}
+        onNew={() => setShowModal(true)}
       />
     </AppLayout>
   );

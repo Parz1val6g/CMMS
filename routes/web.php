@@ -46,6 +46,18 @@ Route::middleware(['auth'])->group(function () {
     require base_path('routes/web/profile.php');
     require base_path('routes/web/settings.php');
 
+    // Equipments (Loan workflow)
+    require base_path('routes/web/equipments.php');
+
+    // Exports
+    require base_path('routes/web/exports.php');
+
+    // Notifications
+    require base_path('routes/web/notifications.php');
+
+    // Analytics & Reports
+    require base_path('routes/web/analytics.php');
+
     // Admin
     require base_path('routes/web/admin.php');
 });

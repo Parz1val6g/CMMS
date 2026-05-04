@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -15,6 +16,8 @@ return new class extends Migration {
             $table->timestamps();
             $table->softDeletes();
         });
+
+        DB::statement('ALTER TABLE mini_tasks_workers_teams ADD CONSTRAINT check_worker_or_team CHECK ((worker_id IS NOT NULL AND team_id IS NULL) OR (worker_id IS NULL AND team_id IS NOT NULL))');
     }
 
     public function down(): void

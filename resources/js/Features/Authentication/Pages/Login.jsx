@@ -32,7 +32,7 @@ export default function Login() {
               {/* Email */}
               <div className="mb-3">
                 <label htmlFor="email" className="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400">
-                  Email or Username
+                  Email or Username <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="email"
@@ -54,7 +54,7 @@ export default function Login() {
               {/* Password */}
               <div className="mb-4">
                 <label htmlFor="password" className="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400">
-                  Password
+                  Password <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="password"

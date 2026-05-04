@@ -2,21 +2,20 @@
 
 namespace App\Features\Materials\Requests;
 
+use App\Core\Forms\FormValidator;
+use App\Features\Materials\Models\Material;
+use App\Features\Materials\Schemas\MaterialFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateMaterialRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('update', $this->route('material'));
     }
 
     public function rules(): array
     {
-        return [
-            'name' => ['sometimes', 'string', 'max:150'],
-            'unit_id' => ['sometimes', 'exists:units,id'],
-            'stock_quantity' => ['nullable', 'numeric', 'min:0'],
-        ];
+        return (new FormValidator())->fromSchema(MaterialFormSchema::update(), $this->all());
     }
 }

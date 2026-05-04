@@ -3,6 +3,7 @@
 namespace App\Features\Tasks\Controllers;
 
 use App\Features\Tasks\Models\Task;
+use App\Features\Tasks\Schemas\TaskFormSchema;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
@@ -17,9 +18,10 @@ class TaskPageController extends Controller
         $tasks = Task::with(['serviceOrder', 'manager', 'sectors'])
             ->latest()
             ->paginate(15)
-            ->through(fn ($t) => [
+            ->through(fn($t) => [
                 'id' => $t->id,
                 'name' => $t->name,
+                'description' => $t->description,
                 'status' => $t->status,
                 'created_at' => $t->created_at->format('Y-m-d'),
                 'service_order' => $t->serviceOrder ? [
@@ -30,34 +32,24 @@ class TaskPageController extends Controller
                     'id' => $t->manager->id,
                     'name' => $t->manager->first_name . ' ' . $t->manager->last_name,
                 ] : null,
-                'sectors' => $t->sectors->map(fn ($s) => ['id' => $s->id, 'name' => $s->name]),
+                'sectors' => $t->sectors->map(fn($s) => ['id' => $s->id, 'name' => $s->name]),
             ]);
+
+        $createSchema = TaskFormSchema::create();
+        $updateSchema = TaskFormSchema::update();
 
         return Inertia::render('Tasks/Pages/Index', [
             'tasks' => $tasks,
             'columns' => [
                 ['key' => 'name', 'label' => 'Name', 'sortable' => true],
+                ['key' => 'description', 'label' => 'Description'],
                 ['key' => 'service_order', 'label' => 'Service Order'],
                 ['key' => 'manager', 'label' => 'Manager'],
                 ['key' => 'status', 'label' => 'Status', 'sortable' => true],
                 ['key' => 'created_at', 'label' => 'Created', 'sortable' => true],
             ],
-            'formSchema' => [
-                ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|max:150'],
-                ['key' => 'service_order_id', 'label' => 'Service Order', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-                ['key' => 'sector_id', 'label' => 'Sector', 'type' => 'select', 'options' => []],
-                ['key' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [
-                    ['value' => 'pending', 'label' => 'Pending'],
-                    ['value' => 'in_progress', 'label' => 'In Progress'],
-                    ['value' => 'completed', 'label' => 'Completed'],
-                    ['value' => 'cancelled', 'label' => 'Cancelled'],
-                ]],
-            ],
-            'createFormSchema' => [
-                ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|max:150'],
-                ['key' => 'service_order_id', 'label' => 'Service Order', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-                ['key' => 'sector_id', 'label' => 'Sector', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-            ],
+            'formSchema' => $updateSchema->toArray(),
+            'createFormSchema' => $createSchema->toArray(),
             'routes' => [
                 'index' => url('/api/tasks'),
                 'store' => url('/api/tasks'),
@@ -67,11 +59,16 @@ class TaskPageController extends Controller
             ],
             'filterSchema' => [
                 ['key' => 'search', 'label' => 'Search', 'type' => 'text', 'placeholder' => 'Search tasks...'],
-                ['key' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => [
-                    ['value' => 'pending', 'label' => 'Pending'],
-                    ['value' => 'in_progress', 'label' => 'In Progress'],
-                    ['value' => 'completed', 'label' => 'Completed'],
-                ]],
+                [
+                    'key' => 'status',
+                    'label' => 'Status',
+                    'type' => 'select',
+                    'options' => [
+                        ['value' => 'pending', 'label' => 'Pending'],
+                        ['value' => 'in_progress', 'label' => 'In Progress'],
+                        ['value' => 'completed', 'label' => 'Completed'],
+                    ]
+                ],
             ],
         ]);
     }

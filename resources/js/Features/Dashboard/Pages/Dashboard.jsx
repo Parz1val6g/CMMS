@@ -54,14 +54,11 @@ function CriticalOrderItem({ order }) {
   );
 }
 
-export default function Dashboard({ kpis, criticalOrders, mapOrders, googleMapsApiKey }) {
-  const breadcrumbs = [
-    { name: 'Dashboard', url: '/dashboard' },
-  ];
-
+export default function Dashboard({ kpis, criticalOrders, mapOrders }) {
   return (
-    <AppLayout title="Dashboard Operacional" breadcrumbs={breadcrumbs}>
-      <div className="space-y-6">
+    <AppLayout title="Dashboard Operacional">
+      <div className="h-full overflow-y-auto w-full">
+        <div className="max-w-7xl mx-auto py-8 px-6 space-y-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <KpiCard
@@ -123,8 +120,9 @@ export default function Dashboard({ kpis, criticalOrders, mapOrders, googleMapsA
               </h3>
             </div>
             <div className="p-1" style={{ height: 420 }}>
-              <InterventionMap orders={mapOrders} apiKey={googleMapsApiKey} />
+              <InterventionMap orders={mapOrders} />
             </div>
+          </div>
           </div>
         </div>
       </div>

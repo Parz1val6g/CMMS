@@ -1,26 +1,26 @@
 import { Head } from '@inertiajs/react';
-import Sidebar from '@/Components/Common/Sidebar';
-import Topbar from '@/Components/Common/Topbar';
+import Sidebar from '@/Components/SideBar';
 
-export default function AppLayout({ title, breadcrumbs = [], children }) {
+export default function AppLayout({ title, children }) {
   return (
     <>
       <Head title={title} />
 
-      <div className="flex h-screen w-screen overflow-hidden bg-gray-100 dark:bg-gray-900">
-        {/* Sidebar */}
-        <Sidebar />
+      <div className="h-screen w-screen flex flex-col overflow-hidden bg-slate-900">
+        {/* Top section: Sidebar + Main Canvas */}
+        <div className="flex-1 flex flex-row overflow-hidden">
+          <Sidebar />
 
-        {/* Main content area */}
-        <div className="flex flex-1 flex-col overflow-hidden">
-          {/* Topbar */}
-          <Topbar breadcrumbs={breadcrumbs} />
-
-          {/* Page content */}
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+          {/* Main content area */}
+          <main className="flex-1 flex flex-col overflow-hidden">
             {children}
           </main>
         </div>
+
+        {/* Global Footer */}
+        <footer className="shrink-0 w-full border-t border-slate-800 bg-slate-950 px-6 py-2 text-xs text-slate-500">
+          &copy; {new Date().getFullYear()} ERP Gestão — All rights reserved.
+        </footer>
       </div>
     </>
   );

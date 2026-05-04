@@ -14,8 +14,9 @@ class DistrictController extends Controller
     {
         $query = District::query();
 
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+        if ($search = $request->validate(['search' => 'nullable|string|max:100'])['search'] ?? null) {
+            $safe = str_replace(['%', '_'], ['\\%', '\\_'], $search);
+            $query->where('name', 'like', '%' . $safe . '%');
         }
 
         return DistrictResource::collection($query->orderBy('name')->get());

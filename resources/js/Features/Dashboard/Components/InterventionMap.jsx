@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { usePage } from '@inertiajs/react';
 import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
 
 // Gouveia center — map stays zoomed here regardless of marker spread
@@ -10,11 +11,11 @@ const MAP_STYLES = {
 };
 
 const PIN_COLORS = {
-  urgent: '#EF4444',  // red-500
-  high: '#EF4444',    // red-500
-  normal: '#EAB308',  // yellow-500
-  medium: '#EAB308',  // yellow-500
-  low: '#22C55E',     // green-500
+  urgent: '#EF4444',
+  high: '#EF4444',
+  normal: '#EAB308',
+  medium: '#EAB308',
+  low: '#22C55E',
 };
 
 function getPinColor(priority) {
@@ -38,13 +39,14 @@ function createPinSvg(color) {
   };
 }
 
-export default function InterventionMap({ orders, apiKey }) {
+/* ── Inner map — only rendered when gmapsKey is truthy ─────── */
+function MapInner({ gmapsKey, orders }) {
   const [selected, setSelected] = useState(null);
   const [map, setMap] = useState(null);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: apiKey,
+    googleMapsApiKey: gmapsKey,
     mapIds: ['INTERVENTION_MAP'],
   });
 
@@ -64,7 +66,6 @@ export default function InterventionMap({ orders, apiKey }) {
 
   const onLoad = (m) => {
     setMap(m);
-    // Center on Gouveia — do NOT fitBounds so zoom stays fixed
     m.setCenter(GOUVEIA_CENTER);
     m.setZoom(MAP_ZOOM);
   };
@@ -124,4 +125,19 @@ export default function InterventionMap({ orders, apiKey }) {
       )}
     </GoogleMap>
   );
+}
+
+/* ── Public wrapper — guards gmapsKey before mounting loader hooks ─ */
+export default function InterventionMap({ orders }) {
+  const { googleMapsApiKey: gmapsKey } = usePage().props;
+
+  if (!gmapsKey) {
+    return (
+      <div className="flex h-full min-h-[320px] items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
+        <p className="text-sm text-gray-500 dark:text-gray-400">Loading Map Configuration...</p>
+      </div>
+    );
+  }
+
+  return <MapInner gmapsKey={gmapsKey} orders={orders} />;
 }

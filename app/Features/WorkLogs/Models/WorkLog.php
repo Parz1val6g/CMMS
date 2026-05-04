@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Features\MiniTasks\Models\MiniTask;
 use App\Features\Workers\Models\Worker;
 use App\Features\Materials\Models\Material;
+use App\Features\Equipments\Models\Equipment;
 
 class WorkLog extends Model
 {
@@ -26,16 +27,28 @@ class WorkLog extends Model
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
         'reviewed_at' => 'datetime',
+        'status' => WorkLogStatus::class,
     ];
-    public function miniTask() { return $this->belongsTo(MiniTask::class); }
-    
-    public function workers() {
+    public function miniTask()
+    {
+        return $this->belongsTo(MiniTask::class);
+    }
+
+    public function workers()
+    {
         return $this->belongsToMany(Worker::class, 'work_logs_workers', 'work_log_id', 'worker_id');
     }
-    
-    public function materials() {
+
+    public function materials()
+    {
         return $this->belongsToMany(Material::class, 'work_logs_materials', 'work_log_id', 'material_id')
             ->withPivot('quantity_used', 'unit_price_at_use');
+    }
+
+    public function equipment()
+    {
+        return $this->belongsToMany(Equipment::class, 'work_log_equipment', 'work_log_id', 'equipment_id')
+            ->withTimestamps();
     }
 
     public function reviewer()

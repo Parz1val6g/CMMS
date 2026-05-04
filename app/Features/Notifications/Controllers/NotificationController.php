@@ -17,6 +17,8 @@ class NotificationController extends Controller
 
     public function index(): AnonymousResourceCollection
     {
+        Gate::authorize('viewAny', Notification::class);
+
         $notifications = Notification::where('user_id', auth()->id())
             ->latest()
             ->paginate(15);

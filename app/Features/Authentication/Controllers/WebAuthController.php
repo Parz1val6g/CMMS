@@ -44,7 +44,7 @@ class WebAuthController extends Controller
         if ($user->status !== SystemStatus::ACTIVE->value) {
             Auth::logout();
             throw ValidationException::withMessages([
-                'email' => __('auth.inactive'),
+                'email' => __('auth.failed'),
             ]);
         }
 

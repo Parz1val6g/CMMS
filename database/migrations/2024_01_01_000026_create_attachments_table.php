@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -20,6 +21,8 @@ return new class extends Migration {
             $table->index('service_order_id');
             $table->index('mini_task_id');
         });
+
+        DB::statement('ALTER TABLE attachments ADD CONSTRAINT check_attachment_entity CHECK ((service_order_id IS NOT NULL AND mini_task_id IS NULL) OR (service_order_id IS NULL AND mini_task_id IS NOT NULL))');
     }
 
     public function down(): void

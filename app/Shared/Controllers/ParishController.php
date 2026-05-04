@@ -15,11 +15,13 @@ class ParishController extends Controller
         $query = Parish::query();
 
         if ($request->has('municipality_id')) {
+            $request->validate(['municipality_id' => 'nullable|integer|exists:municipalities,id']);
             $query->where('municipality_id', $request->municipality_id);
         }
 
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+        if ($search = $request->validate(['search' => 'nullable|string|max:100'])['search'] ?? null) {
+            $safe = str_replace(['%', '_'], ['\\%', '\\_'], $search);
+            $query->where('name', 'like', '%' . $safe . '%');
         }
 
         return ParishResource::collection($query->orderBy('name')->get());

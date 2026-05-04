@@ -1,6 +1,7 @@
 <?php
 namespace App\Features\Tasks\Services;
 use App\Core\Enums\TaskStatus;
+use App\Core\Helpers\InputSanitizer;
 use App\Core\Services\TransactionHandler;
 use App\Features\Tasks\Events\TaskCompletedEvent;
 use App\Features\Tasks\Models\Task;
@@ -17,7 +18,7 @@ class TaskService
             $task = Task::create([
                 'service_order_id' => $data['service_order_id'],
                 'manager_id' => $managerId,
-                'name' => $data['name'],
+                'name' => InputSanitizer::sanitize($data['name']),
                 'status' => TaskStatus::PENDING->value,
             ]);
 
@@ -31,12 +32,12 @@ class TaskService
 
     public function update(Task $task, array $data): Task
     {
-        if (in_array($task->status, [TaskStatus::COMPLETED->value, 'cancelled'])) {
+        if (in_array($task->status, [TaskStatus::COMPLETED->value, TaskStatus::CANCELLED->value])) {
             throw new InvalidArgumentException('Cannot update a completed or cancelled task.');
         }
         return $this->transactions->execute(function () use ($task, $data) {
             if (isset($data['name'])) {
-                $task->update(['name' => $data['name']]);
+                $task->update(['name' => InputSanitizer::sanitize($data['name'])]);
             }
             if (isset($data['sector_ids'])) {
                 $task->sectors()->sync($data['sector_ids']);
@@ -50,7 +51,7 @@ class TaskService
             throw new InvalidArgumentException('Cannot cancel an already completed task.');
         }
         return $this->transactions->execute(function () use ($task) {
-            $task->update(['status' => 'cancelled']);
+            $task->update(['status' => TaskStatus::CANCELLED->value]);
             return $task;
         });
     }

@@ -15,4 +15,8 @@ enum ServiceOrderStatus: string
             self::CANCELLED => 'Cancelled',
         };
     }
+    public static function options(): array
+    {
+        return array_map(fn(self $c) => ['value' => $c->value, 'label' => $c->label()], self::cases());
+    }
 }

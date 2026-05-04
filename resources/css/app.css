@@ -10,3 +10,30 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* ── Dark-themed custom scrollbars ───────────────────────────── */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: hsl(220 10% 50% / 0.35);
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: hsl(220 10% 50% / 0.55);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: hsl(220 10% 30% / 0.6);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: hsl(220 10% 50% / 0.7);
+}

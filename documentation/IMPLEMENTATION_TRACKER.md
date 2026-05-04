@@ -262,6 +262,75 @@ Track all changes, file additions, deletions, and updates to the project.
 
 ---
 
+### Session 5: Loan Workflow & UI Components (2026-05-04)
+
+#### [A] Hierarchical Tree View
+
+**Goal**: Implement hierarchical tree view for service orders.
+
+**Status**: ✅ COMPLETED
+
+---
+
+#### [B] Materials Tab for Loans
+
+**Goal**: Materials tab with priority for loan workflow equipment tracking.
+
+**Status**: ✅ COMPLETED
+
+---
+
+#### [C] Loan Workflow Database Schema
+
+**Status**: ✅ COMPLETED
+
+**Files Created:**
+- [`database/migrations/2026_05_04_090300_add_equipment_id_and_workflow_type_to_service_orders_table.php`](database/migrations/2026_05_04_090300_add_equipment_id_and_workflow_type_to_service_orders_table.php) — Adds `workflow_type` (VARCHAR 50, default 'regular') and `equipment_id` (FK→equipments, nullable) to `service_orders`
+
+**Files Modified:**
+- [`app/Features/ServiceOrders/Models/ServiceOrder.php`](app/Features/ServiceOrders/Models/ServiceOrder.php) — Added `workflow_type`, `equipment_id` to fillable
+- [`app/Features/ServiceOrders/Resources/ServiceOrderResource.php`](app/Features/ServiceOrders/Resources/ServiceOrderResource.php) — Exposes `workflow_type`, `equipment_id` in API responses
+- [`app/Features/ServiceOrders/Controllers/ServiceOrderPageController.php`](app/Features/ServiceOrders/Controllers/ServiceOrderPageController.php) — Handles both regular and loan workflow rendering
+- [`database/seeders/DevelopmentTestSeeder.php`](database/seeders/DevelopmentTestSeeder.php) — Seeds 2 SOs: regular + loan, with task differentiation per workflow type
+
+---
+
+#### [D] Pending: Automatic Task Generation for Loan Workflows
+
+**Goal**: Auto-generate exactly 2 tasks ("Empréstimo de Equipamento" / "Devolução de Equipamento") when a Loan SO is created.
+
+**Status**: 🔄 PENDING
+
+**Requirements:**
+- When `workflow_type='loan'`, the system MUST auto-create exactly 2 tasks upon SO creation:
+  1. `"Empréstimo de Equipamento"`
+  2. `"Devolução de Equipamento"`
+- No additional tasks may be added to a Loan SO
+- Materials tab is replaced by equipment tracking (`work_log_equipment`)
+- Completion of "Devolução de Equipamento" triggers SO closure
+
+---
+
+#### [E] Loan E2E Documentation
+
+**Goal**: Create master E2E specification document for the Loan workflow as Source of Truth.
+
+**Status**: ✅ COMPLETED
+
+**Files Created:**
+- [`documentation/user_stories/12_LOAN_WORKFLOW_E2E.md`](documentation/user_stories/12_LOAN_WORKFLOW_E2E.md) — Complete end-to-end specification covering:
+  - Workflow initiation (trigger, mandatory equipment link)
+  - Binary Task Rule (exactly 2 tasks: Empréstimo/Devolução)
+  - Execution life-cycle with inventory status transitions
+  - UI behavior (Materials tab visibility, task tree rendering)
+  - Database schema, seeder reference, event cascade
+  - State machines, edge cases, cross-reference index
+
+**Cross-References Updated:**
+- [`documentation/ADAPTATION_GUIDE.md`](documentation/ADAPTATION_GUIDE.md) — Added rule #6: "Always enforce the 2-task rule"
+
+---
+
 ## Sessions Summary
 
 | Session | Date | Focus | Changes |
@@ -276,3 +345,66 @@ Track all changes, file additions, deletions, and updates to the project.
 | 4e | 2026-04-28 | Settings Security | Admin-only AppSetting, owner-scoped UserPreference |
 | 4f | 2026-04-28 | CSV Export Feature | CsvExportService, ExportController, routes |
 | 4g | 2026-04-28 | Documentation Sync | All 5 docs rewritten to reflect current state |
+| 5 | 2026-05-04 | Loan Workflow & UI | Migration, seeder, UI components, E2E documentation, tasks auto-generation (pending) |
+| 6 | 2026-05-04 | System Scaffolding & Sidebar Integration | Gap analysis, 4 scaffolded modules (Equipments, Exports, Notifications, Analytics), sidebar redesign with Lucide icons and grouped sections, Dev Preview badges for WIP modules |
+
+---
+
+### Session 6: System Scaffolding & Sidebar Integration (2026-05-04)
+
+**Goal**: Synchronize codebase with documentation roadmap — scaffold missing modules, update sidebar with grouped navigation and visual feedback for WIP features.
+
+#### [A] Gap Analysis
+
+**Result**: Compared all `documentation/user_stories/*.md` against `app/Features/`, `routes/`, and `resources/js/`.
+
+Module | Backend | Frontend | Route | Status |
+|--------|---------|----------|-------|--------|
+Equipments | Model only ❌ | ❌ | ❌ | Scaffolded |
+Exports | API ✅ | ❌ | ❌ | Scaffolded |
+Notifications | API ✅ | ❌ | ❌ | Scaffolded |
+Analytics/Reports | ❌ | ❌ | ❌ | Scaffolded |
+
+**Loan workflow compliance**: Equipment management is now visible in the sidebar under "Operacional" section, acknowledging the E2E loan workflow spec.
+
+#### [B] Scaffolded Backend
+
+**Files Created (Controllers):**
+- [`app/Features/Equipments/Controllers/EquipmentPageController.php`](app/Features/Equipments/Controllers/EquipmentPageController.php) — Inertia page controller with paginated equipment list
+- [`app/Features/Export/Controllers/ExportPageController.php`](app/Features/Export/Controllers/ExportPageController.php) — Inertia page controller referencing existing API routes
+- [`app/Features/Notifications/Controllers/NotificationPageController.php`](app/Features/Notifications/Controllers/NotificationPageController.php) — Inertia page controller with user-scoped notifications
+- [`app/Features/Analytics/Controllers/AnalyticsPageController.php`](app/Features/Analytics/Controllers/AnalyticsPageController.php) — Inertia page controller (placeholder)
+
+**Files Created (Routes):**
+- [`routes/web/equipments.php`](routes/web/equipments.php) — `GET /equipments`
+- [`routes/web/exports.php`](routes/web/exports.php) — `GET /exports`
+- [`routes/web/notifications.php`](routes/web/notifications.php) — `GET /notifications`
+- [`routes/web/analytics.php`](routes/web/analytics.php) — `GET /analytics`
+
+**Files Modified:**
+- [`routes/web.php`](routes/web.php) — Added `require` includes for all 4 new route files
+
+#### [C] Scaffolded Frontend
+
+**Files Created (Placeholder Pages):**
+- [`resources/js/Features/Equipments/Pages/Index.jsx`](resources/js/Features/Equipments/Pages/Index.jsx) — WIP page with equipment icon and "Dev Preview" badge
+- [`resources/js/Features/Export/Pages/Index.jsx`](resources/js/Features/Export/Pages/Index.jsx) — WIP page with download icon and "Dev Preview" badge
+- [`resources/js/Features/Notifications/Pages/Index.jsx`](resources/js/Features/Notifications/Pages/Index.jsx) — WIP page with bell icon and "Dev Preview" badge
+- [`resources/js/Features/Analytics/Pages/Index.jsx`](resources/js/Features/Analytics/Pages/Index.jsx) — WIP page with chart icon and "Dev Preview" badge
+
+#### [D] Sidebar Integration
+
+**Files Modified:**
+- [`resources/js/Components/SideBar/index.jsx`](resources/js/Components/SideBar/index.jsx) — Complete redesign:
+  - **Before**: Flat list of 12 items, raw SVG paths, no grouping, no visual indicators
+  - **After**: 5 grouped sections using `lucide-react` icons, `Dev Preview` badges on scaffolded items, 50% opacity for WIP modules
+
+**Navigation Structure:**
+Section | Items | Type |
+|---------|-------|------|
+*(none)* | Dashboard | Live |
+**Operacional** | Service Orders, Tasks, Mini-Tasks, Work Logs, **Equipamentos** | 4 Live + 1 Dev |
+**Entidades** | Clients, Locations | Live |
+**Recursos Humanos** | Sectors, Teams, Workers | Live |
+**Configurações** | Service Types, Materials, **Exports**, **Notifications**, **Analytics** | 2 Live + 3 Dev |
+*(bottom)* | Settings, Admin, User Profile | Live |

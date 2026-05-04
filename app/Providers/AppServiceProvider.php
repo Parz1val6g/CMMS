@@ -25,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Register model policies
+        Gate::policy(\App\Features\Equipments\Models\Equipment::class, \App\Features\Equipments\Policies\EquipmentPolicy::class);
+        Gate::policy(\App\Features\Equipments\Models\EquipmentRevision::class, \App\Features\Equipments\Policies\EquipmentRevisionPolicy::class);
         Gate::policy(\App\Features\ServiceOrders\Models\ServiceOrder::class, \App\Features\ServiceOrders\Policies\ServiceOrderPolicy::class);
         Gate::policy(\App\Features\Tasks\Models\Task::class, \App\Features\Tasks\Policies\TaskPolicy::class);
         Gate::policy(\App\Features\MiniTasks\Models\MiniTask::class, \App\Features\MiniTasks\Policies\MiniTaskPolicy::class);

@@ -60,6 +60,24 @@ CREATE TABLE `units` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_abbreviation` (`abbreviation`)
 );
+CREATE TABLE `equipments` (
+  `id` VARCHAR(36) NOT NULL,
+  `name` VARCHAR(200) NOT NULL,
+  `serial_number` VARCHAR(250) NOT NULL,
+  `manager_id` VARCHAR(36) NOT NULL,
+  `status` VARCHAR(50) NOT NULL,
+  `is_loanable` BOOLEAN NOT NULL DEFAULT true,
+  `revision_interval_days` INTEGER NOT NULL,
+  `last_revision_date` DATETIME NULL,
+  `next_revision_date` DATETIME NULL,
+  `description` VARCHAR(250) NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` TIMESTAMP NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_serial_number` (`serial_number`),
+  CONSTRAINT fk_equipment_manager FOREIGN KEY (`manager_id`) REFERENCES users(`id`)
+);
 CREATE TABLE `materials` (
   `id` VARCHAR(36) NOT NULL,
   `name` VARCHAR(100) NOT NULL,
@@ -178,6 +196,8 @@ CREATE TABLE `service_orders` (
   `manager_id` VARCHAR(36) NOT NULL,
   `location_id` VARCHAR(36) NOT NULL,
   `service_type_id` VARCHAR(36) NULL,
+  `workflow_type` VARCHAR(50) NOT NULL,
+  `equipment_id` VARCHAR(36) NULL,
   `priority` VARCHAR(20) NOT NULL,
   `execution_date` DATE NULL,
   `status` VARCHAR(50) NOT NULL,
@@ -188,7 +208,8 @@ CREATE TABLE `service_orders` (
   CONSTRAINT fk_so_client FOREIGN KEY (`client_id`) REFERENCES clients(`id`),
   CONSTRAINT fk_so_manager FOREIGN KEY (`manager_id`) REFERENCES users(`id`),
   CONSTRAINT fk_so_location FOREIGN KEY (`location_id`) REFERENCES locations(`id`),
-  CONSTRAINT fk_so_st FOREIGN KEY (`service_type_id`) REFERENCES service_types(`id`)
+  CONSTRAINT fk_so_st FOREIGN KEY (`service_type_id`) REFERENCES service_types(`id`),
+  CONSTRAINT fk_so_equipment FOREIGN KEY (`equipment_id`) REFERENCES equipments(`id`)
 );
 CREATE TABLE `tasks` (
   `id` VARCHAR(36) NOT NULL,
@@ -337,6 +358,31 @@ CREATE TABLE `attachments` (
     )
   )
 );
+CREATE TABLE `equipment_revisions` (
+  `id` VARCHAR(36) NOT NULL,
+  `equipment_id` VARCHAR(36) NOT NULL,
+  `status` VARCHAR(50) NOT NULL,
+  `approved_by` VARCHAR(36) NULL,
+  `approved_at` DATETIME NULL,
+  `revision_date` DATETIME NOT NULL,
+  `notes` TEXT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` TIMESTAMP NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_er_equipment FOREIGN KEY (`equipment_id`) REFERENCES equipments(`id`) ON DELETE CASCADE,
+  CONSTRAINT fk_er_approver FOREIGN KEY (`approved_by`) REFERENCES users(`id`) ON DELETE SET NULL
+);
+CREATE TABLE `work_log_equipment` (
+  `work_log_id` VARCHAR(36) NOT NULL,
+  `equipment_id` VARCHAR(36) NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` TIMESTAMP NULL,
+  PRIMARY KEY (`work_log_id`, `equipment_id`),
+  CONSTRAINT fk_wle_wl FOREIGN KEY (`work_log_id`) REFERENCES work_logs(`id`) ON DELETE CASCADE,
+  CONSTRAINT fk_wle_equipment FOREIGN KEY (`equipment_id`) REFERENCES equipments(`id`) ON DELETE CASCADE
+);
 -- ===== INDEXES COMPLETOS =====
 -- Users
 CREATE INDEX idx_users_email ON users(email);
@@ -360,6 +406,7 @@ CREATE INDEX idx_service_orders_status ON service_orders(status);
 CREATE INDEX idx_service_orders_priority ON service_orders(priority);
 CREATE INDEX idx_service_orders_created ON service_orders(created_at);
 CREATE INDEX idx_service_orders_status_created ON service_orders(status, created_at);
+CREATE INDEX idx_service_orders_equipment ON service_orders(equipment_id);
 -- Tasks
 CREATE INDEX idx_tasks_service_order ON tasks(service_order_id);
 CREATE INDEX idx_tasks_manager ON tasks(manager_id);
@@ -406,3 +453,14 @@ CREATE INDEX idx_role_permissions_role ON role_permissions(role_id);
 CREATE INDEX idx_user_preferences_user ON user_preferences(user_id);
 -- Materials Unit
 CREATE INDEX idx_materials_unit_fk ON materials(unit_id);
+-- ===== EQUIPMENT INDEXES =====
+CREATE INDEX idx_equipments_manager ON equipments(manager_id);
+CREATE INDEX idx_equipments_status ON equipments(status);
+CREATE INDEX idx_equipments_next_revision ON equipments(next_revision_date);
+-- ===== EQUIPMENT_REVISIONS INDEXES =====
+CREATE INDEX idx_equipment_revisions_equipment ON equipment_revisions(equipment_id);
+CREATE INDEX idx_equipment_revisions_status ON equipment_revisions(status);
+CREATE INDEX idx_equipment_revisions_approved_at ON equipment_revisions(approved_at);
+-- ===== WORK_LOG_EQUIPMENT INDEXES =====
+CREATE INDEX idx_work_log_equipment_wl ON work_log_equipment(work_log_id);
+CREATE INDEX idx_work_log_equipment_equipment ON work_log_equipment(equipment_id);

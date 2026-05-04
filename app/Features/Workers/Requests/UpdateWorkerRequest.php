@@ -2,20 +2,22 @@
 
 namespace App\Features\Workers\Requests;
 
+use App\Core\Forms\FormValidator;
+use App\Features\Workers\Models\Worker;
+use App\Features\Workers\Schemas\WorkerFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateWorkerRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('update', $this->route('worker'));
     }
 
     public function rules(): array
     {
-        return [
-            'user_id' => ['sometimes', 'exists:users,id'],
-            'team_id' => ['nullable', 'exists:teams,id'],
-        ];
+        $rules = (new FormValidator())->fromSchema(WorkerFormSchema::update(), $this->all());
+        $rules['user_id'] = ['sometimes', 'exists:users,id'];
+        return $rules;
     }
 }

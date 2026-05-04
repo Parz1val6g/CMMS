@@ -3,6 +3,7 @@
 namespace App\Features\ServiceTypes\Controllers;
 
 use App\Features\ServiceTypes\Models\ServiceType;
+use App\Features\ServiceTypes\Schemas\ServiceTypeFormSchema;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
@@ -23,6 +24,9 @@ class ServiceTypePageController extends Controller
                 'created_at' => $st->created_at->format('Y-m-d'),
             ]);
 
+        $createSchema = ServiceTypeFormSchema::create();
+        $updateSchema = ServiceTypeFormSchema::update();
+
         return Inertia::render('ServiceTypes/Pages/Index', [
             'service_types' => $serviceTypes,
             'columns' => [
@@ -30,14 +34,8 @@ class ServiceTypePageController extends Controller
                 ['key' => 'description', 'label' => 'Description'],
                 ['key' => 'created_at', 'label' => 'Created', 'sortable' => true],
             ],
-            'formSchema' => [
-                ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|max:100'],
-                ['key' => 'description', 'label' => 'Description', 'type' => 'text', 'rules' => 'required|max:250'],
-            ],
-            'createFormSchema' => [
-                ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|max:100'],
-                ['key' => 'description', 'label' => 'Description', 'type' => 'text', 'rules' => 'required|max:250'],
-            ],
+            'formSchema' => $updateSchema->toArray(),
+            'createFormSchema' => $createSchema->toArray(),
             'routes' => [
                 'index' => url('/api/service-types'),
                 'store' => url('/api/service-types'),

@@ -1,6 +1,7 @@
 <?php
 namespace App\Features\WorkLogs\Services;
 use App\Core\Enums\WorkLogStatus;
+use App\Core\Helpers\InputSanitizer;
 use App\Core\Services\TransactionHandler;
 use App\Features\WorkLogs\Events\WorkLogCompletedEvent;
 use App\Features\WorkLogs\Models\WorkLog;
@@ -25,7 +26,7 @@ class WorkLogService
                 'mini_task_id' => $data['mini_task_id'],
                 'started_at' => $data['started_at'],
                 'completed_at' => $data['completed_at'] ?? null,
-                'description' => $data['description'],
+                'description' => InputSanitizer::sanitize($data['description']),
                 'status' => $status,
             ]);
 

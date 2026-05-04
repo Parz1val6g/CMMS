@@ -15,6 +15,9 @@ return new class extends Migration {
             $table->string('status', 50);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index('status');
+            $table->index(['task_id', 'status']);
         });
     }
 

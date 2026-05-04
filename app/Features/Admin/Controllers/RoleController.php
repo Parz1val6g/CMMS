@@ -24,6 +24,8 @@ class RoleController extends Controller
 
     public function store(StoreRoleRequest $request): RoleResource
     {
+        Gate::authorize('create', Role::class);
+
         $role = Role::create($request->validated());
         $role->load(['permissions']);
         return new RoleResource($role);
@@ -39,6 +41,8 @@ class RoleController extends Controller
 
     public function update(UpdateRoleRequest $request, Role $role): RoleResource
     {
+        Gate::authorize('update', $role);
+
         $role->update($request->validated());
         $role->load(['permissions']);
         return new RoleResource($role->fresh());

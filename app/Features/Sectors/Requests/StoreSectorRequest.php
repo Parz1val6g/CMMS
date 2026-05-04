@@ -2,20 +2,20 @@
 
 namespace App\Features\Sectors\Requests;
 
+use App\Core\Forms\FormValidator;
+use App\Features\Sectors\Models\Sector;
+use App\Features\Sectors\Schemas\SectorFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreSectorRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', Sector::class);
     }
 
     public function rules(): array
     {
-        return [
-            'name' => ['required', 'string', 'max:150'],
-            'head_id' => ['nullable', 'exists:users,id'],
-        ];
+        return (new FormValidator())->fromSchema(SectorFormSchema::create(), $this->all());
     }
 }

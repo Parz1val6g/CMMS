@@ -53,7 +53,7 @@ class ValidationHelper
 
     public static function isStrongPassword(string $password): bool
     {
-        return strlen($password) >= 8
+        return strlen($password) >= 12
             && preg_match('/[A-Z]/', $password)
             && preg_match('/[a-z]/', $password)
             && preg_match('/[0-9]/', $password)
@@ -64,8 +64,8 @@ class ValidationHelper
     {
         $strength = 0;
 
-        $strength += strlen($password) >= 8 ? 25 : 0;
         $strength += strlen($password) >= 12 ? 25 : 0;
+        $strength += strlen($password) >= 16 ? 25 : 0;
         $strength += preg_match('/[A-Z]/', $password) ? 25 : 0;
         $strength += preg_match('/[0-9]/', $password) ? 15 : 0;
         $strength += preg_match('/[^A-Za-z0-9]/', $password) ? 10 : 0;

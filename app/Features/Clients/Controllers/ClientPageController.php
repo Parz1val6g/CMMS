@@ -3,6 +3,7 @@
 namespace App\Features\Clients\Controllers;
 
 use App\Features\Clients\Models\Client;
+use App\Features\Clients\Schemas\ClientFormSchema;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
@@ -26,6 +27,9 @@ class ClientPageController extends Controller
                 'created_at' => $c->created_at->format('Y-m-d'),
             ]);
 
+        $createSchema = ClientFormSchema::create();
+        $updateSchema = ClientFormSchema::update();
+
         return Inertia::render('Clients/Pages/Index', [
             'clients' => $clients,
             'columns' => [
@@ -35,20 +39,8 @@ class ClientPageController extends Controller
                 ['key' => 'nif', 'label' => 'NIF'],
                 ['key' => 'created_at', 'label' => 'Created', 'sortable' => true],
             ],
-            'formSchema' => [
-                ['key' => 'nif', 'label' => 'NIF', 'type' => 'text', 'rules' => 'required|max:20'],
-                ['key' => 'first_name', 'label' => 'First Name', 'type' => 'text', 'rules' => 'required|max:250'],
-                ['key' => 'last_name', 'label' => 'Last Name', 'type' => 'text', 'rules' => 'required|max:250'],
-                ['key' => 'email', 'label' => 'Email', 'type' => 'email', 'rules' => 'required|email'],
-                ['key' => 'phone', 'label' => 'Phone', 'type' => 'text'],
-            ],
-            'createFormSchema' => [
-                ['key' => 'nif', 'label' => 'NIF', 'type' => 'text', 'rules' => 'required|max:20'],
-                ['key' => 'first_name', 'label' => 'First Name', 'type' => 'text', 'rules' => 'required|max:250'],
-                ['key' => 'last_name', 'label' => 'Last Name', 'type' => 'text', 'rules' => 'required|max:250'],
-                ['key' => 'email', 'label' => 'Email', 'type' => 'email', 'rules' => 'required|email'],
-                ['key' => 'phone', 'label' => 'Phone', 'type' => 'text'],
-            ],
+            'formSchema' => $updateSchema->toArray(),
+            'createFormSchema' => $createSchema->toArray(),
             'routes' => [
                 'index' => url('/api/clients'),
                 'store' => url('/api/clients'),

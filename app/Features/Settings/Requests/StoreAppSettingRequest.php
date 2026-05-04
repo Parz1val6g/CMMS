@@ -2,13 +2,14 @@
 
 namespace App\Features\Settings\Requests;
 
+use App\Shared\Models\AppSetting;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreAppSettingRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // Authorized via Policy
+        return $this->user()->can('create', AppSetting::class);
     }
 
     public function rules(): array

@@ -2,186 +2,157 @@
 
 namespace Database\Seeders;
 
-use App\Core\Enums\ServiceOrderStatus;
-use App\Core\Enums\ServicesOrdersPriority;
+use App\Core\Enums\ServiceOrderStatus as SOStatus;
+use App\Core\Enums\Priority;
+use App\Features\ServiceOrders\Models\ServiceOrder;
+use App\Features\Clients\Models\Client;
+use App\Shared\Models\User;
+use App\Features\Locations\Models\Location;
+use App\Features\ServiceTypes\Models\ServiceType;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 
 class ServiceOrderSeeder extends Seeder
 {
     public function run(): void
     {
-        $clients = DB::table('clients')->get();
-        $managers = DB::table('users')
-            ->whereIn('id', function ($q) {
-                $q->select('user_id')->from('user_roles')
-                    ->whereIn('role_id', function ($q2) {
-                        $q2->select('id')->from('roles')->whereIn('name', ['admin', 'manager']);
-                    });
-            })->get();
-        $locations = DB::table('locations')->get();
-        $serviceTypes = DB::table('service_types')->get();
+        $clients      = Client::all();
+        $managers     = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'manager']))->get();
+        $locations    = Location::all();
+        $serviceTypes = ServiceType::all();
 
         if ($clients->isEmpty() || $managers->isEmpty() || $locations->isEmpty() || $serviceTypes->isEmpty()) {
             return;
         }
 
-        $statuses = ServiceOrderStatus::cases();
-        $priorities = ServicesOrdersPriority::cases();
-
-        $serviceDescriptions = [
+        // Realistic service order descriptions grouped by service type
+        $descriptions = [
             'Pavimentação' => [
-                'Reparação de piso danificado na via pública',
-                'Aplicação de nova camada de asfalto na estrada municipal',
-                'Correção de buracos e fissuras no pavimento',
-                'Remodelação de passeios e lancis',
-                'Pavimentação de arruamento em zona urbana',
+                'Reparação de piso danificado na via pública com aplicação de nova camada de asfalto',
+                'Remodelação de passeios e lancis na zona central com calcetamento tradicional',
+                'Correção de buracos e fissuras no pavimento após período de chuvas intensas',
+                'Pavimentação de arruamento em zona urbana com preparação de fundação e drenagem',
             ],
             'Iluminação Pública' => [
-                'Substituição de luminárias fundidas na Av. Principal',
-                'Instalação de postes de iluminação no parque infantil',
-                'Reparação de quadro elétrico de iluminação pública',
-                'Manutenção preventiva da rede de iluminação',
-                'Substituição de cabos danificados na Rua das Flores',
+                'Substituição de luminárias fundidas na Av. Principal por LED de baixo consumo',
+                'Instalação de postes de iluminação no parque infantil com sistema fotovoltaico',
+                'Reparação de quadro elétrico de iluminação pública com substituição de disjuntores',
+                'Manutenção preventiva da rede de iluminação incluindo limpeza de luminárias',
             ],
             'Abastecimento de Água' => [
-                'Reparação de rotura na conduta de água',
-                'Substituição de válvula de corte na Rua Nova',
-                'Instalação de novo ramal de ligação',
-                'Manutenção da estação elevatória',
-                'Reparação de fuga de água detectada',
+                'Reparação de rotura na conduta principal de água com escavação e soldadura',
+                'Substituição de válvula de corte na Rua Nova com instalação de ventosa',
+                'Instalação de novo ramal de ligação domiciliária com contador individual',
+                'Reparação de fuga de água detectada com reposição de pavimento',
             ],
             'Saneamento' => [
-                'Limpeza de coletor entupido',
-                'Reparação de caixa de visita danificada',
-                'Substituição de tubagem de saneamento',
-                'Desobstrução de ramal de esgotos',
-                'Vistoria a rede de drenagem',
+                'Limpeza de coletor entupido com recurso a camião de hidrojato',
+                'Reparação de caixa de visita danificada com substituição de tampa e aro',
+                'Substituição de tubagem de saneamento em troço de 50 metros',
+                'Desobstrução de ramal de esgotos com remoção de raízes',
             ],
             'Limpeza Urbana' => [
-                'Limpeza extraordinária de via pública',
-                'Remoção de resíduos volumosos',
-                'Lavagem de contentores de lixo',
-                'Limpeza de terreno baldio',
-                'Higienização de contentores enterrados',
+                'Limpeza extraordinária de via pública após evento municipal com remoção de resíduos',
+                'Remoção de resíduos volumosos e monos abandonados na via pública',
+                'Lavagem de contentores de lixo com recurso a equipamento de hidrolimpeza',
+                'Limpeza de terreno baldio com remoção de vegetação e resíduos',
             ],
             'Gestão de Resíduos' => [
-                'Recolha seletiva de resíduos na zona histórica',
-                'Instalação de novos ecopontos',
-                'Substituição de contentores danificados',
-                'Operação de remoção de monos',
-                'Manutenção do centro de triagem',
+                'Instalação de novos ecopontos para recolha seletiva na zona histórica',
+                'Substituição de contentores subterrâneos danificados na praça central',
+                'Operação de remoção de monos na freguesia com recurso a equipa dedicada',
             ],
             'Manutenção de Jardins' => [
-                'Podas de árvores na Alameda Central',
-                'Plantação de espécies autóctones no jardim municipal',
-                'Manutenção de relvados e canteiros',
-                'Instalação de sistema de rega automática',
-                'Controlo de pragas no parque urbano',
+                'Podas de árvores na Alameda Central com remoção de ramos secos',
+                'Plantação de espécies autóctones no jardim municipal com sistema de rega',
+                'Manutenção de relvados e canteiros com corte de erva e fertilização',
+                'Controlo de pragas no parque urbano com tratamento fitossanitário',
             ],
             'Reparação de Calçadas' => [
-                'Reparação de calçada portuguesa na Praça Municipal',
-                'Substituição de lajetas partidas no passeio',
-                'Reconstrução de lancil danificado',
-                'Nivelamento de pavimento em pedra',
-                'Remodelação de acesso pedonal',
+                'Reparação de calçada portuguesa na Praça Municipal com reposição de cubos',
+                'Substituição de lajetas partidas no passeio da Rua Direita',
+                'Reconstrução de lancil danificado na zona do mercado municipal',
             ],
             'Sinalização de Trânsito' => [
-                'Colocação de sinais de trânsito na nova rotunda',
-                'Substituição de sinal vertical danificado',
-                'Pintura de passadeiras na Av. Central',
-                'Instalação de sinalização temporária para obras',
-                'Reparação de semáforo avariado',
+                'Colocação de sinais de trânsito na nova rotunda de acesso à zona industrial',
+                'Substituição de sinal vertical danificado após acidente na EN 234',
+                'Pintura de passadeiras na Av. Central com tinta termoplástica',
+                'Reparação de semáforo avariado no cruzamento da estação',
             ],
             'Aprovação de Projetos' => [
-                'Análise de projeto de construção civil',
-                'Parecer técnico para alteração de fachada',
-                'Vistoria para licenciamento de obra',
-                'Avaliação de impacto urbanístico',
-                'Emissão de parecer para loteamento',
+                'Análise de projeto de construção civil para edifício habitacional',
+                'Parecer técnico para alteração de fachada em imóvel classificado',
+                'Vistoria para licenciamento de obra de remodelação comercial',
             ],
             'Vistoria de Imóveis' => [
-                'Inspeção técnica a edifício municipal',
-                'Vistoria para licença de habitação',
-                'Avaliação de danos estruturais',
-                'Inspeção periódica a equipamentos públicos',
-                'Vistoria pré-compra de imóvel',
+                'Inspeção técnica a edifício municipal para avaliação de segurança',
+                'Vistoria para licença de habitação de novo empreendimento',
+                'Avaliação de danos estruturais após sinistro em edifício',
             ],
             'Emissão de Licenças' => [
-                'Processamento de licença comercial',
-                'Renovação de licença de ocupação de via pública',
-                'Emissão de alvará de construção',
-                'Licenciamento de evento público',
-                'Autorização para esplanada',
+                'Processamento de licença comercial para novo estabelecimento',
+                'Renovação de licença de ocupação de via pública para esplanada',
+                'Emissão de alvará de construção para obra particular',
             ],
         ];
 
-        $processCounters = [];
         $now = now();
         $threeMonthsAgo = (clone $now)->modify('-3 months');
+        $counter = 0;
 
-        for ($i = 0; $i < 55; $i++) {
-            $client = $clients->random();
-            $manager = $managers->random();
-            $location = $locations->random();
+        for ($i = 0; $i < 40; $i++) {
+            $client     = $clients->random();
+            $manager    = $managers->random();
+            $location   = $locations->random();
             $serviceType = $serviceTypes->random();
+            $counter++;
 
-            $year = $now->format('Y');
-            if (!isset($processCounters[$year])) {
-                $processCounters[$year] = 1000;
+            $createdAt = fake()->dateTimeBetween($threeMonthsAgo, $now);
+            // Avoid DST spring-forward gap (Europe/Lisbon: Mar last Sun 01:00-02:00)
+            if ($createdAt->format('Y-m-d') === '2026-03-29' && $createdAt->format('H') === '01') {
+                $createdAt->modify('+1 hour');
             }
+            $executionDate = (clone $createdAt)->modify('+' . rand(1, 30) . ' days');
 
-            $executionDate = fake()->dateTimeBetween($threeMonthsAgo, $now);
-
-            // Distribute statuses: ~20% completed, ~30% in_progress, ~30% pending, ~20% cancelled
+            // Status distribution: ~20% completed, ~35% in_progress, ~30% pending, ~15% cancelled
             $statusRoll = rand(1, 100);
             $status = match (true) {
-                $statusRoll <= 20 => ServiceOrderStatus::COMPLETED->value,
-                $statusRoll <= 50 => ServiceOrderStatus::IN_PROGRESS->value,
-                $statusRoll <= 80 => ServiceOrderStatus::PENDING->value,
-                default => ServiceOrderStatus::CANCELLED->value,
+                $statusRoll <= 20 => SOStatus::COMPLETED->value,
+                $statusRoll <= 55 => SOStatus::IN_PROGRESS->value,
+                $statusRoll <= 85 => SOStatus::PENDING->value,
+                default           => SOStatus::CANCELLED->value,
             };
 
-            // ~15% urgent, ~25% high, ~40% normal, ~20% low
+            // Priority: ~15% urgent, ~25% high, ~40% normal, ~20% low
             $priorityRoll = rand(1, 100);
             $priority = match (true) {
-                $priorityRoll <= 15 => ServicesOrdersPriority::URGENT->value,
-                $priorityRoll <= 40 => ServicesOrdersPriority::HIGH->value,
-                $priorityRoll <= 80 => ServicesOrdersPriority::NORMAL->value,
-                default => ServicesOrdersPriority::LOW->value,
+                $priorityRoll <= 15 => Priority::URGENT->value,
+                $priorityRoll <= 40 => Priority::HIGH->value,
+                $priorityRoll <= 80 => Priority::NORMAL->value,
+                default             => Priority::LOW->value,
             };
 
-            // Make some critical: urgent + overdue (execution_date in the past + still pending/in_progress)
-            if ($i < 5 && $status !== ServiceOrderStatus::COMPLETED->value && $status !== ServiceOrderStatus::CANCELLED->value) {
-                $priority = ServicesOrdersPriority::URGENT->value;
-                $executionDate = (clone $threeMonthsAgo)->modify('+' . rand(1, 30) . ' days');
+            $typeName = $serviceType->name;
+            $typeDesc = $descriptions[$typeName] ?? ['Execução de serviço municipal'];
+            $description = $typeDesc[array_rand($typeDesc)];
+            $process = 'OS/' . $createdAt->format('Y') . '/' . str_pad((string)$counter, 4, '0', STR_PAD_LEFT);
+
+            // Urgent: force execution_date in the past + in_progress
+            if ($priority === Priority::URGENT->value && $status === SOStatus::PENDING->value) {
+                $status = SOStatus::IN_PROGRESS->value;
+                $executionDate = (clone $threeMonthsAgo)->modify('+' . rand(1, 15) . ' days');
             }
 
-            $counter = $processCounters[$year]++;
-            $typeName = $serviceType->name ?? 'Serviço';
-            $descriptions = $serviceDescriptions[$typeName] ?? ['Execução de serviço municipal'];
-            $description = $descriptions[array_rand($descriptions)];
-
-            // Check if we have a specific column for description - looking at migration, there isn't.
-            // But the model has process field. We'll use process as a meaningful identifier.
-            $process = sprintf('%s/%d/%04d', strtoupper(substr(str_replace(['ç', 'ã', 'á', 'é', 'í', 'ó', 'ú', 'ê', 'ô'], ['c', 'a', 'a', 'e', 'i', 'o', 'u', 'e', 'o'], $typeName), 0, 3)), $year, $counter);
-            // Generate a unique process
-            $process = 'OS/' . $year . '/' . str_pad($counter, 4, '0', STR_PAD_LEFT);
-
-            $id = Str::uuid();
-            DB::table('service_orders')->insert([
-                'id' => $id,
-                'process' => $process,
-                'client_id' => $client->id,
-                'manager_id' => $manager->id,
-                'location_id' => $location->id,
+            ServiceOrder::create([
+                'process'         => $process,
+                'client_id'       => $client->id,
+                'manager_id'      => $manager->id,
+                'location_id'     => $location->id,
                 'service_type_id' => $serviceType->id,
-                'priority' => $priority,
-                'execution_date' => $executionDate,
-                'status' => $status,
-                'created_at' => $executionDate,
-                'updated_at' => $executionDate,
+                'priority'        => $priority,
+                'execution_date'  => $executionDate,
+                'status'          => $status,
+                'created_at'      => $createdAt,
+                'updated_at'      => $createdAt,
             ]);
         }
     }

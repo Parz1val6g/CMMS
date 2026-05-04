@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Features\Sectors\Models\Sector;
-use App\Shared\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +15,8 @@ class SectorFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => 'Departamento ' . fake()->word(),
-            'head_id' => User::factory(),
+            // name and head_id must be provided via state() or seeder
+            'name' => fake()->unique()->word(),
         ];
     }
 }

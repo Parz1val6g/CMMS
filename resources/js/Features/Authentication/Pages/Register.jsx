@@ -36,7 +36,7 @@ export default function Register() {
               {/* First Name */}
               <div className="mb-3">
                 <label htmlFor="first_name" className="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400">
-                  Full Name
+                  Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="first_name"
@@ -59,7 +59,7 @@ export default function Register() {
               {/* Email */}
               <div className="mb-3">
                 <label htmlFor="email" className="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400">
-                  Work Email
+                  Work Email <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="email"
@@ -81,7 +81,7 @@ export default function Register() {
               {/* Password */}
               <div className="mb-3">
                 <label htmlFor="password" className="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400">
-                  Password
+                  Password <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="password"
@@ -103,7 +103,7 @@ export default function Register() {
               {/* Confirm Password */}
               <div className="mb-4">
                 <label htmlFor="password_confirmation" className="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400">
-                  Confirm Password
+                  Confirm Password <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="password_confirmation"

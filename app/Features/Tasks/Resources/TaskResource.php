@@ -13,6 +13,7 @@ class TaskResource extends JsonResource
             'id' => $this->id,
             'service_order_id' => $this->service_order_id,
             'name' => $this->name,
+            'description' => $this->description,
             'status' => $this->status,
             'created_at' => $this->created_at->toIso8601String(),
             'manager' => $this->whenLoaded('manager', function () {

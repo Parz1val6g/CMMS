@@ -3,6 +3,7 @@
 namespace App\Features\Materials\Controllers;
 
 use App\Features\Materials\Models\Material;
+use App\Features\Materials\Schemas\MaterialFormSchema;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
@@ -29,6 +30,9 @@ class MaterialPageController extends Controller
                 'created_at' => $m->created_at->format('Y-m-d'),
             ]);
 
+        $createSchema = MaterialFormSchema::create();
+        $updateSchema = MaterialFormSchema::update();
+
         return Inertia::render('Materials/Pages/Index', [
             'materials' => $materials,
             'columns' => [
@@ -37,16 +41,8 @@ class MaterialPageController extends Controller
                 ['key' => 'stock_quantity', 'label' => 'Stock', 'sortable' => true],
                 ['key' => 'created_at', 'label' => 'Created', 'sortable' => true],
             ],
-            'formSchema' => [
-                ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|max:100'],
-                ['key' => 'unit_id', 'label' => 'Unit', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-                ['key' => 'stock_quantity', 'label' => 'Stock Quantity', 'type' => 'number', 'rules' => 'required|numeric|min:0'],
-            ],
-            'createFormSchema' => [
-                ['key' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|max:100'],
-                ['key' => 'unit_id', 'label' => 'Unit', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-                ['key' => 'stock_quantity', 'label' => 'Stock Quantity', 'type' => 'number', 'rules' => 'required|numeric|min:0'],
-            ],
+            'formSchema' => $updateSchema->toArray(),
+            'createFormSchema' => $createSchema->toArray(),
             'routes' => [
                 'index' => url('/api/materials'),
                 'store' => url('/api/materials'),

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import DataManager from '@/Components/Common/DataManager';
+import DataManager from '@/Components/DataManager';
 import Modal from '@/Components/Common/Modal';
 
 export default function MiniTasksIndex({ mini_tasks, columns, formSchema, createFormSchema, routes, filterSchema }) {
@@ -28,6 +28,7 @@ export default function MiniTasksIndex({ mini_tasks, columns, formSchema, create
         columns={columns}
         formSchema={formSchema}
         filterSchema={filterSchema ?? []}
+        onNew={() => setShowModal(true)}
       />
     </AppLayout>
   );

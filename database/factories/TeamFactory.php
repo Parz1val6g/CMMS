@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Features\Teams\Models\Team;
-use App\Features\Sectors\Models\Sector;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +15,8 @@ class TeamFactory extends Factory
     public function definition(): array
     {
         return [
-            'sector_id' => Sector::factory(),
-            'name' => 'Equipa ' . fake()->word(),
+            // sector_id must be provided via state() or seeder
+            'name' => fake()->unique()->word(),
         ];
     }
 }

@@ -3,16 +3,12 @@ import { Link } from '@inertiajs/react';
 import Badge from '@/Components/Common/Badge';
 
 export default function Profile({ user }) {
-  const breadcrumbs = [
-    { name: 'Dashboard', url: '/dashboard' },
-    { name: 'Profile', url: '/profile' },
-  ];
-
   const statusVariant = user.status === 'active' ? 'success' : user.status === 'pending' ? 'warning' : 'danger';
 
   return (
-    <AppLayout title="Profile" breadcrumbs={breadcrumbs}>
-      <div className="mx-auto max-w-2xl">
+    <AppLayout title="Profile">
+      <div className="h-full overflow-y-auto w-full">
+        <div className="max-w-7xl mx-auto py-8 px-6">
         <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">Profile</h1>
 
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
@@ -49,6 +45,7 @@ export default function Profile({ user }) {
           >
             Back
           </Link>
+        </div>
         </div>
       </div>
     </AppLayout>

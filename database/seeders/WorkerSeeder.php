@@ -2,82 +2,68 @@
 
 namespace Database\Seeders;
 
-use App\Core\Enums\SystemStatus;
+use App\Shared\Models\User;
+use App\Shared\Models\Role;
+use App\Features\Workers\Models\Worker;
+use App\Features\Teams\Models\Team;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class WorkerSeeder extends Seeder
 {
     public function run(): void
     {
-        $managerRole = DB::table('roles')->where('name', 'manager')->first();
-        $teams = DB::table('teams')->get();
+        $workerRole = Role::where('name', 'worker')->firstOrFail();
+        $teams      = Team::all();
 
-        $workerNames = [
-            ['first_name' => 'António', 'last_name' => 'Silva'],
-            ['first_name' => 'Pedro', 'last_name' => 'Santos'],
-            ['first_name' => 'João', 'last_name' => 'Oliveira'],
-            ['first_name' => 'José', 'last_name' => 'Ferreira'],
-            ['first_name' => 'Miguel', 'last_name' => 'Costa'],
-            ['first_name' => 'Rosa', 'last_name' => 'Gonçalves'],
-            ['first_name' => 'Rui', 'last_name' => 'Martins'],
-            ['first_name' => 'Mariana', 'last_name' => 'Alves'],
-            ['first_name' => 'Paulo', 'last_name' => 'Ribeiro'],
+        if ($teams->isEmpty()) {
+            return;
+        }
+
+        $workers = [
+            ['first_name' => 'António',   'last_name' => 'Silva'],
+            ['first_name' => 'Pedro',     'last_name' => 'Santos'],
+            ['first_name' => 'João',      'last_name' => 'Oliveira'],
+            ['first_name' => 'José',      'last_name' => 'Ferreira'],
+            ['first_name' => 'Miguel',    'last_name' => 'Costa'],
+            ['first_name' => 'Rosa',      'last_name' => 'Gonçalves'],
+            ['first_name' => 'Rui',       'last_name' => 'Martins'],
+            ['first_name' => 'Mariana',   'last_name' => 'Alves'],
+            ['first_name' => 'Paulo',     'last_name' => 'Ribeiro'],
             ['first_name' => 'Conceição', 'last_name' => 'Teixeira'],
-            ['first_name' => 'Luís', 'last_name' => 'Fonseca'],
-            ['first_name' => 'Carla', 'last_name' => 'Neves'],
-            ['first_name' => 'André', 'last_name' => 'Pinto'],
-            ['first_name' => 'Teresa', 'last_name' => 'Araújo'],
-            ['first_name' => 'Nuno', 'last_name' => 'Almeida'],
-            ['first_name' => 'Sandra', 'last_name' => 'Rodrigues'],
-            ['first_name' => 'Hélder', 'last_name' => 'Gomes'],
-            ['first_name' => 'Patrícia', 'last_name' => 'Guimarães'],
-            ['first_name' => 'Ricardo', 'last_name' => 'Vieira'],
-            ['first_name' => 'Mónica', 'last_name' => 'Barbosa'],
+            ['first_name' => 'Luís',      'last_name' => 'Fonseca'],
+            ['first_name' => 'Carla',     'last_name' => 'Neves'],
+            ['first_name' => 'André',     'last_name' => 'Pinto'],
+            ['first_name' => 'Teresa',    'last_name' => 'Araújo'],
+            ['first_name' => 'Nuno',      'last_name' => 'Almeida'],
+            ['first_name' => 'Sandra',    'last_name' => 'Rodrigues'],
+            ['first_name' => 'Hélder',    'last_name' => 'Gomes'],
+            ['first_name' => 'Patrícia',  'last_name' => 'Guimarães'],
+            ['first_name' => 'Ricardo',   'last_name' => 'Vieira'],
+            ['first_name' => 'Mónica',    'last_name' => 'Barbosa'],
         ];
 
-        $phoneBase = 900000000;
+        $idx = 0;
         foreach ($teams as $team) {
-            for ($i = 0; $i < 3; $i++) {
-                $name = $workerNames[($phoneBase - 900000000) % count($workerNames)];
-                $counter = rand(1000, 9999);
-                $email = strtolower($name['first_name']) . '.' . strtolower($name['last_name']) . $counter . '@workers.cm.pt';
-                $phone = '+351' . $phoneBase;
+            for ($i = 0; $i < 3 && $idx < count($workers); $i++, $idx++) {
+                $w = $workers[$idx];
+                $email = strtolower($w['first_name']) . '.' . strtolower($w['last_name'])
+                       . ($idx + 1000) . '@workers.cm.pt';
 
-                $userId = Str::uuid();
-                $workerId = Str::uuid();
-
-                DB::table('users')->insert([
-                    'id' => $userId,
-                    'first_name' => $name['first_name'],
-                    'last_name' => $name['last_name'],
-                    'phone' => $phone,
-                    'email' => $email,
-                    'password' => Hash::make('password123'),
-                    'status' => 'active',
-                    'locale' => 'pt',
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                $user = User::create([
+                    'first_name' => $w['first_name'],
+                    'last_name'  => $w['last_name'],
+                    'phone'      => '+3519' . str_pad((string)(10000000 + $idx), 8, '0', STR_PAD_LEFT),
+                    'email'      => $email,
+                    'password'   => Hash::make('password123'),
+                    'status'     => 'active',
                 ]);
+                $user->roles()->attach($workerRole->id);
 
-                DB::table('user_roles')->insert([
-                    'user_id' => $userId,
-                    'role_id' => $managerRole->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-
-                DB::table('workers')->insert([
-                    'id' => $workerId,
-                    'user_id' => $userId,
+                Worker::create([
+                    'user_id' => $user->id,
                     'team_id' => $team->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
-
-                $phoneBase++;
             }
         }
     }

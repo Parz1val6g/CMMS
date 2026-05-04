@@ -3,6 +3,7 @@
 namespace App\Features\Workers\Controllers;
 
 use App\Features\Workers\Models\Worker;
+use App\Features\Workers\Schemas\WorkerFormSchema;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
@@ -26,6 +27,9 @@ class WorkerPageController extends Controller
                 'created_at' => $w->created_at->format('Y-m-d'),
             ]);
 
+        $createSchema = WorkerFormSchema::create();
+        $updateSchema = WorkerFormSchema::update();
+
         return Inertia::render('Workers/Pages/Index', [
             'workers' => $workers,
             'columns' => [
@@ -35,20 +39,8 @@ class WorkerPageController extends Controller
                 ['key' => 'team', 'label' => 'Team'],
                 ['key' => 'created_at', 'label' => 'Created', 'sortable' => true],
             ],
-            'formSchema' => [
-                ['key' => 'first_name', 'label' => 'First Name', 'type' => 'text', 'rules' => 'required|max:250'],
-                ['key' => 'last_name', 'label' => 'Last Name', 'type' => 'text', 'rules' => 'required|max:250'],
-                ['key' => 'email', 'label' => 'Email', 'type' => 'email', 'rules' => 'required|email'],
-                ['key' => 'phone', 'label' => 'Phone', 'type' => 'text'],
-                ['key' => 'team_id', 'label' => 'Team', 'type' => 'select', 'options' => []],
-            ],
-            'createFormSchema' => [
-                ['key' => 'first_name', 'label' => 'First Name', 'type' => 'text', 'rules' => 'required|max:250'],
-                ['key' => 'last_name', 'label' => 'Last Name', 'type' => 'text', 'rules' => 'required|max:250'],
-                ['key' => 'email', 'label' => 'Email', 'type' => 'email', 'rules' => 'required|email'],
-                ['key' => 'phone', 'label' => 'Phone', 'type' => 'text'],
-                ['key' => 'team_id', 'label' => 'Team', 'type' => 'select', 'options' => []],
-            ],
+            'formSchema' => $updateSchema->toArray(),
+            'createFormSchema' => $createSchema->toArray(),
             'routes' => [
                 'index' => url('/api/workers'),
                 'store' => url('/api/workers'),

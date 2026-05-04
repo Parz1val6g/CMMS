@@ -3,6 +3,7 @@
 namespace App\Features\Locations\Controllers;
 
 use App\Features\Locations\Models\Location;
+use App\Features\Locations\Schemas\LocationFormSchema;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
@@ -39,6 +40,9 @@ class LocationPageController extends Controller
                 'created_at' => $l->created_at->format('Y-m-d'),
             ]);
 
+        $createSchema = LocationFormSchema::create();
+        $updateSchema = LocationFormSchema::update();
+
         return Inertia::render('Locations/Pages/Index', [
             'locations' => $locations,
             'columns' => [
@@ -48,22 +52,8 @@ class LocationPageController extends Controller
                 ['key' => 'landmark', 'label' => 'Landmark'],
                 ['key' => 'created_at', 'label' => 'Created', 'sortable' => true],
             ],
-            'formSchema' => [
-                ['key' => 'street_address', 'label' => 'Street Address', 'type' => 'text', 'rules' => 'required|max:100'],
-                ['key' => 'postal_code', 'label' => 'Postal Code', 'type' => 'text', 'rules' => 'required|max:8'],
-                ['key' => 'parish_id', 'label' => 'Parish', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-                ['key' => 'landmark', 'label' => 'Landmark', 'type' => 'text', 'rules' => 'max:100'],
-                ['key' => 'latitude', 'label' => 'Latitude', 'type' => 'number'],
-                ['key' => 'longitude', 'label' => 'Longitude', 'type' => 'number'],
-            ],
-            'createFormSchema' => [
-                ['key' => 'street_address', 'label' => 'Street Address', 'type' => 'text', 'rules' => 'required|max:100'],
-                ['key' => 'postal_code', 'label' => 'Postal Code', 'type' => 'text', 'rules' => 'required|max:8'],
-                ['key' => 'parish_id', 'label' => 'Parish', 'type' => 'select', 'options' => [], 'rules' => 'required'],
-                ['key' => 'landmark', 'label' => 'Landmark', 'type' => 'text'],
-                ['key' => 'latitude', 'label' => 'Latitude', 'type' => 'number'],
-                ['key' => 'longitude', 'label' => 'Longitude', 'type' => 'number'],
-            ],
+            'formSchema' => $updateSchema->toArray(),
+            'createFormSchema' => $createSchema->toArray(),
             'routes' => [
                 'index' => url('/api/locations'),
                 'store' => url('/api/locations'),

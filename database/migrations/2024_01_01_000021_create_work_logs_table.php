@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -12,10 +13,18 @@ return new class extends Migration {
             $table->foreignUuid('mini_task_id')->constrained('mini_tasks')->cascadeOnDelete();
             $table->timestamp('started_at');
             $table->timestamp('completed_at')->nullable();
+            $table->integer('duration_minutes')->storedAs('TIMESTAMPDIFF(MINUTE, started_at, completed_at)');
             $table->string('description', 250);
+            $table->string('status', 20)->default('in_progress');
+            $table->foreignUuid('reviewed_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('reviewed_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index('created_at');
         });
+
+        DB::statement('ALTER TABLE work_logs ADD CONSTRAINT check_time_order CHECK (completed_at > started_at)');
     }
 
     public function down(): void
