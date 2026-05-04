@@ -195,7 +195,7 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
             {visibleFields.map((field, i) => {
               const name = field.name ?? field.key;
               const fieldError = errors[name]?.join?.(' ') ?? errors[name];
-              
+
               // Use FormInput for basic input types
               const basicInputTypes = ['text', 'email', 'number', 'password', 'phone', 'url'];
               if (basicInputTypes.includes(field.type)) {

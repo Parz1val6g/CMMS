@@ -156,9 +156,8 @@ function StandardField({ field, value = '', error }) {
   const options = field.options ?? null;
   const isMultiple = !!field.multiple;
 
-  const baseClass = `block w-full rounded-lg border bg-slate-800/60 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:ring-1 transition-colors ${
-    error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-700 focus:border-indigo-500 focus:ring-indigo-500'
-  }`;
+  const baseClass = `block w-full rounded-lg border bg-slate-800/60 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:ring-1 transition-colors ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-700 focus:border-indigo-500 focus:ring-indigo-500'
+    }`;
 
   /* Normalize select/multiselect options */
   const opts = options ?? [];
@@ -259,13 +258,12 @@ function FileDropzone({ name, required, error }) {
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors ${
-          error
+        className={`relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors ${error
             ? 'border-red-500 bg-red-50 dark:border-red-600 dark:bg-red-900/20'
             : dragOver
-            ? 'border-indigo-400 bg-indigo-50 dark:border-indigo-500 dark:bg-indigo-900/20'
-            : 'border-slate-600 bg-slate-800/40 hover:border-slate-500 dark:border-slate-600'
-        }`}
+              ? 'border-indigo-400 bg-indigo-50 dark:border-indigo-500 dark:bg-indigo-900/20'
+              : 'border-slate-600 bg-slate-800/40 hover:border-slate-500 dark:border-slate-600'
+          }`}
       >
         <svg className={`mb-2 h-8 w-8 ${error ? 'text-red-500 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'}`} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />

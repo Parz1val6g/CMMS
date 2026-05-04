@@ -97,22 +97,20 @@ export default function DataManager({
                                 <div className="flex items-center gap-2 rounded-lg bg-slate-800 p-1">
                                     <button
                                         onClick={() => onViewModeChange && onViewModeChange('table')}
-                                        className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                                            viewMode === 'table'
+                                        className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'table'
                                                 ? 'bg-indigo-600 text-white'
                                                 : 'text-slate-400 hover:text-slate-300'
-                                        }`}
+                                            }`}
                                     >
                                         <LayoutList className="h-4 w-4" />
                                         Table
                                     </button>
                                     <button
                                         onClick={() => onViewModeChange && onViewModeChange('kanban')}
-                                        className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                                            viewMode === 'kanban'
+                                        className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'kanban'
                                                 ? 'bg-indigo-600 text-white'
                                                 : 'text-slate-400 hover:text-slate-300'
-                                        }`}
+                                            }`}
                                     >
                                         <Grid2X2 className="h-4 w-4" />
                                         Kanban

@@ -180,7 +180,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
 
     return [
       { id: 'details', label: 'Details', component: <SODetailsTab serviceOrder={so} /> },
-      { id: 'tasks',   label: 'Tasks',   component: <SOTasksTree serviceOrderId={so.id} workflowType={so.workflow_type} /> },
+      { id: 'tasks', label: 'Tasks', component: <SOTasksTree serviceOrderId={so.id} workflowType={so.workflow_type} /> },
       ...(showMaterials ? [{ id: 'materials', label: 'Materials', component: <SOMaterialsList serviceOrder={so} /> }] : []),
       { id: 'work_logs', label: 'Work Logs', component: <div className="flex items-center justify-center h-40 text-slate-500"><p className="text-sm">Work logs — coming soon</p></div> },
     ];
@@ -192,15 +192,15 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     if (!so) return null;
 
     const statusStyles = {
-      pending:     'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40',
+      pending: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40',
       in_progress: 'bg-blue-500/20  text-blue-300  border border-blue-500/40',
-      completed:   'bg-green-500/20  text-green-300  border border-green-500/40',
-      cancelled:   'bg-red-500/20    text-red-300    border border-red-500/40',
+      completed: 'bg-green-500/20  text-green-300  border border-green-500/40',
+      cancelled: 'bg-red-500/20    text-red-300    border border-red-500/40',
     };
     const priorityStyles = {
-      low:    'bg-blue-500/20    text-blue-300    border border-blue-500/40',
+      low: 'bg-blue-500/20    text-blue-300    border border-blue-500/40',
       normal: 'bg-slate-500/20   text-slate-300   border border-slate-500/40',
-      high:   'bg-orange-500/20  text-orange-300  border border-orange-500/40',
+      high: 'bg-orange-500/20  text-orange-300  border border-orange-500/40',
       urgent: 'bg-red-500/20     text-red-300     border border-red-500/40',
     };
 
@@ -262,14 +262,13 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
 
         {/* Footer: Priority Badge + Manager Avatar */}
         <div className="flex items-center justify-between">
-          <span className={`text-xs font-medium px-2 py-1 rounded ${
-            {
+          <span className={`text-xs font-medium px-2 py-1 rounded ${{
               low: 'bg-blue-500/20 text-blue-300',
               normal: 'bg-slate-500/20 text-slate-300',
               high: 'bg-orange-500/20 text-orange-300',
               urgent: 'bg-red-500/20 text-red-300',
             }[item.priority] || 'bg-slate-500/20 text-slate-300'
-          }`}>
+            }`}>
             {item.priority || 'Normal'}
           </span>
           <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">
@@ -286,8 +285,8 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
       {toast && (
         <div
           className={`mb-4 rounded-lg px-4 py-3 text-sm shadow-sm ${toast.success
-              ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-              : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+            ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+            : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
             }`}
         >
           {toast.success ?? toast.error}

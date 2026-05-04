@@ -337,7 +337,7 @@ abstract class FormField
         if (!empty($this->metadata)) {
             $data['metadata'] = $this->metadata;
         }
-        
+
         // Adiciona metadados de UX se preenchidos
         if ($this->helperText !== null) {
             $data['helperText'] = $this->helperText;

@@ -43,9 +43,8 @@ export default function Register() {
                   type="text"
                   value={data.first_name}
                   onChange={(e) => setData('first_name', e.target.value)}
-                  className={`block w-full rounded-xl border-0 bg-gray-100 px-4 py-3 text-sm shadow-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 ${
-                    errors.first_name ? 'ring-2 ring-red-500' : ''
-                  }`}
+                  className={`block w-full rounded-xl border-0 bg-gray-100 px-4 py-3 text-sm shadow-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 ${errors.first_name ? 'ring-2 ring-red-500' : ''
+                    }`}
                   placeholder="John Doe"
                   required
                   autoFocus
@@ -66,9 +65,8 @@ export default function Register() {
                   type="email"
                   value={data.email}
                   onChange={(e) => setData('email', e.target.value)}
-                  className={`block w-full rounded-xl border-0 bg-gray-100 px-4 py-3 text-sm shadow-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 ${
-                    errors.email ? 'ring-2 ring-red-500' : ''
-                  }`}
+                  className={`block w-full rounded-xl border-0 bg-gray-100 px-4 py-3 text-sm shadow-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 ${errors.email ? 'ring-2 ring-red-500' : ''
+                    }`}
                   placeholder="name@company.com"
                   required
                   aria-label="Work Email"
@@ -88,9 +86,8 @@ export default function Register() {
                   type="password"
                   value={data.password}
                   onChange={(e) => setData('password', e.target.value)}
-                  className={`block w-full rounded-xl border-0 bg-gray-100 px-4 py-3 text-sm shadow-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 ${
-                    errors.password ? 'ring-2 ring-red-500' : ''
-                  }`}
+                  className={`block w-full rounded-xl border-0 bg-gray-100 px-4 py-3 text-sm shadow-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 ${errors.password ? 'ring-2 ring-red-500' : ''
+                    }`}
                   placeholder="Minimum 8 characters"
                   required
                   aria-label="Password"

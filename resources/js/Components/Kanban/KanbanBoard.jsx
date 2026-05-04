@@ -1,12 +1,12 @@
 import { useMemo, useState, useCallback } from 'react';
 import {
-  DndContext,
-  closestCorners,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
+    DndContext,
+    closestCorners,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragOverlay,
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import KanbanColumn from './KanbanColumn';
@@ -21,95 +21,95 @@ import KanbanCard from './KanbanCard';
  * @param {Function} renderCardContent - Function to render card content (item) => JSX
  */
 export default function KanbanBoard({
-  items = [],
-  columns = [],
-  statusField = 'status',
-  onDragEnd = null,
-  renderCardContent = null,
-  onCardClick = null,
+    items = [],
+    columns = [],
+    statusField = 'status',
+    onDragEnd = null,
+    renderCardContent = null,
+    onCardClick = null,
 }) {
-  const [activeId, setActiveId] = useState(null);
+    const [activeId, setActiveId] = useState(null);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      distance: 8,
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            distance: 8,
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
 
-  // Group items by status field
-  const groupedByStatus = useMemo(() => {
-    const grouped = {};
-    columns.forEach(col => {
-      grouped[col.id] = [];
-    });
+    // Group items by status field
+    const groupedByStatus = useMemo(() => {
+        const grouped = {};
+        columns.forEach(col => {
+            grouped[col.id] = [];
+        });
 
-    const itemsArray = Array.isArray(items) ? items : (items?.data ?? []);
-    itemsArray.forEach(item => {
-      const status = item[statusField];
-      if (grouped[status]) {
-        grouped[status].push(item);
-      }
-    });
+        const itemsArray = Array.isArray(items) ? items : (items?.data ?? []);
+        itemsArray.forEach(item => {
+            const status = item[statusField];
+            if (grouped[status]) {
+                grouped[status].push(item);
+            }
+        });
 
-    return grouped;
-  }, [items, columns, statusField]);
+        return grouped;
+    }, [items, columns, statusField]);
 
-  // Handle drag end
-  const handleDragEnd = useCallback((event) => {
-    const { active, over } = event;
-    setActiveId(null);
+    // Handle drag end
+    const handleDragEnd = useCallback((event) => {
+        const { active, over } = event;
+        setActiveId(null);
 
-    if (!over || !onDragEnd) return;
+        if (!over || !onDragEnd) return;
 
-    onDragEnd({
-      activeId: active.id,
-      overId: over.id,
-      items: groupedByStatus,
-    });
-  }, [onDragEnd, groupedByStatus]);
+        onDragEnd({
+            activeId: active.id,
+            overId: over.id,
+            items: groupedByStatus,
+        });
+    }, [onDragEnd, groupedByStatus]);
 
-  const handleDragStart = useCallback((event) => {
-    setActiveId(event.active.id);
-  }, []);
+    const handleDragStart = useCallback((event) => {
+        setActiveId(event.active.id);
+    }, []);
 
-  const activeItem = useMemo(() => {
-    if (!activeId) return null;
-    for (const column of Object.values(groupedByStatus)) {
-      const item = column.find(card => String(card.id) === String(activeId));
-      if (item) return item;
-    }
-    return null;
-  }, [activeId, groupedByStatus]);
+    const activeItem = useMemo(() => {
+        if (!activeId) return null;
+        for (const column of Object.values(groupedByStatus)) {
+            const item = column.find(card => String(card.id) === String(activeId));
+            if (item) return item;
+        }
+        return null;
+    }, [activeId, groupedByStatus]);
 
-  return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="flex-1 flex overflow-x-auto gap-4 bg-slate-900 p-6 rounded-lg w-full">
-        {/* Columns */}
-        {columns.map((column) => (
-          <KanbanColumn
-            key={column.id}
-            column={column}
-            items={groupedByStatus[column.id] || []}
-            renderCardContent={renderCardContent}
-            onCardClick={onCardClick}
-          />
-        ))}
-      </div>
+    return (
+        <DndContext
+            sensors={sensors}
+            collisionDetection={closestCorners}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+        >
+            <div className="flex-1 flex overflow-x-auto gap-4 bg-slate-900 p-6 rounded-lg w-full">
+                {/* Columns */}
+                {columns.map((column) => (
+                    <KanbanColumn
+                        key={column.id}
+                        column={column}
+                        items={groupedByStatus[column.id] || []}
+                        renderCardContent={renderCardContent}
+                        onCardClick={onCardClick}
+                    />
+                ))}
+            </div>
 
-      {/* Drag Overlay */}
-      <DragOverlay>
-        {activeItem && (
-          <KanbanCard item={activeItem} isDragging={true} renderCardContent={renderCardContent} onCardClick={onCardClick} />
-        )}
-      </DragOverlay>
-    </DndContext>
-  );
+            {/* Drag Overlay */}
+            <DragOverlay>
+                {activeItem && (
+                    <KanbanCard item={activeItem} isDragging={true} renderCardContent={renderCardContent} onCardClick={onCardClick} />
+                )}
+            </DragOverlay>
+        </DndContext>
+    );
 }
