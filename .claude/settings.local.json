@@ -14,7 +14,19 @@
       "mcp__mysql__execute_query",
       "Bash(php artisan *)",
       "Bash(npm run *)",
-      "Bash(Get-ChildItem \"C:\\\\Users\\\\joelt\\\\project\\\\app\\\\Features\\\\Tasks\\\\\" -Recurse -File | Select-Object -ExpandProperty FullName *)"
+      "Bash(Get-ChildItem \"C:\\\\Users\\\\joelt\\\\project\\\\app\\\\Features\\\\Tasks\\\\\" -Recurse -File | Select-Object -ExpandProperty FullName *)",
+      "Bash(npm install *)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\joelt\\\\project\\\\database\\\\migrations\\\\2026_05_05_154039_create_audit_logs_table.php\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\joelt\\\\project\\\\database\\\\migrations\\\\2026_05_05_154039_add_manager_status_index_to_service_orders.php\" -Force)",
+      "Bash(Write-Output \"Deleted duplicate migrations\")",
+      "Bash(npx --no-install eslint --version)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\joelt\\\\project\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\joelt\\\\project\" -Recurse -Directory -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -First 30)",
+      "Bash(Format-Table FullName)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\joelt\\\\project\" -Recurse -Directory -ErrorAction SilentlyContinue | Select-Object -First 30 | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\joelt\\\\project\\\\app\\\\Features\" -Directory | ForEach-Object { $_.Name })"
     ]
   }
 }

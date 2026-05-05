@@ -16,8 +16,9 @@ class CheckWorkLogsCompletion
     {
         $miniTask = $event->workLog->miniTask;
 
+        // Per spec: a MiniTask is only complete when ALL WorkLogs are approved, not just submitted
         $hasIncompleteWorkLogs = $miniTask->workLogs()
-            ->whereNull('completed_at')
+            ->where('status', '!=', WorkLogStatus::APPROVED->value)
             ->exists();
 
         if (!$hasIncompleteWorkLogs) {

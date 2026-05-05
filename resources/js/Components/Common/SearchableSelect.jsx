@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { ChevronDown, Search } from 'lucide-react';
 import { toScalar } from '@/Utils/url';
 
-export default function SearchableSelect({ name, options = [], value = '', onChange, placeholder = 'Select...', required }) {
+export default function SearchableSelect({ name, options = [], value = '', onChange, placeholder = 'Select...' }) {
   /* ── Normalize incoming value (may be object from Laravel relation) ── */
   const scalarValue = toScalar(value);
 

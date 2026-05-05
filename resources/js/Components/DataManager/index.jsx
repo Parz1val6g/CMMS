@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { Plus, LayoutList, Grid2X2 } from 'lucide-react';
-import Modal from '@/Components/Common/Modal';
 import DialogModal from '@/Components/Common/DialogModal';
 import Table from '@/Components/Table/index.jsx';
 import Pagination from '@/Components/Table/Pagination.jsx';
@@ -34,7 +33,6 @@ export default function DataManager({
     const [deleting, setDeleting] = useState(false);
     const [errorDialog, setErrorDialog] = useState({ open: false, title: '', description: '' });
     const hasEdit = !!routes.update;
-    const dataToMap = Array.isArray(items) ? items : (items?.data ?? []);
     const name = entityName ?? title?.replace(/s$/, '') ?? 'Record';
 
     const confirmDelete = useCallback(async () => {

@@ -28,7 +28,6 @@ function MapPicker({ field, value }) {
   const [lng, setLng] = useState(initialLng);
   const [loaded, setLoaded] = useState(false);
   const [mapInstance, setMapInstance] = useState(null);
-  const [marker, setMarker] = useState(null);
   const { googleMapsApiKey: gmapsKey } = usePage().props;
 
   /* ── Load Google Maps script ────────────────────────────── */
@@ -65,7 +64,6 @@ function MapPicker({ field, value }) {
       draggable: true,
     });
     setMapInstance(m);
-    setMarker(mk);
     if (!lat && !lng) {
       setLat(startPos.lat.toFixed(6));
       setLng(startPos.lng.toFixed(6));
@@ -85,7 +83,7 @@ function MapPicker({ field, value }) {
       setLat(pos.lat().toFixed(6));
       setLng(pos.lng().toFixed(6));
     });
-  }, []);
+  }, [lat, lng]);
 
   useEffect(() => {
     if (loaded && mapRef.current && !mapInstance) initMap();

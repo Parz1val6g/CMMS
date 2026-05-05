@@ -3,7 +3,6 @@
 namespace App\Features\ServiceOrders\Presenters;
 
 use App\Features\ServiceOrders\Models\ServiceOrder;
-use Illuminate\Support\Collection;
 
 /**
  * Centralizes data shaping for Inertia views.

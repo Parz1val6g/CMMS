@@ -135,10 +135,18 @@ class Equipment extends Model
     }
 
     /**
-     * Mark equipment as reserved (pending checkout)
+     * Mark equipment as in_use when a loan begins (active → in_use per spec).
      */
-    public function markAsReserved(): void
+    public function markAsInUse(): void
     {
-        $this->update(['status' => 'reserved']);
+        $this->update(['status' => 'in_use']);
+    }
+
+    /**
+     * Return equipment to active after a completed loan (in_use → active per spec).
+     */
+    public function markAsActive(): void
+    {
+        $this->update(['status' => 'active']);
     }
 }

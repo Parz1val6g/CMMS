@@ -9,7 +9,7 @@ function navigateWithQuery(params) {
     router.get(window.location.pathname + (qs ? `?${qs}` : ''), {}, { preserveState: true, replace: true });
 }
 
-export default function FilterBar({ routes, filterSchema = [], columns = [], onNew = () => { }, entityName = 'Record' }) {
+export default function FilterBar({ routes, filterSchema = [], onNew = () => { }, entityName = 'Record' }) {
     const toast = useToast();
     const params = new URLSearchParams(window.location.search);
     const searchVal = params.get('search') ?? '';
@@ -34,7 +34,7 @@ export default function FilterBar({ routes, filterSchema = [], columns = [], onN
             }
         }, 800);
         return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-    }, [search]);
+    }, [search, searchVal]);
 
     const hasAdvancedFilters =
         params.has('date_from') || params.has('date_to') ||
@@ -80,7 +80,7 @@ export default function FilterBar({ routes, filterSchema = [], columns = [], onN
                 document.body.removeChild(a);
             })
             .catch(() => toast.error('Falha ao exportar CSV. Tente novamente.'));
-    }, []);
+    }, [toast]);
 
     return (
         <form

@@ -1,7 +1,7 @@
 import Row from './Row.jsx';
 import EmptyState from './EmptyState.jsx';
 
-export default function Table({ items, columns, hasEdit, onEditItem, onDeleteTarget, onRowClick, loading = false }) {
+export default function Table({ items, columns, hasEdit, onEditItem, onDeleteTarget, onRowClick }) {
     const dataToMap = Array.isArray(items) ? items : (items?.data ?? []);
 
     if (!dataToMap || dataToMap.length === 0) {

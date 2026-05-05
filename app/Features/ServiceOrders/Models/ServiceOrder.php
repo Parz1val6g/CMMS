@@ -4,6 +4,7 @@ use App\Core\Enums\Priority;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Enums\WorkflowType;
 use App\Core\Traits\Base;
+use App\Core\Traits\LogsAuditTrail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,7 +18,7 @@ use App\Shared\Models\Attachment;
 
 class ServiceOrder extends Model
 {
-    use Base;
+    use Base, LogsAuditTrail;
     protected $fillable = [
         'process',
         'client_id',

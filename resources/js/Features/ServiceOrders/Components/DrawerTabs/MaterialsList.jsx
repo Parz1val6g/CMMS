@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, AlertCircle, Package } from 'lucide-react';
+import { Search, Package } from 'lucide-react';
 
 /* ── Status badge styling ────────────────────────────────────── */
 const EQUIP_STATUS_STYLE = {
@@ -32,7 +32,7 @@ function TypeBadge({ isLoanable }) {
 }
 
 /* ── Revision date helper ────────────────────────────────────── */
-function RevisionDate({ date, label }) {
+function RevisionDate({ date }) {
   if (!date) return <span className="text-slate-500">—</span>;
   const d = new Date(date);
   const isOverdue = d < new Date();

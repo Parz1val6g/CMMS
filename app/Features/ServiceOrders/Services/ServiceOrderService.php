@@ -13,7 +13,6 @@ use App\Features\ServiceOrders\Events\ServiceOrderCompletedEvent;
 use App\Features\ServiceOrders\Events\ServiceOrderCreatedEvent;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\Tasks\Models\Task;
-use App\Features\Tasks\Resources\TaskResource;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 class ServiceOrderService
@@ -97,14 +96,24 @@ class ServiceOrderService
     }
     public function initiateReturn(ServiceOrder $serviceOrder): Task
     {
+        // Guard pre-conditions before entering the transaction
+        if ($serviceOrder->workflow_type !== WorkflowType::LOAN->value) {
+            throw new InvalidArgumentException('Initiate return is only valid for loan workflows.');
+        }
+
+        if ($serviceOrder->tasks()->where('name', 'Devolução de Equipamento')->exists()) {
+            throw new InvalidArgumentException('A return task already exists for this service order.');
+        }
+
+        $checkoutTask = $serviceOrder->tasks()
+            ->where('name', 'Empréstimo de Equipamento')
+            ->first();
+
+        if (!$checkoutTask || $checkoutTask->status !== TaskStatus::COMPLETED->value) {
+            throw new InvalidArgumentException('Equipment checkout task must be completed before initiating return.');
+        }
+
         return $this->transactions->execute(function () use ($serviceOrder) {
-            abort_if($serviceOrder->workflow_type !== WorkflowType::LOAN->value, 400, 'Initiate return is only valid for loan workflows.');
-
-            abort_if($serviceOrder->tasks()->where('name', 'Devolução de Equipamento')->exists(), 409, 'Return task already exists.');
-
-            $checkoutTask = $serviceOrder->tasks()->where('name', 'Empréstimo de Equipamento')->first();
-            abort_if(!$checkoutTask || $checkoutTask->status !== TaskStatus::COMPLETED->value, 400, 'Equipment checkout task must be completed before initiating return.');
-
             $task = Task::create([
                 'service_order_id' => $serviceOrder->id,
                 'manager_id'       => $serviceOrder->manager_id,
@@ -130,6 +139,12 @@ class ServiceOrderService
         }
         return $this->transactions->execute(function () use ($serviceOrder) {
             $serviceOrder->update(['status' => ServiceOrderStatus::COMPLETED->value]);
+
+            // Spec §3.3: equipment returns to active when the loan SO is completed (in_use → active)
+            if ($serviceOrder->workflow_type === WorkflowType::LOAN->value && $serviceOrder->equipment_id) {
+                $serviceOrder->equipment->markAsActive();
+            }
+
             ServiceOrderCompletedEvent::dispatch($serviceOrder);
             return $serviceOrder;
         });

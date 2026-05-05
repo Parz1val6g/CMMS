@@ -1,6 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 
-export default function ExportsIndex({ routes }) {
+export default function ExportsIndex() {
   const breadcrumbs = [
     { name: 'Dashboard', url: '/dashboard' },
     { name: 'Exports', url: '/exports' },

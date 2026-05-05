@@ -4,15 +4,6 @@ import { Loader2, AlertCircle } from 'lucide-react';
 import TaskTreeNode from './TaskTreeNode';
 import buildTaskTree from '../../Utils/buildTaskTree';
 
-/* ── Status label helpers ───────────────────────────────────── */
-const taskStatusLabel = {
-  pending: 'Pending',
-  in_progress: 'In Progress',
-  completed: 'Completed',
-  cancelled: 'Cancelled',
-  blocked: 'Blocked',
-};
-
 /**
  * SOTasksTree — Hierarchical tasks tree for a Service Order.
  *
@@ -27,7 +18,6 @@ const taskStatusLabel = {
 export default function SOTasksTree({
   serviceOrderId,
   workflowType,
-  onInitiateReturn,
   taskApiUrl = '/api/tasks',
   miniTaskApiUrl = '/api/mini-tasks',
 }) {

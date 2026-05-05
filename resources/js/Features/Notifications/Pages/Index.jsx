@@ -1,6 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 
-export default function NotificationsIndex({ notifications }) {
+export default function NotificationsIndex() {
   const breadcrumbs = [
     { name: 'Dashboard', url: '/dashboard' },
     { name: 'Notifications', url: '/notifications' },

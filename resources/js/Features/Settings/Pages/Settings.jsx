@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import Button from '@/Components/Common/Button';
-import Alert from '@/Components/Common/Alert';
 
 /* ── Toast Context ────────────────────────────────────────────── */
 function Toast({ message, type = 'success', show, onClose }) {
@@ -28,7 +26,7 @@ function Toast({ message, type = 'success', show, onClose }) {
 }
 
 /* ── Single Tab Panel ─────────────────────────────────────────── */
-function TabPanel({ id, label, active, children }) {
+function TabPanel({ id, active, children }) {
   if (!active) return null;
   return (
     <div id={id} role="tabpanel" aria-labelledby={`${id}-tab`} className="tab-pane fade show active">
@@ -98,10 +96,6 @@ async function submitForm(formEl, endpoint) {
 
 /* ── Settings Page ──────────────────────────────────────────────── */
 export default function Settings({ user, preferences, appSettings, isAdmin, routes: apiRoutes }) {
-  const breadcrumbs = [
-    { name: 'Dashboard', url: '/dashboard' },
-    { name: 'Settings', url: '/settings' },
-  ];
 
   /* Tabs */
   const tabs = [
@@ -238,7 +232,6 @@ export default function Settings({ user, preferences, appSettings, isAdmin, rout
   ];
 
   const inputClass = 'block w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm shadow-none focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200';
-  const inputClassInvalid = 'is-invalid border-red-500 focus:border-red-500 focus:ring-red-500';
 
   return (
     <AppLayout title="Settings">

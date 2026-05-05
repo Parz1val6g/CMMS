@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import FormField from '@/Components/Common/FormField';
 import FormInput from '@/Components/Form/FormInput';
 import { X } from 'lucide-react';
@@ -35,14 +35,17 @@ function collectFormData(form, fields) {
   return data;
 }
 
-export default function Modal({ entityName = 'Record', title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit, children }) {
+export default function Modal({ entityName = 'Record', title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit }) {
   const formRef = useRef(null);
   const containerRef = useRef(null);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
   const [workflowType, setWorkflowType] = useState('regular');
   const toast = useToast();
-  const fields = Array.isArray(formSchema) ? formSchema : (formSchema?.inputs ?? []);
+  const fields = useMemo(
+    () => Array.isArray(formSchema) ? formSchema : (formSchema?.inputs ?? []),
+    [formSchema]
+  );
 
   /* ── Track workflow_type changes via DOM delegation ──────── */
   useEffect(() => {

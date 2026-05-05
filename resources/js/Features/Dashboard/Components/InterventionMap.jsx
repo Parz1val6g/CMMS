@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import { usePage } from '@inertiajs/react';
 import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
 
@@ -42,7 +42,7 @@ function createPinSvg(color) {
 /* ── Inner map — only rendered when gmapsKey is truthy ─────── */
 function MapInner({ gmapsKey, orders }) {
   const [selected, setSelected] = useState(null);
-  const [map, setMap] = useState(null);
+  const mapRef = useRef(null);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -65,12 +65,12 @@ function MapInner({ gmapsKey, orders }) {
   }, [orders]);
 
   const onLoad = (m) => {
-    setMap(m);
+    mapRef.current = m;
     m.setCenter(GOUVEIA_CENTER);
     m.setZoom(MAP_ZOOM);
   };
 
-  const onUnmount = () => setMap(null);
+  const onUnmount = () => { mapRef.current = null; };
 
   if (!isLoaded) {
     return (

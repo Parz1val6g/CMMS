@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { usePage, router } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { useToast } from '@/Components/Toast/ToastContext';
-import { Grid2X2, LayoutList, Plus, MapPin, Clock } from 'lucide-react';
+import { MapPin, Clock } from 'lucide-react';
 import AppLayout from '@/Layouts/AppLayout';
 import DataManager from '@/Components/DataManager';
 import Modal from '@/Components/Common/Modal';
@@ -12,7 +12,6 @@ import SOTasksTree from '../Components/DrawerTabs/TasksTree';
 
 export default function ServiceOrdersIndex({ service_orders, columns, formSchema, createFormSchema, routes, filterSchema }) {
   const [showModal, setShowModal] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [photoPreview, setPhotoPreview] = useState(null);
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'kanban'
@@ -48,7 +47,6 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     e.preventDefault();
     if (!routes.store || savingRef.current) return;
     savingRef.current = true;
-    setSaving(true);
     setFormErrors({});
 
     const form = e.target;
@@ -80,9 +78,8 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
       globalToast.error('Ocorreu um erro inesperado.');
     } finally {
       savingRef.current = false;
-      setSaving(false);
     }
-  }, [routes.store]);
+  }, [routes.store, globalToast]);
 
   /* ── Open modal for create ────────────────────────────────── */
   const openCreate = useCallback(() => {
@@ -157,7 +154,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
           error: body.error || 'Failed to update service order status. Changes reverted.',
         });
       }
-    } catch (error) {
+    } catch {
       // Rollback on network error
       setServiceOrdersState(originalState);
       setToast({

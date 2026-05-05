@@ -11,7 +11,7 @@ class UserSeeder extends Seeder
 {
     /**
      * Create exactly ONE user per role for testing.
-     * Password is always 'password123' for all users.
+     * Password defaults to 'password123'; override with DEV_SEED_PASSWORD in .env.
      */
     public function run(): void
     {

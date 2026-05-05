@@ -3,6 +3,7 @@
 namespace App\Shared\Models;
 
 use App\Core\Traits\Base;
+use App\Core\Traits\LogsAuditTrail;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -15,7 +16,7 @@ use App\Features\Sectors\Models\Sector;
 
 class User extends Authenticatable
 {
-    use Base;
+    use Base, LogsAuditTrail;
 
     protected $fillable = [
         'first_name',

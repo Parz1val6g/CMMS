@@ -78,6 +78,9 @@ class HandleInertiaRequests extends Middleware
                 'error'   => $request->session()->get('error')
                     ? e($request->session()->get('error')) : null,
             ],
+            // Scoped to authenticated users only; move to specific page controllers
+            // if the key should be absent from non-map pages.
+            'googleMapsApiKey' => $user ? config('services.google_maps.api_key') : null,
         ];
     }
 }

@@ -32,7 +32,7 @@ class CreateLoanTasks
             ]);
 
             if ($so->equipment_id) {
-                Equipment::findOrFail($so->equipment_id)->markAsReserved();
+                Equipment::findOrFail($so->equipment_id)->markAsInUse();
             }
         });
     }

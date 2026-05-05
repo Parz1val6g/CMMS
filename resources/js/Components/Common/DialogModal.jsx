@@ -49,6 +49,7 @@ export default function DialogModal({
     children = null,
 }) {
     const overlayRef = useRef(null);
+    const contentRef = useRef(null);  // moved above early return to satisfy rules-of-hooks
     const config = typeConfig[type] || typeConfig.info;
     const Icon = config.icon;
 
@@ -70,25 +71,7 @@ export default function DialogModal({
         };
     }, [open]);
 
-    if (!open) return null;
-
-    // Default buttons based on type
-    const defaultButtons = {
-        success: [{ label: 'OK', onClick: onClose, variant: 'primary' }],
-        error: [{ label: 'OK', onClick: onClose, variant: 'primary' }],
-        warning: [{ label: 'OK', onClick: onClose, variant: 'primary' }],
-        info: [{ label: 'OK', onClick: onClose, variant: 'primary' }],
-        confirm: [
-            { label: 'Cancel', onClick: onClose, variant: 'secondary' },
-            { label: 'Confirm', onClick: onClose, variant: 'primary' },
-        ],
-    };
-
-    const renderButtons = buttons.length > 0 ? buttons : defaultButtons[type] || defaultButtons.info;
-
-    const contentRef = useRef(null);
-
-    // Focus trap
+    // Focus trap — must be before early return to satisfy rules-of-hooks
     useEffect(() => {
         if (!open) return;
         const content = contentRef.current;
@@ -97,8 +80,7 @@ export default function DialogModal({
         const sel = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
         const getFocusable = () => Array.from(content.querySelectorAll(sel));
 
-        const firstEl = getFocusable()[0];
-        firstEl?.focus();
+        getFocusable()[0]?.focus();
 
         const trapFocus = (e) => {
             if (e.key !== 'Tab') return;
@@ -115,6 +97,22 @@ export default function DialogModal({
         document.addEventListener('keydown', trapFocus);
         return () => document.removeEventListener('keydown', trapFocus);
     }, [open]);
+
+    if (!open) return null;
+
+    // Default buttons based on type
+    const defaultButtons = {
+        success: [{ label: 'OK', onClick: onClose, variant: 'primary' }],
+        error: [{ label: 'OK', onClick: onClose, variant: 'primary' }],
+        warning: [{ label: 'OK', onClick: onClose, variant: 'primary' }],
+        info: [{ label: 'OK', onClick: onClose, variant: 'primary' }],
+        confirm: [
+            { label: 'Cancel', onClick: onClose, variant: 'secondary' },
+            { label: 'Confirm', onClick: onClose, variant: 'primary' },
+        ],
+    };
+
+    const renderButtons = buttons.length > 0 ? buttons : defaultButtons[type] || defaultButtons.info;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

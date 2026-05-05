@@ -3,6 +3,7 @@
 namespace App\Features\ServiceOrders\Listeners;
 
 use App\Core\Enums\ServiceOrderStatus;
+use App\Core\Enums\TaskStatus;
 use App\Core\Enums\WorkflowType;
 use App\Features\Tasks\Events\TaskCompletedEvent;
 use App\Features\ServiceOrders\Services\ServiceOrderService;
@@ -28,7 +29,7 @@ class CheckTaskCompletion
         }
 
         $hasIncompleteTasks = $serviceOrder->tasks()
-            ->where('status', '!=', ServiceOrderStatus::COMPLETED->value)
+            ->where('status', '!=', TaskStatus::COMPLETED->value)
             ->exists();
 
         if (!$hasIncompleteTasks) {

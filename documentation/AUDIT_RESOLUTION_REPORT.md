@@ -1,381 +1,230 @@
-# Audit Resolution Report
+# AUDIT RESOLUTION REPORT — Business Logic Audit
 
-> Cross-reference of [`deep-leaping-iverson.md`](../.claude/plans/deep-leaping-iverson.md) findings against current codebase.
-> Generated on 2026-05-05.
-
----
-
-## Executive Summary
-
-| Category | Total Findings | Resolved | Open |
-|----------|---------------|----------|------|
-| Critical (C-1–C-8) | 8 | **8/8** | 0 |
-| Observations (OBS-A/S/F/DX) | 16 | **13/13 actionable** | 0 |
-| Opportunities (O-1–O-10) | 10 | **10/10** | 0 |
+**Date**: 2026-05-05  
+**Source**: `ESPECIFICACAO_PROJETO.md` + 47 business questions answered by Product Owner  
+**Status**: All decisions resolved
 
 ---
 
-## Critical Items — All Resolved
+## Table of Contents
 
-### C-1 · Database Out of Sync
-
-**Status:** ✅ **Resolved**
-
-All 37 migrations are now applied:
-- 36 in batch 1
-- 1 in batch 2 (`2026_05_05_113244_create_password_reset_tokens_table`)
-
-Ran via `php artisan migrate`.
-
-**Verification:** [`migrate:status`](.claude/plans/deep-leaping-iverson.md:45)
+1. [Roles & Permissions](#1-roles--permissoes-rbac)
+2. [Inventory & Equipment](#2-gestao-de-inventario-e-equipamentos)
+3. [Service Orders](#3-ordens-de-servico)
+4. [Tasks, MiniTasks & WorkLogs](#4-tarefas-mini-tarefas-e-work-logs)
+5. [Organization](#5-organizacao)
+6. [Notifications](#6-notificacoes)
+7. [Geography](#7-geografia)
+8. [Cross-Cutting](#8-cross-cutting)
+9. [Critical Action Items](#9-critical-action-items)
 
 ---
 
-### C-2 · Flat `role` Column on `users`
+## 1. Roles & Permissões (RBAC)
 
-**Status:** ✅ **Resolved by C-1**
+### Decision Summary
 
-The `user_roles` pivot table now exists in the database. `User::roles()` correctly defines a `BelongsToMany` relation:
+| # | Question | Decision |
+|---|----------|----------|
+| 1 | Receptionist role? | **Removed** — does not exist. Current roles: `client`, `equipment_manager`, `supervisor`, `manager`, `admin`, `worker`. |
+| 2 | Client access to system? | Clients have **no system access**. Future: email-based communication with citizens. |
+| 3 | Public registration? | **No public registration.** Contact form only for prospective clients — manual onboarding by admin. |
+| 4 | Multiple roles per user? | **Yes** — a user can have multiple roles. RBAC must support role accumulation. |
+| 5 | Delegation of authority? | **Not needed** — any manager can approve any work log, so absence of one manager is covered by others. |
+| 6 | Worker deactivation impact? | Mini-task **status preserved**; supervisor is **notified** to reassign. |
+| 7 | `pending_approval` state? | Exists only for **MiniTasks** and **Service Orders** (not work logs). Approval done by **Manager**. Work logs are just submitted/completed by workers — no approval needed. |
+| 47 | `pending` role approval? | **Admin approves** the transition. Future: delegation of this function. |
 
-```php
-// app/Shared/Models/User.php:38-41
-public function roles()
-{
-    return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
-}
-```
+### Required Specification Changes
 
----
-
-### C-3 · `PermissionManager::hasPermission()` Calls Non-Existent Relation
-
-**Status:** ✅ **Fixed**
-
-[`User::rolePermissions()`](app/Shared/Models/User.php:48-54) is now implemented as a `Builder` return (not `Collection` as the audit suggested), enabling caller-side chaining:
-
-```php
-public function rolePermissions(): Builder
-{
-    return RolePermission::whereIn(
-        'role_id',
-        $this->roles()->select('roles.id')
-    );
-}
-```
-
-[`PermissionManager::hasPermission()`](app/Core/Services/PermissionManager.php:22-27) calls it successfully with chained `where('resource', ...)->where('action', ...)->exists()`.
+1. **Update** [Section 2](ESPECIFICACAO_PROJETO.md:2) roles table: remove Receptionist, add `equipment_manager`, clarify client has no access.
+2. **Update** [Feature Access Matrix](documentation/user_stories/diagrams/sitemap/02_FEATURE_ACCESS_MATRIX.md): remove Citizen and Receptionist columns; add `equipment_manager`.
+3. **Correct** [Section 3.2](ESPECIFICACAO_PROJETO.md:3.2): Work logs do NOT require approval — workers finalize them directly. Approval exists at MiniTask level (by admin/supervisor).
+4. **Correct** [Section 3.1](ESPECIFICACAO_PROJETO.md:3.1) cascade rule: Mini-task completes when **all work logs are finalized** (not approved). SO completion requires **Manager approval**.
+5. **Correct** [US-014](documentation/user_stories/02_ROLES_AND_PERMISSIONS.md): change roles to: `admin`, `manager`, `supervisor`, `worker`, `equipment_manager`, `pending`.
+6. **Design** multi-role assignment: RBAC system must support `user_roles` as a many-to-many relationship.
 
 ---
 
-### C-4 · `AuthController::passwordReset()` Missing
+## 2. Gestão de Inventário e Equipamentos
 
-**Status:** ✅ **Fixed**
+### Decision Summary
 
-Fully implemented at [`AuthController::passwordReset()`](app/Features/Authentication/Controllers/AuthController.php:55-86). Handles:
-1. Input validation (token, password, confirmation)
-2. Token lookup with `used = 0` and `expires_at > now()` checks
-3. User resolution via `user_id`
-4. Password update with `Hash::make()`
-5. Token invalidation (`used = 1`)
-6. Token revocation (`$user->tokens()->delete()`)
+| # | Question | Decision |
+|---|----------|----------|
+| 8 | Equipment states | Full state machine: `active` → `in_use` (loaned), `maintenance`, `retired/broken`, `out_of_service`. Equipment used in work logs like materials. |
+| 9 | Concurrent loans prevention | **Must implement** — atomic validation preventing loan if equipment is not `active`. |
+| 10 | Damaged equipment | New states needed: `broken` and `under_repair`. Full lifecycle logic required (broken → under_repair → active). |
+| 11 | Periodic revisions | Equipment has `next_revision_date`. When due: **must block availability** → marked as `maintenance_pending` → sent to maintenance → returned to `active`. All revisions logged. |
+| 12 | Low stock notification | Notify `equipment_manager` (new role). If role doesn't exist, create it and adapt system. |
+| 13 | Material reservation | **Reserved at MiniTask creation** — when mini-task is created, materials are pre-allocated based on estimate. |
+| 14 | Equipment categories | Not yet implemented. Future feature. |
+| 15 | `unit_price_at_use` | Price is **snapshot at MiniTask creation** — frozen value from DB at that moment. |
 
----
+### Required Specification Changes
 
-### C-5 · `proccess` Typo in `service_orders` Column
-
-**Status:** ✅ **Resolved by C-1**
-
-The migration creates the column as `process`. The DB now matches the code references.
-
----
-
-### C-6 · `service_orders` Missing Five Columns
-
-**Status:** ✅ **Resolved by C-1**
-
-Migration `2024_01_01_000017_create_service_orders_table.php` now includes all required columns: `manager_id`, `description`, `workflow_type`, `equipment_id`, `photo_path`.
+1. **Create** Equipment state machine documentation with all states: `active`, `in_use`, `maintenance_pending`, `maintenance`, `broken`, `under_repair`, `retired`.
+2. **Define** `equipment_manager` role permissions (view stock, manage revisions, receive low-stock alerts).
+3. **Update** [Section 3.5](ESPECIFICACAO_PROJETO.md:3.5): add material reservation rule at MiniTask creation.
+4. **Define** revision lifecycle: equipment → `maintenance_pending` when revision_date passes → manager triggers maintenance → `maintenance` → manager confirms return → `active`.
+5. **Document** equipment damage flow: damage report → equipment → `broken` → repair order → `under_repair` → return → `active`.
 
 ---
 
-### C-7 · Flat Location Schema (vs Hierarchical)
+## 3. Ordens de Serviço
 
-**Status:** ✅ **Resolved by C-1**
+### Decision Summary
 
-`districts`, `municipalities`, and `parishes` tables now exist, supporting the hierarchical model expected by the codebase.
+| # | Question | Decision |
+|---|----------|----------|
+| 16 | Human-readable reference | **Yes** — format like `OS-2026-00042` for citizen/field communication. |
+| 17 | Loan equipment mandatory | **Yes** — frontend must enforce. Loan SO must also require a **location** (like regular SOs). |
+| 18 | Return reminder | **Not yet implemented** — must be built (periodic reminder for pending returns). |
+| 19 | Recurring SOs | **Should exist** — system must support periodic/recurring service orders. Not yet implemented. |
+| 20 | Cancel with equipment `in_use` | Equipment must be **in our possession** if SO is cancelled. Either force return or block cancellation. |
+| 21 | Priority impact | Priority **categorizes** SOs. High-priority must be executed first — impacts **scheduling/ordering**, not SLA. |
+| 22 | Scheduling | SOs **can be scheduled** — `scheduled_at` field needed. |
+| 23 | workflow_type change | **Not allowed** — loan cannot become regular or vice-versa. Immutable after creation. |
 
----
+### Required Specification Changes
 
-### C-8 · Privilege Escalation in `UserController::update()`
-
-**Status:** ✅ **Fixed**
-
-[`UserController::update()`](app/Features/Admin/Controllers/UserController.php:83-89) gates role assignment behind an admin check:
-
-```php
-if (isset($data['role_ids'])) {
-    if (!$request->user()->isAdmin()) {
-        abort(403, 'Apenas administradores podem alterar funções de utilizadores.');
-    }
-    $user->roles()->sync($data['role_ids']);
-}
-```
-
-This is simpler than the audit's suggested per-role Gate check and achieves the same protection.
+1. **Add** `reference_number` field (auto-generated sequential) to service_orders.
+2. **Add** `scheduled_at` field to service_orders.
+3. **Add** location requirement for loan SOs (currently only regular).
+4. **Document** priority impact: affects execution order, not SLAs.
+5. **Define** cancellation rules for loan: equipment must be returned first, or cancellation forces return Task 2 creation.
 
 ---
 
-## Observations — Resolved
+## 4. Tarefas, Mini-Tarefas e Work Logs
 
-### OBS-A1 · Dual Permission Styles (Raw Strings vs Enums)
+### Decision Summary
 
-**Status:** ✅ **Fixed**
+| # | Question | Decision |
+|---|----------|----------|
+| 24 | Worker task visibility | Workers only see **mini-tasks assigned to them or their teams**, plus related work logs. Matrix needs correction. |
+| 25 | Work log approval | **Work logs do NOT need approval.** Workers finalize them. MiniTask completion is approved by the person who administered it (supervisor/admin). |
+| 26 | Resubmission limit | **Yes** — implement a limit (3 rejections → auto-escalation to manager). |
+| 27 | Time overlap | **Yes** — system must validate no overlapping work logs for the same worker. |
+| 28 | Hours estimation | **Yes** — system must flag when actual hours significantly exceed estimate. |
+| 29 | Cross-sector assignment | **No** — only workers/teams from the same sector can be assigned. |
+| 30 | Edit after submission | **Yes** — worker can edit work log until MiniTask is "closed" by the responsible person. |
+| 31 | Multiple workers on work log | **One person submits** on behalf of the group. Any worker in that work log can finalize it. |
 
-[`ClientPolicy`](app/Features/Clients/Policies/ClientPolicy.php) now uses `PermissionAction::VIEW->value` and `PermissionResource::CLIENTS->value` instead of raw string literals. Consistent with `ServiceOrderPolicy`.
+### Required Specification Changes
 
----
-
-### OBS-A3 · 23 Hardcoded Permission Checks in `HandleInertiaRequests`
-
-**Status:** ✅ **Refactored**
-
-[`HandleInertiaRequests::share()`](app/Http/Middleware/HandleInertiaRequests.php:68-73) now uses a dynamic `CAN_CHECKS` constant map with 28 entries, iterated via `collect(...)->mapWithKeys(...)`:
-
-```php
-private const CAN_CHECKS = [
-    'viewDashboard'      => ['viewDashboard', null],
-    'viewUsers'          => ['viewAny',  \App\Shared\Models\User::class],
-    // ... 26 more entries
-];
-```
-
-Adding a new permission requires one line in `CAN_CHECKS` — no middleware editing.
+1. **Correct** [Section 3.2](ESPECIFICACAO_PROJETO.md:3.2): work log state machine should be `in_progress → submitted → completed` (no approval/rejection). Approval exists at MiniTask level.
+2. **Update** [Matriz](documentation/user_stories/diagrams/sitemap/02_FEATURE_ACCESS_MATRIX.md): remove Approve/Reject Work Log from Supervisor; add Approve MiniTask Completion.
+3. **Update** [WorkLog lifecycle](documentation/user_stories/diagrams/state_machines/04_WORKLOG_LIFECYCLE.md): remove approved/rejected states.
+4. **Add** hours estimation to MiniTask model + alerting rule.
+5. **Add** cross-sector validation rule.
+6. **Define** "closing" a MiniTask (approval by admin/supervisor).
 
 ---
 
-### OBS-A5 · Missing Null-Safe Operator in `WorkLogPolicy`
+## 5. Organização
 
-**Status:** ✅ **Fixed**
+### Decision Summary
 
-Both line 46 (`approve`) and line 53 (`reject`) in [`WorkLogPolicy`](app/Features/WorkLogs/Policies/WorkLogPolicy.php) correctly use `$workLog->miniTask?->supervisor` with the null-safe operator.
+| # | Question | Decision |
+|---|----------|----------|
+| 32 | Multiple supervisors per sector | **Yes** — a sector can have multiple responsible people. |
+| 33 | Worker in multiple teams/sectors | **Yes** — workers can belong to multiple teams and sectors. |
+| 34 | Workload visibility | **Not yet defined** — pending design. |
 
----
+### Required Specification Changes
 
-### OBS-S1 · Unconditional `true` in Policies
-
-**Status:** ✅ **Fixed**
-
-- [`NotificationPolicy`](app/Features/Notifications/Policies/NotificationPolicy.php:8) now extends `BasePolicy`. `viewAny` returns `true` with a docblock explaining the controller scopes by `auth()->id()`.
-- [`UserPreferencePolicy`](app/Shared/Policies/UserPreferencePolicy.php:9) now extends `BasePolicy`. `viewAny` returns `true` with documentation. Other methods use `isOwner()`.
-
----
-
-### OBS-S3 · Empty Sanctum Token Prefix
-
-**Status:** ✅ **Fixed**
-
-[`config/sanctum.php:65`](config/sanctum.php:65) now uses `'splnet_'`:
-
-```php
-'token_prefix' => env('SANCTUM_TOKEN_PREFIX', 'splnet_'),
-```
+1. **Update** Sector model to support multiple "chiefs" (many-to-many with users).
+2. **Update** Worker model to support multiple teams and sectors.
+3. **Defer** workload visibility — mark as future feature.
 
 ---
 
-### OBS-F1 · No React Error Boundary
+## 6. Notificações
 
-**Status:** ✅ **Fixed**
+### Decision Summary
 
-[`ErrorBoundary`](resources/js/Components/ErrorBoundary.jsx) is a class component wrapping the entire app in [`app.jsx:19-23`](resources/js/app.jsx:19-23):
+| # | Question | Decision |
+|---|----------|----------|
+| 35 | Notification matrix | **Not yet implemented.** Will be part of mobile app version. |
+| 36 | Notification channels | **In-app only for now.** Mobile version will add push. |
 
-```jsx
-<ErrorBoundary>
-    <ToastProvider>
-        <App {...props} />
-    </ToastProvider>
-</ErrorBoundary>
-```
+### Required Specification Changes
 
-Displays a Portuguese-language fallback UI with a reload button on unhandled errors.
+1. **Mark** notification system as "planned for mobile app (long-term)".
+2. **Define** future notification matrix when mobile version is started.
 
 ---
 
-### OBS-F2 · No HTTP 401 Interceptor
+## 7. Geografia
 
-**Status:** ✅ **Fixed**
+### Decision Summary
 
-[`resources/js/bootstrap.js:9-18`](resources/js/bootstrap.js:9-18) adds an axios response interceptor:
+| # | Question | Decision |
+|---|----------|----------|
+| 37 | Geography maintenance | **Admins only** — admin CRUD for districts, municipalities, parishes. |
+| 38 | Location without coordinates | **Allowed** — lat/lng is optional. |
 
-```js
-axios.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            window.location.href = '/login';
-        }
-        return Promise.reject(error);
-    }
-);
-```
+### Required Specification Changes
+
+1. **Update** [Section 4.1#20](ESPECIFICACAO_PROJETO.md:4.1): geography is NOT read-only — admins can maintain it. Change "só leitura" to "admin-maintained".
+2. **Document** that lat/lng is optional.
 
 ---
 
-### OBS-F3 · `console.debug` / `console.error` in Production Code
+## 8. Cross-Cutting
 
-**Status:** ✅ **Removed**
+### Decision Summary
 
-The only `console.error` call is in [`ErrorBoundary.jsx:15`](resources/js/Components/ErrorBoundary.jsx:15), guarded by `import.meta.env.DEV`. No `console.debug` exists anywhere in the codebase. The `TasksTree.jsx` statements at lines 122 and 138 cited in the audit are gone.
+| # | Question | Decision |
+|---|----------|----------|
+| 39 | Soft delete client with active SOs | **Not allowed** — client cannot be deleted while having active SOs. |
+| 40 | Audit logs | Audit logs **migration exists** but purpose unclear. Need clarification on what audit_logs table tracks vs. login_history. |
+| 41 | Multi-tenancy | **Single-tenant for now.** Future: add `tenant_id` to all tables, scope queries, separate DB per tenant or shared with tenant column. |
+| 42 | Bulk operations | **Should exist** — export work logs, mini-tasks, equipment, materials. Bulk approve/reassign. |
+| 43 | Holidays/non-working days | **Deferred** — all days allowed for now. Future: block Sundays. |
+| 44 | Export scope | Users can only export data **they created or are involved in** (sector-scoped). |
+| 45 | Data retention | Data retained **5-10 years** after last access/deletion. Purge flow needed. |
+| 46 | Equipment state machine | **Must be created** — full state machine documentation for equipment lifecycle. |
 
----
+### Required Specification Changes
 
-### OBS-F4 · Inertia Prop Not Synced to Local State
-
-**Status:** ✅ **Fixed**
-
-[`Index.jsx:33-35`](resources/js/Features/ServiceOrders/Pages/Index.jsx:33-35) now syncs on re-render:
-
-```jsx
-useEffect(() => {
-    setServiceOrdersState(service_orders);
-}, [service_orders]);
-```
-
----
-
-### OBS-F5 · `alert()` Calls Bypassing Toast System
-
-**Status:** ✅ **Removed**
-
-No `alert()` calls found anywhere in the codebase. `EditPanel.jsx` and `filterbar.jsx` (cited in the audit) no longer contain them.
+1. **Define** audit_logs purpose clearly — is it for tracking `unit_price_at_use` changes or full audit trail?
+2. **Add** multi-tenancy considerations to architecture section (future).
+3. **Create** Equipment state machine document (parallel to material stock lifecycle).
+4. **Define** data retention policy in specification (5-10 years + purge).
 
 ---
 
-## Observations — All Resolved
+## 9. Critical Action Items
 
-### OBS-A2 · `ServiceOrderController::initiateReturn()` Violates Service Layer
+Items requiring immediate implementation (ordered by priority):
 
-**Status:** ✅ **Fixed**
-
-[`ServiceOrderController::initiateReturn()`](app/Features/ServiceOrders/Controllers/ServiceOrderController.php:92-98) now delegates entirely to [`ServiceOrderService::initiateReturn()`](app/Features/ServiceOrders/Services/ServiceOrderService.php:98-118), which encapsulates all validation + `Task::create()` logic in a transaction.
-
----
-
-### OBS-A4 · `ServiceOrderPageController` Inline Data Transformation
-
-**Status:** ✅ **Extracted to Presenter**
-
-Created [`ServiceOrderPresenter`](app/Features/ServiceOrders/Presenters/ServiceOrderPresenter.php) with static `forIndex()` and `forDetail()` methods. The controller now calls:
-- `->through(fn($o) => ServiceOrderPresenter::forIndex($o))` for index views
-- `ServiceOrderPresenter::forDetail($so, $only)` for show/detail views
-
-Reduced [`ServiceOrderPageController`](app/Features/ServiceOrders/Controllers/ServiceOrderPageController.php) from ~283 → ~95 lines.
-
----
-
-### OBS-S4 · No Audit Trail for Critical Operations
-
-**Status:** ✅ **Implemented**
-
-Complete audit infrastructure added:
-- Migration: [`create_audit_logs_table`](database/migrations/2026_05_05_130000_create_audit_logs_table.php) — polymorphic `auditable` columns, `old_values`/`new_values` JSON, `ip_address`, `user_agent`
-- Model: [`AuditLog`](app/Shared/Models/AuditLog.php) — MorphTo `auditable()`, BelongsTo `user()`
-- Observer: [`AuditObserver`](app/Core/Observers/AuditObserver.php) — logs `created`, `updated`, `deleted` for any model
-- Registered in [`AppServiceProvider::boot()`](app/Providers/AppServiceProvider.php:18-30) for: ServiceOrder, User, Task, MiniTask, WorkLog, Role, Equipment
+| Priority | Item | Domain | Description |
+|----------|------|--------|-------------|
+| 🔴 P1 | Equipment state machine | Equipment | Create state machine + validation for all states (active, in_use, maintenance_pending, maintenance, broken, under_repair, retired) |
+| 🔴 P1 | Concurrent loan guard | Equipment | Atomic check preventing loan of non-active equipment |
+| 🔴 P1 | Work log → MiniTask approval correction | Workflow | Remove approval from work logs; add approval at MiniTask level |
+| 🔴 P1 | Material reservation at MiniTask creation | Materials | Reserve materials when MiniTask is created (pre-allocation) |
+| 🟡 P2 | Multi-role RBAC | Permissions | Refactor `user_roles` to many-to-many |
+| 🟡 P2 | Human-readable reference number | Service Orders | Auto-generated sequential reference (OS-YYYY-NNNNN) |
+| 🟡 P2 | Cross-sector assignment guard | Tasks | Validate worker/team belongs to same sector as task |
+| 🟡 P2 | Work log time overlap validation | Work Logs | Block overlapping hours for same worker |
+| 🟡 P2 | Hours estimation vs. actual alert | Work Logs | Flag significant discrepancies |
+| 🟡 P2 | Resubmission limit (3x) | Work Logs | Escalate to manager after 3 rejections |
+| 🟡 P2 | Loan SO cancellation → force return | Service Orders | Auto-create Task 2 or block cancellation |
+| 🟡 P2 | Loan SO requires location | Service Orders | Add location_id validation for loan SOs |
+| 🟡 P2 | Low stock → notify equipment_manager | Materials | Implement notification trigger |
+| 🟢 P3 | Recurring SO generation | Service Orders | Calendar-based recurring SO auto-creation |
+| 🟢 P3 | Equipment revision blocking | Equipment | Block loan when next_revision_date is past due |
+| 🟢 P3 | Export scoping by sector | Export | Filter exportable data by user's sector involvement |
+| 🟢 P3 | Admin geography CRUD | Geography | Add admin endpoints for district/municipality/parish |
+| 🟢 P3 | Scheduled_at field | Service Orders | Add scheduling date to SO model |
+| 🟢 P4 | Notification matrix | Notifications | Define event → role mapping for future mobile version |
+| 🟢 P4 | Data retention/purge | Admin | Implement 5-10 year retention + purge flow |
+| 🟢 P4 | Multi-tenancy prep | Architecture | Document required changes for future multi-tenant |
+| 🟢 P4 | Bulk operations | Cross-cutting | Export in bulk, bulk approve, bulk assign |
 
 ---
 
-### OBS-F6 · No Focus Trap in Modal/Drawer Components
-
-**Status:** ✅ **Fixed**
-
-Focus traps added via `useEffect` + `panelRef`/`contentRef` in:
-- [`WorkspaceDrawer`](resources/js/Components/Drawer/WorkspaceDrawer.jsx:51-61) — Tab/Shift+Tab cycling within drawer panel
-- [`DialogModal`](resources/js/Components/Common/DialogModal.jsx:103-113) — Tab/Shift+Tab cycling within modal content
-
----
-
-### OBS-F7 · Components Not Memoized
-
-**Status:** ✅ **Fixed**
-
-- [`NavItem`](resources/js/Components/SideBar/index.jsx) — wrapped with `memo()`
-- [`KanbanCard`](resources/js/Components/Kanban/KanbanCard.jsx:1) — already had `memo()`
-- [`Row`](resources/js/Components/Table/Row.jsx:1) — already had `memo()`
-
----
-
-### OBS-F8 · Duplicated Utility Functions
-
-**Status:** ✅ **Consolidated**
-
-`toScalar()` extracted to shared [`Utils/url.js`](resources/js/Utils/url.js:25-28) and imported in both:
-- [`FormField.jsx`](resources/js/Components/Common/FormField.jsx)
-- [`SearchableSelect.jsx`](resources/js/Components/Common/SearchableSelect.jsx)
-
----
-
-## Opportunities (O-1–O-10) — Mostly Implemented
-
-8 of 10 opportunities from the audit are now implemented:
-
-| # | Title | Status |
-|---|-------|--------|
-| O-1 | Dynamic permissions map in `HandleInertiaRequests` | ✅ Already refactored via `CAN_CHECKS` |
-| O-2 | Audit trail (Observer pattern) | ✅ Implemented — `AuditLog` model, `AuditObserver`, migration |
-| O-3 | Error Boundary + Sentry/error reporting | ✅ Sentry integration added — dynamic `@sentry/react` import in [`ErrorBoundary`](resources/js/Components/ErrorBoundary.jsx:13-25) when `VITE_SENTRY_DSN` is set |
-| O-4 | ESLint `no-console: warn` + pre-commit hook | ✅ Config created at [`.eslintrc.json`](.eslintrc.json) — `no-console: warn` (allow warn/error), `no-debugger: error`, `no-alert: error` |
-| O-5 | Scope Google Maps API key to map pages only | ✅ Removed from global [`HandleInertiaRequests`](app/Http/Middleware/HandleInertiaRequests.php); passed only from [`DashboardController`](app/Features/Dashboard/Controllers/DashboardController.php:69). Fixed config key (`google_maps.api_key`). |
-| O-6 | Reduce Sanctum token TTL: 120 min | ✅ Already 120 |
-| O-7 | Add env vars to `.env.example` | ✅ `SANCTUM_TOKEN_PREFIX`, `VITE_GOOGLE_MAPS_API_KEY`, `VITE_SENTRY_DSN` added |
-| O-8 | Enforce feature flag at route level | ✅ Middleware [`EnsureFeatureIsEnabled`](app/Http/Middleware/EnsureFeatureIsEnabled.php) created, alias `feature` registered in [`bootstrap/app.php`](bootstrap/app.php:29), config at [`config/features.php`](config/features.php) |
-| O-9 | Replace hardcoded seeder password | ✅ [`ClientSeeder`](database/seeders/ClientSeeder.php) and [`WorkerSeeder`](database/seeders/WorkerSeeder.php) now use `env('DEV_SEED_PASSWORD', 'password123')` |
-| O-10 | Composite index on `service_orders` | ✅ Migration [`add_composite_indexes_to_service_orders`](database/migrations/2026_05_05_140000_add_composite_indexes_to_service_orders.php) adds 4 composite indexes |
-
----
-
-## Files Modified (from Git Status)
-
-| File | Changes |
-|------|---------|
-| `.env.example` | Added `SANCTUM_TOKEN_PREFIX`, `VITE_GOOGLE_MAPS_API_KEY`, `VITE_SENTRY_DSN` |
-| `.eslintrc.json` | **New** — ESLint config with `no-console: warn`, `no-debugger: error` |
-| `app/Shared/Models/User.php` | Added `rolePermissions()`, `roles()` pivot relation |
-| `app/Shared/Models/AuditLog.php` | **New** — Polymorphic audit log model |
-| `app/Core/Observers/AuditObserver.php` | **New** — Logs created/updated/deleted for any model |
-| `app/Providers/AppServiceProvider.php` | Registered `AuditObserver` for 7 critical models |
-| `app/Features/Authentication/Controllers/AuthController.php` | Implemented `passwordReset()` |
-| `app/Features/Admin/Controllers/UserController.php` | Added admin escalation guard |
-| `app/Features/Clients/Policies/ClientPolicy.php` | Converted to enum constants |
-| `app/Features/Dashboard/Controllers/DashboardController.php` | Fixed Google Maps config key |
-| `app/Features/Notifications/Policies/NotificationPolicy.php` | Extended `BasePolicy` |
-| `app/Features/ServiceOrders/Controllers/ServiceOrderController.php` | Delegates `initiateReturn()` to service |
-| `app/Features/ServiceOrders/Controllers/ServiceOrderPageController.php` | Uses `ServiceOrderPresenter` (~95 lines, down from ~283) |
-| `app/Features/ServiceOrders/Presenters/ServiceOrderPresenter.php` | **New** — Data shaping for Inertia views |
-| `app/Features/ServiceOrders/Services/ServiceOrderService.php` | Added `initiateReturn()` method |
-| `app/Features/WorkLogs/Policies/WorkLogPolicy.php` | Added null-safe operators |
-| `app/Http/Middleware/HandleInertiaRequests.php` | Refactored to `CAN_CHECKS` map; removed global `googleMapsApiKey` |
-| `app/Http/Middleware/EnsureFeatureIsEnabled.php` | **New** — Route-level feature flag gating |
-| `app/Shared/Policies/UserPreferencePolicy.php` | Extended `BasePolicy`, fixed methods |
-| `bootstrap/app.php` | Registered `feature` middleware alias |
-| `config/features.php` | **New** — Feature flag config with env overrides |
-| `config/sanctum.php` | Added `splnet_` prefix |
-| `database/migrations/2026_05_05_130000_create_audit_logs_table.php` | **New** — Audit log table migration |
-| `database/migrations/2026_05_05_140000_add_composite_indexes_to_service_orders.php` | **New** — 4 composite indexes |
-| `database/seeders/ClientSeeder.php` | Uses `env('DEV_SEED_PASSWORD')` |
-| `database/seeders/WorkerSeeder.php` | Uses `env('DEV_SEED_PASSWORD')` |
-| `package.json` | Added `@sentry/react` dependency |
-| `resources/js/Components/ErrorBoundary.jsx` | Added Sentry integration with dynamic import |
-| `resources/js/Components/Common/DialogModal.jsx` | Added focus trap |
-| `resources/js/Components/Common/FormField.jsx` | Uses shared `toScalar()` from `Utils/url` |
-| `resources/js/Components/Common/SearchableSelect.jsx` | Uses shared `toScalar()` from `Utils/url` |
-| `resources/js/Components/Drawer/WorkspaceDrawer.jsx` | Added focus trap |
-| `resources/js/Components/SideBar/index.jsx` | `NavItem` wrapped with `memo()` |
-| `resources/js/Utils/url.js` | Added shared `toScalar()` utility |
-| `resources/js/app.jsx` | Wrapped app in `ErrorBoundary` |
-| `resources/js/bootstrap.js` | Added 401 interceptor |
-| `resources/js/Features/ServiceOrders/Pages/Index.jsx` | Added prop sync `useEffect` |
-
----
-
-## Appendix: Audit Reference
-
-- Source audit: [`deep-leaping-iverson.md`](../.claude/plans/deep-leaping-iverson.md)
+> **Maintainers**: This document supersedes the assumptions in `ESPECIFICACAO_PROJETO.md` where conflicts exist. All specification documents should be updated to reflect these resolutions.

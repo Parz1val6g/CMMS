@@ -17,8 +17,37 @@ function navigateWithQuery(params) {
     window.location.reload();
 }
 
-export default function EditPanel({ title, entityName, formSchema, routes, selectedItem, onClose, onDelete, onError }) {
-    const fields = Array.isArray(formSchema) ? formSchema : (formSchema?.inputs ?? []);
+/**
+ * Resolve a display value from a record, normalising related-object shapes.
+ * "_ids" fields → extract IDs from the related array; "_id" fields → extract id from related object.
+ */
+function resolveFieldValue(field, item) {
+    const fieldName = field.name ?? field.key;
+    const raw = item[fieldName];
+
+    if (raw !== undefined && raw !== null) return raw;
+
+    const guessKey = fieldName.replace(/_(?:id|ids)$/, '') + 's';
+    const singularKey = fieldName.replace(/_(?:id|ids)$/, '');
+    const related = item[guessKey] ?? item[fieldName.replace(/s$/, '')] ?? item[singularKey];
+    if (related === undefined || related === null) return '';
+
+    if (field.multiple) {
+        if (Array.isArray(related)) {
+            return related.map(i => (i && typeof i === 'object' ? i.id : i)).filter(Boolean);
+        }
+        return related;
+    }
+
+    if (related && typeof related === 'object' && 'id' in related) return related.id;
+    return related;
+}
+
+export default function EditPanel({ entityName, formSchema, routes, selectedItem, onClose, onDelete, onError }) {
+    const fields = useMemo(
+        () => Array.isArray(formSchema) ? formSchema : (formSchema?.inputs ?? []),
+        [formSchema]
+    );
     const [errors, setErrors] = useState({});
     const [saving, setSaving] = useState(false);
     const [workflowType, setWorkflowType] = useState('');
@@ -42,50 +71,15 @@ export default function EditPanel({ title, entityName, formSchema, routes, selec
         });
     }, [fields, workflowType]);
 
-    /**
-     * Resolve a value from selectedItem, normalizing related-object shapes.
-     * - Schema name "worker_ids" → try selectedItem.worker_ids, then try selectedItem.workers (extract IDs)
-     * - Schema name "team_id"   → try selectedItem.team_id, then try selectedItem.team (extract id)
-     */
-    function resolveFieldValue(field) {
-        const fieldName = field.name ?? field.key;
-        let raw = selectedItem[fieldName];
-
-        // Direct match found
-        if (raw !== undefined && raw !== null) return raw;
-
-        // Try guessing the related key: strip trailing "_ids" → "workers", or "_id" → "team"
-        const guessKey = fieldName.replace(/_(?:id|ids)$/, '') + 's';
-        const singularKey = fieldName.replace(/_(?:id|ids)$/, '');
-        const related = selectedItem[guessKey] ?? selectedItem[fieldName.replace(/s$/, '')] ?? selectedItem[singularKey];
-        if (related === undefined || related === null) return '';
-
-        if (field.multiple) {
-            // Multi-select: extract IDs from array of objects, or pass through ID array
-            if (Array.isArray(related)) {
-                const ids = related.map(item => (item && typeof item === 'object' ? item.id : item));
-                return ids.filter(Boolean);
-            }
-            return related;
-        }
-
-        // Single select: extract id from object, or pass through scalar
-        if (related && typeof related === 'object' && 'id' in related) {
-            return related.id;
-        }
-        return related;
-    }
-
-    // Initialize formData synchronously from selectedItem so defaultValue binds correctly on first render
-    const [formData, setFormData] = useState(() => {
+    // Derive formData from selectedItem — read-only snapshot for defaultValue bindings
+    const formData = useMemo(() => {
         if (!selectedItem) return {};
         const data = {};
         fields.forEach((f) => {
-            const fieldName = f.name ?? f.key;
-            data[fieldName] = resolveFieldValue(f);
+            data[f.name ?? f.key] = resolveFieldValue(f, selectedItem);
         });
         return data;
-    });
+    }, [selectedItem, fields]);
 
     useEffect(() => {
         if (selectedItem) {
