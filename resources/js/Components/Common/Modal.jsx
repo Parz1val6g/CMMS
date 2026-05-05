@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import FormField from '@/Components/Common/FormField';
 import FormInput from '@/Components/Form/FormInput';
 import { X } from 'lucide-react';
@@ -37,6 +37,7 @@ function collectFormData(form, fields) {
 
 export default function Modal({ entityName = 'Record', title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit, children }) {
   const formRef = useRef(null);
+  const containerRef = useRef(null);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
   const [workflowType, setWorkflowType] = useState('regular');
@@ -88,6 +89,35 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
     if (open) document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [open, onClose]);
+
+  /* ── Focus trap ──────────────────────────────────────────── */
+  useEffect(() => {
+    if (!open) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    const sel = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const getFocusable = () => Array.from(container.querySelectorAll(sel));
+
+    // Move focus into the modal on open
+    const firstEl = getFocusable()[0];
+    firstEl?.focus();
+
+    const trapFocus = (e) => {
+      if (e.key !== 'Tab') return;
+      const focusable = getFocusable();
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
+    };
+
+    document.addEventListener('keydown', trapFocus);
+    return () => document.removeEventListener('keydown', trapFocus);
+  }, [open]);
 
   useEffect(() => {
     if (open) { setErrors({}); setSaving(false); }
@@ -164,7 +194,13 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
         onClick={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
       />
 
-      <div className={`relative w-full ${sizeClass} max-h-[90vh] overflow-hidden rounded-xl bg-slate-800 shadow-2xl border border-slate-700`}>
+      <div
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title ?? `Create ${entityName}`}
+        className={`relative w-full ${sizeClass} max-h-[90vh] overflow-hidden rounded-xl bg-slate-800 shadow-2xl border border-slate-700`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-700 px-6 py-4">
           <h3 className="text-lg font-semibold text-white">{modalTitle}</h3>

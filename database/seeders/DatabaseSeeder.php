@@ -6,6 +6,10 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+    /**
+     * Ordered layers for deterministic, exhaustive seeding.
+     * Every role gets 1 user (UserSeeder), entities cover all enum states.
+     */
     public function run(): void
     {
         $this->call([
@@ -14,14 +18,14 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             GeographicDataSeeder::class,     // districts → municipalities → parishes
 
-                // ── Layer 2: Users & Profiles ──
-            UserSeeder::class,               // admin + managers + workers + clients
+                // ── Layer 2: Users (1 per role) ──
+            UserSeeder::class,               // admin, manager, equipment_manager, supervisor, worker, client
 
                 // ── Layer 3: Configuration ──
             ServiceTypeSeeder::class,
             UnitSeeder::class,
             MaterialSeeder::class,
-            EquipmentSeeder::class,          // EAM: Equipment master data + equipment_manager role
+            EquipmentSeeder::class,          // all statuses: active, maintenance, reserved, inactive
             AppSettingSeeder::class,
 
                 // ── Layer 4: Organisation ──
@@ -33,13 +37,13 @@ class DatabaseSeeder extends Seeder
             ClientSeeder::class,             // creates user accounts + clients
             LocationSeeder::class,           // references parishes
 
-                // ── Layer 6: Service Orders & Tasks ──
-            ServiceOrderSeeder::class,       // references clients, managers, locations, service_types
-            TaskSeeder::class,               // references service_orders, users
-            MiniTaskSeeder::class,           // references tasks, users; assigns workers/teams via pivot
+                // ── Layer 6: Service Orders & Tasks (Testing Gallery) ──
+            ServiceOrderSeeder::class,       // exhaustive: all status×priority×workflow combos
+            TaskSeeder::class,               // all TaskStatus values
+            MiniTaskSeeder::class,           // all MiniTaskStatus values
 
                 // ── Layer 7: Execution Data ──
-            WorkLogSeeder::class,            // references mini_tasks, workers, materials; attaches pivot data
+            WorkLogSeeder::class,            // all WorkLogStatus values
 
                 // ── Layer 8: Attachments ──
             AttachmentSeeder::class,

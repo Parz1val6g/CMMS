@@ -20,6 +20,7 @@
         "@dnd-kit/utilities": "^3.2.2",
         "@inertiajs/react": "^3.0.3",
         "@react-google-maps/api": "^2.20.8",
+        "@sentry/react": "^8.0.0",
         "@vitejs/plugin-react": "^6.0.1",
         "lucide-react": "^1.14.0",
         "react": "^19.2.5",

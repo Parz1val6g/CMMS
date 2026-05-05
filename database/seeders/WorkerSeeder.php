@@ -55,7 +55,7 @@ class WorkerSeeder extends Seeder
                     'last_name'  => $w['last_name'],
                     'phone'      => '+3519' . str_pad((string)(10000000 + $idx), 8, '0', STR_PAD_LEFT),
                     'email'      => $email,
-                    'password'   => Hash::make('password123'),
+                    'password'   => Hash::make(env('DEV_SEED_PASSWORD', 'password123')),
                     'status'     => 'active',
                 ]);
                 $user->roles()->attach($workerRole->id);

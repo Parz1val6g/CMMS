@@ -86,6 +86,36 @@ export default function DialogModal({
 
     const renderButtons = buttons.length > 0 ? buttons : defaultButtons[type] || defaultButtons.info;
 
+    const contentRef = useRef(null);
+
+    // Focus trap
+    useEffect(() => {
+        if (!open) return;
+        const content = contentRef.current;
+        if (!content) return;
+
+        const sel = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+        const getFocusable = () => Array.from(content.querySelectorAll(sel));
+
+        const firstEl = getFocusable()[0];
+        firstEl?.focus();
+
+        const trapFocus = (e) => {
+            if (e.key !== 'Tab') return;
+            const focusable = getFocusable();
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey) {
+                if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
+            } else {
+                if (document.activeElement === last) { e.preventDefault(); first?.focus(); }
+            }
+        };
+
+        document.addEventListener('keydown', trapFocus);
+        return () => document.removeEventListener('keydown', trapFocus);
+    }, [open]);
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Overlay */}
@@ -99,6 +129,7 @@ export default function DialogModal({
 
             {/* Dialog */}
             <div
+                ref={contentRef}
                 className={`relative w-full max-w-md rounded-xl shadow-2xl border ${config.bgColor} ${config.borderColor}`}
                 style={{
                     backgroundColor: 'rgba(15, 23, 42, 0.95)',

@@ -10,7 +10,8 @@ class UserPreferencePolicy extends BasePolicy
 {
     public function viewAny(User $user): bool
     {
-        // Users can only see their own preferences
+        // Gate passes; the controller scopes the query to auth()->id() so users
+        // only ever receive their own preferences in the response.
         return true;
     }
 

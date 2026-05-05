@@ -7,82 +7,77 @@ use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
-    /**
-     * The root template that's loaded on the first page visit.
-     *
-     * @see https://inertiajs.com/server-side-setup#root-template
-     *
-     * @var string
-     */
     protected $rootView = 'app';
 
     /**
-     * Determines the current asset version.
-     *
-     * @see https://inertiajs.com/asset-versioning
+     * Each entry maps a frontend key to [ability, model|null].
+     * null model → ability-only check (e.g. a Gate::define without a model).
+     * Adding a new permission requires a single line here — nowhere else.
      */
+    private const CAN_CHECKS = [
+        'viewDashboard'      => ['viewDashboard', null],
+        'viewUsers'          => ['viewAny',  \App\Shared\Models\User::class],
+        'manageUsers'        => ['create',   \App\Shared\Models\User::class],
+        'viewRoles'          => ['viewAny',  \App\Shared\Models\Role::class],
+        'manageRoles'        => ['create',   \App\Shared\Models\Role::class],
+        'viewServiceOrders'  => ['viewAny',  \App\Features\ServiceOrders\Models\ServiceOrder::class],
+        'createServiceOrders'=> ['create',   \App\Features\ServiceOrders\Models\ServiceOrder::class],
+        'viewTasks'          => ['viewAny',  \App\Features\Tasks\Models\Task::class],
+        'createTasks'        => ['create',   \App\Features\Tasks\Models\Task::class],
+        'viewMiniTasks'      => ['viewAny',  \App\Features\MiniTasks\Models\MiniTask::class],
+        'viewWorkLogs'       => ['viewAny',  \App\Features\WorkLogs\Models\WorkLog::class],
+        'viewClients'        => ['viewAny',  \App\Features\Clients\Models\Client::class],
+        'createClients'      => ['create',   \App\Features\Clients\Models\Client::class],
+        'viewEquipments'     => ['viewAny',  \App\Features\Equipments\Models\Equipment::class],
+        'createEquipments'   => ['create',   \App\Features\Equipments\Models\Equipment::class],
+        'viewMaterials'      => ['viewAny',  \App\Features\Materials\Models\Material::class],
+        'createMaterials'    => ['create',   \App\Features\Materials\Models\Material::class],
+        'viewLocations'      => ['viewAny',  \App\Features\Locations\Models\Location::class],
+        'createLocations'    => ['create',   \App\Features\Locations\Models\Location::class],
+        'viewSectors'        => ['viewAny',  \App\Features\Sectors\Models\Sector::class],
+        'createSectors'      => ['create',   \App\Features\Sectors\Models\Sector::class],
+        'viewTeams'          => ['viewAny',  \App\Features\Teams\Models\Team::class],
+        'createTeams'        => ['create',   \App\Features\Teams\Models\Team::class],
+        'viewWorkers'        => ['viewAny',  \App\Features\Workers\Models\Worker::class],
+        'createWorkers'      => ['create',   \App\Features\Workers\Models\Worker::class],
+        'viewServiceTypes'   => ['viewAny',  \App\Features\ServiceTypes\Models\ServiceType::class],
+        'createServiceTypes' => ['create',   \App\Features\ServiceTypes\Models\ServiceType::class],
+        'viewNotifications'  => ['viewAny',  \App\Features\Notifications\Models\Notification::class],
+        'viewSettings'       => ['viewAny',  \App\Shared\Models\AppSetting::class],
+    ];
+
     public function version(Request $request): ?string
     {
         return parent::version($request);
     }
 
-    /**
-     * Define the props that are shared by default.
-     *
-     * @see https://inertiajs.com/shared-data
-     *
-     * @return array<string, mixed>
-     */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user() ? [
-                    'id' => $request->user()->id,
-                    'first_name' => $request->user()->first_name,
-                    'last_name' => $request->user()->last_name,
-                    'email' => $request->user()->email,
+                'user' => $user ? [
+                    'id'         => $user->id,
+                    'first_name' => $user->first_name,
+                    'last_name'  => $user->last_name,
+                    'email'      => $user->email,
                 ] : null,
             ],
-            'can' => $request->user() ? [
-                'viewDashboard' => $request->user()->can('viewDashboard'),
-                'viewUsers' => $request->user()->can('viewAny', \App\Shared\Models\User::class),
-                'manageUsers' => $request->user()->can('create', \App\Shared\Models\User::class),
-                'viewRoles' => $request->user()->can('viewAny', \App\Shared\Models\Role::class),
-                'manageRoles' => $request->user()->can('create', \App\Shared\Models\Role::class),
-                'viewServiceOrders' => $request->user()->can('viewAny', \App\Features\ServiceOrders\Models\ServiceOrder::class),
-                'createServiceOrders' => $request->user()->can('create', \App\Features\ServiceOrders\Models\ServiceOrder::class),
-                'viewTasks' => $request->user()->can('viewAny', \App\Features\Tasks\Models\Task::class),
-                'createTasks' => $request->user()->can('create', \App\Features\Tasks\Models\Task::class),
-                'viewMiniTasks' => $request->user()->can('viewAny', \App\Features\MiniTasks\Models\MiniTask::class),
-                'viewWorkLogs' => $request->user()->can('viewAny', \App\Features\WorkLogs\Models\WorkLog::class),
-                'viewClients' => $request->user()->can('viewAny', \App\Features\Clients\Models\Client::class),
-                'createClients' => $request->user()->can('create', \App\Features\Clients\Models\Client::class),
-                'viewEquipments' => $request->user()->can('viewAny', \App\Features\Equipments\Models\Equipment::class),
-                'createEquipments' => $request->user()->can('create', \App\Features\Equipments\Models\Equipment::class),
-                'viewMaterials' => $request->user()->can('viewAny', \App\Features\Materials\Models\Material::class),
-                'createMaterials' => $request->user()->can('create', \App\Features\Materials\Models\Material::class),
-                'viewLocations' => $request->user()->can('viewAny', \App\Features\Locations\Models\Location::class),
-                'createLocations' => $request->user()->can('create', \App\Features\Locations\Models\Location::class),
-                'viewSectors' => $request->user()->can('viewAny', \App\Features\Sectors\Models\Sector::class),
-                'createSectors' => $request->user()->can('create', \App\Features\Sectors\Models\Sector::class),
-                'viewTeams' => $request->user()->can('viewAny', \App\Features\Teams\Models\Team::class),
-                'createTeams' => $request->user()->can('create', \App\Features\Teams\Models\Team::class),
-                'viewWorkers' => $request->user()->can('viewAny', \App\Features\Workers\Models\Worker::class),
-                'createWorkers' => $request->user()->can('create', \App\Features\Workers\Models\Worker::class),
-                'viewServiceTypes' => $request->user()->can('viewAny', \App\Features\ServiceTypes\Models\ServiceType::class),
-                'createServiceTypes' => $request->user()->can('create', \App\Features\ServiceTypes\Models\ServiceType::class),
-                'viewNotifications' => $request->user()->can('viewAny', \App\Features\Notifications\Models\Notification::class),
-                'viewSettings' => $request->user()->can('viewAny', \App\Shared\Models\AppSetting::class),
-            ] : null,
+            'can' => $user
+                ? collect(self::CAN_CHECKS)
+                    ->mapWithKeys(fn ($check, $key) => [
+                        $key => $check[1] ? $user->can($check[0], $check[1]) : $user->can($check[0]),
+                    ])
+                    ->toArray()
+                : null,
             'flash' => [
                 'success' => $request->session()->get('success')
                     ? e($request->session()->get('success')) : null,
-                'error' => $request->session()->get('error')
+                'error'   => $request->session()->get('error')
                     ? e($request->session()->get('error')) : null,
             ],
-            'googleMapsApiKey' => config('services.google_maps.api_key'),
         ];
     }
 }

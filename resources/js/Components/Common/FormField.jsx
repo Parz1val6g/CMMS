@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import MultiSelect from '@/Components/Common/MultiSelect';
 import SearchableSelect from '@/Components/Common/SearchableSelect';
+import { toScalar } from '@/Utils/url';
 
 const SEARCH_THRESHOLD = 8;
 
@@ -136,15 +137,6 @@ function MapPicker({ field, value }) {
       </p>
     </div>
   );
-}
-
-/**
- * Normalize a value to a scalar ID — handles Laravel relation objects.
- * If `raw` is an object with an `id` or `value` property, extracts it.
- */
-function toScalar(raw) {
-  if (raw === null || raw === undefined) return '';
-  return (typeof raw === 'object') ? (raw.id ?? raw.value ?? '') : raw;
 }
 
 function StandardField({ field, value = '', error }) {

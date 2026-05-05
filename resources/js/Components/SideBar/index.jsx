@@ -72,7 +72,9 @@ const bottomItems = [
 
 // ── Sub-components ──────────────────────────────────────────────────────
 
-function NavItem({ item }) {
+import { memo } from 'react';
+
+const NavItem = memo(function NavItem({ item }) {
   const { url } = usePage();
   const isActive = url === item.href || url.startsWith(item.href + '/');
   const Icon = item.icon;
@@ -97,7 +99,7 @@ function NavItem({ item }) {
       )}
     </Link>
   );
-}
+});
 
 function NavSection({ section }) {
   return (

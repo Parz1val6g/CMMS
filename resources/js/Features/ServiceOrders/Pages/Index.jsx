@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { usePage, router } from '@inertiajs/react';
+import { useToast } from '@/Components/Toast/ToastContext';
 import { Grid2X2, LayoutList, Plus, MapPin, Clock } from 'lucide-react';
 import AppLayout from '@/Layouts/AppLayout';
 import DataManager from '@/Components/DataManager';
@@ -15,17 +16,23 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
   const [formErrors, setFormErrors] = useState({});
   const [photoPreview, setPhotoPreview] = useState(null);
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'kanban'
-  const [serviceOrdersState, setServiceOrdersState] = useState(service_orders); // Local state for optimistic updates
+  const [serviceOrdersState, setServiceOrdersState] = useState(service_orders);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedServiceOrder, setSelectedServiceOrder] = useState(null);
   const [toast, setToast] = useState(null);
   const savingRef = useRef(false);
   const { flash } = usePage().props;
+  const globalToast = useToast();
 
   const breadcrumbs = [
     { name: 'Dashboard', url: '/dashboard' },
     { name: 'Service Orders', url: '/service-orders' },
   ];
+
+  /* ── Sync Inertia prop into local state on partial reloads ── */
+  useEffect(() => {
+    setServiceOrdersState(service_orders);
+  }, [service_orders]);
 
   /* ── Flash message auto-dismiss ───────────────────────────── */
   useEffect(() => {
@@ -67,10 +74,10 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         window.location.reload();
       } else {
         if (body.errors) setFormErrors(body.errors);
-        else alert(body.error ?? 'Failed to create');
+        else globalToast.error(body.error ?? 'Falha ao criar ordem de serviço.');
       }
     } catch {
-      alert('An error occurred');
+      globalToast.error('Ocorreu um erro inesperado.');
     } finally {
       savingRef.current = false;
       setSaving(false);

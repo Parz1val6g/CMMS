@@ -6,9 +6,12 @@ return [
     | Feature Flags
     |--------------------------------------------------------------------------
     |
-    | Centralised feature toggles for the application.
+    | Route-level gating via EnsureFeatureIsEnabled middleware.
+    | Set to false to disable a feature — the middleware will return 404.
     |
     */
-
-    'registration_enabled' => env('REGISTRATION_ENABLED', false),
+    'service_orders'   => env('FEATURE_SERVICE_ORDERS', true),
+    'equipment_loan'   => env('FEATURE_EQUIPMENT_LOAN', true),
+    'analytics'        => env('FEATURE_ANALYTICS', true),
+    'notifications'    => env('FEATURE_NOTIFICATIONS', true),
 ];

@@ -24,6 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(append: [
             \App\Http\Middleware\RateLimitMiddleware::class,
         ]);
+
+        $middleware->alias([
+            'feature' => \App\Http\Middleware\EnsureFeatureIsEnabled::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

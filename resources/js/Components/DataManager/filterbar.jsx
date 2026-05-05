@@ -1,15 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Download, Plus, SlidersHorizontal } from 'lucide-react';
 import { router } from '@inertiajs/react';
-
-function buildQuery(params) {
-    const s = new URLSearchParams(window.location.search);
-    Object.entries(params).forEach(([k, v]) => {
-        if (v === '' || v === null || v === undefined) s.delete(k);
-        else s.set(k, v);
-    });
-    return s.toString();
-}
+import { useToast } from '@/Components/Toast/ToastContext';
+import { buildQuery } from '@/utils/url';
 
 function navigateWithQuery(params) {
     const qs = buildQuery(params);
@@ -17,6 +10,7 @@ function navigateWithQuery(params) {
 }
 
 export default function FilterBar({ routes, filterSchema = [], columns = [], onNew = () => { }, entityName = 'Record' }) {
+    const toast = useToast();
     const params = new URLSearchParams(window.location.search);
     const searchVal = params.get('search') ?? '';
     const sortVal = params.get('sort') ?? 'desc';
@@ -85,7 +79,7 @@ export default function FilterBar({ routes, filterSchema = [], columns = [], onN
                 window.URL.revokeObjectURL(blobUrl);
                 document.body.removeChild(a);
             })
-            .catch(() => alert('Failed to export CSV'));
+            .catch(() => toast.error('Falha ao exportar CSV. Tente novamente.'));
     }, []);
 
     return (

@@ -50,7 +50,7 @@ class WorkLogPolicy extends BasePolicy
     public function reject(User $user, WorkLog $workLog): bool
     {
         // Only the mini-task supervisor or manager can reject
-        $isSupervisor = $this->isOwner($user, $workLog->miniTask->supervisor);
+        $isSupervisor = $this->isOwner($user, $workLog->miniTask?->supervisor);
         return $this->hasPermission($user, 'reject', 'work_logs') || $isSupervisor || $this->isAdmin($user);
     }
 }

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 
 // Helper to resolve nested object properties
@@ -60,7 +61,7 @@ function renderCell(item, col) {
     return <span className="text-slate-300">{raw}</span>;
 }
 
-export default function Row({ item, columns, hasEdit, onEdit, onDelete, onRowClick }) {
+function Row({ item, columns, hasEdit, onEdit, onDelete, onRowClick }) {
     return (
         <tr
             className={`hover:bg-slate-700/30 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
@@ -98,3 +99,5 @@ export default function Row({ item, columns, hasEdit, onEdit, onDelete, onRowCli
         </tr>
     );
 }
+
+export default memo(Row);

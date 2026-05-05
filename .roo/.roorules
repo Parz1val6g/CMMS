@@ -1,0 +1,18 @@
+# Nexus ERP - Autonomous Agent Rules
+
+## Context & Architecture
+- Este projeto segue **Domain-Driven Design (DDD)** e uma **Arquitetura Modular**.
+- Localização base: `C:\Users\joelt\project`.
+- Base de dados principal: **MySQL (splnet_db)**. Usa o SQLite MCP apenas para mocks ou db local se necessário.
+
+## MCP Usage Protocol
+- **Filesystem**: Antes de criares um novo módulo, mapeia a estrutura atual para garantir que segues o padrão DDD.
+- **Git/GitHub**: 
+    - Após cada correção bem-sucedida, faz stage das mudanças e cria um commit descritivo.
+    - Se encontrares um bug crítico que não possas resolver agora, cria uma Issue no GitHub.
+- **Sequential Thinking**: Usa esta ferramenta para planear refatorações complexas (ex: lógicas de permissões no middleware) antes de escreveres código.
+- **Puppeteer**: Sempre que alterares uma rota ou um componente de UI crítico, tenta aceder à página para verificar se há erros de renderização.
+
+## Quality Standards
+- Não uses `alert()` ou `console.log` em produção. Substitui por Toasts de feedback.
+- Mantém a lógica de negócio nos Services e a lógica de apresentação nos Controllers/Resources.

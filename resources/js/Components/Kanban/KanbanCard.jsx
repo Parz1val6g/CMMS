@@ -1,8 +1,9 @@
+import { memo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 
-export default function KanbanCard({ item, isDragging, renderCardContent, onCardClick }) {
+function KanbanCard({ item, isDragging, renderCardContent, onCardClick }) {
     const {
         attributes,
         listeners,
@@ -42,3 +43,9 @@ export default function KanbanCard({ item, isDragging, renderCardContent, onCard
         </div>
     );
 }
+
+export default memo(KanbanCard, (prev, next) =>
+    prev.item.id === next.item.id &&
+    prev.item.status === next.item.status &&
+    prev.isDragging === next.isDragging
+);

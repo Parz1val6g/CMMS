@@ -47,7 +47,7 @@ return [
     |
     */
 
-   'expiration' => (int) env('SANCTUM_TOKEN_EXPIRATION', 480),
+    'expiration' => (int) env('SANCTUM_TOKEN_EXPIRATION', 120),
 
     /*
     |--------------------------------------------------------------------------
@@ -62,7 +62,7 @@ return [
     |
     */
 
-    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', ''),
+    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', 'splnet_'),
 
     /*
     |--------------------------------------------------------------------------

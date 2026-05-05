@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp *)",
+      "mcp__filesystem__list_directory",
+      "mcp__filesystem__read_text_file",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__list_allowed_directories",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\joelt\\\\project\" -Directory)",
+      "Bash(Select-Object -ExpandProperty Name)",
+      "mcp__mysql__list_databases",
+      "mcp__mysql__list_tables",
+      "mcp__mysql__describe_table",
+      "mcp__mysql__execute_query",
+      "Bash(php artisan *)",
+      "Bash(npm run *)",
+      "Bash(Get-ChildItem \"C:\\\\Users\\\\joelt\\\\project\\\\app\\\\Features\\\\Tasks\\\\\" -Recurse -File | Select-Object -ExpandProperty FullName *)"
+    ]
+  }
+}

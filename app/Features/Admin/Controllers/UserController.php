@@ -81,6 +81,10 @@ class UserController extends Controller
         $user->update($data);
 
         if (isset($data['role_ids'])) {
+            // Role assignment is restricted to admins to prevent privilege escalation
+            if (!$request->user()->isAdmin()) {
+                abort(403, 'Apenas administradores podem alterar funções de utilizadores.');
+            }
             $user->roles()->sync($data['role_ids']);
         }
 

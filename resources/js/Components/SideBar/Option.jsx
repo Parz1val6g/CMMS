@@ -1,7 +1,8 @@
+import { memo } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
 
-export default function Option({ item }) {
+function Option({ item }) {
     const { url } = usePage();
 
     const isActive = useMemo(() => {
@@ -24,3 +25,5 @@ export default function Option({ item }) {
         </Link>
     );
 }
+
+export default memo(Option, (prev, next) => prev.item.href === next.item.href);

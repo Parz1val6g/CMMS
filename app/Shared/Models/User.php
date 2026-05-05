@@ -3,6 +3,7 @@
 namespace App\Shared\Models;
 
 use App\Core\Traits\Base;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 use App\Features\Clients\Models\Client;
@@ -37,6 +38,19 @@ class User extends Authenticatable
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
+    }
+
+    /**
+     * Returns a query builder over RolePermission scoped to this user's roles.
+     * Used by PermissionManager — must remain a Builder so callers can chain
+     * additional where() / exists() / get() calls without loading all rows.
+     */
+    public function rolePermissions(): Builder
+    {
+        return RolePermission::whereIn(
+            'role_id',
+            $this->roles()->select('roles.id')
+        );
     }
 
     public function preferences()

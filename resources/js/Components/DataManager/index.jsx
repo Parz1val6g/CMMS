@@ -6,19 +6,7 @@ import Table from '@/Components/Table/index.jsx';
 import Pagination from '@/Components/Table/Pagination.jsx';
 import EditPanel from './EditPanel.jsx';
 import FilterBar from './filterbar.jsx';
-
-function replaceId(url, id) {
-    return url.replace(':id', id).replace('__ID__', id);
-}
-
-function buildQuery(params) {
-    const s = new URLSearchParams(window.location.search);
-    Object.entries(params).forEach(([k, v]) => {
-        if (v === '' || v === null || v === undefined) s.delete(k);
-        else s.set(k, v);
-    });
-    return s.toString();
-}
+import { replaceId, buildQuery } from '@/utils/url';
 
 function navigateWithQuery(params) {
     const qs = buildQuery(params);

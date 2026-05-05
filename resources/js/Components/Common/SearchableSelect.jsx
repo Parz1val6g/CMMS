@@ -1,13 +1,6 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { ChevronDown, Search } from 'lucide-react';
-
-/**
- * Normalize a value to a scalar — handles Laravel relation objects.
- */
-function toScalar(raw) {
-  if (raw === null || raw === undefined) return '';
-  return (typeof raw === 'object') ? (raw.id ?? raw.value ?? '') : raw;
-}
+import { toScalar } from '@/Utils/url';
 
 export default function SearchableSelect({ name, options = [], value = '', onChange, placeholder = 'Select...', required }) {
   /* ── Normalize incoming value (may be object from Laravel relation) ── */

@@ -6,12 +6,14 @@ use App\Core\Enums\WorkflowType;
 use App\Core\Helpers\InputSanitizer;
 use App\Core\Services\TransactionHandler;
 use App\Exceptions\EquipmentUnavailableException;
+use App\Exceptions\TaskCreationException;
 use App\Features\Equipments\Models\Equipment;
 use App\Features\Locations\Models\Location;
 use App\Features\ServiceOrders\Events\ServiceOrderCompletedEvent;
 use App\Features\ServiceOrders\Events\ServiceOrderCreatedEvent;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\Tasks\Models\Task;
+use App\Features\Tasks\Resources\TaskResource;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 class ServiceOrderService
@@ -93,6 +95,28 @@ class ServiceOrderService
             return $serviceOrder;
         });
     }
+    public function initiateReturn(ServiceOrder $serviceOrder): Task
+    {
+        return $this->transactions->execute(function () use ($serviceOrder) {
+            abort_if($serviceOrder->workflow_type !== WorkflowType::LOAN->value, 400, 'Initiate return is only valid for loan workflows.');
+
+            abort_if($serviceOrder->tasks()->where('name', 'Devolução de Equipamento')->exists(), 409, 'Return task already exists.');
+
+            $checkoutTask = $serviceOrder->tasks()->where('name', 'Empréstimo de Equipamento')->first();
+            abort_if(!$checkoutTask || $checkoutTask->status !== TaskStatus::COMPLETED->value, 400, 'Equipment checkout task must be completed before initiating return.');
+
+            $task = Task::create([
+                'service_order_id' => $serviceOrder->id,
+                'manager_id'       => $serviceOrder->manager_id,
+                'name'             => 'Devolução de Equipamento',
+                'status'           => TaskStatus::PENDING->value,
+            ]);
+
+            $task->load(['sectors', 'manager']);
+            return $task;
+        });
+    }
+
     public function complete(ServiceOrder $serviceOrder): ServiceOrder
     {
         if ($serviceOrder->status === ServiceOrderStatus::COMPLETED->value) {

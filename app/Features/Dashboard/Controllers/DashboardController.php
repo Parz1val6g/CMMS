@@ -66,7 +66,7 @@ class DashboardController extends Controller
             'kpis'              => $kpis,
             'criticalOrders'    => $criticalOrders,
             'mapOrders'         => $mapOrders,
-            'googleMapsApiKey'  => config('services.google_maps_api_key'),
+            'googleMapsApiKey'  => config('services.google_maps.api_key'),
         ]);
     }
 }

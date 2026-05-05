@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { X } from 'lucide-react';
 import FormField from '@/Components/Common/FormField';
+import { replaceId, buildQuery } from '@/utils/url';
 
 /* ── Fields to hide per workflow type ────────────────────────── */
 const LOAN_HIDDEN = new Set([
@@ -10,17 +11,8 @@ const LOAN_HIDDEN = new Set([
     'section-map', 'location',
 ]);
 
-function replaceId(url, id) {
-    return url.replace(':id', id).replace('__ID__', id);
-}
-
 function navigateWithQuery(params) {
-    const s = new URLSearchParams(window.location.search);
-    Object.entries(params).forEach(([k, v]) => {
-        if (v === '' || v === null || v === undefined) s.delete(k);
-        else s.set(k, v);
-    });
-    const qs = s.toString();
+    const qs = buildQuery(params);
     window.history.replaceState(null, '', window.location.pathname + (qs ? `?${qs}` : ''));
     window.location.reload();
 }
@@ -163,7 +155,7 @@ export default function EditPanel({ title, entityName, formSchema, routes, selec
     if (!selectedItem) return null;
 
     return (
-        <div className="flex w-96 shrink-0 flex-col overflow-hidden rounded-lg border border-slate-700 bg-slate-800 shadow-xl max-h-full">
+        <div className="flex w-96 shrink-0 flex-col overflow-y-auto rounded-lg border border-slate-700 bg-slate-800 shadow-xl max-h-full">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-700 px-4 py-3">
                 <h6 className="text-sm font-bold text-white">Edit {entityName}</h6>

@@ -118,9 +118,7 @@ export default function SOTasksTree({
       }
     }
 
-    const result = buildTaskTree(flat, { parentKey: 'parent_id' });
-    console.debug('[SOTasksTree] buildTaskTree output:', { flat, result });
-    return result;
+    return buildTaskTree(flat, { parentKey: 'parent_id' });
   }, [tasks, miniTasksMap]);
 
   /* ── Check if return task already exists in tree ──────────── */
@@ -134,8 +132,8 @@ export default function SOTasksTree({
       onSuccess: () => {
         window.location.reload();
       },
-      onError: (errors) => {
-        console.error('[SOTasksTree] initiate-return failed:', errors);
+      onError: () => {
+        // Silently ignore — parent component handles error state
       },
     });
   }, []);

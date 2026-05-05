@@ -10,13 +10,13 @@ class SectorSeeder extends Seeder
 {
     public function run(): void
     {
-        $headUserId = DB::table('users')->where('email', 'maria.santos@cm.pt')->first()->id;
+        $headUserId = DB::table('users')->where('email', 'maria.santos@cm.pt')->value('id');
 
         $sectors = [
             ['name' => 'Departamento de Obras e Viação', 'head_id' => $headUserId],
             ['name' => 'Departamento de Urbanismo', 'head_id' => $headUserId],
-            ['name' => 'Departamento de Limpeza Urbana', 'head_id' => DB::table('users')->where('email', 'carlos.oliveira@cm.pt')->first()->id],
-            ['name' => 'Departamento de Água e Saneamento', 'head_id' => DB::table('users')->where('email', 'fernanda.pereira@cm.pt')->first()->id],
+            ['name' => 'Departamento de Limpeza Urbana', 'head_id' => $headUserId],
+            ['name' => 'Departamento de Água e Saneamento', 'head_id' => $headUserId],
         ];
 
         foreach ($sectors as $sector) {

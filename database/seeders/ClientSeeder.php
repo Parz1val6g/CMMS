@@ -45,7 +45,7 @@ class ClientSeeder extends Seeder
                 'last_name'  => $lastName ?: '.',
                 'phone'      => '+351' . (910000000 + random_int(0, 59999999)),
                 'email'      => $email,
-                'password'   => Hash::make('password123'),
+                'password'   => Hash::make(env('DEV_SEED_PASSWORD', 'password123')),
                 'status'     => 'active',
             ]);
             $user->roles()->attach($clientRole->id);
