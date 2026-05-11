@@ -7,6 +7,7 @@ use App\Core\Enums\Priority;
 use App\Core\Enums\TaskStatus;
 use App\Core\Enums\MiniTaskStatus;
 use App\Core\Enums\WorkLogStatus;
+use App\Core\Enums\WorkflowType;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\Tasks\Models\Task;
 use App\Features\MiniTasks\Models\MiniTask;
