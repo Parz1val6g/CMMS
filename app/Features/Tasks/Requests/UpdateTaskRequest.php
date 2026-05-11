@@ -4,7 +4,7 @@ namespace App\Features\Tasks\Requests;
 
 use App\Core\Forms\FormValidator;
 use App\Features\Tasks\Models\Task;
-use App\Features\Tasks\Schemas\TaskFormSchema;
+use App\Features\Tasks\TaskFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTaskRequest extends FormRequest
@@ -17,8 +17,7 @@ class UpdateTaskRequest extends FormRequest
     public function rules(): array
     {
         $rules = (new FormValidator())->fromSchema(TaskFormSchema::update(), $this->all());
-        $rules['sector_ids'] = ['sometimes', 'array', 'min:1'];
-        $rules['sector_ids.*'] = ['exists:sectors,id'];
+        $rules['sector_id'] = ['sometimes', 'exists:sectors,id'];
         return $rules;
     }
 }

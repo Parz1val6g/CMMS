@@ -18,13 +18,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // ── Audit Trail: Observe critical models ──
-        \App\Features\ServiceOrders\Models\ServiceOrder::observe(\App\Core\Observers\AuditObserver::class);
-        \App\Shared\Models\User::observe(\App\Core\Observers\AuditObserver::class);
-        \App\Features\Tasks\Models\Task::observe(\App\Core\Observers\AuditObserver::class);
-        \App\Features\MiniTasks\Models\MiniTask::observe(\App\Core\Observers\AuditObserver::class);
-        \App\Features\WorkLogs\Models\WorkLog::observe(\App\Core\Observers\AuditObserver::class);
-        \App\Shared\Models\Role::observe(\App\Core\Observers\AuditObserver::class);
-        \App\Features\Equipments\Models\Equipment::observe(\App\Core\Observers\AuditObserver::class);
+        \App\Features\ServiceOrders\Models\ServiceOrder::observe(\App\Shared\Observers\AuditObserver::class);
+        \App\Shared\Models\User::observe(\App\Shared\Observers\AuditObserver::class);
+        \App\Features\Tasks\Models\Task::observe(\App\Shared\Observers\AuditObserver::class);
+        \App\Features\MiniTasks\Models\MiniTask::observe(\App\Shared\Observers\AuditObserver::class);
+        \App\Features\WorkLogs\Models\WorkLog::observe(\App\Shared\Observers\AuditObserver::class);
+        \App\Shared\Models\Role::observe(\App\Shared\Observers\AuditObserver::class);
+        \App\Features\Equipments\Models\Equipment::observe(\App\Shared\Observers\AuditObserver::class);
 
         // Override factory resolution for feature/shared namespaced models
         // Models: App\Shared\Models\{Name}, App\Features\{Feature}\Models\{Name}

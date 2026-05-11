@@ -4,7 +4,7 @@ namespace App\Features\WorkLogs\Requests;
 
 use App\Core\Forms\FormValidator;
 use App\Features\WorkLogs\Models\WorkLog;
-use App\Features\WorkLogs\Schemas\WorkLogFormSchema;
+use App\Features\WorkLogs\WorkLogFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreWorkLogRequest extends FormRequest

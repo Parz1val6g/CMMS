@@ -8,11 +8,21 @@ class WorkLogResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'reference' => $this->reference,
             'description' => $this->description,
             'started_at' => $this->started_at ? $this->started_at->toIso8601String() : null,
             'completed_at' => $this->completed_at ? $this->completed_at->toIso8601String() : null,
             'duration_minutes' => $this->duration_minutes, // Handled automatically by your MySQL DB!
             'created_at' => $this->created_at->toIso8601String(),
+            'status' => $this->status,
+
+            // Parent MiniTask reference
+            'mini_task' => $this->whenLoaded('miniTask', function () {
+                return [
+                    'id' => $this->miniTask->id,
+                    'reference' => $this->miniTask->reference,
+                ];
+            }),
 
             // Nested Workers
             'workers' => $this->whenLoaded('workers', function () {

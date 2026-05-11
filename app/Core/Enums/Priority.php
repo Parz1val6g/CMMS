@@ -12,10 +12,10 @@ enum Priority: string
     public function label(): string
     {
         return match ($this) {
-            self::LOW => 'Low',
-            self::NORMAL => 'Normal',
-            self::HIGH => 'High',
-            self::URGENT => 'Urgent',
+            self::LOW => __('enums.priority.low'),
+            self::NORMAL => __('enums.priority.normal'),
+            self::HIGH => __('enums.priority.high'),
+            self::URGENT => __('enums.priority.urgent'),
         };
     }
 

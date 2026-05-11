@@ -2,6 +2,7 @@
 namespace App\Features\MiniTasks\Models;
 use App\Core\Enums\MiniTaskStatus;
 use App\Core\Traits\Base;
+use App\Core\Traits\HasAutoReference;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Features\MiniTasks\Models\Pivots\MiniTaskAssignment;
@@ -10,13 +11,20 @@ use App\Shared\Models\User;
 use App\Features\Workers\Models\Worker;
 use App\Features\Teams\Models\Team;
 use App\Features\Materials\Models\Material;
+use App\Features\Equipments\Models\Equipment;
 use App\Features\WorkLogs\Models\WorkLog;
 use App\Shared\Models\Attachment;
 
 class MiniTask extends Model
 {
-    use Base;
+    use Base, HasAutoReference;
+
+    protected function referenceInitials(): string
+    {
+        return 'MT';
+    }
     protected $fillable = [
+        'reference',
         'task_id',
         'supervisor_id',
         'description',
@@ -44,6 +52,12 @@ class MiniTask extends Model
             ->withPivot('planned_quantity');
     }
     
+    public function equipment()
+    {
+        return $this->belongsToMany(Equipment::class, 'mini_task_equipment', 'mini_task_id', 'equipment_id')
+            ->withTimestamps();
+    }
+
     public function workLogs() { return $this->hasMany(WorkLog::class); }
     public function attachments() { return $this->hasMany(Attachment::class); }
 }

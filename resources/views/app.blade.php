@@ -12,6 +12,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet">
 
     <!-- Scripts -->
+    <script>window.__LOCALE__ = '{{ app()->getLocale() }}';</script>
     @viteReactRefresh
     @vite(['resources/js/app.jsx', 'resources/css/app.css'])
 </head>

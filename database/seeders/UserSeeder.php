@@ -18,12 +18,16 @@ class UserSeeder extends Seeder
         $roles = Role::pluck('id', 'name');
 
         $users = [
-            'admin'             => ['first_name' => 'João',    'last_name' => 'Silva',     'phone' => '+351912345678', 'email' => 'admin@cm.pt'],
-            'manager'           => ['first_name' => 'Maria',   'last_name' => 'Santos',    'phone' => '+351912345679', 'email' => 'maria.santos@cm.pt'],
-            'equipment_manager' => ['first_name' => 'Pedro',   'last_name' => 'Equipamentos','phone'=> '+351912345700','email' => 'pedro.equipamentos@cm.pt'],
-            'supervisor'        => ['first_name' => 'Rui',     'last_name' => 'Supervisor','phone' => '+351912345682', 'email' => 'rui.supervisor@cm.pt'],
-            'worker'            => ['first_name' => 'António', 'last_name' => 'Operário',  'phone' => '+351912345683', 'email' => 'antonio.worker@cm.pt'],
-            'client'            => ['first_name' => 'Carlos',  'last_name' => 'Cliente',   'phone' => '+351912345684', 'email' => 'carlos.cliente@clientes.pt'],
+            'admin'             => ['first_name' => 'João',    'last_name' => 'Silva',        'phone' => '+351912345678', 'email' => 'admin@cm.pt'],
+            'manager'           => ['first_name' => 'Maria',   'last_name' => 'Santos',       'phone' => '+351912345679', 'email' => 'maria.santos@cm.pt'],
+            'equipment_manager' => ['first_name' => 'Pedro',   'last_name' => 'Equipamentos', 'phone'=> '+351912345700', 'email' => 'pedro.equipamentos@cm.pt'],
+            'supervisor'        => ['first_name' => 'Rui',     'last_name' => 'Supervisor',   'phone' => '+351912345682', 'email' => 'rui.supervisor@cm.pt'],
+            'worker'            => ['first_name' => 'António', 'last_name' => 'Operário',     'phone' => '+351912345683', 'email' => 'antonio.worker@cm.pt'],
+            'client'            => ['first_name' => 'Carlos',  'last_name' => 'Cliente',      'phone' => '+351912345684', 'email' => 'carlos.cliente@clientes.pt'],
+            'task_manager'      => ['first_name' => 'Sofia',   'last_name' => 'Tarefas',      'phone' => '+351912345701', 'email' => 'sofia.tarefas@cm.pt'],
+            'mini_task_manager' => ['first_name' => 'Hugo',    'last_name' => 'MiniTarefas',  'phone' => '+351912345702', 'email' => 'hugo.minitarefas@cm.pt'],
+            'work_log_manager'  => ['first_name' => 'Inês',    'last_name' => 'Logs',         'phone' => '+351912345703', 'email' => 'ines.logs@cm.pt'],
+            'sector_manager'    => ['first_name' => 'Nuno',    'last_name' => 'Setores',      'phone' => '+351912345704', 'email' => 'nuno.setores@cm.pt'],
         ];
 
         foreach ($users as $roleName => $data) {

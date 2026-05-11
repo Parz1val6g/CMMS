@@ -1,4 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import { t } from '@/utils/i18n';
 
 export default function Login() {
   const { data, setData, post, processing, errors } = useForm({
@@ -13,7 +14,7 @@ export default function Login() {
 
   return (
     <>
-      <Head title="Sign In" />
+      <Head title={t('pages.auth.login.title')} />
 
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-3 dark:from-gray-900 dark:to-gray-950">
         <div className="w-full max-w-sm">
@@ -25,14 +26,14 @@ export default function Login() {
                   <path fillRule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z" />
                 </svg>
               </div>
-              <h4 className="mb-0 text-xl font-bold text-gray-900 dark:text-white">Sign In</h4>
+              <h4 className="mb-0 text-xl font-bold text-gray-900 dark:text-white">{t('pages.auth.login.title')}</h4>
             </div>
 
             <form onSubmit={submit} noValidate>
               {/* Email */}
               <div className="mb-3">
                 <label htmlFor="email" className="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400">
-                  Email or Username <span className="text-red-500">*</span>
+                  {t('pages.auth.login.email_label')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="email"
@@ -43,7 +44,7 @@ export default function Login() {
                     }`}
                   required
                   autoFocus
-                  aria-label="Email or Username"
+                  aria-label={t('pages.auth.login.email_label')}
                 />
                 {errors.email && (
                   <div className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.email}</div>
@@ -53,7 +54,7 @@ export default function Login() {
               {/* Password */}
               <div className="mb-4">
                 <label htmlFor="password" className="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400">
-                  Password <span className="text-red-500">*</span>
+                  {t('pages.auth.login.password_label')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="password"
@@ -63,7 +64,7 @@ export default function Login() {
                   className={`block w-full rounded-xl border-0 bg-gray-100 px-4 py-3 text-sm shadow-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 ${errors.password ? 'ring-2 ring-red-500' : ''
                     }`}
                   required
-                  aria-label="Password"
+                  aria-label={t('pages.auth.login.password_label')}
                 />
                 {errors.password && (
                   <div className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.password}</div>
@@ -77,7 +78,7 @@ export default function Login() {
                   disabled={processing}
                   className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors"
                 >
-                  {processing ? 'Signing in...' : 'Sign In'}
+                  {processing ? t('pages.auth.login.signing_in') : t('pages.auth.login.submit')}
                 </button>
               </div>
             </form>
@@ -85,7 +86,7 @@ export default function Login() {
             {/* Register Link */}
             <div className="mt-3 text-center">
               <Link href="/register" className="text-xs font-medium text-gray-500 no-underline hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                Create an account
+                {t('pages.auth.login.create_account')}
               </Link>
             </div>
           </div>

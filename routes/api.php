@@ -5,32 +5,35 @@ use App\Shared\Controllers\AppSettingController;
 use App\Shared\Controllers\UserPreferenceController;
 
 // Register Authentication Routes
-Route::prefix('auth')->group(base_path('routes/api/authentication.php'));
+Route::prefix('auth')->group(base_path('app/Features/Authentication/Routes/api.php'));
 
 // Register Workflow Routes
-Route::prefix('service-orders')->group(base_path('routes/api/service-orders.php'));
-Route::prefix('tasks')->group(base_path('routes/api/tasks.php'));
-Route::prefix('mini-tasks')->group(base_path('routes/api/mini-tasks.php'));
-Route::prefix('work-logs')->group(base_path('routes/api/work-logs.php'));
+Route::prefix('service-orders')->group(base_path('app/Features/ServiceOrders/Routes/api.php'));
+Route::prefix('tasks')->group(base_path('app/Features/Tasks/Routes/api.php'));
+Route::prefix('mini-tasks')->group(base_path('app/Features/MiniTasks/Routes/api.php'));
+Route::prefix('work-logs')->group(base_path('app/Features/WorkLogs/Routes/api.php'));
 
 // Register Master Data Routes
-Route::prefix('sectors')->group(base_path('routes/api/sectors.php'));
-Route::prefix('teams')->group(base_path('routes/api/teams.php'));
-Route::prefix('workers')->group(base_path('routes/api/workers.php'));
-Route::prefix('locations')->group(base_path('routes/api/locations.php'));
-Route::prefix('clients')->group(base_path('routes/api/clients.php'));
-Route::prefix('materials')->group(base_path('routes/api/materials.php'));
-Route::prefix('service-types')->group(base_path('routes/api/service-types.php'));
+Route::prefix('sectors')->group(base_path('app/Features/Sectors/Routes/api.php'));
+Route::prefix('teams')->group(base_path('app/Features/Teams/Routes/api.php'));
+Route::prefix('workers')->group(base_path('app/Features/Workers/Routes/api.php'));
+Route::prefix('locations')->group(base_path('app/Features/Locations/Routes/api.php'));
+Route::prefix('clients')->group(base_path('app/Features/Clients/Routes/api.php'));
+Route::prefix('materials')->group(base_path('app/Features/Materials/Routes/api.php'));
+Route::prefix('service-types')->group(base_path('app/Features/ServiceTypes/Routes/api.php'));
 Route::prefix('attachments')->group(base_path('routes/api/attachments.php'));
 
 // Register Notifications Routes
-Route::prefix('notifications')->group(base_path('routes/api/notifications.php'));
+Route::prefix('notifications')->group(base_path('app/Features/Notifications/Routes/api.php'));
 
 // Register Admin Routes
-Route::prefix('admin')->group(base_path('routes/api/admin.php'));
+Route::prefix('admin')->group(base_path('app/Features/Admin/Routes/api.php'));
 
 // Register Export Routes
-Route::prefix('exports')->group(base_path('routes/api/exports.php'));
+Route::prefix('exports')->group(base_path('app/Features/Export/Routes/api.php'));
+
+// Register Equipments Routes
+Route::prefix('equipments')->group(base_path('app/Features/Equipments/Routes/api.php'));
 
 // Register Unit Routes
 Route::prefix('units')->group(base_path('routes/api/units.php'));

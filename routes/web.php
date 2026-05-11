@@ -13,51 +13,50 @@ use Inertia\Inertia;
 // Guest  → Login page
 // Auth   → Dashboard
 Route::get('/', function () {
-    if (auth()->check()) {
+    if (auth()->check())
         return redirect()->route('dashboard');
-    }
     return Inertia::render('Authentication/Pages/Login');
 })->name('home');
 
 // Guest routes (no auth required)
-require base_path('routes/web/authentication.php');
+require base_path('app/Features/Authentication/Routes/web.php');
 
 // Authenticated routes — all sub-files define their own middleware/prefix/name groups
 Route::middleware(['auth'])->group(function () {
     // Dashboard
-    require base_path('routes/web/dashboard.php');
+    require base_path('app/Features/Dashboard/Routes/web.php');
 
     // Workflow
-    require base_path('routes/web/service-orders.php');
-    require base_path('routes/web/tasks.php');
-    require base_path('routes/web/mini-tasks.php');
-    require base_path('routes/web/work-logs.php');
+    require base_path('app/Features/ServiceOrders/Routes/web.php');
+    require base_path('app/Features/Tasks/Routes/web.php');
+    require base_path('app/Features/MiniTasks/Routes/web.php');
+    require base_path('app/Features/WorkLogs/Routes/web.php');
 
     // Master Data
-    require base_path('routes/web/clients.php');
-    require base_path('routes/web/locations.php');
-    require base_path('routes/web/materials.php');
-    require base_path('routes/web/sectors.php');
-    require base_path('routes/web/service-types.php');
-    require base_path('routes/web/teams.php');
-    require base_path('routes/web/workers.php');
+    require base_path('app/Features/Clients/Routes/web.php');
+    require base_path('app/Features/Locations/Routes/web.php');
+    require base_path('app/Features/Materials/Routes/web.php');
+    require base_path('app/Features/Sectors/Routes/web.php');
+    require base_path('app/Features/ServiceTypes/Routes/web.php');
+    require base_path('app/Features/Teams/Routes/web.php');
+    require base_path('app/Features/Workers/Routes/web.php');
 
     // Profile & Settings
-    require base_path('routes/web/profile.php');
-    require base_path('routes/web/settings.php');
+    require base_path('app/Features/Profile/Routes/web.php');
+    require base_path('app/Features/Settings/Routes/web.php');
 
     // Equipments (Loan workflow)
-    require base_path('routes/web/equipments.php');
+    require base_path('app/Features/Equipments/Routes/web.php');
 
     // Exports
-    require base_path('routes/web/exports.php');
+    require base_path('app/Features/Export/Routes/web.php');
 
     // Notifications
-    require base_path('routes/web/notifications.php');
+    require base_path('app/Features/Notifications/Routes/web.php');
 
     // Analytics & Reports
-    require base_path('routes/web/analytics.php');
+    require base_path('app/Features/Analytics/Routes/web.php');
 
     // Admin
-    require base_path('routes/web/admin.php');
+    require base_path('app/Features/Admin/Routes/web.php');
 });

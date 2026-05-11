@@ -4,7 +4,7 @@ namespace App\Features\ServiceTypes\Requests;
 
 use App\Core\Forms\FormValidator;
 use App\Features\ServiceTypes\Models\ServiceType;
-use App\Features\ServiceTypes\Schemas\ServiceTypeFormSchema;
+use App\Features\ServiceTypes\ServiceTypeFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreServiceTypeRequest extends FormRequest

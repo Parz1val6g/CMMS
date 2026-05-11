@@ -9,10 +9,10 @@ enum ServiceOrderStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::PENDING => 'Pending',
-            self::IN_PROGRESS => 'In Progress',
-            self::COMPLETED => 'Completed',
-            self::CANCELLED => 'Cancelled',
+            self::PENDING => __('enums.service_order_status.pending'),
+            self::IN_PROGRESS => __('enums.service_order_status.in_progress'),
+            self::COMPLETED => __('enums.service_order_status.completed'),
+            self::CANCELLED => __('enums.service_order_status.cancelled'),
         };
     }
     public static function options(): array

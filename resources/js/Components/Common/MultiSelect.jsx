@@ -22,15 +22,14 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
   /* ── Initialize selected from value (no options filter — may not be loaded) ── */
   const [selected, setSelected] = useState(() => toIds(value));
 
-  /* ── Sync selected when value/options change ────────────── */
+  /* ── Sync selected when value changes ───────────────────── */
   useEffect(() => {
     const ids = toIds(value);
     setSelected(prev => {
-      const filtered = ids.filter(v => options.some(o => o.value === v));
-      if (JSON.stringify(filtered) === JSON.stringify(prev)) return prev;
-      return filtered;
+      if (JSON.stringify(ids) === JSON.stringify(prev)) return prev;
+      return ids;
     });
-  }, [value, options]);
+  }, [value]);
 
   /* ── Focus search input on open ──────────────────────────── */
   useEffect(() => {
@@ -211,11 +210,6 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
           )}
         </div>
       )}
-
-      {/* ── Hidden inputs for form.elements compatibility ──────── */}
-      {selected.map((v) => (
-        <input key={v} type="hidden" name={name} value={v} />
-      ))}
 
       {/* Hidden ref for programmatic focus */}
       <input ref={inputRef} type="hidden" />

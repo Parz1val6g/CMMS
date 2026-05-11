@@ -114,11 +114,6 @@ class FormValidator
         }
 
         if ($field instanceof SelectInput) {
-            $options = $field->getOptions();
-            if (!empty($options)) {
-                $values = array_column($options, 'value');
-                return ['in:' . implode(',', $values)];
-            }
             return [];
         }
 

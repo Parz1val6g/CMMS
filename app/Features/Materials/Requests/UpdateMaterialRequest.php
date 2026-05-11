@@ -4,7 +4,7 @@ namespace App\Features\Materials\Requests;
 
 use App\Core\Forms\FormValidator;
 use App\Features\Materials\Models\Material;
-use App\Features\Materials\Schemas\MaterialFormSchema;
+use App\Features\Materials\MaterialFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateMaterialRequest extends FormRequest

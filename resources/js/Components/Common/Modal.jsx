@@ -1,89 +1,102 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import FormField from '@/Components/Common/FormField';
-import FormInput from '@/Components/Form/FormInput';
+import FormInput from '@/Components/Common/FormInput';
 import { X } from 'lucide-react';
 import { useToast } from '@/Components/Toast/ToastContext';
+import { t } from '@/utils/i18n';
+import { useFocusTrap } from '@/Hooks/useFocusTrap';
+import { useBodyLock } from '@/Hooks/useBodyLock';
 
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
 /* ── Fields to hide per workflow type ────────────────────────── */
+// BACKEND: StoreServiceOrderRequest — prohibited fields for workflow_type=loan
 const LOAN_HIDDEN = new Set([
-  'service_type_id', 'priority',
-  'section-photo', 'photo',
-  'section-location', 'parish_id', 'street', 'reference_point', 'postal_code',
-  'section-map', 'location',
+  'service_type_id',
+  'sector_ids',
+]);
+// BACKEND: StoreServiceOrderRequest — prohibited fields for workflow_type=regular
+const REGULAR_HIDDEN = new Set([
+  'equipment_ids',
 ]);
 
-function collectFormData(form, fields) {
+function getInitialValues(fields) {
+  const vals = {};
+  fields.forEach((f) => {
+    const name = f.name ?? f.key;
+    vals[name] = f.value ?? '';
+  });
+  return vals;
+}
+
+function collectFormData(form, fields, formValues) {
   const data = {};
   fields.forEach((f) => {
     const name = f.name ?? f.key;
-    const el = form.elements[name];
-    if (!el) return;
     if (f.multiple || f.type === 'multiselect') {
-      const checked = form.querySelectorAll(`input[name="${CSS.escape(name)}"]:checked`);
-      data[name] = Array.from(checked).map((c) => c.value);
+      // MultiSelect uses onChange callback — read from React state
+      data[name] = formValues[name] ?? [];
     } else if (f.type === 'map' || f.type === 'map-picker') {
       const latField = f.metadata?.latField ?? 'latitude';
       const lngField = f.metadata?.lngField ?? 'longitude';
       if (form.elements[latField]) data[latField] = form.elements[latField].value;
       if (form.elements[lngField]) data[lngField] = form.elements[lngField].value;
     } else {
+      const el = form.elements[name];
+      if (!el) return;
       data[name] = el.value;
     }
   });
   return data;
 }
 
-export default function Modal({ entityName = 'Record', title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit }) {
+export default function Modal({ entityName = 'Record', title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit, children }) {
   const formRef = useRef(null);
   const containerRef = useRef(null);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
+  const [formValues, setFormValues] = useState({});
   const [workflowType, setWorkflowType] = useState('regular');
   const toast = useToast();
-  const fields = useMemo(
-    () => Array.isArray(formSchema) ? formSchema : (formSchema?.inputs ?? []),
-    [formSchema]
-  );
+  /* ── Extract fields & schemaTitle from formSchema ──────────── */
+  const { fields, schemaTitle } = useMemo(() => {
+    const isObj = !Array.isArray(formSchema) && formSchema !== null;
+    return {
+      fields: isObj ? (formSchema?.inputs ?? []) : formSchema,
+      schemaTitle: isObj ? (formSchema?.title ?? null) : null,
+    };
+  }, [formSchema]);
 
-  /* ── Track workflow_type changes via DOM delegation ──────── */
+  /* ── Initialize form values when schema/modal opens ──────── */
+  useEffect(() => {
+    if (open) setFormValues(getInitialValues(fields));
+  }, [open, fields]);
+
+  /* ── Track workflow_type changes via custom toggle-change event ── */
   useEffect(() => {
     if (!open) { setWorkflowType('regular'); return; }
 
-    const findAndWatch = () => {
-      const el = document.querySelector('select[name="workflow_type"]');
-      if (!el) return false;
-
-      // Remove stale listener before re-adding
-      el._wtHandler?._remove?.();
-      const handler = () => setWorkflowType(el.value);
-      handler._remove = () => el.removeEventListener('change', handler);
-      el._wtHandler = handler;
-      el.addEventListener('change', handler);
-      setWorkflowType(el.value);
-      return true;
+    const handler = (e) => {
+      if (e.detail.name === 'workflow_type') {
+        setWorkflowType(e.detail.value);
+      }
     };
+    document.addEventListener('toggle-change', handler);
 
-    if (!findAndWatch()) {
-      // Select not yet rendered — poll via MutationObserver
-      const observer = new MutationObserver(() => findAndWatch());
-      observer.observe(document.body, { childList: true, subtree: true });
-      return () => observer.disconnect();
-    }
+    // Pick up initial value from hidden input if already rendered
+    const hidden = document.querySelector('input[name="workflow_type"]');
+    if (hidden?.value) setWorkflowType(hidden.value);
 
-    return () => {
-      const handler = document.querySelector('select[name="workflow_type"]')?._wtHandler;
-      handler?._remove?.();
-    };
+    return () => document.removeEventListener('toggle-change', handler);
   }, [open]);
 
   /* ── Compute visible fields based on workflow type ───────── */
   const visibleFields = useMemo(() => {
-    if (workflowType !== 'loan') return fields;
     return fields.filter(f => {
       const key = f.key ?? f.name ?? '';
-      return !LOAN_HIDDEN.has(key);
+      if (workflowType === 'loan') return !LOAN_HIDDEN.has(key);
+      if (workflowType === 'regular') return !REGULAR_HIDDEN.has(key);
+      return true;
     });
   }, [fields, workflowType]);
 
@@ -93,44 +106,32 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
     return () => document.removeEventListener('keydown', handler);
   }, [open, onClose]);
 
-  /* ── Focus trap ──────────────────────────────────────────── */
-  useEffect(() => {
-    if (!open) return;
-    const container = containerRef.current;
-    if (!container) return;
-
-    const sel = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-    const getFocusable = () => Array.from(container.querySelectorAll(sel));
-
-    // Move focus into the modal on open
-    const firstEl = getFocusable()[0];
-    firstEl?.focus();
-
-    const trapFocus = (e) => {
-      if (e.key !== 'Tab') return;
-      const focusable = getFocusable();
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
-      } else {
-        if (document.activeElement === last) { e.preventDefault(); first?.focus(); }
-      }
-    };
-
-    document.addEventListener('keydown', trapFocus);
-    return () => document.removeEventListener('keydown', trapFocus);
-  }, [open]);
+  useFocusTrap(containerRef, open);
+  useBodyLock(open);
 
   useEffect(() => {
     if (open) { setErrors({}); setSaving(false); }
   }, [open]);
+  
+  /* ── Generic onChange to update formValues state ─────────── */
+  const updateValue = useCallback((name, val) => {
+    setFormValues(prev => ({ ...prev, [name]: val }));
+    // Also write to native form element for backward compat
+    const el = formRef.current?.elements[name];
+    if (el) el.value = val;
+    // Notify external listeners (e.g. ClientLocationSelector)
+    document.dispatchEvent(new CustomEvent('modal-field-change', { detail: { name, value: val } }));
+  }, []);
 
+  /* ── Listen for autofill-location events (from ClientLocationSelector) ── */
   useEffect(() => {
-    if (open) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = '';
-    return () => { document.body.style.overflow = ''; };
-  }, [open]);
+    if (!open) return;
+    const handler = (e) => {
+      Object.entries(e.detail).forEach(([name, val]) => updateValue(name, val));
+    };
+    document.addEventListener('autofill-location', handler);
+    return () => document.removeEventListener('autofill-location', handler);
+  }, [open, updateValue]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -138,14 +139,14 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
 
     // If an external onSubmit was provided, delegate to it
     if (externalSubmit) {
-      externalSubmit(e);
+      externalSubmit(e, formValues);
       return;
     }
 
     setSaving(true);
     setErrors({});
 
-    const data = collectFormData(e.currentTarget, fields);
+    const data = collectFormData(e.currentTarget, fields, formValues);
 
     try {
       const res = await fetch(routes.store, {
@@ -162,7 +163,7 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
       const body = await res.json();
 
       if (res.ok) {
-        toast.success(`${entityName} saved successfully!`);
+        toast.success(t('pages.modal.save_success', { name: entityName }));
         onClose?.();
         // Small delay to let user see the toast before reload
         setTimeout(() => {
@@ -172,12 +173,12 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
         if (body.errors) {
           setErrors(body.errors);
         } else {
-          const errorMsg = body.message ?? 'Failed to save. Please try again.';
+          const errorMsg = body.message ?? t('pages.modal.save_failed_desc');
           setErrors({ _general: errorMsg });
         }
       }
     } catch (err) {
-      const errorMsg = err?.message || 'An unexpected error occurred.';
+      const errorMsg = err?.message || t('pages.datamanager.error_fallback');
       setErrors({ _general: errorMsg });
     } finally {
       setSaving(false);
@@ -188,7 +189,7 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
 
   const sizeMap = { xl: 'max-w-5xl', lg: 'max-w-3xl', sm: 'max-w-md' };
   const sizeClass = sizeMap[size] ?? 'max-w-lg';
-  const modalTitle = title ?? `Create ${entityName}`;
+  const modalTitle = title ?? schemaTitle ?? t('pages.modal.create_title', { name: entityName });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -201,7 +202,7 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
         ref={containerRef}
         role="dialog"
         aria-modal="true"
-        aria-label={title ?? `Create ${entityName}`}
+        aria-label={title ?? schemaTitle ?? t('pages.modal.create_title', { name: entityName })}
         className={`relative w-full ${sizeClass} max-h-[90vh] overflow-hidden rounded-xl bg-slate-800 shadow-2xl border border-slate-700`}
       >
         {/* Header */}
@@ -211,7 +212,7 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
             type="button"
             className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t('pages.datamanager.close_aria')}
           >
             <X className="h-5 w-5" />
           </button>
@@ -231,25 +232,21 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
           )}
 
           <div className="overflow-y-auto px-6 py-4 max-h-[60vh] space-y-4">
+            {children}
             {visibleFields.map((field, i) => {
               const name = field.name ?? field.key;
               const fieldError = errors[name]?.join?.(' ') ?? errors[name];
+              const currentVal = formValues[name] ?? '';
 
-              // Use FormInput for basic input types
+              // Use FormInput for basic input types (uncontrolled via defaultValue)
               const basicInputTypes = ['text', 'email', 'number', 'password', 'phone', 'url'];
               if (basicInputTypes.includes(field.type)) {
                 return (
                   <FormInput
                     key={i}
                     field={field}
-                    value={field.value || ''}
-                    onChange={(e) => {
-                      // Track in form for submission
-                      const form = formRef.current;
-                      if (form && form.elements[name]) {
-                        form.elements[name].value = e.target.value;
-                      }
-                    }}
+                    value={currentVal}
+                    onChange={(e) => updateValue(name, e.target.value)}
                     error={fieldError}
                   />
                 );
@@ -260,8 +257,9 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
                 <FormField
                   key={i}
                   field={field}
-                  value={field.value || ''}
+                  value={currentVal}
                   error={fieldError}
+                  onChange={(val) => updateValue(name, val)}
                 />
               );
             })}
@@ -274,14 +272,14 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
               onClick={onClose}
               disabled={saving}
             >
-              Cancel
+              {t('pages.datamanager.cancel_btn')}
             </button>
             <button
               type="submit"
               disabled={saving}
               className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors"
             >
-              {saving ? 'Saving...' : `Save ${entityName}`}
+              {saving ? t('pages.datamanager.saving_btn') : t('pages.modal.save_entity_btn', { name: entityName })}
             </button>
           </div>
         </form>

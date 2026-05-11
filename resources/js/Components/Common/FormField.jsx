@@ -19,16 +19,49 @@ function SectionHeader({ label }) {
 }
 
 function MapPicker({ field, value }) {
-  const mapRef = useRef(null);
+  const mapRef    = useRef(null);
+  const markerRef = useRef(null);
   const latField = field.metadata?.latField ?? 'latitude';
   const lngField = field.metadata?.lngField ?? 'longitude';
-  const initialLat = value?.[latField] ?? field.metadata?.latitude ?? '';
-  const initialLng = value?.[lngField] ?? field.metadata?.longitude ?? '';
-  const [lat, setLat] = useState(initialLat);
-  const [lng, setLng] = useState(initialLng);
+
+  // Refs hold the authoritative coords so initMap always reads the latest
+  // values even before React has applied the state update.
+  const latRef = useRef('');
+  const lngRef = useRef('');
+
+  const [lat, setLat] = useState('');
+  const [lng, setLng] = useState('');
   const [loaded, setLoaded] = useState(false);
   const [mapInstance, setMapInstance] = useState(null);
   const { googleMapsApiKey: gmapsKey } = usePage().props;
+
+  /* ── Sync coords from value prop ────────────────────────────
+     Writes to refs immediately (synchronous) so initMap can read
+     them even in the same effect flush, then queues the state
+     update for the re-centre effect / hidden inputs.             */
+  useEffect(() => {
+    const newLat = value?.[latField];
+    const newLng = value?.[lngField];
+    if (newLat != null && newLat !== '') {
+      latRef.current = String(newLat);
+      setLat(String(newLat));
+    }
+    if (newLng != null && newLng !== '') {
+      lngRef.current = String(newLng);
+      setLng(String(newLng));
+    }
+  }, [value?.[latField], value?.[lngField]]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ── Re-centre map and reposition marker when state coords change ── */
+  useEffect(() => {
+    if (!mapInstance || !markerRef.current || !lat || !lng) return;
+    const latNum = parseFloat(lat);
+    const lngNum = parseFloat(lng);
+    if (isNaN(latNum) || isNaN(lngNum)) return;
+    const pos = { lat: latNum, lng: lngNum };
+    mapInstance.setCenter(pos);
+    markerRef.current.setPosition(pos);
+  }, [lat, lng, mapInstance]);
 
   /* ── Load Google Maps script ────────────────────────────── */
   useEffect(() => {
@@ -44,11 +77,15 @@ function MapPicker({ field, value }) {
     return () => { document.head.removeChild(script); };
   }, [gmapsKey, loaded]);
 
-  /* ── Init map ──────────────────────────────────────────── */
+  /* ── Init map ──────────────────────────────────────────────
+     Reads from refs (not state) so it always gets the latest
+     incoming coords regardless of batching order.
+     Never writes back to lat/lng state — the sync effect owns
+     that, and writing here caused the default-overwrite race.  */
   const initMap = useCallback(() => {
     if (!mapRef.current || !window.google?.maps) return;
-    const latNum = parseFloat(lat) || 40.4923;
-    const lngNum = parseFloat(lng) || -7.5936;
+    const latNum = parseFloat(latRef.current) || 40.4923;
+    const lngNum = parseFloat(lngRef.current) || -7.5936;
     const startPos = { lat: latNum, lng: lngNum };
     const m = new window.google.maps.Map(mapRef.current, {
       center: startPos,
@@ -63,27 +100,26 @@ function MapPicker({ field, value }) {
       position: startPos,
       draggable: true,
     });
+    markerRef.current = mk;
     setMapInstance(m);
-    if (!lat && !lng) {
-      setLat(startPos.lat.toFixed(6));
-      setLng(startPos.lng.toFixed(6));
-    }
 
-    /* Click to place marker */
     m.addListener('click', (e) => {
       const pos = e.latLng;
       mk.setPosition(pos);
-      setLat(pos.lat().toFixed(6));
-      setLng(pos.lng().toFixed(6));
+      latRef.current = pos.lat().toFixed(6);
+      lngRef.current = pos.lng().toFixed(6);
+      setLat(latRef.current);
+      setLng(lngRef.current);
     });
 
-    /* Drag to update coords */
     mk.addListener('dragend', () => {
       const pos = mk.getPosition();
-      setLat(pos.lat().toFixed(6));
-      setLng(pos.lng().toFixed(6));
+      latRef.current = pos.lat().toFixed(6);
+      lngRef.current = pos.lng().toFixed(6);
+      setLat(latRef.current);
+      setLng(lngRef.current);
     });
-  }, [lat, lng]);
+  }, []); // no deps — reads refs, never reads state
 
   useEffect(() => {
     if (loaded && mapRef.current && !mapInstance) initMap();
@@ -137,7 +173,7 @@ function MapPicker({ field, value }) {
   );
 }
 
-function StandardField({ field, value = '', error }) {
+function StandardField({ field, value = '', error, onChange }) {
   const type = field.type ?? 'text';
   const name = field.name ?? field.key ?? '';
   const required = !!field.required;
@@ -153,6 +189,11 @@ function StandardField({ field, value = '', error }) {
   const opts = options ?? [];
   const ph = field.placeholder ?? 'Select...';
 
+  // Track changes on native DOM element for form serialization
+  const handleInputChange = (val) => {
+    onChange?.(val);
+  };
+
   if (type === 'select' || type === 'multiselect') {
     const isMulti = isMultiple || type === 'multiselect';
     if (isMulti) {
@@ -163,6 +204,7 @@ function StandardField({ field, value = '', error }) {
           value={Array.isArray(value) ? value : []}
           placeholder={ph}
           showSearch={opts.length > SEARCH_THRESHOLD}
+          onChange={handleInputChange}
         />
       );
     }
@@ -176,11 +218,12 @@ function StandardField({ field, value = '', error }) {
           value={scalarVal}
           placeholder={ph}
           required={required}
+          onChange={handleInputChange}
         />
       );
     }
     return (
-      <select name={name} className={baseClass} required={required} defaultValue={scalarVal}>
+      <select name={name} className={baseClass} required={required} value={toScalar(value) ?? ''} onChange={(e) => handleInputChange(e.target.value)}>
         <option value="">{ph}</option>
         {opts.map((opt, i) => (
           <option key={i} value={opt.value}>{opt.label}</option>
@@ -191,12 +234,24 @@ function StandardField({ field, value = '', error }) {
 
   if (type === 'textarea') {
     return (
-      <textarea name={name} className={baseClass} rows={4} required={required} defaultValue={value} />
+      <textarea name={name} className={baseClass} rows={4} required={required} value={value ?? ''} onChange={(e) => handleInputChange(e.target.value)} />
     );
   }
 
   if (type === 'file') {
-    return <FileDropzone name={name} required={required} error={error} />;
+    return <FileDropzone name={name} required={required} error={error} onChange={handleInputChange} />;
+  }
+
+  if (type === 'checkbox') {
+    return (
+      <input
+        type="checkbox"
+        name={name}
+        className="h-4 w-4 rounded border-slate-700 bg-slate-800/60 text-indigo-600 focus:ring-indigo-500"
+        checked={!!value}
+        onChange={(e) => handleInputChange(e.target.checked)}
+      />
+    );
   }
 
   return (
@@ -204,7 +259,8 @@ function StandardField({ field, value = '', error }) {
       type={type}
       name={name}
       className={baseClass}
-      defaultValue={value}
+      value={value ?? ''}
+      onChange={(e) => handleInputChange(e.target.value)}
       required={required}
       step={step ?? undefined}
       pattern={pattern ?? undefined}
@@ -212,8 +268,54 @@ function StandardField({ field, value = '', error }) {
   );
 }
 
+/* ── Toggle Button Group ─────────────────────────────────────── */
+function ToggleField({ field, value = '', onChange }) {
+  const name = field.name ?? field.key;
+  const options = field.options ?? [];
+  const [active, setActive] = useState(value || options[0]?.value || '');
+
+  // Update active state when value prop changes (for form pre-fill)
+  useEffect(() => {
+    if (value) setActive(value);
+  }, [value]);
+
+  const handleClick = (val) => {
+    setActive(val);
+    // Notify parent of change
+    if (typeof onChange === 'function') {
+      onChange(val);
+    }
+    /* Dispatch custom event so Modal/EditPanel track workflow_type */
+    const ev = new CustomEvent('toggle-change', {
+      detail: { name, value: val },
+    });
+    document.dispatchEvent(ev);
+  };
+
+  return (
+    <div className="flex rounded-lg border border-slate-700 bg-slate-800/60 p-0.5">
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          data-toggle-value={opt.value}
+          onClick={() => handleClick(opt.value)}
+          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-all ${
+            active === opt.value
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
+      <input type="hidden" name={name} value={active} />
+    </div>
+  );
+}
+
 /* ── File Dropzone ───────────────────────────────────────────── */
-function FileDropzone({ name, required, error }) {
+function FileDropzone({ name, required, error, onChange }) {
   const [dragOver, setDragOver] = useState(false);
   const [file, setFile] = useState(null);
   const inputRef = useRef(null);
@@ -223,6 +325,9 @@ function FileDropzone({ name, required, error }) {
   const handleChange = (e) => {
     const f = e.target.files?.[0] ?? null;
     setFile(f);
+    if (f && typeof onChange === 'function') {
+      onChange(f);
+    }
   };
 
   const handleDrop = (e) => {
@@ -231,6 +336,9 @@ function FileDropzone({ name, required, error }) {
     const f = e.dataTransfer?.files?.[0] ?? null;
     if (f) {
       setFile(f);
+      if (typeof onChange === 'function') {
+        onChange(f);
+      }
       /* Sync the hidden input so FormData picks it up */
       const dt = new DataTransfer();
       dt.items.add(f);
@@ -281,7 +389,7 @@ function FileDropzone({ name, required, error }) {
   );
 }
 
-export default function FormField({ field, value = '', error }) {
+export default function FormField({ field, value = '', error, onChange }) {
   const type = field.type ?? 'text';
   const label = field.label ?? '';
 
@@ -290,7 +398,11 @@ export default function FormField({ field, value = '', error }) {
   }
 
   if (type === 'map-picker' || type === 'map') {
-    return <MapPicker field={field} value={value} />;
+    return <MapPicker field={field} value={value} onChange={onChange} />;
+  }
+
+  if (type === 'toggle') {
+    return <ToggleField field={field} value={value} onChange={onChange} />;
   }
 
   return (
@@ -301,7 +413,7 @@ export default function FormField({ field, value = '', error }) {
           {field.required && <span className="ml-1 text-red-500">*</span>}
         </label>
       )}
-      <StandardField field={field} value={value} error={error} />
+      <StandardField field={field} value={value} error={error} onChange={onChange} />
       {error && (
         <p className="text-xs text-red-500 mt-1.5">{error}</p>
       )}

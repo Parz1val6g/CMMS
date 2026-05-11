@@ -1,5 +1,8 @@
 import { useEffect, useRef } from 'react';
+import { useFocusTrap } from '@/Hooks/useFocusTrap';
+import { useBodyLock } from '@/Hooks/useBodyLock';
 import { AlertCircle, CheckCircle, Info, AlertTriangle, X } from 'lucide-react';
+import { t } from '@/utils/i18n';
 
 const typeConfig = {
     success: {
@@ -62,53 +65,20 @@ export default function DialogModal({
         return () => document.removeEventListener('keydown', handler);
     }, [open, onClose]);
 
-    // Manage body scroll
-    useEffect(() => {
-        if (open) document.body.style.overflow = 'hidden';
-        else document.body.style.overflow = '';
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, [open]);
-
-    // Focus trap — must be before early return to satisfy rules-of-hooks
-    useEffect(() => {
-        if (!open) return;
-        const content = contentRef.current;
-        if (!content) return;
-
-        const sel = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-        const getFocusable = () => Array.from(content.querySelectorAll(sel));
-
-        getFocusable()[0]?.focus();
-
-        const trapFocus = (e) => {
-            if (e.key !== 'Tab') return;
-            const focusable = getFocusable();
-            const first = focusable[0];
-            const last = focusable[focusable.length - 1];
-            if (e.shiftKey) {
-                if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
-            } else {
-                if (document.activeElement === last) { e.preventDefault(); first?.focus(); }
-            }
-        };
-
-        document.addEventListener('keydown', trapFocus);
-        return () => document.removeEventListener('keydown', trapFocus);
-    }, [open]);
+    useBodyLock(open);
+    useFocusTrap(contentRef, open);
 
     if (!open) return null;
 
     // Default buttons based on type
     const defaultButtons = {
-        success: [{ label: 'OK', onClick: onClose, variant: 'primary' }],
-        error: [{ label: 'OK', onClick: onClose, variant: 'primary' }],
-        warning: [{ label: 'OK', onClick: onClose, variant: 'primary' }],
-        info: [{ label: 'OK', onClick: onClose, variant: 'primary' }],
+        success: [{ label: t('pages.datamanager.ok_btn'), onClick: onClose, variant: 'primary' }],
+        error: [{ label: t('pages.datamanager.ok_btn'), onClick: onClose, variant: 'primary' }],
+        warning: [{ label: t('pages.datamanager.ok_btn'), onClick: onClose, variant: 'primary' }],
+        info: [{ label: t('pages.datamanager.ok_btn'), onClick: onClose, variant: 'primary' }],
         confirm: [
-            { label: 'Cancel', onClick: onClose, variant: 'secondary' },
-            { label: 'Confirm', onClick: onClose, variant: 'primary' },
+            { label: t('pages.datamanager.cancel_btn'), onClick: onClose, variant: 'secondary' },
+            { label: t('pages.modal.confirm_btn'), onClick: onClose, variant: 'primary' },
         ],
     };
 
@@ -149,7 +119,7 @@ export default function DialogModal({
                         type="button"
                         className="rounded-lg p-1 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors shrink-0"
                         onClick={onClose}
-                        aria-label="Close"
+                        aria-label={t('pages.datamanager.close_aria')}
                     >
                         <X className="h-5 w-5" />
                     </button>

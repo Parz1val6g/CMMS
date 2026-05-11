@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Core\Enums\EquipmentStatus;
 use App\Features\Equipments\Models\Equipment;
 use App\Shared\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -35,9 +36,10 @@ class EquipmentFactory extends Factory
             ]) . ' - ' . $this->faker->randomNumber(4),
             'serial_number' => strtoupper($this->faker->unique()->bothify('??-####-##')),
             'manager_id' => User::inRandomOrder()->first()?->id ?? User::factory()->create()->id,
-            'status' => $this->faker->randomElement(['active', 'inactive', 'maintenance', 'archived']),
-            'is_loanable' => $this->faker->boolean(85), // 85% likely to be loanable
-            'revision_interval_days' => $this->faker->randomElement([90, 180, 365, 730]), // 3 months, 6 months, 1 year, 2 years
+            // Pick from all enum values; the EquipmentStatus cast on the model handles hydration
+            'status' => $this->faker->randomElement(array_map(fn(EquipmentStatus $s) => $s->value, EquipmentStatus::cases())),
+            'is_loanable' => $this->faker->boolean(85),
+            'revision_interval_days' => $this->faker->randomElement([90, 180, 365, 730]),
             'last_revision_date' => (function () {
                 $dt = $this->faker->dateTimeBetween('-6 months', 'now');
                 if ($dt->format('Y-m-d') === '2026-03-29' && $dt->format('H') === '01') {
@@ -76,7 +78,7 @@ class EquipmentFactory extends Factory
     public function active(): self
     {
         return $this->state([
-            'status' => 'active',
+            'status' => EquipmentStatus::ACTIVE->value,
         ]);
     }
 

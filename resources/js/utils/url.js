@@ -19,6 +19,15 @@ export function buildQuery(params) {
 }
 
 /**
+ * Build a query string from an object, ignoring null/undefined/empty values.
+ * Pure function — no window.location dependency.
+ */
+export function toQueryString(params) {
+    const entries = Object.entries(params).filter(([, v]) => v !== '' && v !== null && v !== undefined);
+    return new URLSearchParams(entries).toString();
+}
+
+/**
  * Normalize a value to a scalar ID — handles Laravel relation objects.
  * If `raw` is an object with an `id` or `value` property, extracts it.
  */

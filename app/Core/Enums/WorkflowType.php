@@ -10,8 +10,8 @@ enum WorkflowType: string
     public function label(): string
     {
         return match ($this) {
-            self::STANDARD => 'Standard',
-            self::LOAN => 'Loan',
+            self::STANDARD => __('enums.workflow_type.regular'),
+            self::LOAN => __('enums.workflow_type.loan'),
         };
     }
 

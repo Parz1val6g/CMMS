@@ -16,7 +16,9 @@ class DatabaseSeeder extends Seeder
                 // ── Layer 1: Foundation ──
             RoleSeeder::class,
             RolePermissionSeeder::class,
-            GeographicDataSeeder::class,     // districts → municipalities → parishes
+            DistrictSeeder::class,           // 18 districts (hardcoded from concelho.sql)
+            MunicipalitySeeder::class,       // 278 municipalities (hardcoded from concelho.sql)
+            ParishSeeder::class,             // 2882 parishes (hardcoded from freguesias.sql)
 
                 // ── Layer 2: Users (1 per role) ──
             UserSeeder::class,               // admin, manager, equipment_manager, supervisor, worker, client

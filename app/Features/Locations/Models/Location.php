@@ -6,6 +6,7 @@ use App\Core\Traits\Base;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Shared\Models\Parish;
+use App\Features\Clients\Models\ClientLocation;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 
 class Location extends Model
@@ -32,5 +33,9 @@ class Location extends Model
 
     public function serviceOrders(){
         return $this->hasMany(ServiceOrder::class);
+    }
+
+    public function clientLocations(){
+        return $this->hasMany(ClientLocation::class);
     }
 }

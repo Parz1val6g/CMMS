@@ -12,10 +12,10 @@ enum SystemStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::ACTIVE => 'Active',
-            self::INACTIVE => 'Inactive',
-            self::SUSPENDED => 'Suspended',
-            self::ARCHIVED => 'Archived',
+            self::ACTIVE => __('enums.system_status.active'),
+            self::INACTIVE => __('enums.system_status.inactive'),
+            self::SUSPENDED => __('enums.system_status.suspended'),
+            self::ARCHIVED => __('enums.system_status.archived'),
         };
     }
 

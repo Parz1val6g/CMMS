@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import Toast from './Toast';
+import { t } from '@/utils/i18n';
 
 /**
  * Toast context for global toast notifications
@@ -70,7 +71,7 @@ export function ToastProvider({ children }) {
 export function useToast() {
     const context = useContext(ToastContext);
     if (!context) {
-        throw new Error('useToast must be used within ToastProvider');
+        throw new Error(t('pages.toast.use_toast_error'));
     }
     return context;
 }

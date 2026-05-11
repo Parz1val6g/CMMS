@@ -2,7 +2,9 @@
 
 namespace App\Core\Traits;
 
-use App\Core\Models\AuditLog;
+use App\Shared\Models\AuditLog;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Automatically writes to audit_logs on model created / updated / deleted.
@@ -23,14 +25,19 @@ trait LogsAuditTrail
         $old    = array_diff_key($old, $hidden);
         $new    = array_diff_key($new, $hidden);
 
-        AuditLog::create([
+        $now = now()->toDateTimeString();
+        DB::table('audit_logs')->insert([
+            'id'             => (string) Str::orderedUuid(),
             'auditable_type' => get_class($model),
             'auditable_id'   => $model->getKey(),
             'event'          => $event,
-            'old_values'     => $old ?: null,
-            'new_values'     => $new ?: null,
+            'old_values'     => json_encode($old ?: null),
+            'new_values'     => json_encode($new ?: null),
             'user_id'        => auth()->id(),
             'ip_address'     => request()->ip(),
+            'user_agent'     => request()->userAgent(),
+            'created_at'     => $now,
+            'updated_at'     => $now,
         ]);
     }
 

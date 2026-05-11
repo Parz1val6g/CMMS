@@ -17,15 +17,15 @@ enum PermissionAction: string
     public function label(): string
     {
         return match ($this) {
-            self::VIEW => 'View',
-            self::CREATE => 'Create',
-            self::UPDATE => 'Update',
-            self::DELETE => 'Delete',
-            self::CHANGE_ROLE => 'Change Role',
-            self::EXPORT => 'Export',
-            self::IMPORT => 'Import',
-            self::RESTORE => 'Restore',
-            self::FORCE_DELETE => 'Force Delete',
+            self::VIEW => __('enums.permission_action.view'),
+            self::CREATE => __('enums.permission_action.create'),
+            self::UPDATE => __('enums.permission_action.update'),
+            self::DELETE => __('enums.permission_action.delete'),
+            self::CHANGE_ROLE => __('enums.permission_action.change_role'),
+            self::EXPORT => __('enums.permission_action.export'),
+            self::IMPORT => __('enums.permission_action.import'),
+            self::RESTORE => __('enums.permission_action.restore'),
+            self::FORCE_DELETE => __('enums.permission_action.force_delete'),
         };
     }
 }

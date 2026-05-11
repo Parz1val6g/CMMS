@@ -4,7 +4,7 @@ namespace App\Features\MiniTasks\Requests;
 
 use App\Core\Forms\FormValidator;
 use App\Features\MiniTasks\Models\MiniTask;
-use App\Features\MiniTasks\Schemas\MiniTaskFormSchema;
+use App\Features\MiniTasks\MiniTaskFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreMiniTaskRequest extends FormRequest

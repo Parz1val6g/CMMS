@@ -2,6 +2,7 @@
 namespace App\Features\WorkLogs\Models;
 use App\Core\Enums\WorkLogStatus;
 use App\Core\Traits\Base;
+use App\Core\Traits\HasAutoReference;
 use App\Shared\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,8 +13,14 @@ use App\Features\Equipments\Models\Equipment;
 
 class WorkLog extends Model
 {
-    use Base;
+    use Base, HasAutoReference;
+
+    protected function referenceInitials(): string
+    {
+        return 'WL';
+    }
     protected $fillable = [
+        'reference',
         'mini_task_id',
         'started_at',
         'completed_at',

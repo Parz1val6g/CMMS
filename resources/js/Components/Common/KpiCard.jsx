@@ -1,0 +1,29 @@
+const BORDER_COLORS = {
+  blue: 'border-blue-500',
+  yellow: 'border-yellow-500',
+  green: 'border-green-500',
+  indigo: 'border-indigo-500',
+};
+
+/**
+ * Dashboard KPI card with coloured left border and metric display.
+ */
+export default function KpiCard({ label, value, unit, color = 'blue' }) {
+  const borderColor = BORDER_COLORS[color] ?? BORDER_COLORS.blue;
+
+  return (
+    <div className={`rounded-lg border-l-4 ${borderColor} bg-white p-6 shadow-sm dark:bg-gray-800`}>
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+        {label}
+      </h3>
+      <div className="mt-2 flex items-baseline gap-1">
+        <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
+          {value}
+        </span>
+        {unit && (
+          <span className="text-sm text-gray-500 dark:text-gray-400">{unit}</span>
+        )}
+      </div>
+    </div>
+  );
+}

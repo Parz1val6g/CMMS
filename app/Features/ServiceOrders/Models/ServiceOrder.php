@@ -4,28 +4,41 @@ use App\Core\Enums\Priority;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Enums\WorkflowType;
 use App\Core\Traits\Base;
+use App\Core\Traits\HasAutoReference;
 use App\Core\Traits\LogsAuditTrail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 use App\Features\Clients\Models\Client;
+use App\Features\Clients\Models\ClientLocation;
 use App\Shared\Models\User;
 use App\Features\Locations\Models\Location;
 use App\Features\ServiceTypes\Models\ServiceType;
 use App\Features\Equipments\Models\Equipment;
+use App\Features\Sectors\Models\Sector;
 use App\Features\Tasks\Models\Task;
 use App\Shared\Models\Attachment;
 
 class ServiceOrder extends Model
 {
-    use Base, LogsAuditTrail;
+    use Base, HasAutoReference, LogsAuditTrail;
+
+    protected function referenceColumn(): string
+    {
+        return 'process';
+    }
+
+    protected function referenceInitials(): string
+    {
+        return 'OS';
+    }
     protected $fillable = [
         'process',
         'client_id',
+        'client_location_id',
         'manager_id',
         'location_id',
         'service_type_id',
-        'equipment_id',
         'workflow_type',
         'priority',
         'execution_date',
@@ -52,6 +65,10 @@ class ServiceOrder extends Model
     {
         return $this->belongsTo(Client::class);
     }
+    public function clientLocation()
+    {
+        return $this->belongsTo(ClientLocation::class);
+    }
     public function manager()
     {
         return $this->belongsTo(User::class, 'manager_id');
@@ -65,9 +82,15 @@ class ServiceOrder extends Model
         return $this->belongsTo(ServiceType::class);
     }
 
-    public function equipment()
+    public function equipments()
     {
-        return $this->belongsTo(Equipment::class);
+        return $this->belongsToMany(Equipment::class, 'equipment_service_order')
+            ->withTimestamps();
+    }
+
+    public function sectors()
+    {
+        return $this->belongsToMany(Sector::class, 'service_order_sector', 'service_order_id', 'sector_id');
     }
 
     public function tasks()

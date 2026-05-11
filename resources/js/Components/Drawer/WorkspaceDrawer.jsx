@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { useFocusTrap } from '@/Hooks/useFocusTrap';
+import { useBodyLock } from '@/Hooks/useBodyLock';
 
 /**
  * WorkspaceDrawer — Generic right-sliding workspace panel.
@@ -29,40 +31,8 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
     return () => document.removeEventListener('keydown', handler);
   }, [isOpen, onClose]);
 
-  /* Lock body scroll when open */
-  useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = '';
-    return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
-
-  /* ── Focus trap ──────────────────────────────────────────── */
-  useEffect(() => {
-    if (!isOpen) return;
-    const panel = panelRef.current;
-    if (!panel) return;
-
-    const sel = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-    const getFocusable = () => Array.from(panel.querySelectorAll(sel));
-
-    const firstEl = getFocusable()[0];
-    firstEl?.focus();
-
-    const trapFocus = (e) => {
-      if (e.key !== 'Tab') return;
-      const focusable = getFocusable();
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
-      } else {
-        if (document.activeElement === last) { e.preventDefault(); first?.focus(); }
-      }
-    };
-
-    document.addEventListener('keydown', trapFocus);
-    return () => document.removeEventListener('keydown', trapFocus);
-  }, [isOpen]);
+  useBodyLock(isOpen);
+  useFocusTrap(panelRef, isOpen);
 
   const activeComponent = tabs.find((t) => t.id === activeTab)?.component ?? null;
 
@@ -131,9 +101,9 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
           </div>
         )}
 
-        {/* Tab Content */}
+        {/* Tab Content — only render when open so child components don't mount eagerly */}
         <div className="flex-1 overflow-y-auto px-6 py-6">
-          {activeComponent}
+          {isOpen && activeComponent}
         </div>
       </div>
     </>

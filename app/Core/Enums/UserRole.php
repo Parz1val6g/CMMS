@@ -11,9 +11,9 @@ enum UserRole: string
     public function label(): string
     {
         return match ($this) {
-            self::ADMIN => 'Administrator',
-            self::MANAGER => 'Manager',
-            self::PENDING => 'Pending Approval',
+            self::ADMIN => __('enums.user_role.admin'),
+            self::MANAGER => __('enums.user_role.manager'),
+            self::PENDING => __('enums.user_role.pending'),
         };
     }
 

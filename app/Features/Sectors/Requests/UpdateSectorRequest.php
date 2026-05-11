@@ -4,7 +4,7 @@ namespace App\Features\Sectors\Requests;
 
 use App\Core\Forms\FormValidator;
 use App\Features\Sectors\Models\Sector;
-use App\Features\Sectors\Schemas\SectorFormSchema;
+use App\Features\Sectors\SectorFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSectorRequest extends FormRequest

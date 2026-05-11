@@ -12,10 +12,10 @@ enum WorkLogStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::IN_PROGRESS => 'In Progress',
-            self::SUBMITTED => 'Pending Approval',
-            self::APPROVED => 'Approved',
-            self::REJECTED => 'Rejected',
+            self::IN_PROGRESS => __('enums.work_log_status.in_progress'),
+            self::SUBMITTED => __('enums.work_log_status.submitted'),
+            self::APPROVED => __('enums.work_log_status.approved'),
+            self::REJECTED => __('enums.work_log_status.rejected'),
         };
     }
 

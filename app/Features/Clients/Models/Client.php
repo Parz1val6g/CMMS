@@ -21,4 +21,8 @@ class Client extends Model
     {
         return $this->hasMany(ServiceOrder::class);
     }
+    public function clientLocations()
+    {
+        return $this->hasMany(ClientLocation::class);
+    }
 }

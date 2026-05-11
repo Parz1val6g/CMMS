@@ -1,34 +1,17 @@
-import { useState } from 'react';
-import AppLayout from '@/Layouts/AppLayout';
-import DataManager from '@/Components/DataManager';
-import Modal from '@/Components/Common/Modal';
+import CrudPage from '@/Components/Common/CrudPage';
 
-export default function ServiceTypesIndex({ service_types, columns, formSchema, createFormSchema, routes, filterSchema }) {
-  const [showModal, setShowModal] = useState(false);
-
-  const breadcrumbs = [
-    { name: 'Dashboard', url: '/dashboard' },
-    { name: 'Service Types', url: '/service-types' },
-  ];
-
+export default function ServiceTypesIndex({ service_types, columns, formSchema, createFormSchema, routes, filterSchema, advancedFilterFields}) {
   return (
-    <AppLayout title="Service Types Management" breadcrumbs={breadcrumbs}>
-      <Modal
-        formSchema={createFormSchema}
-        routes={routes}
-        open={showModal}
-        onClose={() => setShowModal(false)}
-      />
-
-      <DataManager
-        title="Service Types"
-        items={service_types}
-        routes={routes}
-        columns={columns}
-        formSchema={formSchema}
-        filterSchema={filterSchema ?? []}
-        onNew={() => setShowModal(true)}
-      />
-    </AppLayout>
+    <CrudPage
+      title="pages.sidebar.service_types"
+      items={service_types}
+      columns={columns}
+      formSchema={formSchema}
+      createFormSchema={createFormSchema}
+      routes={routes}
+      filterSchema={filterSchema}
+      advancedFilterFields={advancedFilterFields}
+      baseRoute="/service-types"
+    />
   );
 }

@@ -4,7 +4,7 @@ namespace App\Features\Equipments\Requests;
 
 use App\Core\Forms\FormValidator;
 use App\Features\Equipments\Models\Equipment;
-use App\Features\Equipments\Schemas\EquipmentFormSchema;
+use App\Features\Equipments\EquipmentFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateEquipmentRequest extends FormRequest

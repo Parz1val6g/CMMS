@@ -8,10 +8,20 @@ class MiniTaskResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'reference' => $this->reference,
             'task_id' => $this->task_id,
             'description' => $this->description,
             'status' => $this->status,
             'created_at' => $this->created_at->toIso8601String(),
+
+            // Parent Task reference
+            'task' => $this->whenLoaded('task', function () {
+                return [
+                    'id' => $this->task->id,
+                    'reference' => $this->task->reference,
+                    'name' => $this->task->name,
+                ];
+            }),
 
             'supervisor' => $this->whenLoaded('supervisor', function () {
                 return [

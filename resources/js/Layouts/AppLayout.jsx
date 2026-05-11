@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import Sidebar from '@/Components/SideBar';
+import { t } from '@/utils/i18n';
 
 export default function AppLayout({ title, children }) {
   return (
@@ -19,7 +20,7 @@ export default function AppLayout({ title, children }) {
 
         {/* Global Footer */}
         <footer className="shrink-0 w-full border-t border-slate-800 bg-slate-950 px-6 py-2 text-xs text-slate-500">
-          &copy; {new Date().getFullYear()} ERP Gestão — All rights reserved.
+          {t('pages.layout.footer_copyright', { year: String(new Date().getFullYear()) })}
         </footer>
       </div>
     </>

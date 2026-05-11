@@ -4,7 +4,7 @@ namespace App\Features\Clients\Requests;
 
 use App\Core\Forms\FormValidator;
 use App\Features\Clients\Models\Client;
-use App\Features\Clients\Schemas\ClientFormSchema;
+use App\Features\Clients\ClientFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

@@ -22,8 +22,8 @@ class TaskService
                 'status' => TaskStatus::PENDING->value,
             ]);
 
-            if (isset($data['sector_ids'])) {
-                $task->sectors()->attach($data['sector_ids']);
+            if (isset($data['sector_id'])) {
+                $task->sectors()->attach($data['sector_id']);
             }
 
             return $task;
@@ -39,8 +39,8 @@ class TaskService
             if (isset($data['name'])) {
                 $task->update(['name' => InputSanitizer::sanitize($data['name'])]);
             }
-            if (isset($data['sector_ids'])) {
-                $task->sectors()->sync($data['sector_ids']);
+            if (isset($data['sector_id'])) {
+                $task->sectors()->sync([$data['sector_id']]);
             }
             return $task;
         });

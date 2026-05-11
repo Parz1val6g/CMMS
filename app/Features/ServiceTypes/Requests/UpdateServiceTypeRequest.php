@@ -4,14 +4,14 @@ namespace App\Features\ServiceTypes\Requests;
 
 use App\Core\Forms\FormValidator;
 use App\Features\ServiceTypes\Models\ServiceType;
-use App\Features\ServiceTypes\Schemas\ServiceTypeFormSchema;
+use App\Features\ServiceTypes\ServiceTypeFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateServiceTypeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('update', $this->route('service_type'));
+        return $this->user()->can('update', $this->route('serviceType'));
     }
 
     public function rules(): array

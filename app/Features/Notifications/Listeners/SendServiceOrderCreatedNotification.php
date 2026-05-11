@@ -21,8 +21,8 @@ class SendServiceOrderCreatedNotification
 
         $this->notificationService->create(
             userId: $manager->id,
-            title: 'New Service Order Created',
-            message: "Service Order {$so->process} has been created and assigned to you.",
+            title: __('messages.services.notifications.new_order_title'),
+            message: __('messages.services.notifications.new_order_message', ['process' => $so->process]),
             type: 'service_order_created',
         );
     }

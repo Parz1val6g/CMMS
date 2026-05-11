@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Core\Enums\EquipmentStatus;
 use App\Features\Equipments\Models\Equipment;
 use App\Shared\Models\User;
 use Illuminate\Database\Seeder;
@@ -10,8 +11,7 @@ use Illuminate\Support\Str;
 class EquipmentSeeder extends Seeder
 {
     /**
-     * Seed equipment covering all possible statuses:
-     * active, maintenance, reserved, inactive
+     * Seed equipment covering all EquipmentStatus enum values.
      */
     public function run(): void
     {
@@ -25,21 +25,31 @@ class EquipmentSeeder extends Seeder
 
         $equipmentData = [
             // ── Active equipment ──
-            ['name' => 'Escavadora CAT 320D',               'serial_number' => 'CAT-320D-001',  'status' => 'active',      'is_loanable' => false, 'revision_interval_days' => 365, 'description' => 'Escavadora pesada para obras de grande escala'],
-            ['name' => 'Compressor de Ar Atlas Copco 250',  'serial_number' => 'ATLAS-250-002', 'status' => 'active',      'is_loanable' => true,  'revision_interval_days' => 180, 'description' => 'Compressor portátil para trabalhos de pneumática'],
-            ['name' => 'Martelo Pneumático Bosch',          'serial_number' => 'BOSCH-PH-003',  'status' => 'active',      'is_loanable' => true,  'revision_interval_days' => 90,  'description' => 'Martelo para demolição e rotura de pavimento'],
-            ['name' => 'Bomba de Água Diesel',              'serial_number' => 'DIESEL-PUMP-004','status' => 'active',     'is_loanable' => true,  'revision_interval_days' => 180, 'description' => 'Bomba para drenagem de obras'],
-            ['name' => 'Gerador 250 kVA Caterpillar',       'serial_number' => 'CAT-GEN-005',   'status' => 'active',      'is_loanable' => false, 'revision_interval_days' => 365, 'description' => 'Gerador industrial para alimentação de canteiros'],
-            ['name' => 'Vibrador de Placas Dinamarca',      'serial_number' => 'DIN-PLATE-007', 'status' => 'active',      'is_loanable' => true,  'revision_interval_days' => 120, 'description' => 'Compactador de solo e asfalto'],
-            ['name' => 'Broca Rotativa SPT',                'serial_number' => 'SPT-DRILL-008',  'status' => 'active',     'is_loanable' => false, 'revision_interval_days' => 730, 'description' => 'Sonda rotativa para sondagens geotécnicas'],
-            ['name' => 'Betoneira 350L',                    'serial_number' => 'MIXER-350-009',  'status' => 'active',      'is_loanable' => true,  'revision_interval_days' => 180, 'description' => 'Betoneira portátil para pequenas obras'],
-            ['name' => 'Grua Telescópica 25T',              'serial_number' => 'CRANE-25T-010',  'status' => 'active',      'is_loanable' => false, 'revision_interval_days' => 365, 'description' => 'Grua para movimentação de cargas até 25 toneladas'],
-            // ── Maintenance ──
-            ['name' => 'Retroescavadora JCB 3CX',           'serial_number' => 'JCB-3CX-006',   'status' => 'maintenance', 'is_loanable' => false, 'revision_interval_days' => 365, 'description' => 'Máquina versátil para escavação e carga — em manutenção'],
+            ['name' => 'Escavadora CAT 320D',               'serial_number' => 'CAT-320D-001',  'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => false, 'revision_interval_days' => 365, 'description' => 'Escavadora pesada para obras de grande escala'],
+            ['name' => 'Compressor de Ar Atlas Copco 250',  'serial_number' => 'ATLAS-250-002', 'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => true,  'revision_interval_days' => 180, 'description' => 'Compressor portátil para trabalhos de pneumática'],
+            ['name' => 'Martelo Pneumático Bosch',          'serial_number' => 'BOSCH-PH-003',  'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => true,  'revision_interval_days' => 90,  'description' => 'Martelo para demolição e rotura de pavimento'],
+            ['name' => 'Bomba de Água Diesel',              'serial_number' => 'DIESEL-PUMP-004','status' => EquipmentStatus::ACTIVE->value,      'is_loanable' => true,  'revision_interval_days' => 180, 'description' => 'Bomba para drenagem de obras'],
+            ['name' => 'Gerador 250 kVA Caterpillar',       'serial_number' => 'CAT-GEN-005',   'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => false, 'revision_interval_days' => 365, 'description' => 'Gerador industrial para alimentação de canteiros'],
+            ['name' => 'Vibrador de Placas Dinamarca',      'serial_number' => 'DIN-PLATE-007', 'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => true,  'revision_interval_days' => 120, 'description' => 'Compactador de solo e asfalto'],
+            ['name' => 'Broca Rotativa SPT',                'serial_number' => 'SPT-DRILL-008',  'status' => EquipmentStatus::ACTIVE->value,      'is_loanable' => false, 'revision_interval_days' => 730, 'description' => 'Sonda rotativa para sondagens geotécnicas'],
+            ['name' => 'Betoneira 350L',                    'serial_number' => 'MIXER-350-009',  'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => true,  'revision_interval_days' => 180, 'description' => 'Betoneira portátil para pequenas obras'],
+            ['name' => 'Grua Telescópica 25T',              'serial_number' => 'CRANE-25T-010',  'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => false, 'revision_interval_days' => 365, 'description' => 'Grua para movimentação de cargas até 25 toneladas'],
+            // ── In Use (on loan) ──
+            ['name' => 'Martelo Demolidor Makita',          'serial_number' => 'MAK-DEM-013',    'status' => EquipmentStatus::IN_USE->value,       'is_loanable' => true,  'revision_interval_days' => 90,  'description' => 'Martelo demolidor emprestado a obra externa'],
+            // ── Under Maintenance ──
+            ['name' => 'Retroescavadora JCB 3CX',           'serial_number' => 'JCB-3CX-006',    'status' => EquipmentStatus::UNDER_MAINTENANCE->value, 'is_loanable' => false, 'revision_interval_days' => 365, 'description' => 'Máquina versátil para escavação e carga — em manutenção'],
+            // ── Maintenance Pending ──
+            ['name' => 'Cortador de Asfalto Husqvarna',     'serial_number' => 'HUS-CORT-014',   'status' => EquipmentStatus::MAINTENANCE_PENDING->value, 'is_loanable' => false, 'revision_interval_days' => 120, 'description' => 'Aguardando revisão programada'],
+            // ── Broken ──
+            ['name' => 'Perfurador Pneumático Atlas',       'serial_number' => 'ATL-PERF-015',   'status' => EquipmentStatus::BROKEN->value,       'is_loanable' => false, 'revision_interval_days' => 90,  'description' => 'Avariado — necessita reparação urgente'],
+            // ── Under Repair ──
+            ['name' => 'Serrador Circular Stihl',           'serial_number' => 'STI-SER-016',    'status' => EquipmentStatus::UNDER_REPAIR->value,  'is_loanable' => false, 'revision_interval_days' => 180, 'description' => 'Em reparação na oficina externa'],
             // ── Reserved ──
-            ['name' => 'Camião de Carga MAN TGS 18.480',   'serial_number' => 'MAN-TGS-011',    'status' => 'reserved',    'is_loanable' => false, 'revision_interval_days' => 365, 'description' => 'Camião de carga reservado para obra na Zona Industrial'],
+            ['name' => 'Camião de Carga MAN TGS 18.480',   'serial_number' => 'MAN-TGS-011',    'status' => EquipmentStatus::RESERVED->value,     'is_loanable' => false, 'revision_interval_days' => 365, 'description' => 'Camião de carga reservado para obra na Zona Industrial'],
             // ── Inactive ──
-            ['name' => 'Gerador Antigo 100 kVA',           'serial_number' => 'OLD-GEN-012',    'status' => 'inactive',    'is_loanable' => false, 'revision_interval_days' => 0,   'description' => 'Gerador desativado — aguarda abate'],
+            ['name' => 'Gerador Antigo 100 kVA',           'serial_number' => 'OLD-GEN-012',    'status' => EquipmentStatus::INACTIVE->value,     'is_loanable' => false, 'revision_interval_days' => 0,   'description' => 'Gerador desativado — aguarda abate'],
+            // ── Retired ──
+            ['name' => 'Compressor de Ar Old Ingersoll',    'serial_number' => 'ING-COMP-017',   'status' => EquipmentStatus::RETIRED->value,      'is_loanable' => false, 'revision_interval_days' => 0,   'description' => 'Equipamento abatido — fora de serviço'],
         ];
 
         foreach ($equipmentData as $index => $data) {

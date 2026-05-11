@@ -89,6 +89,41 @@ class RolePermissionSeeder extends Seeder
                 ],
                 'actions' => [PermissionAction::VIEW],
             ],
+            'task_manager' => [
+                'resources' => [
+                    PermissionResource::SERVICE_ORDERS,
+                    PermissionResource::TASKS,
+                    PermissionResource::ATTACHMENTS,
+                    PermissionResource::PROFILE,
+                ],
+                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
+            ],
+            'mini_task_manager' => [
+                'resources' => [
+                    PermissionResource::TASKS,
+                    PermissionResource::MINI_TASKS,
+                    PermissionResource::ATTACHMENTS,
+                    PermissionResource::PROFILE,
+                ],
+                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
+            ],
+            'work_log_manager' => [
+                'resources' => [
+                    PermissionResource::MINI_TASKS,
+                    PermissionResource::WORK_LOGS,
+                    PermissionResource::PROFILE,
+                ],
+                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
+            ],
+            'sector_manager' => [
+                'resources' => [
+                    PermissionResource::SECTORS,
+                    PermissionResource::TEAMS,
+                    PermissionResource::WORKERS,
+                    PermissionResource::PROFILE,
+                ],
+                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
+            ],
         ];
 
         foreach ($roleResourceActions as $roleName => $config) {

@@ -24,6 +24,7 @@ abstract class FormField
     protected ?int $colSpan = null;
     protected ?string $validationRules = null;
     protected array $metadata = [];
+    protected mixed $value = null;
     protected ?string $helperText = null;
     protected array $helpExamples = [];
     protected string $validationTiming = 'submit'; // submit, blur, or both
@@ -85,6 +86,11 @@ abstract class FormField
         return $this->condition;
     }
 
+    public function getValue(): mixed
+    {
+        return $this->value;
+    }
+
     public function getRules(): ?string
     {
         return $this->validationRules;
@@ -130,6 +136,18 @@ abstract class FormField
             throw new \InvalidArgumentException('Label cannot be empty');
         }
         $this->label = $label;
+        return $this;
+    }
+
+    /**
+     * Define o valor padrão (default) do campo.
+     *
+     * @param mixed $value
+     * @return $this
+     */
+    public function setValue(mixed $value): static
+    {
+        $this->value = $value;
         return $this;
     }
 
@@ -322,6 +340,9 @@ abstract class FormField
         ];
 
         // Adiciona campos opcionais apenas se preenchidos
+        if ($this->value !== null) {
+            $data['value'] = $this->value;
+        }
         if ($this->placeholder !== null) {
             $data['placeholder'] = $this->placeholder;
         }

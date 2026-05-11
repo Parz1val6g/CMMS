@@ -1,78 +1,9 @@
 import { usePage, Link } from '@inertiajs/react';
-import {
-  LayoutDashboard,
-  ClipboardList,
-  CheckSquare,
-  ListChecks,
-  FileClock,
-  Wrench,
-  Users,
-  MapPin,
-  Building2,
-  UserCog,
-  Group,
-  Package,
-  Download,
-  Bell,
-  BarChart3,
-  Settings,
-  Shield,
-} from 'lucide-react';
-
-// ── Section definitions ────────────────────────────────────────────────
-// `dev: true` items get a visual "Dev Preview" indicator
-const sections = [
-  {
-    label: null,
-    items: [
-      { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', dev: false },
-    ],
-  },
-  {
-    label: 'Operacional',
-    items: [
-      { label: 'Ordens Serviço', icon: ClipboardList, href: '/service-orders', dev: false },
-      { label: 'Tarefas', icon: CheckSquare, href: '/tasks', dev: false },
-      { label: 'Mini-Tarefas', icon: ListChecks, href: '/mini-tasks', dev: false },
-      { label: 'Work Logs', icon: FileClock, href: '/work-logs', dev: false },
-      { label: 'Equipamentos', icon: Wrench, href: '/equipments', dev: true },
-    ],
-  },
-  {
-    label: 'Entidades',
-    items: [
-      { label: 'Clientes', icon: Users, href: '/clients', dev: false },
-      { label: 'Localizações', icon: MapPin, href: '/locations', dev: false },
-    ],
-  },
-  {
-    label: 'Recursos Humanos',
-    items: [
-      { label: 'Sectores', icon: Building2, href: '/sectors', dev: false },
-      { label: 'Equipas', icon: Group, href: '/teams', dev: false },
-      { label: 'Trabalhadores', icon: UserCog, href: '/workers', dev: false },
-    ],
-  },
-  {
-    label: 'Configurações',
-    items: [
-      { label: 'Tipos Serviço', icon: Package, href: '/service-types', dev: false },
-      { label: 'Materiais', icon: Package, href: '/materials', dev: false },
-      { label: 'Exportações', icon: Download, href: '/exports', dev: true },
-      { label: 'Notificações', icon: Bell, href: '/notifications', dev: true },
-      { label: 'Analytics', icon: BarChart3, href: '/analytics', dev: true },
-    ],
-  },
-];
-
-const bottomItems = [
-  { label: 'Configurações', icon: Settings, href: '/settings', dev: false },
-  { label: 'Admin', icon: Shield, href: '/admin', dev: false },
-];
+import { memo } from 'react';
+import { sections, bottomItems } from '@/Layouts/data/sidebar';
+import { t } from '@/utils/i18n';
 
 // ── Sub-components ──────────────────────────────────────────────────────
-
-import { memo } from 'react';
 
 const NavItem = memo(function NavItem({ item }) {
   const { url } = usePage();
@@ -94,7 +25,7 @@ const NavItem = memo(function NavItem({ item }) {
       <span className="flex-1 truncate">{item.label}</span>
       {item.dev && (
         <span className="shrink-0 rounded-full bg-indigo-900/60 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-indigo-300 ring-1 ring-indigo-700/40">
-          Dev
+          {t('pages.sidebar.dev_badge')}
         </span>
       )}
     </Link>
@@ -127,7 +58,7 @@ export default function Sidebar() {
     <aside className="w-64 flex flex-col h-full bg-slate-950 border-r border-slate-800 shrink-0">
       {/* Logo */}
       <div className="shrink-0 p-4">
-        <span className="text-lg font-bold tracking-tight text-white">ERP Gestão</span>
+        <span className="text-lg font-bold tracking-tight text-white">{t('pages.sidebar.brand')}</span>
       </div>
 
       {/* Navigation */}

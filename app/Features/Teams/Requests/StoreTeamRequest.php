@@ -4,7 +4,7 @@ namespace App\Features\Teams\Requests;
 
 use App\Core\Forms\FormValidator;
 use App\Features\Teams\Models\Team;
-use App\Features\Teams\Schemas\TeamFormSchema;
+use App\Features\Teams\TeamFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreTeamRequest extends FormRequest

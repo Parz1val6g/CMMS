@@ -94,3 +94,40 @@ Sanctum stateless API tokens (Bearer). Public routes (login, password reset) are
 ### File Storage
 
 ServiceOrder photos are stored on the `public` disk (`Storage::disk('public')`), exposed via an appended `photo_url` attribute on the model.
+
+## Knowledge Graph (RAG)
+
+A pre-built knowledge graph of this codebase lives at `graphify-out/`. Use it as your primary lookup system before touching source files.
+
+**Files:**
+- `graphify-out/graph.json` — full graph (2,038 nodes, 2,091 edges, 331 communities)
+- `graphify-out/GRAPH_REPORT.md` — audit report with god nodes, surprising connections, suggested questions
+- `graphify-out/graph.html` — interactive browser visualization
+
+**Rules:**
+- Before reading source files, running grep/glob, or answering any codebase question, read `graphify-out/GRAPH_REPORT.md` first — it is your map.
+- For "how does X relate to Y" questions use `/graphify path "X" "Y"` or `/graphify query "<question>"` to traverse the graph instead of grepping files.
+- For "what is X" questions use `/graphify explain "X"` to get all edges and source locations for a concept.
+
+**God nodes** (highest connectivity — touch these carefully, they affect many things):
+1. `FormSchema` (45 edges) — `app/Core/Forms/FormSchema.php`
+2. `FormField` (33 edges) — `app/Core/Forms/FormField.php`
+3. `SelectInput` (30 edges) — `app/Core/Forms/Fields/SelectInput.php`
+4. `TextInput` (29 edges) — `app/Core/Forms/Fields/TextInput.php`
+5. `FormValidator` (29 edges) — `app/Core/Forms/`
+6. `t()` (28 edges) — `resources/js/utils/i18n.js` (i18n, called across all frontend components)
+7. `Equipment` (23 edges) — `app/Features/Equipments/Models/Equipment.php`
+
+**Community map** (major clusters):
+- `Domain Actors & Workflows` — UML use cases, actor roles, equipment loan flow
+- `Admin & Cross-Cutting Concerns` — admin role, cascade completion, export, JWT auth
+- `Architecture & Documentation` — arch docs, audit reports, loan tasks listener
+- `FormField Core` / `FormSchema Builder` / `Form Field Components` — the form DSL system
+- `Form Schema Definitions` — per-feature schemas (Client, Worker, Equipment, etc.)
+- `Service Order Forms` / `MiniTask Management` / `Task Management` — domain CRUD layers
+- `Frontend UI Shell` — CRUDPage, AppLayout, TopBar, Dashboard
+- `Notification System` — events, listeners, notification model/resource
+- `Equipment Model & State` — state machine, loan/return lifecycle
+- `Material Management` / `Sector Management` / `Team Management` / `Location Management` / `Service Type Management` / `WorkLog Forms & Input`
+
+**Keep graph current:** after modifying code run `/graphify . --update` (AST-only, no token cost).

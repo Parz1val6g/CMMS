@@ -13,11 +13,11 @@ enum TaskStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::PENDING => 'Pending',
-            self::IN_PROGRESS => 'In Progress',
-            self::COMPLETED => 'Completed',
-            self::BLOCKED => 'Blocked',
-            self::CANCELLED => 'Cancelled',
+            self::PENDING => __('enums.task_status.pending'),
+            self::IN_PROGRESS => __('enums.task_status.in_progress'),
+            self::COMPLETED => __('enums.task_status.completed'),
+            self::BLOCKED => __('enums.task_status.blocked'),
+            self::CANCELLED => __('enums.task_status.cancelled'),
         };
     }
 

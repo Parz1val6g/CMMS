@@ -20,7 +20,6 @@ class ServiceOrderPresenter
             'process'       => $o->process,
             'description'   => $o->description,
             'workflow_type' => $o->workflow_type,
-            'equipment_id'  => $o->equipment_id,
             'client_id'     => $o->client_id,
             'location_id'   => $o->location_id,
             'service_type_id' => $o->service_type_id,
@@ -30,11 +29,22 @@ class ServiceOrderPresenter
             'execution_date' => $o->execution_date?->format('Y-m-d'),
             'created_at'    => $o->created_at->format('Y-m-d'),
             'photo_url'     => $o->photo_url,
+            'sectors'       => $o->sectors->map(fn($s) => [
+                'id'   => $s->id,
+                'name' => $s->name,
+            ])->toArray(),
             'client'        => self::shapeClient($o),
             'manager'       => self::shapeUser($o->manager),
             'location'      => self::shapeLocation($o),
             'service_type'  => $o->serviceType ? ['name' => $o->serviceType->name] : null,
-            'equipment'     => self::shapeEquipment($o),
+            'equipments'    => self::shapeEquipments($o),
+            // Flatten location fields for edit form pre-fill
+            'parish_id'       => $o->location?->parish_id,
+            'street'          => $o->location?->street_address,
+            'reference_point' => $o->location?->landmark,
+            'postal_code'     => $o->location?->postal_code,
+            'latitude'        => $o->location?->latitude,
+            'longitude'       => $o->location?->longitude,
         ];
     }
 
@@ -53,18 +63,28 @@ class ServiceOrderPresenter
             'client_id'     => $so->client_id,
             'location_id'   => $so->location_id,
             'service_type_id' => $so->service_type_id,
-            'equipment_id'  => $so->equipment_id,
             'manager_id'    => $so->manager_id,
             'priority'      => $so->priority,
             'status'        => $so->status,
             'execution_date' => $so->execution_date?->format('Y-m-d'),
             'created_at'    => $so->created_at->format('Y-m-d'),
             'photo_url'     => $so->photo_url,
+            'sectors'       => $so->sectors->map(fn($s) => [
+                'id'   => $s->id,
+                'name' => $s->name,
+            ])->toArray(),
             'client'        => self::shapeClient($so),
             'manager'       => self::shapeUser($so->manager),
             'location'      => self::shapeLocation($so),
             'service_type'  => $so->serviceType ? ['name' => $so->serviceType->name] : null,
-            'equipment'     => self::shapeEquipmentDetail($so),
+            'equipments'    => self::shapeEquipmentsDetail($so),
+            // Flatten location fields for edit form pre-fill
+            'parish_id'       => $so->location?->parish_id,
+            'street'          => $so->location?->street_address,
+            'reference_point' => $so->location?->landmark,
+            'postal_code'     => $so->location?->postal_code,
+            'latitude'        => $so->location?->latitude,
+            'longitude'       => $so->location?->longitude,
         ];
 
         if (empty($only) || in_array('tasks', $only)) {
@@ -107,28 +127,35 @@ class ServiceOrderPresenter
         ];
     }
 
-    private static function shapeEquipment(ServiceOrder $o): ?array
+    private static function shapeEquipments(ServiceOrder $o): array
     {
-        if (!$o->equipment) return null;
-        return [
-            'id'                => $o->equipment->id,
-            'name'              => $o->equipment->name,
-            'serial_number'     => $o->equipment->serial_number,
-            'status'            => $o->equipment->status,
-            'is_loanable'       => $o->equipment->is_loanable,
-            'description'       => $o->equipment->description,
-            'last_revision_date' => $o->equipment->last_revision_date?->format('Y-m-d'),
-            'next_revision_date' => $o->equipment->next_revision_date?->format('Y-m-d'),
-        ];
+        if (!$o->relationLoaded('equipments') || $o->equipments->isEmpty()) return [];
+        return $o->equipments->map(fn($eq) => [
+            'id'                => $eq->id,
+            'name'              => $eq->name,
+            'serial_number'     => $eq->serial_number,
+            'status'            => $eq->status,
+            'is_loanable'       => $eq->is_loanable,
+            'description'       => $eq->description,
+            'last_revision_date' => $eq->last_revision_date?->format('Y-m-d'),
+            'next_revision_date' => $eq->next_revision_date?->format('Y-m-d'),
+        ])->toArray();
     }
 
-    private static function shapeEquipmentDetail(ServiceOrder $o): ?array
+    private static function shapeEquipmentsDetail(ServiceOrder $o): array
     {
-        $eq = self::shapeEquipment($o);
-        if (!$eq || !$o->equipment->manager) return $eq;
-
-        $eq['manager'] = self::shapeUser($o->equipment->manager);
-        return $eq;
+        if (!$o->relationLoaded('equipments') || $o->equipments->isEmpty()) return [];
+        return $o->equipments->map(fn($eq) => [
+            'id'                => $eq->id,
+            'name'              => $eq->name,
+            'serial_number'     => $eq->serial_number,
+            'status'            => $eq->status,
+            'is_loanable'       => $eq->is_loanable,
+            'description'       => $eq->description,
+            'last_revision_date' => $eq->last_revision_date?->format('Y-m-d'),
+            'next_revision_date' => $eq->next_revision_date?->format('Y-m-d'),
+            'manager'           => $eq->manager ? self::shapeUser($eq->manager) : null,
+        ])->toArray();
     }
 
     private static function shapeTasks(ServiceOrder $so): array
@@ -150,10 +177,6 @@ class ServiceOrderPresenter
                         'name'        => $mt->name,
                         'description' => $mt->description,
                         'status'      => $mt->status,
-                        'sectors'     => $mt->sectors->map(fn($s) => [
-                            'id'   => $s->id,
-                            'name' => $s->name,
-                        ])->toArray(),
                         'work_logs'   => $mt->workLogs->map(function ($wl) {
                             return [
                                 'id'               => $wl->id,

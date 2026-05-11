@@ -4,7 +4,7 @@ namespace App\Features\Workers\Requests;
 
 use App\Core\Forms\FormValidator;
 use App\Features\Workers\Models\Worker;
-use App\Features\Workers\Schemas\WorkerFormSchema;
+use App\Features\Workers\WorkerFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreWorkerRequest extends FormRequest

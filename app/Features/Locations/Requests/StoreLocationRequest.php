@@ -4,7 +4,7 @@ namespace App\Features\Locations\Requests;
 
 use App\Core\Forms\FormValidator;
 use App\Features\Locations\Models\Location;
-use App\Features\Locations\Schemas\LocationFormSchema;
+use App\Features\Locations\LocationFormSchema;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreLocationRequest extends FormRequest
