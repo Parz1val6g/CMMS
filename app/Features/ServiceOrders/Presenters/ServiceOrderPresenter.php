@@ -163,7 +163,7 @@ class ServiceOrderPresenter
         return $so->tasks->map(function ($task) {
             return [
                 'id'          => $task->id,
-                'name'        => $task->name,
+                'reference'   => $task->reference,
                 'description' => $task->description,
                 'status'      => $task->status,
                 'manager'     => self::shapeUser($task->manager),
@@ -174,7 +174,7 @@ class ServiceOrderPresenter
                 'mini_tasks'  => $task->miniTasks->map(function ($mt) {
                     return [
                         'id'          => $mt->id,
-                        'name'        => $mt->name,
+                        'reference'   => $mt->reference,
                         'description' => $mt->description,
                         'status'      => $mt->status,
                         'work_logs'   => $mt->workLogs->map(function ($wl) {

@@ -83,7 +83,6 @@ class ServiceOrderResource extends JsonResource
                 return $this->tasks->map(fn($task) => [
                     'id'          => $task->id,
                     'reference'   => $task->reference,
-                    'name'        => $task->name,
                     'description' => $task->description,
                     'status'      => $task->status,
                     'manager'     => $task->relationLoaded('manager') && $task->manager ? [
@@ -97,7 +96,6 @@ class ServiceOrderResource extends JsonResource
                     'mini_tasks'  => $task->relationLoaded('miniTasks') ? $task->miniTasks->map(fn($mt) => [
                         'id'          => $mt->id,
                         'reference'   => $mt->reference,
-                        'name'        => $mt->name,
                         'description' => $mt->description,
                         'status'      => $mt->status,
                         'work_logs'   => $mt->relationLoaded('workLogs') ? $mt->workLogs->map(fn($wl) => [

@@ -16,7 +16,13 @@ class WorkLogPageController extends Controller
     {
         Gate::authorize('viewAny', WorkLog::class);
 
+        $user = $request->user();
+
         $workLogs = WorkLog::with(['miniTask.task', 'workers.user', 'materials'])
+            ->when(
+                !$user->isAdmin() && $user->roles()->where('name', 'supervisor')->exists(),
+                fn($q) => $q->whereHas('miniTask', fn($mq) => $mq->where('supervisor_id', $user->id))
+            )
             ->latest()
             ->paginate(15)
             ->through(fn ($wl) => [
@@ -32,8 +38,8 @@ class WorkLogPageController extends Controller
                     'reference' => $wl->miniTask->reference,
                     'description' => $wl->miniTask->description,
                     'task' => $wl->miniTask->task ? [
-                        'name' => $wl->miniTask->task->name,
-                        'reference' => $wl->miniTask->task->reference,
+                        'reference'   => $wl->miniTask->task->reference,
+                        'description' => $wl->miniTask->task->description,
                     ] : null,
                 ] : null,
                 'workers' => $wl->workers->map(fn ($w) => $w->user?->first_name . ' ' . $w->user?->last_name)->join(', '),
@@ -49,13 +55,12 @@ class WorkLogPageController extends Controller
         return Inertia::render('WorkLogs/Pages/Index', [
             'work_logs' => $workLogs,
             'columns' => [
-                ['key' => 'reference',   'label' => 'Referência',  'sortable' => true],
-                ['key' => 'description', 'label' => 'Descrição'],
-                ['key' => 'mini_task.reference',   'label' => 'Mini-Tarefa'],
-                ['key' => 'workers',     'label' => 'Trabalhadores'],
-                ['key' => 'duration_minutes', 'label' => 'Duração (min)', 'sortable' => true],
-                ['key' => 'status',      'label' => 'Estado', 'sortable' => true],
-                ['key' => 'completed_at','label' => 'Concluído', 'sortable' => true],
+                ['key' => 'reference',            'label' => 'Referência',    'sortable' => true],
+                ['key' => 'mini_task.reference',  'label' => 'Mini-Tarefa', 'href' => '/mini-tasks?view={mini_task.id}'],
+                ['key' => 'workers',              'label' => 'Trabalhadores'],
+                ['key' => 'duration_minutes',     'label' => 'Duração (min)', 'sortable' => true],
+                ['key' => 'status',               'label' => 'Estado',        'sortable' => true],
+                ['key' => 'completed_at',         'label' => 'Concluído',     'sortable' => true],
             ],
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),

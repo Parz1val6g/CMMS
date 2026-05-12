@@ -29,7 +29,7 @@ class CreateLoanTasks
             Task::create([
                 'service_order_id' => $so->id,
                 'manager_id'       => $so->manager_id,
-                'name'             => __('messages.task_names.equipment_loan'),
+                'description'      => __('messages.task_names.equipment_loan'),
                 'status'           => TaskStatus::PENDING->value,
             ]);
         });

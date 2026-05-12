@@ -1,0 +1,244 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]: ERP Gestão
+      - generic [ref=e7]:
+        - navigation [ref=e9]:
+          - link "Dashboard" [ref=e10] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e11]
+            - generic [ref=e16]: Dashboard
+        - generic [ref=e17]:
+          - paragraph [ref=e18]: Operacional
+          - navigation [ref=e19]:
+            - link "Ordens Serviço" [ref=e20] [cursor=pointer]:
+              - /url: /service-orders
+              - img [ref=e21]
+              - generic [ref=e24]: Ordens Serviço
+            - link "Tarefas" [ref=e25] [cursor=pointer]:
+              - /url: /tasks
+              - img [ref=e26]
+              - generic [ref=e29]: Tarefas
+            - link "Mini-Tarefas" [ref=e30] [cursor=pointer]:
+              - /url: /mini-tasks
+              - img [ref=e31]
+              - generic [ref=e34]: Mini-Tarefas
+            - link "Work Logs" [ref=e35] [cursor=pointer]:
+              - /url: /work-logs
+              - img [ref=e36]
+              - generic [ref=e41]: Work Logs
+            - link "Equipamentos" [ref=e42] [cursor=pointer]:
+              - /url: /equipments
+              - img [ref=e43]
+              - generic [ref=e45]: Equipamentos
+        - generic [ref=e46]:
+          - paragraph [ref=e47]: Entidades
+          - navigation [ref=e48]:
+            - link "Clientes" [ref=e49] [cursor=pointer]:
+              - /url: /clients
+              - img [ref=e50]
+              - generic [ref=e55]: Clientes
+            - link "Localizações" [ref=e56] [cursor=pointer]:
+              - /url: /locations
+              - img [ref=e57]
+              - generic [ref=e60]: Localizações
+        - generic [ref=e61]:
+          - paragraph [ref=e62]: Recursos Humanos
+          - navigation [ref=e63]:
+            - link "Sectores" [ref=e64] [cursor=pointer]:
+              - /url: /sectors
+              - img [ref=e65]
+              - generic [ref=e69]: Sectores
+            - link "Equipas" [ref=e70] [cursor=pointer]:
+              - /url: /teams
+              - img [ref=e71]
+              - generic [ref=e78]: Equipas
+            - link "Trabalhadores" [ref=e79] [cursor=pointer]:
+              - /url: /workers
+              - img [ref=e80]
+              - generic [ref=e92]: Trabalhadores
+        - generic [ref=e93]:
+          - paragraph [ref=e94]: Configurações
+          - navigation [ref=e95]:
+            - link "Tipos Serviço" [ref=e96] [cursor=pointer]:
+              - /url: /service-types
+              - img [ref=e97]
+              - generic [ref=e101]: Tipos Serviço
+            - link "Materiais" [ref=e102] [cursor=pointer]:
+              - /url: /materials
+              - img [ref=e103]
+              - generic [ref=e107]: Materiais
+            - link "Exportações Dev" [ref=e108] [cursor=pointer]:
+              - /url: /exports
+              - img [ref=e109]
+              - generic [ref=e112]: Exportações
+              - generic [ref=e113]: Dev
+            - link "Notificações Dev" [ref=e114] [cursor=pointer]:
+              - /url: /notifications
+              - img [ref=e115]
+              - generic [ref=e118]: Notificações
+              - generic [ref=e119]: Dev
+            - link "Analytics Dev" [ref=e120] [cursor=pointer]:
+              - /url: /analytics
+              - img [ref=e121]
+              - generic [ref=e123]: Analytics
+              - generic [ref=e124]: Dev
+      - generic [ref=e125]:
+        - link "Configurações" [ref=e126] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e127]
+          - generic [ref=e130]: Configurações
+        - link "Admin" [ref=e131] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e132]
+          - generic [ref=e134]: Admin
+        - link "João Silva" [ref=e135] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e137]
+          - generic [ref=e139]: João Silva
+    - main [ref=e140]:
+      - generic [ref=e141]:
+        - generic [ref=e142]:
+          - heading "Equipas" [level=2] [ref=e144]
+          - generic [ref=e146]:
+            - generic [ref=e147]:
+              - generic:
+                - img
+              - textbox "Pesquisar" [ref=e148]:
+                - /placeholder: Pesquisar...
+            - button "Construtor de Filtros" [ref=e149]:
+              - img [ref=e150]
+              - text: Construtor de Filtros
+            - generic [ref=e151]:
+              - button "Exportar CSV" [ref=e152]:
+                - img [ref=e153]
+                - text: Exportar CSV
+              - button "Novo Equipa" [ref=e156]:
+                - img [ref=e157]
+                - text: Novo Equipa
+        - table [ref=e161]:
+          - rowgroup [ref=e162]:
+            - row "Selecionar todos Nome Setor Criado Ações" [ref=e163]:
+              - columnheader "Selecionar todos" [ref=e164]:
+                - checkbox "Selecionar todos" [ref=e165]
+              - columnheader "Nome" [ref=e166] [cursor=pointer]:
+                - generic [ref=e167]:
+                  - text: Nome
+                  - img [ref=e168]
+              - columnheader "Setor" [ref=e171]:
+                - generic [ref=e172]: Setor
+              - columnheader "Criado" [ref=e173] [cursor=pointer]:
+                - generic [ref=e174]:
+                  - text: Criado
+                  - img [ref=e175]
+              - columnheader "Ações" [ref=e178]
+          - rowgroup [ref=e179]:
+            - row "Selecionar Equipa de Água Equipa de Água Departamento de Água e Saneamento 11/05 Editar Equipa de Água Eliminar Equipa de Água" [ref=e180] [cursor=pointer]:
+              - cell "Selecionar Equipa de Água" [ref=e181]:
+                - checkbox "Selecionar Equipa de Água" [ref=e182]
+              - cell "Equipa de Água" [ref=e183]
+              - cell "Departamento de Água e Saneamento" [ref=e184]
+              - cell "11/05" [ref=e185]
+              - cell "Editar Equipa de Água Eliminar Equipa de Água" [ref=e186]:
+                - generic [ref=e187]:
+                  - button "Editar Equipa de Água" [ref=e188]:
+                    - img [ref=e189]
+                  - button "Eliminar Equipa de Água" [ref=e192]:
+                    - img [ref=e193]
+            - row "Selecionar Equipa de Jardinagem Equipa de Jardinagem Departamento de Limpeza Urbana 11/05 Editar Equipa de Jardinagem Eliminar Equipa de Jardinagem" [ref=e196] [cursor=pointer]:
+              - cell "Selecionar Equipa de Jardinagem" [ref=e197]:
+                - checkbox "Selecionar Equipa de Jardinagem" [ref=e198]
+              - cell "Equipa de Jardinagem" [ref=e199]
+              - cell "Departamento de Limpeza Urbana" [ref=e200]
+              - cell "11/05" [ref=e201]
+              - cell "Editar Equipa de Jardinagem Eliminar Equipa de Jardinagem" [ref=e202]:
+                - generic [ref=e203]:
+                  - button "Editar Equipa de Jardinagem" [ref=e204]:
+                    - img [ref=e205]
+                  - button "Eliminar Equipa de Jardinagem" [ref=e208]:
+                    - img [ref=e209]
+            - row "Selecionar Equipa de Inspeção Equipa de Inspeção Departamento de Urbanismo 11/05 Editar Equipa de Inspeção Eliminar Equipa de Inspeção" [ref=e212] [cursor=pointer]:
+              - cell "Selecionar Equipa de Inspeção" [ref=e213]:
+                - checkbox "Selecionar Equipa de Inspeção" [ref=e214]
+              - cell "Equipa de Inspeção" [ref=e215]
+              - cell "Departamento de Urbanismo" [ref=e216]
+              - cell "11/05" [ref=e217]
+              - cell "Editar Equipa de Inspeção Eliminar Equipa de Inspeção" [ref=e218]:
+                - generic [ref=e219]:
+                  - button "Editar Equipa de Inspeção" [ref=e220]:
+                    - img [ref=e221]
+                  - button "Eliminar Equipa de Inspeção" [ref=e224]:
+                    - img [ref=e225]
+            - row "Selecionar Equipa de Pavimentação Equipa de Pavimentação Departamento de Obras e Viação 11/05 Editar Equipa de Pavimentação Eliminar Equipa de Pavimentação" [ref=e228] [cursor=pointer]:
+              - cell "Selecionar Equipa de Pavimentação" [ref=e229]:
+                - checkbox "Selecionar Equipa de Pavimentação" [ref=e230]
+              - cell "Equipa de Pavimentação" [ref=e231]
+              - cell "Departamento de Obras e Viação" [ref=e232]
+              - cell "11/05" [ref=e233]
+              - cell "Editar Equipa de Pavimentação Eliminar Equipa de Pavimentação" [ref=e234]:
+                - generic [ref=e235]:
+                  - button "Editar Equipa de Pavimentação" [ref=e236]:
+                    - img [ref=e237]
+                  - button "Eliminar Equipa de Pavimentação" [ref=e240]:
+                    - img [ref=e241]
+            - row "Selecionar Equipa de Reparações Equipa de Reparações Departamento de Obras e Viação 11/05 Editar Equipa de Reparações Eliminar Equipa de Reparações" [ref=e244] [cursor=pointer]:
+              - cell "Selecionar Equipa de Reparações" [ref=e245]:
+                - checkbox "Selecionar Equipa de Reparações" [ref=e246]
+              - cell "Equipa de Reparações" [ref=e247]
+              - cell "Departamento de Obras e Viação" [ref=e248]
+              - cell "11/05" [ref=e249]
+              - cell "Editar Equipa de Reparações Eliminar Equipa de Reparações" [ref=e250]:
+                - generic [ref=e251]:
+                  - button "Editar Equipa de Reparações" [ref=e252]:
+                    - img [ref=e253]
+                  - button "Eliminar Equipa de Reparações" [ref=e256]:
+                    - img [ref=e257]
+            - row "Selecionar Equipa de Iluminação Equipa de Iluminação Departamento de Obras e Viação 11/05 Editar Equipa de Iluminação Eliminar Equipa de Iluminação" [ref=e260] [cursor=pointer]:
+              - cell "Selecionar Equipa de Iluminação" [ref=e261]:
+                - checkbox "Selecionar Equipa de Iluminação" [ref=e262]
+              - cell "Equipa de Iluminação" [ref=e263]
+              - cell "Departamento de Obras e Viação" [ref=e264]
+              - cell "11/05" [ref=e265]
+              - cell "Editar Equipa de Iluminação Eliminar Equipa de Iluminação" [ref=e266]:
+                - generic [ref=e267]:
+                  - button "Editar Equipa de Iluminação" [ref=e268]:
+                    - img [ref=e269]
+                  - button "Eliminar Equipa de Iluminação" [ref=e272]:
+                    - img [ref=e273]
+            - row "Selecionar Equipa de Esgotos Equipa de Esgotos Departamento de Água e Saneamento 11/05 Editar Equipa de Esgotos Eliminar Equipa de Esgotos" [ref=e276] [cursor=pointer]:
+              - cell "Selecionar Equipa de Esgotos" [ref=e277]:
+                - checkbox "Selecionar Equipa de Esgotos" [ref=e278]
+              - cell "Equipa de Esgotos" [ref=e279]
+              - cell "Departamento de Água e Saneamento" [ref=e280]
+              - cell "11/05" [ref=e281]
+              - cell "Editar Equipa de Esgotos Eliminar Equipa de Esgotos" [ref=e282]:
+                - generic [ref=e283]:
+                  - button "Editar Equipa de Esgotos" [ref=e284]:
+                    - img [ref=e285]
+                  - button "Eliminar Equipa de Esgotos" [ref=e288]:
+                    - img [ref=e289]
+            - row "Selecionar Equipa de Limpeza Equipa de Limpeza Departamento de Limpeza Urbana 11/05 Editar Equipa de Limpeza Eliminar Equipa de Limpeza" [ref=e292] [cursor=pointer]:
+              - cell "Selecionar Equipa de Limpeza" [ref=e293]:
+                - checkbox "Selecionar Equipa de Limpeza" [ref=e294]
+              - cell "Equipa de Limpeza" [ref=e295]
+              - cell "Departamento de Limpeza Urbana" [ref=e296]
+              - cell "11/05" [ref=e297]
+              - cell "Editar Equipa de Limpeza Eliminar Equipa de Limpeza" [ref=e298]:
+                - generic [ref=e299]:
+                  - button "Editar Equipa de Limpeza" [ref=e300]:
+                    - img [ref=e301]
+                  - button "Eliminar Equipa de Limpeza" [ref=e304]:
+                    - img [ref=e305]
+            - row "Selecionar Equipa de Licenças Equipa de Licenças Departamento de Urbanismo 11/05 Editar Equipa de Licenças Eliminar Equipa de Licenças" [ref=e308] [cursor=pointer]:
+              - cell "Selecionar Equipa de Licenças" [ref=e309]:
+                - checkbox "Selecionar Equipa de Licenças" [ref=e310]
+              - cell "Equipa de Licenças" [ref=e311]
+              - cell "Departamento de Urbanismo" [ref=e312]
+              - cell "11/05" [ref=e313]
+              - cell "Editar Equipa de Licenças Eliminar Equipa de Licenças" [ref=e314]:
+                - generic [ref=e315]:
+                  - button "Editar Equipa de Licenças" [ref=e316]:
+                    - img [ref=e317]
+                  - button "Eliminar Equipa de Licenças" [ref=e320]:
+                    - img [ref=e321]
+  - contentinfo [ref=e325]: © 2026 ERP Gestão — Todos os direitos reservados.

@@ -80,9 +80,12 @@ class MiniTaskFormSchema
                 TaskStatus::COMPLETED->value,
                 TaskStatus::CANCELLED->value,
             ])
-            ->orderBy('name')
-            ->get(['id', 'name'])
-            ->map(fn($t) => ['value' => $t->id, 'label' => $t->name])
+            ->orderBy('reference')
+            ->get(['id', 'reference', 'description'])
+            ->map(fn($t) => [
+                'value' => $t->id,
+                'label' => $t->reference . ($t->description ? ' — ' . \Str::limit($t->description, 50) : ''),
+            ])
             ->toArray();
     }
 

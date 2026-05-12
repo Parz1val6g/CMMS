@@ -22,7 +22,6 @@ class Task extends Model
         'reference',
         'service_order_id',
         'manager_id',
-        'name',
         'description',
         'status',
     ];

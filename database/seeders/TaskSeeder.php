@@ -32,31 +32,31 @@ class TaskSeeder extends Seeder
         $taskDefs = [
             // PENDING SO → only pending tasks
             'pending' => [
-                ['name' => 'Inspeção e levantamento de necessidades',          'status' => TaskStatus::PENDING],
-                ['name' => 'Preparação do local de intervenção',               'status' => TaskStatus::PENDING],
+                ['description' => 'Inspeção e levantamento de necessidades',          'status' => TaskStatus::PENDING],
+                ['description' => 'Preparação do local de intervenção',               'status' => TaskStatus::PENDING],
             ],
             // IN_PROGRESS SO → mix of completed, in_progress, pending
             'in_progress' => [
-                ['name' => 'Inspeção e levantamento de necessidades',          'status' => TaskStatus::COMPLETED],
-                ['name' => 'Preparação do local de intervenção',               'status' => TaskStatus::COMPLETED],
-                ['name' => 'Execução de trabalhos preparatórios',              'status' => TaskStatus::IN_PROGRESS],
-                ['name' => 'Aplicação de materiais e revestimentos',           'status' => TaskStatus::PENDING],
-                ['name' => 'Sinalização e segurança do local',                 'status' => TaskStatus::BLOCKED],
+                ['description' => 'Inspeção e levantamento de necessidades',          'status' => TaskStatus::COMPLETED],
+                ['description' => 'Preparação do local de intervenção',               'status' => TaskStatus::COMPLETED],
+                ['description' => 'Execução de trabalhos preparatórios',              'status' => TaskStatus::IN_PROGRESS],
+                ['description' => 'Aplicação de materiais e revestimentos',           'status' => TaskStatus::PENDING],
+                ['description' => 'Sinalização e segurança do local',                 'status' => TaskStatus::BLOCKED],
             ],
             // COMPLETED SO → all tasks completed, plus one blocked for edge case
             'completed' => [
-                ['name' => 'Inspeção e levantamento de necessidades',          'status' => TaskStatus::COMPLETED],
-                ['name' => 'Preparação do local de intervenção',               'status' => TaskStatus::COMPLETED],
-                ['name' => 'Execução de trabalhos preparatórios',              'status' => TaskStatus::COMPLETED],
-                ['name' => 'Aplicação de materiais e revestimentos',           'status' => TaskStatus::COMPLETED],
-                ['name' => 'Controlo de qualidade e conformidade',             'status' => TaskStatus::COMPLETED],
-                ['name' => 'Acabamentos e remates finais',                     'status' => TaskStatus::COMPLETED],
-                ['name' => 'Vistoria final e elaboração de relatório',         'status' => TaskStatus::BLOCKED], // edge: completed SO with a blocked task
+                ['description' => 'Inspeção e levantamento de necessidades',          'status' => TaskStatus::COMPLETED],
+                ['description' => 'Preparação do local de intervenção',               'status' => TaskStatus::COMPLETED],
+                ['description' => 'Execução de trabalhos preparatórios',              'status' => TaskStatus::COMPLETED],
+                ['description' => 'Aplicação de materiais e revestimentos',           'status' => TaskStatus::COMPLETED],
+                ['description' => 'Controlo de qualidade e conformidade',             'status' => TaskStatus::COMPLETED],
+                ['description' => 'Acabamentos e remates finais',                     'status' => TaskStatus::COMPLETED],
+                ['description' => 'Vistoria final e elaboração de relatório',         'status' => TaskStatus::BLOCKED],
             ],
             // CANCELLED SO → all tasks cancelled
             'cancelled' => [
-                ['name' => 'Inspeção e levantamento de necessidades',          'status' => TaskStatus::CANCELLED],
-                ['name' => 'Preparação do local de intervenção',               'status' => TaskStatus::CANCELLED],
+                ['description' => 'Inspeção e levantamento de necessidades',          'status' => TaskStatus::CANCELLED],
+                ['description' => 'Preparação do local de intervenção',               'status' => TaskStatus::CANCELLED],
             ],
         ];
 
@@ -88,8 +88,7 @@ class TaskSeeder extends Seeder
                 Task::create([
                     'service_order_id' => $order->id,
                     'manager_id'       => $assignee?->id ?? $manager->id,
-                    'name'             => $def['name'],
-                    'description'      => $descriptions[$def['status']->value],
+                    'description'      => $def['description'],
                     'status'           => $def['status']->value,
                     'created_at'       => $createdAt,
                     'updated_at'       => $createdAt,

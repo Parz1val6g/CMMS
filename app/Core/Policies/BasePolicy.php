@@ -4,7 +4,6 @@ namespace App\Core\Policies;
 
 use App\Core\Enums\PermissionAction;
 use App\Core\Enums\PermissionResource;
-use App\Core\Enums\UserRole;
 use App\Shared\Models\User;
 
 class BasePolicy
@@ -17,10 +16,9 @@ class BasePolicy
 
     public function before(User $user, string $ability): ?bool
     {
-        if ($this->isAdmin($user)) {
-            return true;
-        }
-
+        // No hardcoded admin bypass — admin is verified like any other role.
+        // The seeder gives admin all resources × all actions, so hasPermission()
+        // will return true for admin. This makes permissions data-driven.
         return null;
     }
 
@@ -85,5 +83,15 @@ class BasePolicy
         }
 
         return $this->permCache[$key];
+    }
+
+    protected function isSectorManager(User $user): bool
+    {
+        return $this->hasRole($user, 'sector_manager');
+    }
+
+    protected function isSupervisor(User $user): bool
+    {
+        return $this->hasRole($user, 'supervisor');
     }
 }

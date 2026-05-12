@@ -19,7 +19,7 @@ class MiniTaskResource extends JsonResource
                 return [
                     'id' => $this->task->id,
                     'reference' => $this->task->reference,
-                    'name' => $this->task->name,
+                    'description' => $this->task->description,
                 ];
             }),
 

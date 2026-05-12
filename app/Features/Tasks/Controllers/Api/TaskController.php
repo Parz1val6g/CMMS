@@ -28,9 +28,9 @@ class TaskController extends Controller
         Gate::authorize('viewAny', Task::class);
 
         $query = $this->filterService->apply(
-            Task::with(['sectors', 'manager']),
+            Task::with(['sectors', 'manager', 'serviceOrder']),
             $request->only(['search', 'status', 'priority', 'from_date', 'to_date', 'sort']),
-            ['name', 'description', 'status']
+            ['description', 'status']
         );
 
         // Search across relationship columns
@@ -56,7 +56,7 @@ class TaskController extends Controller
 
         $this->applyAdvancedFilters(
             $request, $query, $this->filterService,
-            ['name', 'description', 'status', 'priority', 'created_at']
+            ['description', 'status', 'priority', 'created_at']
         );
 
         $tasks = $query->when(!$request->filled('sort'), fn($q) => $q->latest())->paginate(15);

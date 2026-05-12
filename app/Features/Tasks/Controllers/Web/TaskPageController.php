@@ -16,13 +16,18 @@ class TaskPageController extends Controller
     {
         Gate::authorize('viewAny', Task::class);
 
+        $user = $request->user();
+
         $tasks = Task::with(['serviceOrder', 'manager', 'sectors'])
+            ->when(
+                !$user->isAdmin() && $user->roles()->where('name', 'sector_manager')->exists(),
+                fn($q) => $q->whereHas('sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id')))
+            )
             ->latest()
             ->paginate(15)
             ->through(fn($t) => [
-                'id'        => $t->id,
-                'reference' => $t->reference,
-                'name'      => $t->name,
+                'id'          => $t->id,
+                'reference'   => $t->reference,
                 'description' => $t->description,
                 'status'    => $t->status,
                 'created_at' => $t->created_at->format('Y-m-d'),
@@ -44,9 +49,7 @@ class TaskPageController extends Controller
             'tasks' => $tasks,
             'columns' => [
                 ['key' => 'reference',     'label' => 'Referência',       'sortable' => true],
-                ['key' => 'name',          'label' => 'Nome',             'sortable' => true],
-                ['key' => 'description',   'label' => 'Descrição'],
-                ['key' => 'service_order', 'label' => 'Ordem de Serviço'],
+                ['key' => 'service_order', 'label' => 'Ordem de Serviço', 'href' => '/service-orders?view={service_order.id}'],
                 ['key' => 'manager',       'label' => 'Gestor'],
                 ['key' => 'status',        'label' => 'Estado',           'sortable' => true],
                 ['key' => 'created_at',    'label' => 'Criado',           'sortable' => true],
@@ -61,7 +64,6 @@ class TaskPageController extends Controller
                 'show' => url('/api/tasks/__ID__'),
             ],
             'advancedFilterFields' => [
-                ['value' => 'name',        'label' => 'Nome'],
                 ['value' => 'description', 'label' => 'Descrição'],
                 ['value' => 'status',      'label' => 'Estado', 'type' => 'select', 'options' => TaskStatus::options()],
                 ['value' => 'created_at',  'label' => 'Criado'],

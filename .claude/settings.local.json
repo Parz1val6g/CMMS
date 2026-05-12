@@ -61,7 +61,20 @@
       "mcp__filesystem__search_files",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\joelt\\\\project\" -Recurse -Name)",
       "Bash(composer test *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(rtk npx *)",
+      "mcp__puppeteer__puppeteer_navigate",
+      "mcp__puppeteer__puppeteer_screenshot",
+      "mcp__puppeteer__puppeteer_evaluate",
+      "mcp__puppeteer__puppeteer_fill",
+      "mcp__puppeteer__puppeteer_click",
+      "mcp__puppeteer__puppeteer_select",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_snapshot",
+      "Bash(findstr -E \"\\(ServiceOrder|Task|MiniTask|WorkLog\\)\")",
+      "Bash(Get-ChildItem *)",
+      "Bash(Get-Item -Path \"app/Core/Enums/RoleName.php\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -Property FullName)"
     ]
   },
   "spinnerTipsEnabled": false

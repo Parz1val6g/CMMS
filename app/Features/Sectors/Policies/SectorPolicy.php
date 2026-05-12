@@ -15,7 +15,16 @@ class SectorPolicy extends BasePolicy
 
     public function view(User $user, Sector $sector): bool
     {
-        return $this->hasPermission($user, 'view', 'sectors');
+        if (!$this->hasPermission($user, 'view', 'sectors')) {
+            return false;
+        }
+
+        // sector_manager can only view their own sectors
+        if ($this->isSectorManager($user)) {
+            return $sector->head_id === $user->id;
+        }
+
+        return true;
     }
 
     public function create(User $user): bool

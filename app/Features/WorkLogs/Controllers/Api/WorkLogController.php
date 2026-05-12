@@ -69,7 +69,7 @@ class WorkLogController extends Controller
     {
         Gate::authorize('view', $workLog);
 
-        $workLog->load(['workers.user', 'materials']);
+        $workLog->load(['workers.user', 'materials', 'equipment', 'miniTask']);
         return new WorkLogResource($workLog);
     }
 

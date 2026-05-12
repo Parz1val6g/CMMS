@@ -1,0 +1,470 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]: ERP Gestão
+      - generic [ref=e7]:
+        - navigation [ref=e9]:
+          - link "Dashboard" [ref=e10] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e11]
+            - generic [ref=e16]: Dashboard
+        - generic [ref=e17]:
+          - paragraph [ref=e18]: Operacional
+          - navigation [ref=e19]:
+            - link "Ordens Serviço" [ref=e20] [cursor=pointer]:
+              - /url: /service-orders
+              - img [ref=e21]
+              - generic [ref=e24]: Ordens Serviço
+            - link "Tarefas" [ref=e25] [cursor=pointer]:
+              - /url: /tasks
+              - img [ref=e26]
+              - generic [ref=e29]: Tarefas
+            - link "Mini-Tarefas" [ref=e30] [cursor=pointer]:
+              - /url: /mini-tasks
+              - img [ref=e31]
+              - generic [ref=e34]: Mini-Tarefas
+            - link "Work Logs" [ref=e35] [cursor=pointer]:
+              - /url: /work-logs
+              - img [ref=e36]
+              - generic [ref=e41]: Work Logs
+            - link "Equipamentos" [ref=e42] [cursor=pointer]:
+              - /url: /equipments
+              - img [ref=e43]
+              - generic [ref=e45]: Equipamentos
+        - generic [ref=e46]:
+          - paragraph [ref=e47]: Entidades
+          - navigation [ref=e48]:
+            - link "Clientes" [ref=e49] [cursor=pointer]:
+              - /url: /clients
+              - img [ref=e50]
+              - generic [ref=e55]: Clientes
+            - link "Localizações" [ref=e56] [cursor=pointer]:
+              - /url: /locations
+              - img [ref=e57]
+              - generic [ref=e60]: Localizações
+        - generic [ref=e61]:
+          - paragraph [ref=e62]: Recursos Humanos
+          - navigation [ref=e63]:
+            - link "Sectores" [ref=e64] [cursor=pointer]:
+              - /url: /sectors
+              - img [ref=e65]
+              - generic [ref=e69]: Sectores
+            - link "Equipas" [ref=e70] [cursor=pointer]:
+              - /url: /teams
+              - img [ref=e71]
+              - generic [ref=e78]: Equipas
+            - link "Trabalhadores" [ref=e79] [cursor=pointer]:
+              - /url: /workers
+              - img [ref=e80]
+              - generic [ref=e92]: Trabalhadores
+        - generic [ref=e93]:
+          - paragraph [ref=e94]: Configurações
+          - navigation [ref=e95]:
+            - link "Tipos Serviço" [ref=e96] [cursor=pointer]:
+              - /url: /service-types
+              - img [ref=e97]
+              - generic [ref=e101]: Tipos Serviço
+            - link "Materiais" [ref=e102] [cursor=pointer]:
+              - /url: /materials
+              - img [ref=e103]
+              - generic [ref=e107]: Materiais
+            - link "Exportações Dev" [ref=e108] [cursor=pointer]:
+              - /url: /exports
+              - img [ref=e109]
+              - generic [ref=e112]: Exportações
+              - generic [ref=e113]: Dev
+            - link "Notificações Dev" [ref=e114] [cursor=pointer]:
+              - /url: /notifications
+              - img [ref=e115]
+              - generic [ref=e118]: Notificações
+              - generic [ref=e119]: Dev
+            - link "Analytics Dev" [ref=e120] [cursor=pointer]:
+              - /url: /analytics
+              - img [ref=e121]
+              - generic [ref=e123]: Analytics
+              - generic [ref=e124]: Dev
+      - generic [ref=e125]:
+        - link "Configurações" [ref=e126] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e127]
+          - generic [ref=e130]: Configurações
+        - link "Admin" [ref=e131] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e132]
+          - generic [ref=e134]: Admin
+        - link "João Silva" [ref=e135] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e137]
+          - generic [ref=e139]: João Silva
+    - main [ref=e140]:
+      - generic [ref=e141]:
+        - generic [ref=e142]:
+          - heading "Equipamentos" [level=2] [ref=e144]
+          - generic [ref=e146]:
+            - generic [ref=e147]:
+              - generic:
+                - img
+              - textbox "Pesquisar" [ref=e148]:
+                - /placeholder: Pesquisar...
+            - button "Construtor de Filtros" [ref=e149]:
+              - img [ref=e150]
+              - text: Construtor de Filtros
+            - generic [ref=e151]:
+              - button "Exportar CSV" [ref=e152]:
+                - img [ref=e153]
+                - text: Exportar CSV
+              - button "Novo Equipamento" [ref=e156]:
+                - img [ref=e157]
+                - text: Novo Equipamento
+        - generic [ref=e158]:
+          - generic [ref=e581]:
+            - generic [ref=e582]: 1 item selecionado
+            - generic [ref=e583]:
+              - button "Eliminar 1" [ref=e584]:
+                - img [ref=e585]
+                - text: Eliminar 1
+              - button "Limpar seleção" [ref=e588]:
+                - img [ref=e589]
+          - table [ref=e161]:
+            - rowgroup [ref=e162]:
+              - row "Selecionar todos Nome Marca Modelo Nº Série Estado Emprestável Próx. Revisão Gestor Criado Ações" [ref=e163]:
+                - columnheader "Selecionar todos" [ref=e164]:
+                  - checkbox "Selecionar todos" [checked=mixed] [ref=e165]
+                - columnheader "Nome" [ref=e166] [cursor=pointer]:
+                  - generic [ref=e167]:
+                    - text: Nome
+                    - img [ref=e168]
+                - columnheader "Marca" [ref=e171]:
+                  - generic [ref=e172]: Marca
+                - columnheader "Modelo" [ref=e173]:
+                  - generic [ref=e174]: Modelo
+                - columnheader "Nº Série" [ref=e175]:
+                  - generic [ref=e176]: Nº Série
+                - columnheader "Estado" [ref=e177]:
+                  - generic [ref=e178]: Estado
+                - columnheader "Emprestável" [ref=e179]:
+                  - generic [ref=e180]: Emprestável
+                - columnheader "Próx. Revisão" [ref=e181] [cursor=pointer]:
+                  - generic [ref=e182]:
+                    - text: Próx. Revisão
+                    - img [ref=e183]
+                - columnheader "Gestor" [ref=e186]:
+                  - generic [ref=e187]: Gestor
+                - columnheader "Criado" [ref=e188] [cursor=pointer]:
+                  - generic [ref=e189]:
+                    - text: Criado
+                    - img [ref=e190]
+                - columnheader "Ações" [ref=e193]
+            - rowgroup [ref=e194]:
+              - 'row "Selecionar Gerador Antigo 100 kVA Gerador Antigo 100 kVA OLD-GEN-012 Inativo Atribuído a: Pedro Equipamentos 11/05 Editar Gerador Antigo 100 kVA Eliminar Gerador Antigo 100 kVA" [ref=e195] [cursor=pointer]':
+                - cell "Selecionar Gerador Antigo 100 kVA" [ref=e196]:
+                  - checkbox "Selecionar Gerador Antigo 100 kVA" [checked] [ref=e197]
+                - cell "Gerador Antigo 100 kVA" [ref=e198]
+                - cell [ref=e199]
+                - cell [ref=e200]
+                - cell "OLD-GEN-012" [ref=e201]
+                - cell "Inativo" [ref=e202]:
+                  - generic [ref=e203]: Inativo
+                - cell [ref=e204]
+                - cell [ref=e205]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e206]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e207]': PE
+                - cell "11/05" [ref=e208]
+                - cell "Editar Gerador Antigo 100 kVA Eliminar Gerador Antigo 100 kVA" [ref=e209]:
+                  - generic [ref=e210]:
+                    - button "Editar Gerador Antigo 100 kVA" [ref=e211]:
+                      - img [ref=e212]
+                    - button "Eliminar Gerador Antigo 100 kVA" [ref=e215]:
+                      - img [ref=e216]
+              - 'row "Selecionar Martelo Demolidor Makita Martelo Demolidor Makita MAK-DEM-013 Ativo Atribuído a: Pedro Equipamentos 11/05 Editar Martelo Demolidor Makita Eliminar Martelo Demolidor Makita" [ref=e219] [cursor=pointer]':
+                - cell "Selecionar Martelo Demolidor Makita" [ref=e220]:
+                  - checkbox "Selecionar Martelo Demolidor Makita" [ref=e221]
+                - cell "Martelo Demolidor Makita" [ref=e222]
+                - cell [ref=e223]
+                - cell [ref=e224]
+                - cell "MAK-DEM-013" [ref=e225]
+                - cell "Ativo" [ref=e226]:
+                  - generic [ref=e227]: Ativo
+                - cell [ref=e228]
+                - cell [ref=e229]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e230]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e231]': PE
+                - cell "11/05" [ref=e232]
+                - cell "Editar Martelo Demolidor Makita Eliminar Martelo Demolidor Makita" [ref=e233]:
+                  - generic [ref=e234]:
+                    - button "Editar Martelo Demolidor Makita" [ref=e235]:
+                      - img [ref=e236]
+                    - button "Eliminar Martelo Demolidor Makita" [ref=e239]:
+                      - img [ref=e240]
+              - 'row "Selecionar Bomba de Água Diesel Bomba de Água Diesel DIESEL-PUMP-004 Ativo Atribuído a: Pedro Equipamentos 11/05 Editar Bomba de Água Diesel Eliminar Bomba de Água Diesel" [ref=e243] [cursor=pointer]':
+                - cell "Selecionar Bomba de Água Diesel" [ref=e244]:
+                  - checkbox "Selecionar Bomba de Água Diesel" [ref=e245]
+                - cell "Bomba de Água Diesel" [ref=e246]
+                - cell [ref=e247]
+                - cell [ref=e248]
+                - cell "DIESEL-PUMP-004" [ref=e249]
+                - cell "Ativo" [ref=e250]:
+                  - generic [ref=e251]: Ativo
+                - cell [ref=e252]
+                - cell [ref=e253]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e254]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e255]': PE
+                - cell "11/05" [ref=e256]
+                - cell "Editar Bomba de Água Diesel Eliminar Bomba de Água Diesel" [ref=e257]:
+                  - generic [ref=e258]:
+                    - button "Editar Bomba de Água Diesel" [ref=e259]:
+                      - img [ref=e260]
+                    - button "Eliminar Bomba de Água Diesel" [ref=e263]:
+                      - img [ref=e264]
+              - 'row "Selecionar Camião de Carga MAN TGS 18.480 Camião de Carga MAN TGS 18.480 MAN-TGS-011 reserved Atribuído a: Pedro Equipamentos 11/05 Editar Camião de Carga MAN TGS 18.480 Eliminar Camião de Carga MAN TGS 18.480" [ref=e267] [cursor=pointer]':
+                - cell "Selecionar Camião de Carga MAN TGS 18.480" [ref=e268]:
+                  - checkbox "Selecionar Camião de Carga MAN TGS 18.480" [ref=e269]
+                - cell "Camião de Carga MAN TGS 18.480" [ref=e270]
+                - cell [ref=e271]
+                - cell [ref=e272]
+                - cell "MAN-TGS-011" [ref=e273]
+                - cell "reserved" [ref=e274]:
+                  - generic [ref=e275]: reserved
+                - cell [ref=e276]
+                - cell [ref=e277]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e278]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e279]': PE
+                - cell "11/05" [ref=e280]
+                - cell "Editar Camião de Carga MAN TGS 18.480 Eliminar Camião de Carga MAN TGS 18.480" [ref=e281]:
+                  - generic [ref=e282]:
+                    - button "Editar Camião de Carga MAN TGS 18.480" [ref=e283]:
+                      - img [ref=e284]
+                    - button "Eliminar Camião de Carga MAN TGS 18.480" [ref=e287]:
+                      - img [ref=e288]
+              - 'row "Selecionar Broca Rotativa SPT Broca Rotativa SPT SPT-DRILL-008 Ativo Atribuído a: Pedro Equipamentos 11/05 Editar Broca Rotativa SPT Eliminar Broca Rotativa SPT" [ref=e291] [cursor=pointer]':
+                - cell "Selecionar Broca Rotativa SPT" [ref=e292]:
+                  - checkbox "Selecionar Broca Rotativa SPT" [ref=e293]
+                - cell "Broca Rotativa SPT" [ref=e294]
+                - cell [ref=e295]
+                - cell [ref=e296]
+                - cell "SPT-DRILL-008" [ref=e297]
+                - cell "Ativo" [ref=e298]:
+                  - generic [ref=e299]: Ativo
+                - cell [ref=e300]
+                - cell [ref=e301]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e302]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e303]': PE
+                - cell "11/05" [ref=e304]
+                - cell "Editar Broca Rotativa SPT Eliminar Broca Rotativa SPT" [ref=e305]:
+                  - generic [ref=e306]:
+                    - button "Editar Broca Rotativa SPT" [ref=e307]:
+                      - img [ref=e308]
+                    - button "Eliminar Broca Rotativa SPT" [ref=e311]:
+                      - img [ref=e312]
+              - 'row "Selecionar Betoneira 350L Betoneira 350L MIXER-350-009 Ativo Atribuído a: Pedro Equipamentos 11/05 Editar Betoneira 350L Eliminar Betoneira 350L" [ref=e315] [cursor=pointer]':
+                - cell "Selecionar Betoneira 350L" [ref=e316]:
+                  - checkbox "Selecionar Betoneira 350L" [ref=e317]
+                - cell "Betoneira 350L" [ref=e318]
+                - cell [ref=e319]
+                - cell [ref=e320]
+                - cell "MIXER-350-009" [ref=e321]
+                - cell "Ativo" [ref=e322]:
+                  - generic [ref=e323]: Ativo
+                - cell [ref=e324]
+                - cell [ref=e325]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e326]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e327]': PE
+                - cell "11/05" [ref=e328]
+                - cell "Editar Betoneira 350L Eliminar Betoneira 350L" [ref=e329]:
+                  - generic [ref=e330]:
+                    - button "Editar Betoneira 350L" [ref=e331]:
+                      - img [ref=e332]
+                    - button "Eliminar Betoneira 350L" [ref=e335]:
+                      - img [ref=e336]
+              - 'row "Selecionar Gerador 250 kVA Caterpillar Gerador 250 kVA Caterpillar CAT-GEN-005 Ativo Atribuído a: Pedro Equipamentos 11/05 Editar Gerador 250 kVA Caterpillar Eliminar Gerador 250 kVA Caterpillar" [ref=e339] [cursor=pointer]':
+                - cell "Selecionar Gerador 250 kVA Caterpillar" [ref=e340]:
+                  - checkbox "Selecionar Gerador 250 kVA Caterpillar" [ref=e341]
+                - cell "Gerador 250 kVA Caterpillar" [ref=e342]
+                - cell [ref=e343]
+                - cell [ref=e344]
+                - cell "CAT-GEN-005" [ref=e345]
+                - cell "Ativo" [ref=e346]:
+                  - generic [ref=e347]: Ativo
+                - cell [ref=e348]
+                - cell [ref=e349]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e350]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e351]': PE
+                - cell "11/05" [ref=e352]
+                - cell "Editar Gerador 250 kVA Caterpillar Eliminar Gerador 250 kVA Caterpillar" [ref=e353]:
+                  - generic [ref=e354]:
+                    - button "Editar Gerador 250 kVA Caterpillar" [ref=e355]:
+                      - img [ref=e356]
+                    - button "Eliminar Gerador 250 kVA Caterpillar" [ref=e359]:
+                      - img [ref=e360]
+              - 'row "Selecionar Serrador Circular Stihl Serrador Circular Stihl STI-SER-016 Em Reparação Atribuído a: Pedro Equipamentos 11/05 Editar Serrador Circular Stihl Eliminar Serrador Circular Stihl" [ref=e363] [cursor=pointer]':
+                - cell "Selecionar Serrador Circular Stihl" [ref=e364]:
+                  - checkbox "Selecionar Serrador Circular Stihl" [ref=e365]
+                - cell "Serrador Circular Stihl" [ref=e366]
+                - cell [ref=e367]
+                - cell [ref=e368]
+                - cell "STI-SER-016" [ref=e369]
+                - cell "Em Reparação" [ref=e370]:
+                  - generic [ref=e371]: Em Reparação
+                - cell [ref=e372]
+                - cell [ref=e373]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e374]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e375]': PE
+                - cell "11/05" [ref=e376]
+                - cell "Editar Serrador Circular Stihl Eliminar Serrador Circular Stihl" [ref=e377]:
+                  - generic [ref=e378]:
+                    - button "Editar Serrador Circular Stihl" [ref=e379]:
+                      - img [ref=e380]
+                    - button "Eliminar Serrador Circular Stihl" [ref=e383]:
+                      - img [ref=e384]
+              - 'row "Selecionar Cortador de Asfalto Husqvarna Cortador de Asfalto Husqvarna HUS-CORT-014 Manutenção Pendente Atribuído a: Pedro Equipamentos 11/05 Editar Cortador de Asfalto Husqvarna Eliminar Cortador de Asfalto Husqvarna" [ref=e387] [cursor=pointer]':
+                - cell "Selecionar Cortador de Asfalto Husqvarna" [ref=e388]:
+                  - checkbox "Selecionar Cortador de Asfalto Husqvarna" [ref=e389]
+                - cell "Cortador de Asfalto Husqvarna" [ref=e390]
+                - cell [ref=e391]
+                - cell [ref=e392]
+                - cell "HUS-CORT-014" [ref=e393]
+                - cell "Manutenção Pendente" [ref=e394]:
+                  - generic [ref=e395]: Manutenção Pendente
+                - cell [ref=e396]
+                - cell [ref=e397]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e398]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e399]': PE
+                - cell "11/05" [ref=e400]
+                - cell "Editar Cortador de Asfalto Husqvarna Eliminar Cortador de Asfalto Husqvarna" [ref=e401]:
+                  - generic [ref=e402]:
+                    - button "Editar Cortador de Asfalto Husqvarna" [ref=e403]:
+                      - img [ref=e404]
+                    - button "Eliminar Cortador de Asfalto Husqvarna" [ref=e407]:
+                      - img [ref=e408]
+              - 'row "Selecionar Vibrador de Placas Dinamarca Vibrador de Placas Dinamarca DIN-PLATE-007 Ativo Atribuído a: Pedro Equipamentos 11/05 Editar Vibrador de Placas Dinamarca Eliminar Vibrador de Placas Dinamarca" [ref=e411] [cursor=pointer]':
+                - cell "Selecionar Vibrador de Placas Dinamarca" [ref=e412]:
+                  - checkbox "Selecionar Vibrador de Placas Dinamarca" [ref=e413]
+                - cell "Vibrador de Placas Dinamarca" [ref=e414]
+                - cell [ref=e415]
+                - cell [ref=e416]
+                - cell "DIN-PLATE-007" [ref=e417]
+                - cell "Ativo" [ref=e418]:
+                  - generic [ref=e419]: Ativo
+                - cell [ref=e420]
+                - cell [ref=e421]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e422]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e423]': PE
+                - cell "11/05" [ref=e424]
+                - cell "Editar Vibrador de Placas Dinamarca Eliminar Vibrador de Placas Dinamarca" [ref=e425]:
+                  - generic [ref=e426]:
+                    - button "Editar Vibrador de Placas Dinamarca" [ref=e427]:
+                      - img [ref=e428]
+                    - button "Eliminar Vibrador de Placas Dinamarca" [ref=e431]:
+                      - img [ref=e432]
+              - 'row "Selecionar Retroescavadora JCB 3CX Retroescavadora JCB 3CX JCB-3CX-006 Em Manutenção Atribuído a: Pedro Equipamentos 11/05 Editar Retroescavadora JCB 3CX Eliminar Retroescavadora JCB 3CX" [ref=e435] [cursor=pointer]':
+                - cell "Selecionar Retroescavadora JCB 3CX" [ref=e436]:
+                  - checkbox "Selecionar Retroescavadora JCB 3CX" [ref=e437]
+                - cell "Retroescavadora JCB 3CX" [ref=e438]
+                - cell [ref=e439]
+                - cell [ref=e440]
+                - cell "JCB-3CX-006" [ref=e441]
+                - cell "Em Manutenção" [ref=e442]:
+                  - generic [ref=e443]: Em Manutenção
+                - cell [ref=e444]
+                - cell [ref=e445]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e446]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e447]': PE
+                - cell "11/05" [ref=e448]
+                - cell "Editar Retroescavadora JCB 3CX Eliminar Retroescavadora JCB 3CX" [ref=e449]:
+                  - generic [ref=e450]:
+                    - button "Editar Retroescavadora JCB 3CX" [ref=e451]:
+                      - img [ref=e452]
+                    - button "Eliminar Retroescavadora JCB 3CX" [ref=e455]:
+                      - img [ref=e456]
+              - 'row "Selecionar Perfurador Pneumático Atlas Perfurador Pneumático Atlas ATL-PERF-015 Avariado Atribuído a: Pedro Equipamentos 11/05 Editar Perfurador Pneumático Atlas Eliminar Perfurador Pneumático Atlas" [ref=e459] [cursor=pointer]':
+                - cell "Selecionar Perfurador Pneumático Atlas" [ref=e460]:
+                  - checkbox "Selecionar Perfurador Pneumático Atlas" [ref=e461]
+                - cell "Perfurador Pneumático Atlas" [ref=e462]
+                - cell [ref=e463]
+                - cell [ref=e464]
+                - cell "ATL-PERF-015" [ref=e465]
+                - cell "Avariado" [ref=e466]:
+                  - generic [ref=e467]: Avariado
+                - cell [ref=e468]
+                - cell [ref=e469]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e470]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e471]': PE
+                - cell "11/05" [ref=e472]
+                - cell "Editar Perfurador Pneumático Atlas Eliminar Perfurador Pneumático Atlas" [ref=e473]:
+                  - generic [ref=e474]:
+                    - button "Editar Perfurador Pneumático Atlas" [ref=e475]:
+                      - img [ref=e476]
+                    - button "Eliminar Perfurador Pneumático Atlas" [ref=e479]:
+                      - img [ref=e480]
+              - 'row "Selecionar Martelo Pneumático Bosch Martelo Pneumático Bosch BOSCH-PH-003 Ativo Atribuído a: Pedro Equipamentos 11/05 Editar Martelo Pneumático Bosch Eliminar Martelo Pneumático Bosch" [ref=e483] [cursor=pointer]':
+                - cell "Selecionar Martelo Pneumático Bosch" [ref=e484]:
+                  - checkbox "Selecionar Martelo Pneumático Bosch" [ref=e485]
+                - cell "Martelo Pneumático Bosch" [ref=e486]
+                - cell [ref=e487]
+                - cell [ref=e488]
+                - cell "BOSCH-PH-003" [ref=e489]
+                - cell "Ativo" [ref=e490]:
+                  - generic [ref=e491]: Ativo
+                - cell [ref=e492]
+                - cell [ref=e493]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e494]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e495]': PE
+                - cell "11/05" [ref=e496]
+                - cell "Editar Martelo Pneumático Bosch Eliminar Martelo Pneumático Bosch" [ref=e497]:
+                  - generic [ref=e498]:
+                    - button "Editar Martelo Pneumático Bosch" [ref=e499]:
+                      - img [ref=e500]
+                    - button "Eliminar Martelo Pneumático Bosch" [ref=e503]:
+                      - img [ref=e504]
+              - 'row "Selecionar Escavadora CAT 320D Escavadora CAT 320D CAT-320D-001 Ativo Atribuído a: Pedro Equipamentos 11/05 Editar Escavadora CAT 320D Eliminar Escavadora CAT 320D" [ref=e507] [cursor=pointer]':
+                - cell "Selecionar Escavadora CAT 320D" [ref=e508]:
+                  - checkbox "Selecionar Escavadora CAT 320D" [ref=e509]
+                - cell "Escavadora CAT 320D" [ref=e510]
+                - cell [ref=e511]
+                - cell [ref=e512]
+                - cell "CAT-320D-001" [ref=e513]
+                - cell "Ativo" [ref=e514]:
+                  - generic [ref=e515]: Ativo
+                - cell [ref=e516]
+                - cell [ref=e517]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e518]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e519]': PE
+                - cell "11/05" [ref=e520]
+                - cell "Editar Escavadora CAT 320D Eliminar Escavadora CAT 320D" [ref=e521]:
+                  - generic [ref=e522]:
+                    - button "Editar Escavadora CAT 320D" [ref=e523]:
+                      - img [ref=e524]
+                    - button "Eliminar Escavadora CAT 320D" [ref=e527]:
+                      - img [ref=e528]
+              - 'row "Selecionar Grua Telescópica 25T Grua Telescópica 25T CRANE-25T-010 Ativo Atribuído a: Pedro Equipamentos 11/05 Editar Grua Telescópica 25T Eliminar Grua Telescópica 25T" [ref=e531] [cursor=pointer]':
+                - cell "Selecionar Grua Telescópica 25T" [ref=e532]:
+                  - checkbox "Selecionar Grua Telescópica 25T" [ref=e533]
+                - cell "Grua Telescópica 25T" [ref=e534]
+                - cell [ref=e535]
+                - cell [ref=e536]
+                - cell "CRANE-25T-010" [ref=e537]
+                - cell "Ativo" [ref=e538]:
+                  - generic [ref=e539]: Ativo
+                - cell [ref=e540]
+                - cell [ref=e541]
+                - 'cell "Atribuído a: Pedro Equipamentos" [ref=e542]':
+                  - 'generic "Atribuído a: Pedro Equipamentos" [ref=e543]': PE
+                - cell "11/05" [ref=e544]
+                - cell "Editar Grua Telescópica 25T Eliminar Grua Telescópica 25T" [ref=e545]:
+                  - generic [ref=e546]:
+                    - button "Editar Grua Telescópica 25T" [ref=e547]:
+                      - img [ref=e548]
+                    - button "Eliminar Grua Telescópica 25T" [ref=e551]:
+                      - img [ref=e552]
+          - navigation [ref=e556]:
+            - generic [ref=e558]:
+              - text: Página 1
+              - generic [ref=e559]: de 2
+            - generic [ref=e560]:
+              - button [disabled] [ref=e561]:
+                - img [ref=e562]
+              - button "1" [ref=e564]
+              - button "2" [ref=e565]
+              - button [ref=e566]:
+                - img [ref=e567]
+  - contentinfo [ref=e569]: © 2026 ERP Gestão — Todos os direitos reservados.

@@ -15,7 +15,13 @@ class SectorPageController extends Controller
     {
         Gate::authorize('viewAny', Sector::class);
 
+        $user = $request->user();
+
         $sectors = Sector::with(['head'])
+            ->when(
+                !$user->isAdmin() && $user->roles()->where('name', 'sector_manager')->exists(),
+                fn($q) => $q->where('head_id', $user->id)
+            )
             ->latest()
             ->paginate(15)
             ->through(fn ($s) => [

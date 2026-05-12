@@ -15,7 +15,23 @@ class WorkerPolicy extends BasePolicy
 
     public function view(User $user, Worker $worker): bool
     {
-        return $this->hasPermission($user, 'view', 'workers');
+        if (!$this->hasPermission($user, 'view', 'workers')) {
+            return false;
+        }
+
+        // sector_manager can only view workers in their sectors
+        if ($this->isSectorManager($user)) {
+            return $worker->team?->sector->head_id === $user->id;
+        }
+
+        // supervisor can only view workers in their teams
+        if ($this->isSupervisor($user)) {
+            return $worker->team?->miniTasks()
+                ->where('supervisor_id', $user->id)
+                ->exists();
+        }
+
+        return true;
     }
 
     public function create(User $user): bool

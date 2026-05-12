@@ -12,10 +12,23 @@ function resolveValue(item, key) {
         if (val === null || val === undefined) return '';
         val = val[p];
     }
-    if (val !== null && val !== undefined && typeof val === 'object' && !Array.isArray(val)) {
+    if (val === null || val === undefined) return '';
+    // Array of objects (e.g. roles from API) — join display names
+    if (Array.isArray(val)) {
+        return val.map(v => (v !== null && typeof v === 'object') ? (v.name ?? v.label ?? v.process ?? '') : String(v)).filter(Boolean).join(', ');
+    }
+    if (typeof val === 'object') {
         return val.name ?? val.process ?? val.label ?? '';
     }
-    return val ?? '';
+    return val;
+}
+
+// Resolve href template: replace {path.to.field} with item values
+function resolveHref(template, item) {
+    if (!template) return null;
+    const resolved = template.replace(/\{([^}]+)\}/g, (_, path) => resolveValue(item, path) ?? '');
+    // Don't produce a link if any placeholder resolved to empty (e.g. null relation)
+    return resolved.includes('=&') || resolved.endsWith('=') ? null : resolved;
 }
 
 
@@ -67,44 +80,53 @@ function renderCell(item, col) {
     const isAvatar    = AVATAR_KEYS.has(col.key);
     const isReference = isRefKey(col.key);
 
+    let content;
+
     // Reference / process codes — indigo mono badge
     if (isReference) {
-        return (
+        content = (
             <span className="font-mono font-bold text-indigo-400 text-xs tracking-wide">
                 {raw || '—'}
             </span>
         );
-    }
-
-    if (isStatusOrPriority) {
-        return (
+    } else if (isStatusOrPriority) {
+        content = (
             <span className={'inline-block rounded-full px-2 py-0.5 text-xs font-semibold ' + badgeStyle(raw)}>
                 {labelFor(raw)}
             </span>
         );
-    }
-
-    // Fix 2 — human-readable PT-PT date
-    if (isDate) {
-        return <span className="text-slate-300">{formatDate(raw)}</span>;
-    }
-
-    // Fix 5 — user avatar with initials
-    if (isAvatar) {
-        return <AvatarInitial value={item[col.key]} />;
-    }
-
-    // Fix 1 — truncated with full-text native tooltip
-    if (isLongText) {
+    } else if (isDate) {
+        content = <span className="text-slate-300">{formatDate(raw)}</span>;
+    } else if (isAvatar) {
+        content = <AvatarInitial value={item[col.key]} />;
+    } else if (isLongText) {
         const fullText = raw != null ? String(raw) : '';
-        return (
+        content = (
             <span className="block max-w-xs truncate text-slate-300" title={fullText}>
                 {raw}
             </span>
         );
+    } else {
+        content = <span className="text-slate-300">{raw}</span>;
     }
 
-    return <span className="text-slate-300">{raw}</span>;
+    // Wrap in a navigable link if the column declares an href template
+    if (col.href) {
+        const href = resolveHref(col.href, item);
+        if (href) {
+            return (
+                <a
+                    href={href}
+                    onClick={e => e.stopPropagation()}
+                    className="group inline-flex items-center gap-1 hover:underline decoration-indigo-400/60 underline-offset-2 transition-colors"
+                >
+                    {content}
+                </a>
+            );
+        }
+    }
+
+    return content;
 }
 
 function Row({ item, columns, hasEdit, onEdit, onDelete, onRowClick, selected = false, onToggleSelect = null }) {

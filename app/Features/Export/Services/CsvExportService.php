@@ -87,7 +87,7 @@ class CsvExportService
 
             return [
                 $wl->id,
-                $wl->miniTask?->name ?? 'N/A',
+                $wl->miniTask?->description ?? 'N/A',
                 $wl->miniTask?->task?->serviceOrder?->process ?? 'N/A',
                 $wl->description,
                 $wl->started_at->format('Y-m-d H:i'),
