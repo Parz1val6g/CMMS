@@ -1,0 +1,360 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]: ERP Gestão
+      - generic [ref=e7]:
+        - navigation [ref=e9]:
+          - link "Dashboard" [ref=e10] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e11]
+            - generic [ref=e16]: Dashboard
+        - generic [ref=e17]:
+          - paragraph [ref=e18]: Operacional
+          - navigation [ref=e19]:
+            - link "Ordens Serviço" [ref=e20] [cursor=pointer]:
+              - /url: /service-orders
+              - img [ref=e21]
+              - generic [ref=e24]: Ordens Serviço
+            - link "Tarefas" [ref=e25] [cursor=pointer]:
+              - /url: /tasks
+              - img [ref=e26]
+              - generic [ref=e29]: Tarefas
+            - link "Mini-Tarefas" [ref=e30] [cursor=pointer]:
+              - /url: /mini-tasks
+              - img [ref=e31]
+              - generic [ref=e34]: Mini-Tarefas
+            - link "Work Logs" [ref=e35] [cursor=pointer]:
+              - /url: /work-logs
+              - img [ref=e36]
+              - generic [ref=e41]: Work Logs
+            - link "Equipamentos" [ref=e42] [cursor=pointer]:
+              - /url: /equipments
+              - img [ref=e43]
+              - generic [ref=e45]: Equipamentos
+        - generic [ref=e46]:
+          - paragraph [ref=e47]: Entidades
+          - navigation [ref=e48]:
+            - link "Clientes" [ref=e49] [cursor=pointer]:
+              - /url: /clients
+              - img [ref=e50]
+              - generic [ref=e55]: Clientes
+            - link "Localizações" [ref=e56] [cursor=pointer]:
+              - /url: /locations
+              - img [ref=e57]
+              - generic [ref=e60]: Localizações
+        - generic [ref=e61]:
+          - paragraph [ref=e62]: Recursos Humanos
+          - navigation [ref=e63]:
+            - link "Sectores" [ref=e64] [cursor=pointer]:
+              - /url: /sectors
+              - img [ref=e65]
+              - generic [ref=e69]: Sectores
+            - link "Equipas" [ref=e70] [cursor=pointer]:
+              - /url: /teams
+              - img [ref=e71]
+              - generic [ref=e78]: Equipas
+            - link "Trabalhadores" [ref=e79] [cursor=pointer]:
+              - /url: /workers
+              - img [ref=e80]
+              - generic [ref=e92]: Trabalhadores
+        - generic [ref=e93]:
+          - paragraph [ref=e94]: Configurações
+          - navigation [ref=e95]:
+            - link "Tipos Serviço" [ref=e96] [cursor=pointer]:
+              - /url: /service-types
+              - img [ref=e97]
+              - generic [ref=e101]: Tipos Serviço
+            - link "Materiais" [ref=e102] [cursor=pointer]:
+              - /url: /materials
+              - img [ref=e103]
+              - generic [ref=e107]: Materiais
+            - link "Exportações Dev" [ref=e108] [cursor=pointer]:
+              - /url: /exports
+              - img [ref=e109]
+              - generic [ref=e112]: Exportações
+              - generic [ref=e113]: Dev
+            - link "Notificações Dev" [ref=e114] [cursor=pointer]:
+              - /url: /notifications
+              - img [ref=e115]
+              - generic [ref=e118]: Notificações
+              - generic [ref=e119]: Dev
+            - link "Analytics Dev" [ref=e120] [cursor=pointer]:
+              - /url: /analytics
+              - img [ref=e121]
+              - generic [ref=e123]: Analytics
+              - generic [ref=e124]: Dev
+      - generic [ref=e125]:
+        - link "Configurações" [ref=e126] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e127]
+          - generic [ref=e130]: Configurações
+        - link "Admin" [ref=e131] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e132]
+          - generic [ref=e134]: Admin
+        - link "João Silva" [ref=e135] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e137]
+          - generic [ref=e139]: João Silva
+    - main [ref=e140]:
+      - generic [ref=e141]:
+        - generic [ref=e142]:
+          - heading "Trabalhadores" [level=2] [ref=e144]
+          - generic [ref=e146]:
+            - generic [ref=e147]:
+              - generic:
+                - img
+              - textbox "Pesquisar" [ref=e148]:
+                - /placeholder: Pesquisar...
+            - button "Construtor de Filtros" [ref=e149]:
+              - img [ref=e150]
+              - text: Construtor de Filtros
+            - generic [ref=e151]:
+              - button "Exportar CSV" [ref=e152]:
+                - img [ref=e153]
+                - text: Exportar CSV
+              - button "Novo Trabalhadore" [ref=e156]:
+                - img [ref=e157]
+                - text: Novo Trabalhadore
+        - generic [ref=e158]:
+          - table [ref=e161]:
+            - rowgroup [ref=e162]:
+              - row "Selecionar todos Nome Email Telefone Equipa Criado Ações" [ref=e163]:
+                - columnheader "Selecionar todos" [ref=e164]:
+                  - checkbox "Selecionar todos" [ref=e165]
+                - columnheader "Nome" [ref=e166]:
+                  - generic [ref=e167]: Nome
+                - columnheader "Email" [ref=e168]:
+                  - generic [ref=e169]: Email
+                - columnheader "Telefone" [ref=e170]:
+                  - generic [ref=e171]: Telefone
+                - columnheader "Equipa" [ref=e172]:
+                  - generic [ref=e173]: Equipa
+                - columnheader "Criado" [ref=e174] [cursor=pointer]:
+                  - generic [ref=e175]:
+                    - text: Criado
+                    - img [ref=e176]
+                - columnheader "Ações" [ref=e179]
+            - rowgroup [ref=e180]:
+              - row "Selecionar Patrícia Guimarães Patrícia Guimarães patrícia.guimarães1017@workers.cm.pt +351910000017 Equipa de Iluminação 11/05 Editar Patrícia Guimarães Eliminar Patrícia Guimarães" [ref=e181] [cursor=pointer]:
+                - cell "Selecionar Patrícia Guimarães" [ref=e182]:
+                  - checkbox "Selecionar Patrícia Guimarães" [ref=e183]
+                - cell "Patrícia Guimarães" [ref=e184]
+                - cell "patrícia.guimarães1017@workers.cm.pt" [ref=e185]
+                - cell "+351910000017" [ref=e186]
+                - cell "Equipa de Iluminação" [ref=e187]
+                - cell "11/05" [ref=e188]
+                - cell "Editar Patrícia Guimarães Eliminar Patrícia Guimarães" [ref=e189]:
+                  - generic [ref=e190]:
+                    - button "Editar Patrícia Guimarães" [ref=e191]:
+                      - img [ref=e192]
+                    - button "Eliminar Patrícia Guimarães" [ref=e195]:
+                      - img [ref=e196]
+              - row "Selecionar Ricardo Vieira Ricardo Vieira ricardo.vieira1018@workers.cm.pt +351910000018 Equipa de Esgotos 11/05 Editar Ricardo Vieira Eliminar Ricardo Vieira" [ref=e199] [cursor=pointer]:
+                - cell "Selecionar Ricardo Vieira" [ref=e200]:
+                  - checkbox "Selecionar Ricardo Vieira" [ref=e201]
+                - cell "Ricardo Vieira" [ref=e202]
+                - cell "ricardo.vieira1018@workers.cm.pt" [ref=e203]
+                - cell "+351910000018" [ref=e204]
+                - cell "Equipa de Esgotos" [ref=e205]
+                - cell "11/05" [ref=e206]
+                - cell "Editar Ricardo Vieira Eliminar Ricardo Vieira" [ref=e207]:
+                  - generic [ref=e208]:
+                    - button "Editar Ricardo Vieira" [ref=e209]:
+                      - img [ref=e210]
+                    - button "Eliminar Ricardo Vieira" [ref=e213]:
+                      - img [ref=e214]
+              - row "Selecionar Mónica Barbosa Mónica Barbosa mónica.barbosa1019@workers.cm.pt +351910000019 Equipa de Esgotos 11/05 Editar Mónica Barbosa Eliminar Mónica Barbosa" [ref=e217] [cursor=pointer]:
+                - cell "Selecionar Mónica Barbosa" [ref=e218]:
+                  - checkbox "Selecionar Mónica Barbosa" [ref=e219]
+                - cell "Mónica Barbosa" [ref=e220]
+                - cell "mónica.barbosa1019@workers.cm.pt" [ref=e221]
+                - cell "+351910000019" [ref=e222]
+                - cell "Equipa de Esgotos" [ref=e223]
+                - cell "11/05" [ref=e224]
+                - cell "Editar Mónica Barbosa Eliminar Mónica Barbosa" [ref=e225]:
+                  - generic [ref=e226]:
+                    - button "Editar Mónica Barbosa" [ref=e227]:
+                      - img [ref=e228]
+                    - button "Eliminar Mónica Barbosa" [ref=e231]:
+                      - img [ref=e232]
+              - row "Selecionar Sandra Rodrigues Sandra Rodrigues sandra.rodrigues1015@workers.cm.pt +351910000015 Equipa de Iluminação 11/05 Editar Sandra Rodrigues Eliminar Sandra Rodrigues" [ref=e235] [cursor=pointer]:
+                - cell "Selecionar Sandra Rodrigues" [ref=e236]:
+                  - checkbox "Selecionar Sandra Rodrigues" [ref=e237]
+                - cell "Sandra Rodrigues" [ref=e238]
+                - cell "sandra.rodrigues1015@workers.cm.pt" [ref=e239]
+                - cell "+351910000015" [ref=e240]
+                - cell "Equipa de Iluminação" [ref=e241]
+                - cell "11/05" [ref=e242]
+                - cell "Editar Sandra Rodrigues Eliminar Sandra Rodrigues" [ref=e243]:
+                  - generic [ref=e244]:
+                    - button "Editar Sandra Rodrigues" [ref=e245]:
+                      - img [ref=e246]
+                    - button "Eliminar Sandra Rodrigues" [ref=e249]:
+                      - img [ref=e250]
+              - row "Selecionar Hélder Gomes Hélder Gomes hélder.gomes1016@workers.cm.pt +351910000016 Equipa de Iluminação 11/05 Editar Hélder Gomes Eliminar Hélder Gomes" [ref=e253] [cursor=pointer]:
+                - cell "Selecionar Hélder Gomes" [ref=e254]:
+                  - checkbox "Selecionar Hélder Gomes" [ref=e255]
+                - cell "Hélder Gomes" [ref=e256]
+                - cell "hélder.gomes1016@workers.cm.pt" [ref=e257]
+                - cell "+351910000016" [ref=e258]
+                - cell "Equipa de Iluminação" [ref=e259]
+                - cell "11/05" [ref=e260]
+                - cell "Editar Hélder Gomes Eliminar Hélder Gomes" [ref=e261]:
+                  - generic [ref=e262]:
+                    - button "Editar Hélder Gomes" [ref=e263]:
+                      - img [ref=e264]
+                    - button "Eliminar Hélder Gomes" [ref=e267]:
+                      - img [ref=e268]
+              - row "Selecionar Teresa Araújo Teresa Araújo teresa.araújo1013@workers.cm.pt +351910000013 Equipa de Reparações 11/05 Editar Teresa Araújo Eliminar Teresa Araújo" [ref=e271] [cursor=pointer]:
+                - cell "Selecionar Teresa Araújo" [ref=e272]:
+                  - checkbox "Selecionar Teresa Araújo" [ref=e273]
+                - cell "Teresa Araújo" [ref=e274]
+                - cell "teresa.araújo1013@workers.cm.pt" [ref=e275]
+                - cell "+351910000013" [ref=e276]
+                - cell "Equipa de Reparações" [ref=e277]
+                - cell "11/05" [ref=e278]
+                - cell "Editar Teresa Araújo Eliminar Teresa Araújo" [ref=e279]:
+                  - generic [ref=e280]:
+                    - button "Editar Teresa Araújo" [ref=e281]:
+                      - img [ref=e282]
+                    - button "Eliminar Teresa Araújo" [ref=e285]:
+                      - img [ref=e286]
+              - row "Selecionar Nuno Almeida Nuno Almeida nuno.almeida1014@workers.cm.pt +351910000014 Equipa de Reparações 11/05 Editar Nuno Almeida Eliminar Nuno Almeida" [ref=e289] [cursor=pointer]:
+                - cell "Selecionar Nuno Almeida" [ref=e290]:
+                  - checkbox "Selecionar Nuno Almeida" [ref=e291]
+                - cell "Nuno Almeida" [ref=e292]
+                - cell "nuno.almeida1014@workers.cm.pt" [ref=e293]
+                - cell "+351910000014" [ref=e294]
+                - cell "Equipa de Reparações" [ref=e295]
+                - cell "11/05" [ref=e296]
+                - cell "Editar Nuno Almeida Eliminar Nuno Almeida" [ref=e297]:
+                  - generic [ref=e298]:
+                    - button "Editar Nuno Almeida" [ref=e299]:
+                      - img [ref=e300]
+                    - button "Eliminar Nuno Almeida" [ref=e303]:
+                      - img [ref=e304]
+              - row "Selecionar Luís Fonseca Luís Fonseca luís.fonseca1010@workers.cm.pt +351910000010 Equipa de Pavimentação 11/05 Editar Luís Fonseca Eliminar Luís Fonseca" [ref=e307] [cursor=pointer]:
+                - cell "Selecionar Luís Fonseca" [ref=e308]:
+                  - checkbox "Selecionar Luís Fonseca" [ref=e309]
+                - cell "Luís Fonseca" [ref=e310]
+                - cell "luís.fonseca1010@workers.cm.pt" [ref=e311]
+                - cell "+351910000010" [ref=e312]
+                - cell "Equipa de Pavimentação" [ref=e313]
+                - cell "11/05" [ref=e314]
+                - cell "Editar Luís Fonseca Eliminar Luís Fonseca" [ref=e315]:
+                  - generic [ref=e316]:
+                    - button "Editar Luís Fonseca" [ref=e317]:
+                      - img [ref=e318]
+                    - button "Eliminar Luís Fonseca" [ref=e321]:
+                      - img [ref=e322]
+              - row "Selecionar Carla Neves Carla Neves carla.neves1011@workers.cm.pt +351910000011 Equipa de Pavimentação 11/05 Editar Carla Neves Eliminar Carla Neves" [ref=e325] [cursor=pointer]:
+                - cell "Selecionar Carla Neves" [ref=e326]:
+                  - checkbox "Selecionar Carla Neves" [ref=e327]
+                - cell "Carla Neves" [ref=e328]
+                - cell "carla.neves1011@workers.cm.pt" [ref=e329]
+                - cell "+351910000011" [ref=e330]
+                - cell "Equipa de Pavimentação" [ref=e331]
+                - cell "11/05" [ref=e332]
+                - cell "Editar Carla Neves Eliminar Carla Neves" [ref=e333]:
+                  - generic [ref=e334]:
+                    - button "Editar Carla Neves" [ref=e335]:
+                      - img [ref=e336]
+                    - button "Eliminar Carla Neves" [ref=e339]:
+                      - img [ref=e340]
+              - row "Selecionar André Pinto André Pinto andré.pinto1012@workers.cm.pt +351910000012 Equipa de Reparações 11/05 Editar André Pinto Eliminar André Pinto" [ref=e343] [cursor=pointer]:
+                - cell "Selecionar André Pinto" [ref=e344]:
+                  - checkbox "Selecionar André Pinto" [ref=e345]
+                - cell "André Pinto" [ref=e346]
+                - cell "andré.pinto1012@workers.cm.pt" [ref=e347]
+                - cell "+351910000012" [ref=e348]
+                - cell "Equipa de Reparações" [ref=e349]
+                - cell "11/05" [ref=e350]
+                - cell "Editar André Pinto Eliminar André Pinto" [ref=e351]:
+                  - generic [ref=e352]:
+                    - button "Editar André Pinto" [ref=e353]:
+                      - img [ref=e354]
+                    - button "Eliminar André Pinto" [ref=e357]:
+                      - img [ref=e358]
+              - row "Selecionar Mariana Alves Mariana Alves mariana.alves1007@workers.cm.pt +351910000007 Equipa de Inspeção 11/05 Editar Mariana Alves Eliminar Mariana Alves" [ref=e361] [cursor=pointer]:
+                - cell "Selecionar Mariana Alves" [ref=e362]:
+                  - checkbox "Selecionar Mariana Alves" [ref=e363]
+                - cell "Mariana Alves" [ref=e364]
+                - cell "mariana.alves1007@workers.cm.pt" [ref=e365]
+                - cell "+351910000007" [ref=e366]
+                - cell "Equipa de Inspeção" [ref=e367]
+                - cell "11/05" [ref=e368]
+                - cell "Editar Mariana Alves Eliminar Mariana Alves" [ref=e369]:
+                  - generic [ref=e370]:
+                    - button "Editar Mariana Alves" [ref=e371]:
+                      - img [ref=e372]
+                    - button "Eliminar Mariana Alves" [ref=e375]:
+                      - img [ref=e376]
+              - row "Selecionar Paulo Ribeiro Paulo Ribeiro paulo.ribeiro1008@workers.cm.pt +351910000008 Equipa de Inspeção 11/05 Editar Paulo Ribeiro Eliminar Paulo Ribeiro" [ref=e379] [cursor=pointer]:
+                - cell "Selecionar Paulo Ribeiro" [ref=e380]:
+                  - checkbox "Selecionar Paulo Ribeiro" [ref=e381]
+                - cell "Paulo Ribeiro" [ref=e382]
+                - cell "paulo.ribeiro1008@workers.cm.pt" [ref=e383]
+                - cell "+351910000008" [ref=e384]
+                - cell "Equipa de Inspeção" [ref=e385]
+                - cell "11/05" [ref=e386]
+                - cell "Editar Paulo Ribeiro Eliminar Paulo Ribeiro" [ref=e387]:
+                  - generic [ref=e388]:
+                    - button "Editar Paulo Ribeiro" [ref=e389]:
+                      - img [ref=e390]
+                    - button "Eliminar Paulo Ribeiro" [ref=e393]:
+                      - img [ref=e394]
+              - row "Selecionar Conceição Teixeira Conceição Teixeira conceição.teixeira1009@workers.cm.pt +351910000009 Equipa de Pavimentação 11/05 Editar Conceição Teixeira Eliminar Conceição Teixeira" [ref=e397] [cursor=pointer]:
+                - cell "Selecionar Conceição Teixeira" [ref=e398]:
+                  - checkbox "Selecionar Conceição Teixeira" [ref=e399]
+                - cell "Conceição Teixeira" [ref=e400]
+                - cell "conceição.teixeira1009@workers.cm.pt" [ref=e401]
+                - cell "+351910000009" [ref=e402]
+                - cell "Equipa de Pavimentação" [ref=e403]
+                - cell "11/05" [ref=e404]
+                - cell "Editar Conceição Teixeira Eliminar Conceição Teixeira" [ref=e405]:
+                  - generic [ref=e406]:
+                    - button "Editar Conceição Teixeira" [ref=e407]:
+                      - img [ref=e408]
+                    - button "Eliminar Conceição Teixeira" [ref=e411]:
+                      - img [ref=e412]
+              - row "Selecionar José Ferreira José Ferreira josé.ferreira1003@workers.cm.pt +351910000003 Equipa de Jardinagem 11/05 Editar José Ferreira Eliminar José Ferreira" [ref=e415] [cursor=pointer]:
+                - cell "Selecionar José Ferreira" [ref=e416]:
+                  - checkbox "Selecionar José Ferreira" [ref=e417]
+                - cell "José Ferreira" [ref=e418]
+                - cell "josé.ferreira1003@workers.cm.pt" [ref=e419]
+                - cell "+351910000003" [ref=e420]
+                - cell "Equipa de Jardinagem" [ref=e421]
+                - cell "11/05" [ref=e422]
+                - cell "Editar José Ferreira Eliminar José Ferreira" [ref=e423]:
+                  - generic [ref=e424]:
+                    - button "Editar José Ferreira" [ref=e425]:
+                      - img [ref=e426]
+                    - button "Eliminar José Ferreira" [ref=e429]:
+                      - img [ref=e430]
+              - row "Selecionar Miguel Costa Miguel Costa miguel.costa1004@workers.cm.pt +351910000004 Equipa de Jardinagem 11/05 Editar Miguel Costa Eliminar Miguel Costa" [ref=e433] [cursor=pointer]:
+                - cell "Selecionar Miguel Costa" [ref=e434]:
+                  - checkbox "Selecionar Miguel Costa" [ref=e435]
+                - cell "Miguel Costa" [ref=e436]
+                - cell "miguel.costa1004@workers.cm.pt" [ref=e437]
+                - cell "+351910000004" [ref=e438]
+                - cell "Equipa de Jardinagem" [ref=e439]
+                - cell "11/05" [ref=e440]
+                - cell "Editar Miguel Costa Eliminar Miguel Costa" [ref=e441]:
+                  - generic [ref=e442]:
+                    - button "Editar Miguel Costa" [ref=e443]:
+                      - img [ref=e444]
+                    - button "Eliminar Miguel Costa" [ref=e447]:
+                      - img [ref=e448]
+          - navigation [ref=e452]:
+            - generic [ref=e454]:
+              - text: Página 1
+              - generic [ref=e455]: de 2
+            - generic [ref=e456]:
+              - button [disabled] [ref=e457]:
+                - img [ref=e458]
+              - button "1" [ref=e460]
+              - button "2" [ref=e461]
+              - button [ref=e462]:
+                - img [ref=e463]
+  - contentinfo [ref=e465]: © 2026 ERP Gestão — Todos os direitos reservados.

@@ -17,6 +17,7 @@ export default function CrudPage({
   baseRoute,
   modalSize = '',
   entityName,
+  onRowClick,
   children,
 }) {
   const [showModal, setShowModal] = useState(false);
@@ -52,6 +53,7 @@ export default function CrudPage({
         filterSchema={filterSchema}
         advancedFilterFields={advancedFilterFields}
         onNew={() => setShowModal(true)}
+        onRowClick={onRowClick}
       />
 
       {children}

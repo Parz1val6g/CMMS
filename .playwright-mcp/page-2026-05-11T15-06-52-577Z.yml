@@ -1,0 +1,246 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]: ERP Gestão
+      - generic [ref=e7]:
+        - navigation [ref=e9]:
+          - link "Dashboard" [ref=e10] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e11]
+            - generic [ref=e16]: Dashboard
+        - generic [ref=e17]:
+          - paragraph [ref=e18]: Operacional
+          - navigation [ref=e19]:
+            - link "Ordens Serviço" [ref=e20] [cursor=pointer]:
+              - /url: /service-orders
+              - img [ref=e21]
+              - generic [ref=e24]: Ordens Serviço
+            - link "Tarefas" [ref=e25] [cursor=pointer]:
+              - /url: /tasks
+              - img [ref=e26]
+              - generic [ref=e29]: Tarefas
+            - link "Mini-Tarefas" [ref=e30] [cursor=pointer]:
+              - /url: /mini-tasks
+              - img [ref=e31]
+              - generic [ref=e34]: Mini-Tarefas
+            - link "Work Logs" [ref=e35] [cursor=pointer]:
+              - /url: /work-logs
+              - img [ref=e36]
+              - generic [ref=e41]: Work Logs
+            - link "Equipamentos" [ref=e42] [cursor=pointer]:
+              - /url: /equipments
+              - img [ref=e43]
+              - generic [ref=e45]: Equipamentos
+        - generic [ref=e46]:
+          - paragraph [ref=e47]: Entidades
+          - navigation [ref=e48]:
+            - link "Clientes" [ref=e49] [cursor=pointer]:
+              - /url: /clients
+              - img [ref=e50]
+              - generic [ref=e55]: Clientes
+            - link "Localizações" [ref=e56] [cursor=pointer]:
+              - /url: /locations
+              - img [ref=e57]
+              - generic [ref=e60]: Localizações
+        - generic [ref=e61]:
+          - paragraph [ref=e62]: Recursos Humanos
+          - navigation [ref=e63]:
+            - link "Sectores" [ref=e64] [cursor=pointer]:
+              - /url: /sectors
+              - img [ref=e65]
+              - generic [ref=e69]: Sectores
+            - link "Equipas" [ref=e70] [cursor=pointer]:
+              - /url: /teams
+              - img [ref=e71]
+              - generic [ref=e78]: Equipas
+            - link "Trabalhadores" [ref=e79] [cursor=pointer]:
+              - /url: /workers
+              - img [ref=e80]
+              - generic [ref=e92]: Trabalhadores
+        - generic [ref=e93]:
+          - paragraph [ref=e94]: Configurações
+          - navigation [ref=e95]:
+            - link "Tipos Serviço" [ref=e96] [cursor=pointer]:
+              - /url: /service-types
+              - img [ref=e97]
+              - generic [ref=e101]: Tipos Serviço
+            - link "Materiais" [ref=e102] [cursor=pointer]:
+              - /url: /materials
+              - img [ref=e103]
+              - generic [ref=e107]: Materiais
+            - link "Exportações Dev" [ref=e108] [cursor=pointer]:
+              - /url: /exports
+              - img [ref=e109]
+              - generic [ref=e112]: Exportações
+              - generic [ref=e113]: Dev
+            - link "Notificações Dev" [ref=e114] [cursor=pointer]:
+              - /url: /notifications
+              - img [ref=e115]
+              - generic [ref=e118]: Notificações
+              - generic [ref=e119]: Dev
+            - link "Analytics Dev" [ref=e120] [cursor=pointer]:
+              - /url: /analytics
+              - img [ref=e121]
+              - generic [ref=e123]: Analytics
+              - generic [ref=e124]: Dev
+      - generic [ref=e125]:
+        - link "Configurações" [ref=e126] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e127]
+          - generic [ref=e130]: Configurações
+        - link "Admin" [ref=e131] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e132]
+          - generic [ref=e134]: Admin
+        - link "João Silva" [ref=e135] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e137]
+          - generic [ref=e139]: João Silva
+    - main [ref=e140]:
+      - generic [ref=e141]:
+        - generic [ref=e142]:
+          - generic [ref=e143]:
+            - heading "Ordens de Serviço" [level=2] [ref=e144]
+            - generic [ref=e146]:
+              - button "Tabela" [ref=e147]:
+                - img [ref=e148]
+                - text: Tabela
+              - button "Kanban" [ref=e151]:
+                - img [ref=e152]
+                - text: Kanban
+          - generic [ref=e155]:
+            - generic [ref=e156]:
+              - generic:
+                - img
+              - textbox "Pesquisar" [ref=e157]:
+                - /placeholder: Pesquisar...
+            - button "Construtor de Filtros" [ref=e158]:
+              - img [ref=e159]
+              - text: Construtor de Filtros
+            - generic [ref=e160]:
+              - button "Exportar CSV" [ref=e161]:
+                - img [ref=e162]
+                - text: Exportar CSV
+              - button "Novo Ordem de Serviço" [ref=e165]:
+                - img [ref=e166]
+                - text: Novo Ordem de Serviço
+        - table [ref=e170]:
+          - rowgroup [ref=e171]:
+            - row "Selecionar todos Processo Descrição Cliente Estado Prioridade Criado Ações" [ref=e172]:
+              - columnheader "Selecionar todos" [ref=e173]:
+                - checkbox "Selecionar todos" [ref=e174]
+              - columnheader "Processo" [ref=e175] [cursor=pointer]:
+                - generic [ref=e176]:
+                  - text: Processo
+                  - img [ref=e177]
+              - columnheader "Descrição" [ref=e180]:
+                - generic [ref=e181]: Descrição
+              - columnheader "Cliente" [ref=e182]:
+                - generic [ref=e183]: Cliente
+              - columnheader "Estado" [ref=e184] [cursor=pointer]:
+                - generic [ref=e185]:
+                  - text: Estado
+                  - img [ref=e186]
+              - columnheader "Prioridade" [ref=e189] [cursor=pointer]:
+                - generic [ref=e190]:
+                  - text: Prioridade
+                  - img [ref=e191]
+              - columnheader "Criado" [ref=e194] [cursor=pointer]:
+                - generic [ref=e195]:
+                  - text: Criado
+                  - img [ref=e196]
+              - columnheader "Ações" [ref=e199]
+          - rowgroup [ref=e200]:
+            - row "Selecionar OS202600000001 OS202600000001 Teste E2E - Puppeteer MCP Hélder Gomes Pendente Normal 11/05 Editar OS202600000001 Eliminar OS202600000001" [ref=e201] [cursor=pointer]:
+              - cell "Selecionar OS202600000001" [ref=e202]:
+                - checkbox "Selecionar OS202600000001" [ref=e203]
+              - cell "OS202600000001" [ref=e204]
+              - cell "Teste E2E - Puppeteer MCP" [ref=e205]:
+                - generic "Teste E2E - Puppeteer MCP" [ref=e206]
+              - cell "Hélder Gomes" [ref=e207]
+              - cell "Pendente" [ref=e208]:
+                - generic [ref=e209]: Pendente
+              - cell "Normal" [ref=e210]:
+                - generic [ref=e211]: Normal
+              - cell "11/05" [ref=e212]
+              - cell "Editar OS202600000001 Eliminar OS202600000001" [ref=e213]:
+                - generic [ref=e214]:
+                  - button "Editar OS202600000001" [ref=e215]:
+                    - img [ref=e216]
+                  - button "Eliminar OS202600000001" [ref=e219]:
+                    - img [ref=e220]
+            - row "Selecionar OS/2026/TEST-001 OS/2026/TEST-001 Teste de ordem de serviço padrão - Pendente Carlos Silva Pendente Normal 11/05 Editar OS/2026/TEST-001 Eliminar OS/2026/TEST-001" [ref=e223] [cursor=pointer]:
+              - cell "Selecionar OS/2026/TEST-001" [ref=e224]:
+                - checkbox "Selecionar OS/2026/TEST-001" [ref=e225]
+              - cell "OS/2026/TEST-001" [ref=e226]
+              - cell "Teste de ordem de serviço padrão - Pendente" [ref=e227]:
+                - generic "Teste de ordem de serviço padrão - Pendente" [ref=e228]
+              - cell "Carlos Silva" [ref=e229]
+              - cell "Pendente" [ref=e230]:
+                - generic [ref=e231]: Pendente
+              - cell "Normal" [ref=e232]:
+                - generic [ref=e233]: Normal
+              - cell "11/05" [ref=e234]
+              - cell "Editar OS/2026/TEST-001 Eliminar OS/2026/TEST-001" [ref=e235]:
+                - generic [ref=e236]:
+                  - button "Editar OS/2026/TEST-001" [ref=e237]:
+                    - img [ref=e238]
+                  - button "Eliminar OS/2026/TEST-001" [ref=e241]:
+                    - img [ref=e242]
+            - row "Selecionar OS/2026/TEST-002 OS/2026/TEST-002 Teste de ordem de serviço padrão - Em Progresso Carlos Silva Em Progresso Alta 11/05 Editar OS/2026/TEST-002 Eliminar OS/2026/TEST-002" [ref=e245] [cursor=pointer]:
+              - cell "Selecionar OS/2026/TEST-002" [ref=e246]:
+                - checkbox "Selecionar OS/2026/TEST-002" [ref=e247]
+              - cell "OS/2026/TEST-002" [ref=e248]
+              - cell "Teste de ordem de serviço padrão - Em Progresso" [ref=e249]:
+                - generic "Teste de ordem de serviço padrão - Em Progresso" [ref=e250]
+              - cell "Carlos Silva" [ref=e251]
+              - cell "Em Progresso" [ref=e252]:
+                - generic [ref=e253]: Em Progresso
+              - cell "Alta" [ref=e254]:
+                - generic [ref=e255]: Alta
+              - cell "11/05" [ref=e256]
+              - cell "Editar OS/2026/TEST-002 Eliminar OS/2026/TEST-002" [ref=e257]:
+                - generic [ref=e258]:
+                  - button "Editar OS/2026/TEST-002" [ref=e259]:
+                    - img [ref=e260]
+                  - button "Eliminar OS/2026/TEST-002" [ref=e263]:
+                    - img [ref=e264]
+            - row "Selecionar OS/2026/TEST-003 OS/2026/TEST-003 Teste de ordem de serviço de empréstimo - Pendente Carlos Silva Pendente Urgente 11/05 Editar OS/2026/TEST-003 Eliminar OS/2026/TEST-003" [ref=e267] [cursor=pointer]:
+              - cell "Selecionar OS/2026/TEST-003" [ref=e268]:
+                - checkbox "Selecionar OS/2026/TEST-003" [ref=e269]
+              - cell "OS/2026/TEST-003" [ref=e270]
+              - cell "Teste de ordem de serviço de empréstimo - Pendente" [ref=e271]:
+                - generic "Teste de ordem de serviço de empréstimo - Pendente" [ref=e272]
+              - cell "Carlos Silva" [ref=e273]
+              - cell "Pendente" [ref=e274]:
+                - generic [ref=e275]: Pendente
+              - cell "Urgente" [ref=e276]:
+                - generic [ref=e277]: Urgente
+              - cell "11/05" [ref=e278]
+              - cell "Editar OS/2026/TEST-003 Eliminar OS/2026/TEST-003" [ref=e279]:
+                - generic [ref=e280]:
+                  - button "Editar OS/2026/TEST-003" [ref=e281]:
+                    - img [ref=e282]
+                  - button "Eliminar OS/2026/TEST-003" [ref=e285]:
+                    - img [ref=e286]
+            - row "Selecionar OS/2026/TEST-004 OS/2026/TEST-004 Teste de ordem de serviço padrão - Concluída Carlos Silva Concluído Baixa 11/05 Editar OS/2026/TEST-004 Eliminar OS/2026/TEST-004" [ref=e289] [cursor=pointer]:
+              - cell "Selecionar OS/2026/TEST-004" [ref=e290]:
+                - checkbox "Selecionar OS/2026/TEST-004" [ref=e291]
+              - cell "OS/2026/TEST-004" [ref=e292]
+              - cell "Teste de ordem de serviço padrão - Concluída" [ref=e293]:
+                - generic "Teste de ordem de serviço padrão - Concluída" [ref=e294]
+              - cell "Carlos Silva" [ref=e295]
+              - cell "Concluído" [ref=e296]:
+                - generic [ref=e297]: Concluído
+              - cell "Baixa" [ref=e298]:
+                - generic [ref=e299]: Baixa
+              - cell "11/05" [ref=e300]
+              - cell "Editar OS/2026/TEST-004 Eliminar OS/2026/TEST-004" [ref=e301]:
+                - generic [ref=e302]:
+                  - button "Editar OS/2026/TEST-004" [ref=e303]:
+                    - img [ref=e304]
+                  - button "Eliminar OS/2026/TEST-004" [ref=e307]:
+                    - img [ref=e308]
+      - button "Close drawer" [ref=e314]:
+        - img [ref=e315]
+  - contentinfo [ref=e319]: © 2026 ERP Gestão — Todos os direitos reservados.

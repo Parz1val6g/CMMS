@@ -13,7 +13,6 @@ class TaskResource extends JsonResource
             'id' => $this->id,
             'reference' => $this->reference,
             'service_order_id' => $this->service_order_id,
-            'name' => $this->name,
             'description' => $this->description,
             'status' => $this->status,
             'created_at' => $this->created_at->toIso8601String(),
@@ -31,7 +30,13 @@ class TaskResource extends JsonResource
                     return ['id' => $sector->id, 'name' => $sector->name];
                 });
             }),
-            'mini_tasks' => $this->whenLoaded('miniTasks'),
+            'mini_tasks' => $this->whenLoaded('miniTasks', function () {
+                return $this->miniTasks->map(fn ($mt) => [
+                    'id'        => $mt->id,
+                    'reference' => $mt->reference,
+                    'status'    => $mt->status,
+                ]);
+            }),
         ];
     }
 }

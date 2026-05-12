@@ -21,7 +21,14 @@ class ServiceOrderPageController extends Controller
         $user = $request->user();
 
         $orders = ServiceOrder::with(['client.user', 'manager', 'location.parish', 'serviceType', 'equipments', 'sectors'])
-            ->when(!$user->isAdmin(), fn($q) => $q->where('manager_id', $user->id))
+            ->when(
+                !$user->isAdmin() && !$user->roles()->where('name', 'sector_manager')->exists(),
+                fn($q) => $q->where('manager_id', $user->id)
+            )
+            ->when(
+                !$user->isAdmin() && $user->roles()->where('name', 'sector_manager')->exists(),
+                fn($q) => $q->whereHas('sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id')))
+            )
             ->latest()
             ->paginate(15)
             ->through(fn ($o) => ServiceOrderPresenter::forIndex($o));

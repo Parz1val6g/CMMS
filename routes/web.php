@@ -22,7 +22,7 @@ Route::get('/', function () {
 require base_path('app/Features/Authentication/Routes/web.php');
 
 // Authenticated routes — all sub-files define their own middleware/prefix/name groups
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'web.access'])->group(function () {
     // Dashboard
     require base_path('app/Features/Dashboard/Routes/web.php');
 

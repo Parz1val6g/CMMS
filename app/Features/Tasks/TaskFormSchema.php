@@ -5,7 +5,7 @@ namespace App\Features\Tasks;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Enums\TaskStatus;
 use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput};
+use App\Core\Forms\Fields\{TextAreaInput, SelectInput};
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\Sectors\Models\Sector;
 
@@ -15,18 +15,12 @@ class TaskFormSchema
     {
         return FormSchema::make(__('forms.tasks.create_title'))
             ->field(
-                TextInput::make('name')
-                    ->setLabel(__('forms.tasks.name'))
-                    ->setRequired()
-                    ->helperText(__('forms.tasks.name_helper'))
-                    ->setRules('required|string|max:150')
-            )
-            ->field(
                 TextAreaInput::make('description')
                     ->setLabel(__('forms.tasks.description'))
+                    ->setRequired()
                     ->helperText(__('forms.tasks.description_helper'))
                     ->setRows(3)
-                    ->setRules('nullable|string|max:1000')
+                    ->setRules('required|string|max:1000')
             )
             ->field(
                 SelectInput::make('service_order_id')
@@ -48,17 +42,11 @@ class TaskFormSchema
     {
         return FormSchema::make(__('forms.tasks.edit_title'))
             ->field(
-                TextInput::make('name')
-                    ->setLabel(__('forms.tasks.name'))
-                    ->helperText(__('forms.tasks.name_helper'))
-                    ->setRules('sometimes|string|max:150')
-            )
-            ->field(
                 TextAreaInput::make('description')
                     ->setLabel(__('forms.tasks.description'))
                     ->helperText(__('forms.tasks.description_helper'))
                     ->setRows(3)
-                    ->setRules('nullable|string|max:1000')
+                    ->setRules('sometimes|string|max:1000')
             )
             ->field(
                 SelectInput::make('service_order_id')

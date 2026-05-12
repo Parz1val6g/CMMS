@@ -1,0 +1,350 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]: ERP Gestão
+      - generic [ref=e7]:
+        - navigation [ref=e9]:
+          - link "Dashboard" [ref=e10] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e11]
+            - generic [ref=e16]: Dashboard
+        - generic [ref=e17]:
+          - paragraph [ref=e18]: Operacional
+          - navigation [ref=e19]:
+            - link "Ordens Serviço" [ref=e20] [cursor=pointer]:
+              - /url: /service-orders
+              - img [ref=e21]
+              - generic [ref=e24]: Ordens Serviço
+            - link "Tarefas" [ref=e25] [cursor=pointer]:
+              - /url: /tasks
+              - img [ref=e26]
+              - generic [ref=e29]: Tarefas
+            - link "Mini-Tarefas" [ref=e30] [cursor=pointer]:
+              - /url: /mini-tasks
+              - img [ref=e31]
+              - generic [ref=e34]: Mini-Tarefas
+            - link "Work Logs" [ref=e35] [cursor=pointer]:
+              - /url: /work-logs
+              - img [ref=e36]
+              - generic [ref=e41]: Work Logs
+            - link "Equipamentos" [ref=e42] [cursor=pointer]:
+              - /url: /equipments
+              - img [ref=e43]
+              - generic [ref=e45]: Equipamentos
+        - generic [ref=e46]:
+          - paragraph [ref=e47]: Entidades
+          - navigation [ref=e48]:
+            - link "Clientes" [ref=e49] [cursor=pointer]:
+              - /url: /clients
+              - img [ref=e50]
+              - generic [ref=e55]: Clientes
+            - link "Localizações" [ref=e56] [cursor=pointer]:
+              - /url: /locations
+              - img [ref=e57]
+              - generic [ref=e60]: Localizações
+        - generic [ref=e61]:
+          - paragraph [ref=e62]: Recursos Humanos
+          - navigation [ref=e63]:
+            - link "Sectores" [ref=e64] [cursor=pointer]:
+              - /url: /sectors
+              - img [ref=e65]
+              - generic [ref=e69]: Sectores
+            - link "Equipas" [ref=e70] [cursor=pointer]:
+              - /url: /teams
+              - img [ref=e71]
+              - generic [ref=e78]: Equipas
+            - link "Trabalhadores" [ref=e79] [cursor=pointer]:
+              - /url: /workers
+              - img [ref=e80]
+              - generic [ref=e92]: Trabalhadores
+        - generic [ref=e93]:
+          - paragraph [ref=e94]: Configurações
+          - navigation [ref=e95]:
+            - link "Tipos Serviço" [ref=e96] [cursor=pointer]:
+              - /url: /service-types
+              - img [ref=e97]
+              - generic [ref=e101]: Tipos Serviço
+            - link "Materiais" [ref=e102] [cursor=pointer]:
+              - /url: /materials
+              - img [ref=e103]
+              - generic [ref=e107]: Materiais
+            - link "Exportações Dev" [ref=e108] [cursor=pointer]:
+              - /url: /exports
+              - img [ref=e109]
+              - generic [ref=e112]: Exportações
+              - generic [ref=e113]: Dev
+            - link "Notificações Dev" [ref=e114] [cursor=pointer]:
+              - /url: /notifications
+              - img [ref=e115]
+              - generic [ref=e118]: Notificações
+              - generic [ref=e119]: Dev
+            - link "Analytics Dev" [ref=e120] [cursor=pointer]:
+              - /url: /analytics
+              - img [ref=e121]
+              - generic [ref=e123]: Analytics
+              - generic [ref=e124]: Dev
+      - generic [ref=e125]:
+        - link "Configurações" [ref=e126] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e127]
+          - generic [ref=e130]: Configurações
+        - link "Admin" [ref=e131] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e132]
+          - generic [ref=e134]: Admin
+        - link "João Silva" [ref=e135] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e137]
+          - generic [ref=e139]: João Silva
+    - main [ref=e140]:
+      - generic [ref=e141]:
+        - generic [ref=e142]:
+          - heading "Clientes" [level=2] [ref=e144]
+          - generic [ref=e146]:
+            - generic [ref=e147]:
+              - generic:
+                - img
+              - textbox "Pesquisar" [ref=e148]:
+                - /placeholder: Pesquisar...
+            - button "Construtor de Filtros" [ref=e149]:
+              - img [ref=e150]
+              - text: Construtor de Filtros
+            - generic [ref=e151]:
+              - button "Exportar CSV" [ref=e152]:
+                - img [ref=e153]
+                - text: Exportar CSV
+              - button "Novo Cliente" [ref=e156]:
+                - img [ref=e157]
+                - text: Novo Cliente
+        - table [ref=e161]:
+          - rowgroup [ref=e162]:
+            - row "Selecionar todos Nome Email Telefone NIF Criado Ações" [ref=e163]:
+              - columnheader "Selecionar todos" [ref=e164]:
+                - checkbox "Selecionar todos" [ref=e165]
+              - columnheader "Nome" [ref=e166]:
+                - generic [ref=e167]: Nome
+              - columnheader "Email" [ref=e168]:
+                - generic [ref=e169]: Email
+              - columnheader "Telefone" [ref=e170]:
+                - generic [ref=e171]: Telefone
+              - columnheader "NIF" [ref=e172]:
+                - generic [ref=e173]: NIF
+              - columnheader "Criado" [ref=e174] [cursor=pointer]:
+                - generic [ref=e175]:
+                  - text: Criado
+                  - img [ref=e176]
+              - columnheader "Ações" [ref=e179]
+          - rowgroup [ref=e180]:
+            - row "Selecionar Paulo Teixeira Paulo Teixeira seguran..a.e.vigil..ncia.lda@empresas.pt +351960012000 501345678 11/05 Editar Paulo Teixeira Eliminar Paulo Teixeira" [ref=e181] [cursor=pointer]:
+              - cell "Selecionar Paulo Teixeira" [ref=e182]:
+                - checkbox "Selecionar Paulo Teixeira" [ref=e183]
+              - cell "Paulo Teixeira" [ref=e184]
+              - cell "seguran..a.e.vigil..ncia.lda@empresas.pt" [ref=e185]
+              - cell "+351960012000" [ref=e186]
+              - cell "501345678" [ref=e187]
+              - cell "11/05" [ref=e188]
+              - cell "Editar Paulo Teixeira Eliminar Paulo Teixeira" [ref=e189]:
+                - generic [ref=e190]:
+                  - button "Editar Paulo Teixeira" [ref=e191]:
+                    - img [ref=e192]
+                  - button "Eliminar Paulo Teixeira" [ref=e195]:
+                    - img [ref=e196]
+            - row "Selecionar Mariana Costa Mariana Costa elevadores.lda@empresas.pt +351960013000 501456789 11/05 Editar Mariana Costa Eliminar Mariana Costa" [ref=e199] [cursor=pointer]:
+              - cell "Selecionar Mariana Costa" [ref=e200]:
+                - checkbox "Selecionar Mariana Costa" [ref=e201]
+              - cell "Mariana Costa" [ref=e202]
+              - cell "elevadores.lda@empresas.pt" [ref=e203]
+              - cell "+351960013000" [ref=e204]
+              - cell "501456789" [ref=e205]
+              - cell "11/05" [ref=e206]
+              - cell "Editar Mariana Costa Eliminar Mariana Costa" [ref=e207]:
+                - generic [ref=e208]:
+                  - button "Editar Mariana Costa" [ref=e209]:
+                    - img [ref=e210]
+                  - button "Eliminar Mariana Costa" [ref=e213]:
+                    - img [ref=e214]
+            - row "Selecionar Hélder Gomes Hélder Gomes estucadores.e.gesseiros.lda@empresas.pt +351960014000 501567890 11/05 Editar Hélder Gomes Eliminar Hélder Gomes" [ref=e217] [cursor=pointer]:
+              - cell "Selecionar Hélder Gomes" [ref=e218]:
+                - checkbox "Selecionar Hélder Gomes" [ref=e219]
+              - cell "Hélder Gomes" [ref=e220]
+              - cell "estucadores.e.gesseiros.lda@empresas.pt" [ref=e221]
+              - cell "+351960014000" [ref=e222]
+              - cell "501567890" [ref=e223]
+              - cell "11/05" [ref=e224]
+              - cell "Editar Hélder Gomes Eliminar Hélder Gomes" [ref=e225]:
+                - generic [ref=e226]:
+                  - button "Editar Hélder Gomes" [ref=e227]:
+                    - img [ref=e228]
+                  - button "Eliminar Hélder Gomes" [ref=e231]:
+                    - img [ref=e232]
+            - row "Selecionar Ricardo Mendes Ricardo Mendes pinturas.e.decora....es.mendes@empresas.pt +351960008000 500901234 11/05 Editar Ricardo Mendes Eliminar Ricardo Mendes" [ref=e235] [cursor=pointer]:
+              - cell "Selecionar Ricardo Mendes" [ref=e236]:
+                - checkbox "Selecionar Ricardo Mendes" [ref=e237]
+              - cell "Ricardo Mendes" [ref=e238]
+              - cell "pinturas.e.decora....es.mendes@empresas.pt" [ref=e239]
+              - cell "+351960008000" [ref=e240]
+              - cell "500901234" [ref=e241]
+              - cell "11/05" [ref=e242]
+              - cell "Editar Ricardo Mendes Eliminar Ricardo Mendes" [ref=e243]:
+                - generic [ref=e244]:
+                  - button "Editar Ricardo Mendes" [ref=e245]:
+                    - img [ref=e246]
+                  - button "Eliminar Ricardo Mendes" [ref=e249]:
+                    - img [ref=e250]
+            - row "Selecionar António Rodrigues António Rodrigues canaliza....es.rodrigues.unipessoal@empresas.pt +351960009000 501012345 11/05 Editar António Rodrigues Eliminar António Rodrigues" [ref=e253] [cursor=pointer]:
+              - cell "Selecionar António Rodrigues" [ref=e254]:
+                - checkbox "Selecionar António Rodrigues" [ref=e255]
+              - cell "António Rodrigues" [ref=e256]
+              - cell "canaliza....es.rodrigues.unipessoal@empresas.pt" [ref=e257]
+              - cell "+351960009000" [ref=e258]
+              - cell "501012345" [ref=e259]
+              - cell "11/05" [ref=e260]
+              - cell "Editar António Rodrigues Eliminar António Rodrigues" [ref=e261]:
+                - generic [ref=e262]:
+                  - button "Editar António Rodrigues" [ref=e263]:
+                    - img [ref=e264]
+                  - button "Eliminar António Rodrigues" [ref=e267]:
+                    - img [ref=e268]
+            - row "Selecionar Miguel Lopes Miguel Lopes climatiza....o.e.avac.lda@empresas.pt +351960010000 501123456 11/05 Editar Miguel Lopes Eliminar Miguel Lopes" [ref=e271] [cursor=pointer]:
+              - cell "Selecionar Miguel Lopes" [ref=e272]:
+                - checkbox "Selecionar Miguel Lopes" [ref=e273]
+              - cell "Miguel Lopes" [ref=e274]
+              - cell "climatiza....o.e.avac.lda@empresas.pt" [ref=e275]
+              - cell "+351960010000" [ref=e276]
+              - cell "501123456" [ref=e277]
+              - cell "11/05" [ref=e278]
+              - cell "Editar Miguel Lopes Eliminar Miguel Lopes" [ref=e279]:
+                - generic [ref=e280]:
+                  - button "Editar Miguel Lopes" [ref=e281]:
+                    - img [ref=e282]
+                  - button "Eliminar Miguel Lopes" [ref=e285]:
+                    - img [ref=e286]
+            - row "Selecionar Sandra Silva Sandra Silva telhados.e.estruturas.lda@empresas.pt +351960011000 501234567 11/05 Editar Sandra Silva Eliminar Sandra Silva" [ref=e289] [cursor=pointer]:
+              - cell "Selecionar Sandra Silva" [ref=e290]:
+                - checkbox "Selecionar Sandra Silva" [ref=e291]
+              - cell "Sandra Silva" [ref=e292]
+              - cell "telhados.e.estruturas.lda@empresas.pt" [ref=e293]
+              - cell "+351960011000" [ref=e294]
+              - cell "501234567" [ref=e295]
+              - cell "11/05" [ref=e296]
+              - cell "Editar Sandra Silva Eliminar Sandra Silva" [ref=e297]:
+                - generic [ref=e298]:
+                  - button "Editar Sandra Silva" [ref=e299]:
+                    - img [ref=e300]
+                  - button "Eliminar Sandra Silva" [ref=e303]:
+                    - img [ref=e304]
+            - row "Selecionar Mário Oliveira Mário Oliveira servi..os.de.jardinagem.lda@empresas.pt +351960005000 500678901 11/05 Editar Mário Oliveira Eliminar Mário Oliveira" [ref=e307] [cursor=pointer]:
+              - cell "Selecionar Mário Oliveira" [ref=e308]:
+                - checkbox "Selecionar Mário Oliveira" [ref=e309]
+              - cell "Mário Oliveira" [ref=e310]
+              - cell "servi..os.de.jardinagem.lda@empresas.pt" [ref=e311]
+              - cell "+351960005000" [ref=e312]
+              - cell "500678901" [ref=e313]
+              - cell "11/05" [ref=e314]
+              - cell "Editar Mário Oliveira Eliminar Mário Oliveira" [ref=e315]:
+                - generic [ref=e316]:
+                  - button "Editar Mário Oliveira" [ref=e317]:
+                    - img [ref=e318]
+                  - button "Eliminar Mário Oliveira" [ref=e321]:
+                    - img [ref=e322]
+            - row "Selecionar Luísa Mendes Luísa Mendes repara....es.gerais.lda@empresas.pt +351960006000 500789012 11/05 Editar Luísa Mendes Eliminar Luísa Mendes" [ref=e325] [cursor=pointer]:
+              - cell "Selecionar Luísa Mendes" [ref=e326]:
+                - checkbox "Selecionar Luísa Mendes" [ref=e327]
+              - cell "Luísa Mendes" [ref=e328]
+              - cell "repara....es.gerais.lda@empresas.pt" [ref=e329]
+              - cell "+351960006000" [ref=e330]
+              - cell "500789012" [ref=e331]
+              - cell "11/05" [ref=e332]
+              - cell "Editar Luísa Mendes Eliminar Luísa Mendes" [ref=e333]:
+                - generic [ref=e334]:
+                  - button "Editar Luísa Mendes" [ref=e335]:
+                    - img [ref=e336]
+                  - button "Eliminar Luísa Mendes" [ref=e339]:
+                    - img [ref=e340]
+            - row "Selecionar Fernando Pereira Fernando Pereira consultoria.t..cnica.lda@empresas.pt +351960007000 500890123 11/05 Editar Fernando Pereira Eliminar Fernando Pereira" [ref=e343] [cursor=pointer]:
+              - cell "Selecionar Fernando Pereira" [ref=e344]:
+                - checkbox "Selecionar Fernando Pereira" [ref=e345]
+              - cell "Fernando Pereira" [ref=e346]
+              - cell "consultoria.t..cnica.lda@empresas.pt" [ref=e347]
+              - cell "+351960007000" [ref=e348]
+              - cell "500890123" [ref=e349]
+              - cell "11/05" [ref=e350]
+              - cell "Editar Fernando Pereira Eliminar Fernando Pereira" [ref=e351]:
+                - generic [ref=e352]:
+                  - button "Editar Fernando Pereira" [ref=e353]:
+                    - img [ref=e354]
+                  - button "Eliminar Fernando Pereira" [ref=e357]:
+                    - img [ref=e358]
+            - row "Selecionar Ana Martins Ana Martins engenharia.e.obras.lda@empresas.pt +351960001000 500234567 11/05 Editar Ana Martins Eliminar Ana Martins" [ref=e361] [cursor=pointer]:
+              - cell "Selecionar Ana Martins" [ref=e362]:
+                - checkbox "Selecionar Ana Martins" [ref=e363]
+              - cell "Ana Martins" [ref=e364]
+              - cell "engenharia.e.obras.lda@empresas.pt" [ref=e365]
+              - cell "+351960001000" [ref=e366]
+              - cell "500234567" [ref=e367]
+              - cell "11/05" [ref=e368]
+              - cell "Editar Ana Martins Eliminar Ana Martins" [ref=e369]:
+                - generic [ref=e370]:
+                  - button "Editar Ana Martins" [ref=e371]:
+                    - img [ref=e372]
+                  - button "Eliminar Ana Martins" [ref=e375]:
+                    - img [ref=e376]
+            - row "Selecionar José Ferreira José Ferreira empresa.de.limpeza.urbana@empresas.pt +351960002000 500345678 11/05 Editar José Ferreira Eliminar José Ferreira" [ref=e379] [cursor=pointer]:
+              - cell "Selecionar José Ferreira" [ref=e380]:
+                - checkbox "Selecionar José Ferreira" [ref=e381]
+              - cell "José Ferreira" [ref=e382]
+              - cell "empresa.de.limpeza.urbana@empresas.pt" [ref=e383]
+              - cell "+351960002000" [ref=e384]
+              - cell "500345678" [ref=e385]
+              - cell "11/05" [ref=e386]
+              - cell "Editar José Ferreira Eliminar José Ferreira" [ref=e387]:
+                - generic [ref=e388]:
+                  - button "Editar José Ferreira" [ref=e389]:
+                    - img [ref=e390]
+                  - button "Eliminar José Ferreira" [ref=e393]:
+                    - img [ref=e394]
+            - row "Selecionar Rui Costa Rui Costa instala....es.el..tricas.costa@empresas.pt +351960003000 500456789 11/05 Editar Rui Costa Eliminar Rui Costa" [ref=e397] [cursor=pointer]:
+              - cell "Selecionar Rui Costa" [ref=e398]:
+                - checkbox "Selecionar Rui Costa" [ref=e399]
+              - cell "Rui Costa" [ref=e400]
+              - cell "instala....es.el..tricas.costa@empresas.pt" [ref=e401]
+              - cell "+351960003000" [ref=e402]
+              - cell "500456789" [ref=e403]
+              - cell "11/05" [ref=e404]
+              - cell "Editar Rui Costa Eliminar Rui Costa" [ref=e405]:
+                - generic [ref=e406]:
+                  - button "Editar Rui Costa" [ref=e407]:
+                    - img [ref=e408]
+                  - button "Eliminar Rui Costa" [ref=e411]:
+                    - img [ref=e412]
+            - row "Selecionar Pedro Santos Pedro Santos fornecedor.de.materiais.lda@empresas.pt +351960004000 500567890 11/05 Editar Pedro Santos Eliminar Pedro Santos" [ref=e415] [cursor=pointer]:
+              - cell "Selecionar Pedro Santos" [ref=e416]:
+                - checkbox "Selecionar Pedro Santos" [ref=e417]
+              - cell "Pedro Santos" [ref=e418]
+              - cell "fornecedor.de.materiais.lda@empresas.pt" [ref=e419]
+              - cell "+351960004000" [ref=e420]
+              - cell "500567890" [ref=e421]
+              - cell "11/05" [ref=e422]
+              - cell "Editar Pedro Santos Eliminar Pedro Santos" [ref=e423]:
+                - generic [ref=e424]:
+                  - button "Editar Pedro Santos" [ref=e425]:
+                    - img [ref=e426]
+                  - button "Eliminar Pedro Santos" [ref=e429]:
+                    - img [ref=e430]
+            - row "Selecionar Carlos Silva Carlos Silva constru....es.silva.lda@empresas.pt +351960000000 500123456 11/05 Editar Carlos Silva Eliminar Carlos Silva" [ref=e433] [cursor=pointer]:
+              - cell "Selecionar Carlos Silva" [ref=e434]:
+                - checkbox "Selecionar Carlos Silva" [ref=e435]
+              - cell "Carlos Silva" [ref=e436]
+              - cell "constru....es.silva.lda@empresas.pt" [ref=e437]
+              - cell "+351960000000" [ref=e438]
+              - cell "500123456" [ref=e439]
+              - cell "11/05" [ref=e440]
+              - cell "Editar Carlos Silva Eliminar Carlos Silva" [ref=e441]:
+                - generic [ref=e442]:
+                  - button "Editar Carlos Silva" [ref=e443]:
+                    - img [ref=e444]
+                  - button "Eliminar Carlos Silva" [ref=e447]:
+                    - img [ref=e448]
+      - button "Close drawer" [ref=e454]:
+        - img [ref=e455]
+  - contentinfo [ref=e459]: © 2026 ERP Gestão — Todos os direitos reservados.

@@ -16,7 +16,17 @@ class MiniTaskPageController extends Controller
     {
         Gate::authorize('viewAny', MiniTask::class);
 
+        $user = $request->user();
+
         $miniTasks = MiniTask::with(['task.serviceOrder', 'supervisor', 'workers.user', 'teams'])
+            ->when(
+                !$user->isAdmin() && $user->roles()->where('name', 'supervisor')->exists(),
+                fn($q) => $q->where('supervisor_id', $user->id)
+            )
+            ->when(
+                !$user->isAdmin() && $user->roles()->where('name', 'sector_manager')->exists(),
+                fn($q) => $q->whereHas('task.sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id')))
+            )
             ->latest()
             ->paginate(15)
             ->through(fn ($mt) => [
@@ -26,9 +36,9 @@ class MiniTaskPageController extends Controller
                 'status'      => $mt->status,
                 'created_at'  => $mt->created_at->format('Y-m-d'),
                 'task' => $mt->task ? [
-                    'id'   => $mt->task->id,
-                    'reference' => $mt->task->reference,
-                    'name' => $mt->task->name,
+                    'id'          => $mt->task->id,
+                    'reference'   => $mt->task->reference,
+                    'description' => $mt->task->description,
                     'service_order' => $mt->task->serviceOrder
                         ? ['process' => $mt->task->serviceOrder->process]
                         : null,
@@ -49,14 +59,13 @@ class MiniTaskPageController extends Controller
         return Inertia::render('MiniTasks/Pages/Index', [
             'mini_tasks' => $miniTasks,
             'columns' => [
-                ['key' => 'reference',    'label' => 'Referência',    'sortable' => true],
-                ['key' => 'description',  'label' => 'Descrição'],
-                ['key' => 'task.reference',         'label' => 'Tarefa'],
-                ['key' => 'supervisor',   'label' => 'Supervisor'],
-                ['key' => 'workers_list', 'label' => 'Trabalhadores'],
-                ['key' => 'teams_list',   'label' => 'Equipas'],
-                ['key' => 'status',       'label' => 'Estado',        'sortable' => true],
-                ['key' => 'created_at',   'label' => 'Criado',        'sortable' => true],
+                ['key' => 'reference',      'label' => 'Referência',   'sortable' => true],
+                ['key' => 'task.reference', 'label' => 'Tarefa', 'href' => '/tasks?view={task.id}'],
+                ['key' => 'supervisor',     'label' => 'Supervisor'],
+                ['key' => 'workers_list',   'label' => 'Trabalhadores'],
+                ['key' => 'teams_list',     'label' => 'Equipas'],
+                ['key' => 'status',         'label' => 'Estado',       'sortable' => true],
+                ['key' => 'created_at',     'label' => 'Criado',       'sortable' => true],
             ],
             'formSchema'       => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),

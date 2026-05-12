@@ -15,7 +15,23 @@ class TeamPolicy extends BasePolicy
 
     public function view(User $user, Team $team): bool
     {
-        return $this->hasPermission($user, 'view', 'teams');
+        if (!$this->hasPermission($user, 'view', 'teams')) {
+            return false;
+        }
+
+        // sector_manager can only view teams in their sectors
+        if ($this->isSectorManager($user)) {
+            return $team->sector->head_id === $user->id;
+        }
+
+        // supervisor can only view teams assigned to their mini-tasks
+        if ($this->isSupervisor($user)) {
+            return $team->miniTasks()
+                ->where('supervisor_id', $user->id)
+                ->exists();
+        }
+
+        return true;
     }
 
     public function create(User $user): bool

@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Features\MiniTasks\Models\MiniTask;
 use App\Features\WorkLogs\Models\WorkLog;
+use App\Shared\Models\Unit;
 
 class Material extends Model
 {

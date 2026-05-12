@@ -213,6 +213,17 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     setSoError(null);
   }, []);
 
+  /* ── Auto-open drawer when arriving via ?view=<id> link ─── */
+  const viewParamHandled = useRef(false);
+  useEffect(() => {
+    if (viewParamHandled.current) return;
+    viewParamHandled.current = true;
+    const id = new URLSearchParams(window.location.search).get('view');
+    if (!id) return;
+    window.history.replaceState({}, '', window.location.pathname);
+    handleCardClick({ id });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   /* ── Build tabs array for WorkspaceDrawer ─────────────────── */
   const soTabs = useMemo(() => {
     const so = selectedServiceOrder;

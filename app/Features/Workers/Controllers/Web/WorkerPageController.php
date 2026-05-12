@@ -15,7 +15,28 @@ class WorkerPageController extends Controller
     {
         Gate::authorize('viewAny', Worker::class);
 
+        $user = $request->user();
+
         $workers = Worker::with(['user', 'team.sector'])
+            ->when(
+                !$user->isAdmin() && $user->roles()->where('name', 'sector_manager')->exists(),
+                fn($q) => $q->whereIn('team_id', function ($sub) use ($user) {
+                    $sub->select('id')
+                        ->from('teams')
+                        ->whereIn('sector_id', $user->headedSectors()->pluck('id'));
+                })
+            )
+            ->when(
+                !$user->isAdmin() && $user->roles()->where('name', 'supervisor')->exists(),
+                fn($q) => $q->whereIn('team_id', function ($sub) use ($user) {
+                    $sub->select('team_id')
+                        ->from('mini_tasks_workers_teams')
+                        ->join('mini_tasks', 'mini_tasks.id', '=', 'mini_tasks_workers_teams.mini_task_id')
+                        ->where('mini_tasks.supervisor_id', $user->id)
+                        ->whereNotNull('mini_tasks_workers_teams.team_id')
+                        ->distinct();
+                })
+            )
             ->latest()
             ->paginate(15)
             ->through(fn ($w) => [

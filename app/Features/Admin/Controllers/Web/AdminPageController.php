@@ -30,7 +30,7 @@ class AdminPageController extends Controller
                 'email' => $u->email,
                 'phone' => $u->phone,
                 'status' => $u->status,
-                'roles' => $u->roles->pluck('id')->toArray(),
+                'roles' => $u->roles->pluck('name')->join(', '),
                 'created_at' => $u->created_at->format('Y-m-d'),
             ]);
 

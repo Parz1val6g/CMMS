@@ -44,6 +44,18 @@ class WorkLogResource extends JsonResource
                     ];
                 });
             }),
+            // Equipment used
+            'equipment' => $this->whenLoaded('equipment', function () {
+                return $this->equipment->map(function ($eq) {
+                    return [
+                        'id'            => $eq->id,
+                        'name'          => $eq->name,
+                        'brand'         => $eq->brand,
+                        'model'         => $eq->model,
+                        'serial_number' => $eq->serial_number,
+                    ];
+                });
+            }),
         ];
     }
 }

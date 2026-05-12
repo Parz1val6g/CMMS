@@ -105,8 +105,7 @@ class ServiceOrderService
                         $task = Task::create([
                             'service_order_id' => $serviceOrder->id,
                             'manager_id'       => $managerId,
-                            'name'             => $serviceOrder->process . ' - ' . $sector->name,
-                            'description'      => $data['description'] ?? null,
+                            'description'      => $serviceOrder->process . ' - ' . $sector->name,
                             'status'           => TaskStatus::PENDING->value,
                         ]);
 
@@ -278,12 +277,12 @@ class ServiceOrderService
             throw new InvalidArgumentException(__('messages.services.service_order.return_only_for_loan'));
         }
 
-        if ($serviceOrder->tasks()->where('name', __('messages.task_names.equipment_return'))->exists()) {
+        if ($serviceOrder->tasks()->where('description', __('messages.task_names.equipment_return'))->exists()) {
             throw new InvalidArgumentException(__('messages.services.service_order.return_task_exists'));
         }
 
         $checkoutTask = $serviceOrder->tasks()
-            ->where('name', __('messages.task_names.equipment_loan'))
+            ->where('description', __('messages.task_names.equipment_loan'))
             ->first();
 
         if (!$checkoutTask || $checkoutTask->status !== TaskStatus::COMPLETED->value) {
@@ -294,7 +293,7 @@ class ServiceOrderService
             $task = Task::create([
                 'service_order_id' => $serviceOrder->id,
                 'manager_id'       => $serviceOrder->manager_id,
-                'name'             => __('messages.task_names.equipment_return'),
+                'description'      => __('messages.task_names.equipment_return'),
                 'status'           => TaskStatus::PENDING->value,
             ]);
 

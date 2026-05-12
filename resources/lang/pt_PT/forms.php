@@ -157,10 +157,8 @@ return [
     'tasks' => [
         'create_title' => 'Nova Tarefa',
         'edit_title' => 'Editar Tarefa',
-        'name' => 'Nome',
-        'name_helper' => 'Breve nome ou título para esta tarefa',
         'description' => 'Descrição',
-        'description_helper' => 'Descrição detalhada do que precisa ser feito',
+        'description_helper' => 'Breve descrição do que precisa ser feito',
         'service_order' => 'Ordem de Serviço',
         'service_order_helper' => 'Selecione a ordem de serviço à qual esta tarefa pertence',
         'sectors' => 'Setores',

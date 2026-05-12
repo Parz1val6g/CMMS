@@ -157,10 +157,8 @@ return [
     'tasks' => [
         'create_title' => 'New Task',
         'edit_title' => 'Edit Task',
-        'name' => 'Name',
-        'name_helper' => 'Brief name or title for this task',
         'description' => 'Description',
-        'description_helper' => 'Detailed description of what needs to be done',
+        'description_helper' => 'Brief description of what needs to be done',
         'service_order' => 'Service Order',
         'service_order_helper' => 'Select the service order this task belongs to',
         'sectors' => 'Sectors',
