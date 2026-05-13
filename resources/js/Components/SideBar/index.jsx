@@ -15,8 +15,8 @@ const NavItem = memo(function NavItem({ item }) {
       href={item.href}
       className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
         ${isActive
-          ? 'bg-indigo-600 text-white shadow-sm'
-          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          ? 'bg-brand-accent text-brand-light shadow-sm'
+          : 'text-brand-light hover:bg-brand-darkest/50 hover:text-brand-white'
         }
         ${item.dev ? 'opacity-60 hover:opacity-100' : ''}
       `}
@@ -24,7 +24,7 @@ const NavItem = memo(function NavItem({ item }) {
       <Icon className="h-5 w-5 shrink-0" />
       <span className="flex-1 truncate">{item.label}</span>
       {item.dev && (
-        <span className="shrink-0 rounded-full bg-indigo-900/60 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-indigo-300 ring-1 ring-indigo-700/40">
+        <span className="shrink-0 rounded-full bg-brand-accent/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand-accent ring-1 ring-brand-accent/30">
           {t('pages.sidebar.dev_badge')}
         </span>
       )}
@@ -36,7 +36,7 @@ function NavSection({ section }) {
   return (
     <div>
       {section.label && (
-        <p className="px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+        <p className="px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-mid">
           {section.label}
         </p>
       )}
@@ -55,10 +55,10 @@ export default function Sidebar() {
   const { auth } = usePage().props;
 
   return (
-    <aside className="w-64 flex flex-col h-full bg-slate-950 border-r border-slate-800 shrink-0">
+    <aside className="w-64 flex flex-col h-full bg-brand-darkest border-r border-brand-mid/20 shrink-0">
       {/* Logo */}
       <div className="shrink-0 p-4">
-        <span className="text-lg font-bold tracking-tight text-white">{t('pages.sidebar.brand')}</span>
+        <span className="text-lg font-bold tracking-tight text-brand-white">{t('pages.sidebar.brand')}</span>
       </div>
 
       {/* Navigation */}
@@ -69,14 +69,14 @@ export default function Sidebar() {
       </div>
 
       {/* Bottom — Settings, Admin, User */}
-      <div className="shrink-0 mt-auto border-t border-slate-800 p-4 space-y-1">
+      <div className="shrink-0 mt-auto border-t border-brand-mid/20 p-4 space-y-1">
         {bottomItems.map((item) => (
           <NavItem key={item.href} item={item} />
         ))}
         {auth?.user && (
           <Link
             href="/profile"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800 hover:text-white transition-colors"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-brand-mid hover:bg-brand-darkest/50 hover:text-brand-white transition-colors"
           >
             <div className="flex h-5 w-5 shrink-0 items-center justify-center">
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

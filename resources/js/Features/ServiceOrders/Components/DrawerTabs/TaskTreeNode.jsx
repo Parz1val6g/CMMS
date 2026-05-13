@@ -12,8 +12,8 @@ const STATUS_STYLE = {
 
 /* ── Type icon map ─────────────────────────────────────────── */
 const NODE_ICON = {
-  task:      'bg-indigo-500/30 text-indigo-300',
-  mini_task: 'bg-slate-600/40  text-slate-400',
+  task:      'bg-brand-accent/15 text-brand-accent',
+  mini_task: 'bg-slate-600/40  text-brand-mid',
 };
 
 /* ── Recursive tree node ────────────────────────────────────── */
@@ -35,8 +35,8 @@ function TaskTreeNode({ node, depth = 0, expandedIds, onToggle, workflowType, on
       <div
         className={`
           group relative flex items-center gap-2 px-4 py-2.5 cursor-pointer transition-colors
-          ${depth === 0 ? 'bg-slate-800/40' : 'bg-slate-800/10'}
-          hover:bg-slate-700/60
+          ${depth === 0 ? 'bg-brand-light' : 'bg-brand-white'}
+          hover:bg-brand-light
         `}
         style={{ paddingLeft: `${16 + depth * 24}px` }}
         onClick={() => hasChildren && onToggle(item.id)}
@@ -64,9 +64,9 @@ function TaskTreeNode({ node, depth = 0, expandedIds, onToggle, workflowType, on
         <span className="shrink-0 w-5 h-5 flex items-center justify-center">
           {hasChildren ? (
             isExpanded ? (
-              <ChevronDown className="h-4 w-4 text-slate-400 group-hover:text-indigo-400 transition-colors" />
+              <ChevronDown className="h-4 w-4 text-brand-mid group-hover:text-brand-accent transition-colors" />
             ) : (
-              <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-400 transition-colors" />
+              <ChevronRight className="h-4 w-4 text-brand-mid group-hover:text-brand-accent transition-colors" />
             )
           ) : (
             <span className="h-4 w-4 flex items-center justify-center">
@@ -81,12 +81,12 @@ function TaskTreeNode({ node, depth = 0, expandedIds, onToggle, workflowType, on
         </span>
 
         {/* Type badge */}
-        <span className={`shrink-0 inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold rounded ${NODE_ICON[item._type] || 'bg-slate-700 text-slate-400'}`}>
+        <span className={`shrink-0 inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold rounded ${NODE_ICON[item._type] || 'bg-slate-700 text-brand-mid'}`}>
           {item._type === 'task' ? 'T' : 'MT'}
         </span>
 
         {/* Title */}
-        <span className="flex-1 min-w-0 text-sm font-medium text-slate-200 truncate group-hover:text-white transition-colors">
+        <span className="flex-1 min-w-0 text-sm font-medium text-brand-darkest truncate group-hover:text-brand-darkest transition-colors">
           {item.name || item.description || '—'}
         </span>
 
@@ -95,7 +95,7 @@ function TaskTreeNode({ node, depth = 0, expandedIds, onToggle, workflowType, on
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onInitiateReturn(item.service_order_id); }}
-            className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shadow-sm"
+            className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded bg-brand-accent hover:bg-brand-accent/90 text-white transition-colors shadow-sm"
           >
             <RotateCcw className="h-3.5 w-3.5" />
             Iniciar Devolução
@@ -104,12 +104,12 @@ function TaskTreeNode({ node, depth = 0, expandedIds, onToggle, workflowType, on
 
         {/* Manager / Assignee */}
         {item.manager?.name && (
-          <span className="shrink-0 text-xs text-slate-500 truncate max-w-[120px] hidden sm:inline">
+          <span className="shrink-0 text-xs text-brand-mid truncate max-w-[120px] hidden sm:inline">
             {item.manager.name}
           </span>
         )}
         {item.supervisor?.name && (
-          <span className="shrink-0 text-xs text-slate-500 truncate max-w-[120px] hidden sm:inline">
+          <span className="shrink-0 text-xs text-brand-mid truncate max-w-[120px] hidden sm:inline">
             {item.supervisor.name}
           </span>
         )}

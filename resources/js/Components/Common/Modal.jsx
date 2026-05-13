@@ -50,7 +50,7 @@ function collectFormData(form, fields, formValues) {
   return data;
 }
 
-export default function Modal({ entityName = 'Record', title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit, children }) {
+export default function Modal({ entityName = 'Record', title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit, children, injectAfterField }) {
   const formRef = useRef(null);
   const containerRef = useRef(null);
   const [saving, setSaving] = useState(false);
@@ -203,14 +203,14 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
         role="dialog"
         aria-modal="true"
         aria-label={title ?? schemaTitle ?? t('pages.modal.create_title', { name: entityName })}
-        className={`relative w-full ${sizeClass} max-h-[90vh] overflow-hidden rounded-xl bg-slate-800 shadow-2xl border border-slate-700`}
+        className={`relative w-full ${sizeClass} max-h-[90vh] overflow-hidden rounded-xl bg-brand-white shadow-2xl border border-brand-mid/20`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-700 px-6 py-4">
-          <h3 className="text-lg font-semibold text-white">{modalTitle}</h3>
+        <div className="flex items-center justify-between border-b border-brand-mid/20 px-6 py-4">
+          <h3 className="text-lg font-semibold text-brand-darkest">{modalTitle}</h3>
           <button
             type="button"
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors"
+            className="rounded-lg p-1.5 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors"
             onClick={onClose}
             aria-label={t('pages.datamanager.close_aria')}
           >
@@ -232,43 +232,46 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
           )}
 
           <div className="overflow-y-auto px-6 py-4 max-h-[60vh] space-y-4">
-            {children}
-            {visibleFields.map((field, i) => {
+            {/* ── Legacy: children at top when injectAfterField not set ── */}
+            {!injectAfterField && children}
+            {visibleFields.flatMap((field, i) => {
+              const key = field.key ?? field.name ?? '';
               const name = field.name ?? field.key;
               const fieldError = errors[name]?.join?.(' ') ?? errors[name];
               const currentVal = formValues[name] ?? '';
 
-              // Use FormInput for basic input types (uncontrolled via defaultValue)
+              // Build field element
               const basicInputTypes = ['text', 'email', 'number', 'password', 'phone', 'url'];
-              if (basicInputTypes.includes(field.type)) {
-                return (
-                  <FormInput
-                    key={i}
-                    field={field}
-                    value={currentVal}
-                    onChange={(e) => updateValue(name, e.target.value)}
-                    error={fieldError}
-                  />
-                );
-              }
+              const el = basicInputTypes.includes(field.type)
+                ? (
+                    <FormInput
+                      key={i}
+                      field={field}
+                      value={currentVal}
+                      onChange={(e) => updateValue(name, e.target.value)}
+                      error={fieldError}
+                    />
+                  )
+                : (
+                    <FormField
+                      key={i}
+                      field={field}
+                      value={currentVal}
+                      error={fieldError}
+                      onChange={(val) => updateValue(name, val)}
+                    />
+                  );
 
-              // Use FormField for complex types (map, select, file, etc)
-              return (
-                <FormField
-                  key={i}
-                  field={field}
-                  value={currentVal}
-                  error={fieldError}
-                  onChange={(val) => updateValue(name, val)}
-                />
-              );
+              // Inject children after the target field
+              const isInjectPoint = injectAfterField && key === injectAfterField;
+              return isInjectPoint && children ? [el, <div key="injected-children">{children}</div>] : el;
             })}
           </div>
 
-          <div className="flex items-center justify-end gap-3 border-t border-slate-700 px-6 py-4">
+          <div className="flex items-center justify-end gap-3 border-t border-brand-mid/20 px-6 py-4">
             <button
               type="button"
-              className="rounded-lg border border-slate-600 bg-slate-700 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-600 transition-colors"
+              className="rounded-lg border border-brand-mid/20 bg-brand-light px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-mid/10 transition-colors"
               onClick={onClose}
               disabled={saving}
             >
@@ -277,7 +280,7 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 disabled:opacity-50 transition-colors"
             >
               {saving ? t('pages.datamanager.saving_btn') : t('pages.modal.save_entity_btn', { name: entityName })}
             </button>

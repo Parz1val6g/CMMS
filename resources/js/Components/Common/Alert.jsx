@@ -25,10 +25,10 @@ const icons = {
 };
 
 const alertStyles = {
-  success: 'border-green-500 bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-  danger: 'border-red-500 bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-  warning: 'border-yellow-500 bg-yellow-50 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-  info: 'border-blue-500 bg-blue-50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+  success: 'border-green-500 bg-green-50 text-green-800',
+  danger: 'border-red-500 bg-red-50 text-red-800',
+  warning: 'border-yellow-500 bg-yellow-50 text-yellow-800',
+  info: 'border-blue-500 bg-blue-50 text-blue-800',
 };
 
 export default function Alert({ type = 'info', title, icon = true, dismissible = true, children }) {

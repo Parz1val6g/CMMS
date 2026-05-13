@@ -35,10 +35,10 @@ const typeConfig = {
     },
     confirm: {
         icon: AlertCircle,
-        bgColor: 'bg-indigo-500/10',
-        borderColor: 'border-indigo-500/30',
-        iconColor: 'text-indigo-400',
-        buttonColor: 'bg-indigo-600 hover:bg-indigo-700',
+        bgColor: 'bg-brand-accent/10',
+        borderColor: 'border-brand-accent/30',
+        iconColor: 'text-brand-accent',
+        buttonColor: 'bg-brand-accent hover:bg-brand-accent/90',
     },
 };
 
@@ -100,8 +100,8 @@ export default function DialogModal({
                 ref={contentRef}
                 className={`relative w-full max-w-md rounded-xl shadow-2xl border ${config.bgColor} ${config.borderColor}`}
                 style={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    borderColor: 'rgba(100, 116, 139, 0.5)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: 'rgba(101, 122, 129, 0.5)',
                 }}
             >
                 {/* Header with Icon */}
@@ -109,15 +109,15 @@ export default function DialogModal({
                     <div className="flex items-start gap-4">
                         <Icon className={`h-6 w-6 shrink-0 mt-0.5 ${config.iconColor}`} />
                         <div>
-                            {title && <h3 className="text-lg font-semibold text-white">{title}</h3>}
+                            {title && <h3 className="text-lg font-semibold text-brand-darkest">{title}</h3>}
                             {description && (
-                                <p className="mt-1 text-sm text-slate-300 leading-relaxed">{description}</p>
+                                <p className="mt-1 text-sm text-brand-mid leading-relaxed">{description}</p>
                             )}
                         </div>
                     </div>
                     <button
                         type="button"
-                        className="rounded-lg p-1 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors shrink-0"
+                        className="rounded-lg p-1 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors shrink-0"
                         onClick={onClose}
                         aria-label={t('pages.datamanager.close_aria')}
                     >
@@ -126,10 +126,10 @@ export default function DialogModal({
                 </div>
 
                 {/* Custom Content */}
-                {children && <div className="px-6 py-3 border-t border-slate-700/50 text-sm text-slate-300">{children}</div>}
+                {children && <div className="px-6 py-3 border-t border-brand-mid/10 text-sm text-brand-mid">{children}</div>}
 
                 {/* Buttons */}
-                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-700/50">
+                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-brand-mid/10">
                     {renderButtons.map((btn, idx) => (
                         <button
                             key={idx}
@@ -137,7 +137,7 @@ export default function DialogModal({
                             disabled={btn.disabled}
                             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${btn.variant === 'primary'
                                     ? `${config.buttonColor} text-white shadow-sm`
-                                    : 'border border-slate-600 bg-slate-700/50 text-slate-300 hover:bg-slate-600 hover:text-white'
+                                    : 'border border-brand-mid/20 bg-brand-light/50 text-brand-mid hover:bg-brand-mid/10 hover:text-brand-darkest'
                                 }`}
                             onClick={() => {
                                 if (!btn.disabled) btn.onClick?.();

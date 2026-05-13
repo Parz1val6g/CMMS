@@ -4,11 +4,11 @@
  */
 export default function SectionHeader({ title, icon: Icon, color = 'gray' }) {
   const textColor = color === 'red'
-    ? 'text-red-600 dark:text-red-400'
-    : 'text-gray-900 dark:text-white';
+    ? 'text-red-600'
+    : 'text-brand-darkest';
 
   return (
-    <div className="border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-800/80">
+    <div className="border-b border-brand-mid/20 bg-brand-light px-6 py-4">
       <h3 className={`flex items-center gap-2 text-lg font-medium ${textColor}`}>
         {Icon && <Icon className="h-5 w-5" />}
         {title}

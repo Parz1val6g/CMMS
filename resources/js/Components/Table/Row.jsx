@@ -56,12 +56,12 @@ function isRefKey(key) {
 // Fix 5 — Avatar circle with initials and accessible labels
 function AvatarInitial({ value }) {
     const name = typeof value === 'object' ? (value?.name ?? '') : String(value ?? '');
-    if (!name) return <span className="text-slate-300">{'—'}</span>;
+    if (!name) return <span className="text-brand-mid">{'—'}</span>;
     const initials = name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
     const label = 'Atribuído a: ' + name;
     return (
         <span
-            className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold"
+            className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-brand-accent text-brand-white text-xs font-bold"
             title={label}
             aria-label={label}
         >
@@ -85,7 +85,7 @@ function renderCell(item, col) {
     // Reference / process codes — indigo mono badge
     if (isReference) {
         content = (
-            <span className="font-mono font-bold text-indigo-400 text-xs tracking-wide">
+            <span className="font-mono font-bold text-brand-accent text-xs tracking-wide">
                 {raw || '—'}
             </span>
         );
@@ -96,18 +96,18 @@ function renderCell(item, col) {
             </span>
         );
     } else if (isDate) {
-        content = <span className="text-slate-300">{formatDate(raw)}</span>;
+        content = <span className="text-brand-mid">{formatDate(raw)}</span>;
     } else if (isAvatar) {
         content = <AvatarInitial value={item[col.key]} />;
     } else if (isLongText) {
         const fullText = raw != null ? String(raw) : '';
         content = (
-            <span className="block max-w-xs truncate text-slate-300" title={fullText}>
+            <span className="block max-w-xs truncate text-brand-mid" title={fullText}>
                 {raw}
             </span>
         );
     } else {
-        content = <span className="text-slate-300">{raw}</span>;
+        content = <span className="text-brand-mid">{raw}</span>;
     }
 
     // Wrap in a navigable link if the column declares an href template
@@ -118,7 +118,7 @@ function renderCell(item, col) {
                 <a
                     href={href}
                     onClick={e => e.stopPropagation()}
-                    className="group inline-flex items-center gap-1 hover:underline decoration-indigo-400/60 underline-offset-2 transition-colors"
+                    className="group inline-flex items-center gap-1 hover:underline decoration-brand-accent/60 underline-offset-2 transition-colors"
                 >
                     {content}
                 </a>
@@ -136,7 +136,7 @@ function Row({ item, columns, hasEdit, onEdit, onDelete, onRowClick, selected = 
         <tr
             className={[
                 'transition-colors',
-                selected ? 'bg-indigo-500/10' : 'hover:bg-slate-700/30',
+                selected ? 'bg-brand-accent/10' : 'hover:bg-brand-light',
                 onRowClick || showCheckbox ? 'cursor-pointer' : '',
             ].join(' ')}
             onClick={() => {
@@ -149,7 +149,7 @@ function Row({ item, columns, hasEdit, onEdit, onDelete, onRowClick, selected = 
                 <td className="w-10 px-4 py-2" onClick={e => e.stopPropagation()}>
                     <input
                         type="checkbox"
-                        className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-800"
+                        className="h-4 w-4 rounded border-brand-mid/20 bg-brand-white text-brand-accent focus:ring-brand-accent focus:ring-offset-brand-light"
                         checked={selected}
                         onChange={() => onToggleSelect(item.id)}
                         aria-label={'Selecionar ' + (item.process ?? item.name ?? item.id)}
@@ -159,7 +159,7 @@ function Row({ item, columns, hasEdit, onEdit, onDelete, onRowClick, selected = 
             {columns.map((col, i) => (
                 <td
                     key={col.key ?? i}
-                    className={'px-4 py-2 text-sm text-slate-300 ' + (TRUNCATE_KEYS.has(col.key) ? '' : 'whitespace-nowrap')}
+                    className={'px-4 py-2 text-sm text-brand-mid ' + (TRUNCATE_KEYS.has(col.key) ? '' : 'whitespace-nowrap')}
                 >
                     {renderCell(item, col)}
                 </td>
@@ -169,7 +169,7 @@ function Row({ item, columns, hasEdit, onEdit, onDelete, onRowClick, selected = 
                     <div className="inline-flex items-center gap-1">
                         <button
                             type="button"
-                            className="rounded-lg p-1.5 text-slate-500 hover:bg-indigo-500/20 hover:text-indigo-400 transition-colors"
+                            className="rounded-lg p-1.5 text-brand-mid hover:bg-brand-accent/10 hover:text-brand-accent transition-colors"
                             onClick={(e) => { e.stopPropagation(); onEdit(item); }}
                             title="Editar"
                             aria-label={'Editar ' + (item.process ?? item.name ?? '')}

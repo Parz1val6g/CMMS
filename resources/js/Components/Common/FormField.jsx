@@ -9,11 +9,11 @@ const SEARCH_THRESHOLD = 8;
 function SectionHeader({ label }) {
   return (
     <div className="flex items-center gap-2 py-2">
-      <hr className="flex-1 border-gray-200 dark:border-gray-700" />
-      <span className="shrink-0 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+      <hr className="flex-1 border-brand-mid/20" />
+      <span className="shrink-0 text-xs font-semibold uppercase tracking-wider text-brand-mid">
         {label}
       </span>
-      <hr className="flex-1 border-gray-200 dark:border-gray-700" />
+      <hr className="flex-1 border-brand-mid/20" />
     </div>
   );
 }
@@ -127,7 +127,7 @@ function MapPicker({ field, value }) {
 
   if (!gmapsKey) {
     return (
-      <div className="mb-3 rounded-lg bg-yellow-50 p-3 text-sm text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300">
+      <div className="mb-3 rounded-lg bg-yellow-50 p-3 text-sm text-yellow-700">
         Loading Map Configuration...
       </div>
     );
@@ -136,14 +136,14 @@ function MapPicker({ field, value }) {
   return (
     <div className="mb-3">
       <div className="mb-2 flex items-center justify-between">
-        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" className="mr-1 inline text-indigo-500" viewBox="0 0 16 16">
+        <label className="text-sm font-medium text-brand-mid">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" className="mr-1 inline text-brand-accent" viewBox="0 0 16 16">
             <path fillRule="evenodd" d="M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999z" />
           </svg>
           Select on Map
         </label>
         {(lat && lng) && (
-          <span className="inline-flex items-center rounded bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
+          <span className="inline-flex items-center rounded bg-brand-accent/10 px-2 py-0.5 text-xs font-medium text-brand-accent">
             {lat}, {lng}
           </span>
         )}
@@ -152,11 +152,11 @@ function MapPicker({ field, value }) {
       {/* Map canvas */}
       <div
         ref={mapRef}
-        className="mb-3 rounded-lg border border-gray-200 dark:border-gray-700"
+        className="mb-3 rounded-lg border border-brand-mid/20"
         style={{ height: 260, background: '#e5e7eb' }}
       >
         {!loaded && (
-          <div className="flex h-full items-center justify-center text-sm text-gray-400">
+          <div className="flex h-full items-center justify-center text-sm text-brand-mid">
             Loading map...
           </div>
         )}
@@ -166,7 +166,7 @@ function MapPicker({ field, value }) {
       <input type="hidden" name={latField} value={lat} readOnly />
       <input type="hidden" name={lngField} value={lng} readOnly />
 
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-brand-mid">
         Click on the map or drag the marker to set coordinates
       </p>
     </div>
@@ -182,7 +182,7 @@ function StandardField({ field, value = '', error, onChange }) {
   const options = field.options ?? null;
   const isMultiple = !!field.multiple;
 
-  const baseClass = `block w-full rounded-lg border bg-slate-800/60 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:ring-1 transition-colors ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-700 focus:border-indigo-500 focus:ring-indigo-500'
+  const baseClass = `block w-full rounded-lg border bg-brand-white px-3 py-2 text-sm text-brand-darkest placeholder:text-brand-mid focus:ring-1 transition-colors ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-brand-mid/20 focus:border-brand-accent focus:ring-brand-accent'
     }`;
 
   /* Normalize select/multiselect options */
@@ -247,7 +247,7 @@ function StandardField({ field, value = '', error, onChange }) {
       <input
         type="checkbox"
         name={name}
-        className="h-4 w-4 rounded border-slate-700 bg-slate-800/60 text-indigo-600 focus:ring-indigo-500"
+        className="h-4 w-4 rounded border-brand-mid/20 bg-brand-white text-brand-accent focus:ring-brand-accent"
         checked={!!value}
         onChange={(e) => handleInputChange(e.target.checked)}
       />
@@ -293,7 +293,7 @@ function ToggleField({ field, value = '', onChange }) {
   };
 
   return (
-    <div className="flex rounded-lg border border-slate-700 bg-slate-800/60 p-0.5">
+    <div className="flex rounded-lg border border-brand-mid/20 bg-brand-white p-0.5">
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -302,8 +302,8 @@ function ToggleField({ field, value = '', onChange }) {
           onClick={() => handleClick(opt.value)}
           className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-all ${
             active === opt.value
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-brand-accent text-brand-white shadow-sm'
+              : 'text-brand-mid hover:text-brand-darkest'
           }`}
         >
           {opt.label}
@@ -357,23 +357,23 @@ function FileDropzone({ name, required, error, onChange }) {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         className={`relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors ${error
-            ? 'border-red-500 bg-red-50 dark:border-red-600 dark:bg-red-900/20'
+            ? 'border-red-500 bg-red-50'
             : dragOver
-              ? 'border-indigo-400 bg-indigo-50 dark:border-indigo-500 dark:bg-indigo-900/20'
-              : 'border-slate-600 bg-slate-800/40 hover:border-slate-500 dark:border-slate-600'
+              ? 'border-brand-accent bg-brand-accent/5'
+              : 'border-brand-mid/20 bg-brand-white hover:border-brand-mid/30'
           }`}
       >
-        <svg className={`mb-2 h-8 w-8 ${error ? 'text-red-500 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'}`} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg className={`mb-2 h-8 w-8 ${error ? 'text-red-500' : 'text-brand-mid'}`} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
           <polyline points="17 8 12 3 7 8" />
           <line x1="12" x2="12" y1="3" y2="15" />
         </svg>
         {file ? (
-          <p className={`text-sm font-medium ${error ? 'text-red-600 dark:text-red-400' : 'text-slate-200'}`}>{file.name}</p>
+          <p className={`text-sm font-medium ${error ? 'text-red-600' : 'text-brand-darkest'}`}>{file.name}</p>
         ) : (
           <>
-            <p className={`text-sm font-medium ${error ? 'text-red-600 dark:text-red-400' : 'text-slate-200'}`}>Click to upload or drag and drop</p>
-            <p className={`mt-1 text-xs ${error ? 'text-red-500 dark:text-red-400' : 'text-slate-400 dark:text-slate-500'}`}>Any file type supported</p>
+            <p className={`text-sm font-medium ${error ? 'text-red-600' : 'text-brand-darkest'}`}>Click to upload or drag and drop</p>
+            <p className={`mt-1 text-xs ${error ? 'text-red-500' : 'text-brand-mid'}`}>Any file type supported</p>
           </>
         )}
       </div>
@@ -408,7 +408,7 @@ export default function FormField({ field, value = '', error, onChange }) {
   return (
     <div className="mb-4">
       {label && (
-        <label className="block text-sm font-medium text-slate-300 mb-1.5">
+        <label className="block text-sm font-medium text-brand-darkest mb-1.5">
           {label}
           {field.required && <span className="ml-1 text-red-500">*</span>}
         </label>

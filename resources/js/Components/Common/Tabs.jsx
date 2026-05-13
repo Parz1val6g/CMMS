@@ -17,7 +17,7 @@ export default function Tabs({ tabs, defaultTab, onChange, className = '' }) {
   return (
     <div className={className}>
       {/* Tab navigation */}
-      <div className="shrink-0 border-b border-gray-200 dark:border-gray-700">
+      <div className="shrink-0 border-b border-brand-mid/20">
         <nav className="flex gap-6 overflow-x-auto" role="tablist" style={{ scrollbarWidth: 'none' }}>
           {tabs.map((tab) => (
             <button
@@ -29,8 +29,8 @@ export default function Tabs({ tabs, defaultTab, onChange, className = '' }) {
               onClick={() => handleClick(tab.id)}
               className={`shrink-0 border-b-2 bg-transparent px-0 pb-3 pt-2 text-sm font-medium transition-colors
                 ${active === tab.id
-                  ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-200'
+                  ? 'border-brand-accent text-brand-accent'
+                  : 'border-transparent text-brand-mid hover:border-brand-mid/30 hover:text-brand-darkest'
                 }`}
             >
               {tab.label}

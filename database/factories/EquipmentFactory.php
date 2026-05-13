@@ -49,6 +49,7 @@ class EquipmentFactory extends Factory
             })(),
             'next_revision_date' => $this->faker->dateTimeBetween('now', '+6 months'),
             'description' => $this->faker->sentence(10),
+            'cost_per_hour' => $this->faker->randomFloat(2, 0, 150),
         ];
     }
 

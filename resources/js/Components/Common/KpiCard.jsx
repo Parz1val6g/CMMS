@@ -12,16 +12,16 @@ export default function KpiCard({ label, value, unit, color = 'blue' }) {
   const borderColor = BORDER_COLORS[color] ?? BORDER_COLORS.blue;
 
   return (
-    <div className={`rounded-lg border-l-4 ${borderColor} bg-white p-6 shadow-sm dark:bg-gray-800`}>
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+    <div className={`rounded-lg border-l-4 ${borderColor} bg-brand-white p-6 shadow-sm`}>
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-brand-mid">
         {label}
       </h3>
       <div className="mt-2 flex items-baseline gap-1">
-        <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
+        <span className="text-3xl font-extrabold text-brand-darkest">
           {value}
         </span>
         {unit && (
-          <span className="text-sm text-gray-500 dark:text-gray-400">{unit}</span>
+          <span className="text-sm text-brand-mid">{unit}</span>
         )}
       </div>
     </div>

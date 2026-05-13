@@ -31,7 +31,7 @@ export default function ClientsIndex({ clients, columns, formSchema, createFormS
       <div className="flex items-center gap-3">
         <span>{selectedClient.name}</span>
         {selectedClient.nif && (
-          <span className="text-xs font-mono text-slate-400">NIF {selectedClient.nif}</span>
+          <span className="text-xs font-mono text-brand-mid">NIF {selectedClient.nif}</span>
         )}
       </div>
     );

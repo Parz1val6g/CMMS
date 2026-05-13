@@ -3,7 +3,7 @@
 namespace App\Features\Workers;
 
 use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextInput, SelectInput, EmailInput};
+use App\Core\Forms\Fields\{TextInput, SelectInput, EmailInput, NumberInput};
 use App\Features\Teams\Models\Team;
 
 class WorkerFormSchema
@@ -45,6 +45,12 @@ class WorkerFormSchema
                     ->helperText(__('forms.workers.team_helper'))
                     ->setOptions(self::teamOptions())
                     ->setRules('nullable|exists:teams,id')
+            )
+            ->field(
+                NumberInput::make('cost_per_hour')
+                    ->setLabel(__('forms.workers.cost_per_hour'))
+                    ->setRequired()
+                    ->setRules('required|numeric|min:0|max:9999.99')
             );
     }
 
@@ -82,6 +88,11 @@ class WorkerFormSchema
                     ->helperText(__('forms.workers.team_helper'))
                     ->setOptions(self::teamOptions())
                     ->setRules('nullable|exists:teams,id')
+            )
+            ->field(
+                NumberInput::make('cost_per_hour')
+                    ->setLabel(__('forms.workers.cost_per_hour'))
+                    ->setRules('sometimes|numeric|min:0|max:9999.99')
             );
     }
 

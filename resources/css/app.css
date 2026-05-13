@@ -9,6 +9,13 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* ── Brand color tokens (Palette Update) ──────────────────── */
+    --color-brand-darkest: #0b2b3a;
+    --color-brand-mid:     #657a81;
+    --color-brand-light:   #f6f7fb;
+    --color-brand-white:   #ffffff;
+    --color-brand-accent:  #2a9d8f;
 }
 
 /* ── Dark-themed custom scrollbars ───────────────────────────── */

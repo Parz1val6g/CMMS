@@ -16,6 +16,7 @@ class WorkerFactory extends Factory
     {
         return [
             // user_id and team_id must be provided via state() or seeder
+            'cost_per_hour' => $this->faker->randomFloat(2, 10, 50),
         ];
     }
 }

@@ -58,6 +58,12 @@ class EquipmentFormSchema
                     ->setLabel(__('forms.equipments.description'))
                     ->helperText(__('forms.equipments.description_helper'))
                     ->setRules('nullable|string|max:250')
+            )
+            ->field(
+                NumberInput::make('cost_per_hour')
+                    ->setLabel(__('forms.equipments.cost_per_hour'))
+                    ->setRequired()
+                    ->setRules('required|numeric|min:0|max:9999.99')
             );
     }
 
@@ -110,6 +116,11 @@ class EquipmentFormSchema
                 TextAreaInput::make('description')
                     ->setLabel(__('forms.equipments.description'))
                     ->setRules('nullable|string|max:250')
+            )
+            ->field(
+                NumberInput::make('cost_per_hour')
+                    ->setLabel(__('forms.equipments.cost_per_hour'))
+                    ->setRules('sometimes|numeric|min:0|max:9999.99')
             );
     }
 }

@@ -199,13 +199,13 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
     if (!selectedItem) return null;
 
     return (
-        <div className="flex w-96 shrink-0 flex-col overflow-y-auto rounded-lg border border-slate-700 bg-slate-800 shadow-xl max-h-full">
+        <div className="flex w-96 shrink-0 flex-col overflow-y-auto rounded-lg border border-brand-mid/20 bg-brand-white shadow-xl max-h-full">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-700 px-4 py-3">
-                <h6 className="text-sm font-bold text-white">{t('pages.datamanager.edit_title', { name: entityName })}</h6>
+            <div className="flex items-center justify-between border-b border-brand-mid/20 px-4 py-3">
+                <h6 className="text-sm font-bold text-brand-darkest">{t('pages.datamanager.edit_title', { name: entityName })}</h6>
                 <button
                     type="button"
-                    className="rounded-lg p-1 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors"
+                    className="rounded-lg p-1 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors"
                     onClick={onClose}
                     aria-label={t('pages.datamanager.close_aria')}
                 >
@@ -244,19 +244,19 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
                 </div>
 
                 {/* Footer */}
-                <div className="sticky bottom-0 border-t border-slate-700 bg-slate-800 px-4 py-3">
+                <div className="sticky bottom-0 border-t border-brand-mid/20 bg-brand-white px-4 py-3">
                     <div className="flex flex-col gap-2">
                         <button
                             type="submit"
                             disabled={saving}
-                            className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                            className="inline-flex items-center justify-center rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 disabled:opacity-50 transition-colors"
                         >
                             {saving ? t('pages.datamanager.saving_btn') : t('pages.datamanager.save_btn')}
                         </button>
                         <button
                             type="button"
                             onClick={onClose}
-                            className="inline-flex items-center justify-center rounded-lg border border-slate-700 bg-slate-800/60 px-4 py-2 text-sm font-medium text-slate-400 hover:bg-slate-700 transition-colors"
+                            className="inline-flex items-center justify-center rounded-lg border border-brand-mid/20 bg-brand-light px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-mid/10 transition-colors"
                         >
                             {t('pages.datamanager.cancel_btn')}
                         </button>

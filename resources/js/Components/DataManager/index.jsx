@@ -244,31 +244,31 @@ export default function DataManager({
     }, [routes.destroy, deleteTarget, refetch]);
 
     return (
-        <div className="flex-1 flex flex-col h-full overflow-hidden bg-slate-900 p-6">
+        <div className="flex-1 flex flex-col h-full overflow-hidden bg-brand-white p-6">
             {/* Top Area — title + search + filters + action buttons */}
             <div className="shrink-0 mb-4 flex flex-col gap-4">
                 {/* Title row with optional view toggles */}
                 {title && (
                     <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-white">{title}</h2>
+                        <h2 className="text-lg font-bold text-brand-darkest">{title}</h2>
                         {supportKanban && (
                             <div className="flex items-center gap-3">
                                 {viewMode === 'kanban' && onNew && routes.store && (
                                     <button
                                         type="button"
                                         onClick={onNew}
-                                        className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors"
+                                        className="inline-flex items-center gap-1.5 rounded-lg bg-brand-accent px-3 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 transition-colors"
                                     >
                                         <Plus className="h-4 w-4" />
                                         {t('pages.datamanager.new_entity', { name })}
                                     </button>
                                 )}
-                                <div className="flex items-center gap-2 rounded-lg bg-slate-800 p-1">
+                                <div className="flex items-center gap-2 rounded-lg bg-brand-light p-1">
                                     <button
                                         onClick={() => onViewModeChange && onViewModeChange('table')}
                                         className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'table'
-                                                ? 'bg-indigo-600 text-white'
-                                                : 'text-slate-400 hover:text-slate-300'
+                                                ? 'bg-brand-accent text-brand-white'
+                                                : 'text-brand-mid hover:text-brand-darkest'
                                             }`}
                                     >
                                         <LayoutList className="h-4 w-4" />
@@ -277,8 +277,8 @@ export default function DataManager({
                                     <button
                                         onClick={() => onViewModeChange && onViewModeChange('kanban')}
                                         className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'kanban'
-                                                ? 'bg-indigo-600 text-white'
-                                                : 'text-slate-400 hover:text-slate-300'
+                                                ? 'bg-brand-accent text-brand-white'
+                                                : 'text-brand-mid hover:text-brand-darkest'
                                             }`}
                                     >
                                         <Grid2X2 className="h-4 w-4" />
@@ -306,18 +306,18 @@ export default function DataManager({
 
             {/* Table Container (only show in table view) */}
             {viewMode !== 'kanban' && (
-                <div className="relative flex-1 flex flex-col overflow-hidden bg-slate-800 rounded-lg shadow-xl">
+                <div className="relative flex-1 flex flex-col overflow-hidden bg-brand-white rounded-lg shadow-xl">
                     {/* Loading overlay — `relative` on parent contains this correctly (#2) */}
                     {loading && (
-                        <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/40 rounded-lg">
-                            <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
+                        <div className="absolute inset-0 z-20 flex items-center justify-center bg-brand-darkest/10 rounded-lg">
+                            <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-accent border-t-transparent" />
                         </div>
                     )}
 
                     {/* Batch action bar — visible when rows are selected */}
                     {selectedIds.size > 0 && (
-                        <div className="shrink-0 flex items-center justify-between gap-3 border-b border-slate-700 bg-indigo-600/10 px-4 py-2">
-                            <span className="text-sm font-medium text-indigo-300">
+                        <div className="shrink-0 flex items-center justify-between gap-3 border-b border-brand-mid/20 bg-brand-accent/10 px-4 py-2">
+                            <span className="text-sm font-medium text-brand-accent">
                                 {selectedIds.size} {selectedIds.size === 1 ? t('pages.datamanager.selected_one') : t('pages.datamanager.selected_many')}
                             </span>
                             <div className="flex items-center gap-2">
@@ -335,7 +335,7 @@ export default function DataManager({
                                 <button
                                     type="button"
                                     onClick={clearSelection}
-                                    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors"
+                                    className="rounded-lg p-1.5 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors"
                                     aria-label={t('pages.datamanager.clear_selection')}
                                 >
                                     <X className="h-4 w-4" />
@@ -381,7 +381,7 @@ export default function DataManager({
 
                     {/* Pagination */}
                     {items?.links && (
-                        <div className="shrink-0 pt-4 mt-4 border-t border-slate-700 px-4 pb-4">
+                        <div className="shrink-0 pt-4 mt-4 border-t border-brand-mid/20 px-4 pb-4">
                             <Pagination links={items.links} onPageChange={handlePageChange} />
                         </div>
                     )}

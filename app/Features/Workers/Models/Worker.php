@@ -16,7 +16,12 @@ class Worker extends Model
 
     protected $fillable = [
         'user_id',
-        'team_id'
+        'team_id',
+        'cost_per_hour',
+    ];
+
+    protected $casts = [
+        'cost_per_hour' => 'decimal:2',
     ];
 
     public function user()

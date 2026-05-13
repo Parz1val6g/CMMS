@@ -63,6 +63,7 @@ class WorkerSeeder extends Seeder
                 Worker::create([
                     'user_id' => $user->id,
                     'team_id' => $team->id,
+                    'cost_per_hour' => 15.00,
                 ]);
             }
         }

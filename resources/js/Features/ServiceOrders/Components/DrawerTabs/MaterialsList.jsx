@@ -22,8 +22,8 @@ function TypeBadge({ isLoanable }) {
     <span
       className={`inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-full ${
         isLoanable
-          ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
-          : 'bg-slate-600/30  text-slate-400 border border-slate-600/40'
+          ? 'bg-brand-accent/15 text-brand-accent border border-brand-accent/30'
+          : 'bg-slate-600/30  text-brand-mid border border-slate-600/40'
       }`}
     >
       {isLoanable ? 'Loanable' : 'Fixed'}
@@ -33,11 +33,11 @@ function TypeBadge({ isLoanable }) {
 
 /* ── Revision date helper ────────────────────────────────────── */
 function RevisionDate({ date }) {
-  if (!date) return <span className="text-slate-500">—</span>;
+  if (!date) return <span className="text-brand-mid">—</span>;
   const d = new Date(date);
   const isOverdue = d < new Date();
   return (
-    <span className={isOverdue ? 'text-red-400' : 'text-slate-300'}>
+    <span className={isOverdue ? 'text-red-400' : 'text-brand-mid'}>
       {d.toLocaleDateString()}
     </span>
   );
@@ -71,7 +71,7 @@ export default function SOMaterialsList({ serviceOrder }) {
   /* ── Waiting for SO data ───────────────────────────────────── */
   if (!serviceOrder) {
     return (
-      <div className="flex items-center justify-center h-40 text-slate-500">
+      <div className="flex items-center justify-center h-40 text-brand-mid">
         <p className="text-sm">No service order selected.</p>
       </div>
     );
@@ -80,8 +80,8 @@ export default function SOMaterialsList({ serviceOrder }) {
   /* ── No equipment linked ───────────────────────────────────── */
   if (!equipment) {
     return (
-      <div className="flex flex-col items-center justify-center h-40 text-slate-500 gap-2">
-        <Package className="h-6 w-6 text-slate-600" />
+      <div className="flex flex-col items-center justify-center h-40 text-brand-mid gap-2">
+        <Package className="h-6 w-6 text-brand-mid" />
         <p className="text-sm">No equipment linked to this service order.</p>
       </div>
     );
@@ -93,17 +93,17 @@ export default function SOMaterialsList({ serviceOrder }) {
       <div>
         {/* Search bar */}
         <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-mid" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Filter by name or serial number…"
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-slate-800/60 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-accent/50"
           />
         </div>
-        <div className="flex flex-col items-center justify-center h-40 text-slate-500 gap-2">
-          <Search className="h-5 w-5 text-slate-600" />
+        <div className="flex flex-col items-center justify-center h-40 text-brand-mid gap-2">
+          <Search className="h-5 w-5 text-brand-mid" />
           <p className="text-sm">No equipment matches your filter.</p>
         </div>
       </div>
@@ -115,43 +115,43 @@ export default function SOMaterialsList({ serviceOrder }) {
     <div>
       {/* Quick Filter */}
       <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-mid" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Filter by name or serial number…"
-          className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-slate-800/60 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+          className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-accent/50"
         />
       </div>
 
       {/* Equipment table */}
-      <div className="rounded-lg border border-slate-700/50 overflow-hidden">
+      <div className="rounded-lg border border-brand-mid/20 overflow-hidden">
         <table className="w-full text-sm">
           {/* Header */}
-          <thead className="bg-slate-800/60 border-b border-slate-700/50">
+          <thead className="bg-brand-light border-b border-brand-mid/20">
             <tr>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Item Name</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Serial Number</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Type</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Next Revision</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">Item Name</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">Serial Number</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">Type</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">Status</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">Next Revision</th>
             </tr>
           </thead>
 
           {/* Body */}
-          <tbody className="divide-y divide-slate-700/30">
-            <tr className="bg-slate-800/20 hover:bg-slate-700/40 transition-colors">
+          <tbody className="divide-y divide-brand-mid/10">
+            <tr className="bg-slate-800/20 hover:bg-brand-light transition-colors">
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span className="font-medium text-slate-200">{filtered.name}</span>
+                  <Package className="h-4 w-4 text-brand-accent shrink-0" />
+                  <span className="font-medium text-brand-darkest">{filtered.name}</span>
                 </div>
                 {filtered.description && (
-                  <p className="mt-0.5 text-xs text-slate-500 line-clamp-2">{filtered.description}</p>
+                  <p className="mt-0.5 text-xs text-brand-mid line-clamp-2">{filtered.description}</p>
                 )}
               </td>
-              <td className="px-4 py-3 font-mono text-xs text-slate-300">
+              <td className="px-4 py-3 font-mono text-xs text-brand-mid">
                 {filtered.serial_number}
               </td>
               <td className="px-4 py-3">
@@ -160,7 +160,7 @@ export default function SOMaterialsList({ serviceOrder }) {
               <td className="px-4 py-3">
                 <span
                   className={`inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-full ${
-                    EQUIP_STATUS_STYLE[filtered.status] || 'bg-slate-600/30 text-slate-400 border border-slate-600/40'
+                    EQUIP_STATUS_STYLE[filtered.status] || 'bg-brand-mid/20 text-brand-mid border border-brand-mid/20'
                   }`}
                 >
                   {EQUIP_STATUS_LABEL[filtered.status] || filtered.status}
@@ -176,7 +176,7 @@ export default function SOMaterialsList({ serviceOrder }) {
 
       {/* Footer summary */}
       <div className="mt-3 flex items-center justify-between px-1">
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-brand-mid">
           {query.trim() ? '1 equipment (filtered)' : '1 equipment'}
         </span>
       </div>

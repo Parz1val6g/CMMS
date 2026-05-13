@@ -22,6 +22,7 @@ return [
         'description' => 'Descrição',
         'description_helper' => 'Detalhes adicionais sobre o equipamento (opcional)',
         'status' => 'Estado',
+        'cost_per_hour' => 'Custo por Hora (€)',
     ],
 
     'service_orders' => [
@@ -126,6 +127,7 @@ return [
         'phone_helper' => 'Número de telefone de contacto do trabalhador (opcional)',
         'team' => 'Equipa',
         'team_helper' => 'Atribuir o trabalhador a uma equipa (opcional)',
+        'cost_per_hour' => 'Custo por Hora (€)',
     ],
 
     'work_logs' => [

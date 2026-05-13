@@ -1,16 +1,16 @@
 import { Link } from '@inertiajs/react';
 
 const variantStyles = {
-  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 shadow-sm',
-  secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600',
+  primary: 'bg-brand-accent text-brand-white hover:bg-brand-accent/90 focus:ring-brand-accent shadow-sm',
+  secondary: 'bg-brand-white text-brand-darkest border border-brand-mid/20 hover:bg-brand-light focus:ring-brand-accent',
   success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-sm',
   danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-sm',
   warning: 'bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500 shadow-sm',
   info: 'bg-cyan-600 text-white hover:bg-cyan-700 focus:ring-cyan-500 shadow-sm',
   light: 'bg-gray-100 text-gray-800 hover:bg-gray-200 focus:ring-gray-500',
   dark: 'bg-gray-800 text-white hover:bg-gray-900 focus:ring-gray-700 shadow-sm',
-  link: 'text-indigo-600 hover:text-indigo-800 underline-offset-2 hover:underline dark:text-indigo-400 dark:hover:text-indigo-300',
-  'outline-primary': 'border border-indigo-600 text-indigo-600 hover:bg-indigo-50 focus:ring-indigo-500 dark:border-indigo-400 dark:text-indigo-400 dark:hover:bg-indigo-900/30',
+  link: 'text-brand-accent hover:text-brand-accent/80 underline-offset-2 hover:underline',
+  'outline-primary': 'border border-brand-accent text-brand-accent hover:bg-brand-accent/5 focus:ring-brand-accent',
 };
 
 const sizeStyles = {
@@ -32,7 +32,7 @@ export default function Button({
   ...props
 }) {
   const cls = [
-    'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900',
+    'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
     variantStyles[variant] ?? variantStyles.secondary,
     sizeStyles[size] ?? sizeStyles.md,
     disabled && 'pointer-events-none opacity-50',

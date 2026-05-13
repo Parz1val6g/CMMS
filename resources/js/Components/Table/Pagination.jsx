@@ -20,9 +20,9 @@ export default function Pagination({ links, onPageChange }) {
     return (
         <nav className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-slate-400">
-                    {t('pages.table.page_label')} <span className="font-bold text-white">{currentPage}</span>
-                    {totalPages > 0 && <span className="text-slate-500"> {t('pages.table.of_label')} {totalPages}</span>}
+                <span className="text-xs font-medium text-brand-mid">
+                    {t('pages.table.page_label')} <span className="font-bold text-brand-darkest">{currentPage}</span>
+                    {totalPages > 0 && <span className="text-brand-mid"> {t('pages.table.of_label')} {totalPages}</span>}
                 </span>
             </div>
 
@@ -32,7 +32,7 @@ export default function Pagination({ links, onPageChange }) {
                     const key = i === 0 ? '__prev' : i === links.length - 1 ? '__next' : `page-${link.label}`;
 
                     if (link.label === '...') {
-                        return <span key={`ellipsis-${i}`} className="px-2 text-xs text-slate-500">...</span>;
+                        return <span key={`ellipsis-${i}`} className="px-2 text-xs text-brand-mid">...</span>;
                     }
 
                     const isPrev = i === 0;
@@ -45,10 +45,10 @@ export default function Pagination({ links, onPageChange }) {
                             disabled={!link.url}
                             onClick={() => handleClick(link)}
                             className={`inline-flex h-7 w-7 items-center justify-center rounded-lg text-xs font-medium transition-colors ${link.active
-                                ? 'bg-indigo-600 text-white'
+                                ? 'bg-brand-accent text-brand-white'
                                 : link.url
-                                    ? 'text-slate-400 hover:bg-slate-700'
-                                    : 'cursor-not-allowed text-slate-600'
+                                    ? 'text-brand-mid hover:bg-brand-light'
+                                    : 'cursor-not-allowed text-brand-mid/50'
                                 }`}
                         >
                             {isPrev ? <ChevronLeft className="h-3.5 w-3.5" />

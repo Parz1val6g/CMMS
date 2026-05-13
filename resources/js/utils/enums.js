@@ -50,7 +50,7 @@ const BADGE_VARIANT = {
   warning: 'bg-yellow-500/20 text-yellow-300',
   danger:  'bg-red-500/20 text-red-300',
   info:    'bg-blue-500/20 text-blue-300',
-  neutral: 'bg-slate-500/20 text-slate-400',
+  neutral: 'bg-brand-mid/20 text-brand-mid',
   urgent:  'bg-orange-500/20 text-orange-300',
   teal:    'bg-teal-500/20 text-teal-300',
 };
@@ -84,7 +84,7 @@ export function badgeStyle(value, { border = false } = {}) {
     PRIORITY_VARIANT[key] ??
     (CRITICAL_VALUES.has(key) ? 'danger' : 'neutral');
   const cls = BADGE_VARIANT[variant] ?? BADGE_VARIANT.neutral;
-  return border ? `${cls} border border-${variant === 'danger' ? 'red' : variant === 'warning' ? 'yellow' : variant === 'info' ? 'blue' : variant === 'urgent' ? 'orange' : variant === 'teal' ? 'teal' : 'slate'}-500/40` : cls;
+  return border ? `${cls} border border-${variant === 'danger' ? 'red' : variant === 'warning' ? 'yellow' : variant === 'info' ? 'blue' : variant === 'urgent' ? 'orange' : variant === 'teal' ? 'teal' : 'brand-mid'}-500/40` : cls;
 }
 
 /**
