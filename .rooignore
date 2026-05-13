@@ -1,5 +1,6 @@
 # Pastas pesadas (proibidas para a IA)
 node_modules/
+graphify-out/
 vendor/
 .git/
 .history/

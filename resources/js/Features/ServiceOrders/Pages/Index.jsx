@@ -236,7 +236,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         id: 'loading',
         label: t('pages.service_orders.tab_details'),
         component: (
-          <div className="flex items-center justify-center h-40 text-slate-400 gap-2">
+          <div className="flex items-center justify-center h-40 text-brand-mid gap-2">
             <Loader2 className="h-5 w-5 animate-spin" />
             <span className="text-sm">{t('pages.service_orders.tab_details')}…</span>
           </div>
@@ -300,20 +300,20 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     return (
       <>
         {/* Process ID */}
-        <p className="text-indigo-400 font-mono font-bold text-xs mb-1">
+        <p className="text-brand-accent font-mono font-bold text-xs mb-1">
           {item.process}
         </p>
 
         {/* Title/Description */}
         {item.description && item.description.trim() && (
-          <h4 className="text-sm font-semibold text-slate-100 mb-2 line-clamp-2">
+          <h4 className="text-sm font-semibold text-brand-darkest mb-2 line-clamp-2">
             {item.description}
           </h4>
         )}
 
         {/* Client */}
         {item.client && (
-          <p className="text-xs text-slate-300 mb-2">
+          <p className="text-xs text-brand-darkest mb-2">
             <span className="font-medium">{t('pages.service_orders.card_client_label')}</span> {item.client.name}
           </p>
         )}
@@ -321,16 +321,16 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         {/* Location & Date */}
         <div className="space-y-1 mb-3">
           {item.location && (
-            <div className="flex items-start gap-2 text-xs text-slate-400">
-              <MapPin className="h-3 w-3 mt-0.5 flex-shrink-0 text-indigo-400" />
+            <div className="flex items-start gap-2 text-xs text-brand-mid">
+              <MapPin className="h-3 w-3 mt-0.5 flex-shrink-0 text-brand-accent" />
               <span className="line-clamp-1">
                 {item.location.street || item.location.landmark || t('pages.service_orders.card_unknown_location')}
               </span>
             </div>
           )}
           {item.execution_date && (
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              <Clock className="h-3 w-3 flex-shrink-0 text-indigo-400" />
+            <div className="flex items-center gap-2 text-xs text-brand-mid">
+              <Clock className="h-3 w-3 flex-shrink-0 text-brand-accent" />
               <span>{formatDate(item.execution_date)}</span>
             </div>
           )}
@@ -340,15 +340,15 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         <div className="flex items-center justify-between">
           <span className={`text-xs font-medium px-2 py-1 rounded ${{
               low: 'bg-blue-500/20 text-blue-300',
-              normal: 'bg-slate-500/20 text-slate-300',
+              normal: 'bg-brand-mid/20 text-brand-mid',
               high: 'bg-orange-500/20 text-orange-300',
               urgent: 'bg-red-500/20 text-red-300',
-            }[item.priority] || 'bg-slate-500/20 text-slate-300'
+            }[item.priority] || 'bg-brand-mid/20 text-brand-mid'
             }`}>
             {labelFor(item.priority)}
           </span>
           <div
-            className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold"
+            className="w-6 h-6 rounded-full bg-brand-accent text-brand-white flex items-center justify-center text-xs font-bold"
             title={item.manager?.name ? `Atribuído a: ${item.manager.name}` : 'Sem responsável'}
             aria-label={item.manager?.name ? `Atribuído a: ${item.manager.name}` : 'Sem responsável'}
           >
@@ -365,8 +365,8 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
       {toast && (
         <div
           className={`mb-4 rounded-lg px-4 py-3 text-sm shadow-sm ${toast.success
-            ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-            : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+            ? 'bg-green-50 text-green-700'
+            : 'bg-red-50 text-red-700'
             }`}
         >
           {toast.success ?? toast.error}
@@ -450,11 +450,11 @@ function SODetailsTab({ serviceOrder }) {
       {/* Process & Status row */}
       <div className="grid grid-cols-2 gap-4">
         <section>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('pages.service_orders.section_process')}</h4>
-          <p className="text-sm font-mono text-indigo-400 font-bold">{so.process || `OS/${so.id}`}</p>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_process')}</h4>
+          <p className="text-sm font-mono text-brand-accent font-bold">{so.process || `OS/${so.id}`}</p>
         </section>
         <section>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('pages.service_orders.section_status')}</h4>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_status')}</h4>
           <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${badgeStyle(so.status)}`}>
             {labelFor(so.status)}
           </span>
@@ -464,14 +464,14 @@ function SODetailsTab({ serviceOrder }) {
       {/* Priority & Workflow row */}
       <div className="grid grid-cols-2 gap-4">
         <section>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('pages.service_orders.section_priority')}</h4>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_priority')}</h4>
           <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${badgeStyle(so.priority)}`}>
             {labelFor(so.priority)}
           </span>
         </section>
         <section>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('pages.service_orders.section_workflow')}</h4>
-          <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full bg-indigo-500/20 text-indigo-300">
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_workflow')}</h4>
+          <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full bg-brand-accent/20 text-brand-accent">
             {labelFor(so.workflow_type)}
           </span>
         </section>
@@ -480,37 +480,37 @@ function SODetailsTab({ serviceOrder }) {
       {/* Description */}
       {so.description && (
         <section>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('pages.service_orders.section_description')}</h4>
-          <p className="text-sm text-slate-200">{so.description}</p>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_description')}</h4>
+          <p className="text-sm text-brand-darkest">{so.description}</p>
         </section>
       )}
 
       {/* Client */}
       {so.client && (
         <section>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('pages.service_orders.section_client')}</h4>
-          <p className="text-sm text-slate-200">{so.client.name}</p>
-          {so.client.nif && <p className="text-xs text-slate-400 mt-0.5">NIF: {so.client.nif}</p>}
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_client')}</h4>
+          <p className="text-sm text-brand-darkest">{so.client.name}</p>
+          {so.client.nif && <p className="text-xs text-brand-mid mt-0.5">NIF: {so.client.nif}</p>}
         </section>
       )}
 
       {/* Manager */}
       {so.manager && (
         <section>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('pages.service_orders.section_manager')}</h4>
-          <p className="text-sm text-slate-200">{so.manager.name}</p>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_manager')}</h4>
+          <p className="text-sm text-brand-darkest">{so.manager.name}</p>
         </section>
       )}
 
       {/* Location */}
       {so.location && (
         <section>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('pages.service_orders.section_location')}</h4>
-          <p className="text-sm text-slate-200">
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_location')}</h4>
+          <p className="text-sm text-brand-darkest">
             {so.location.street || so.location.landmark || t('pages.service_orders.value_missing')}
           </p>
           {so.location.parish && (
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-brand-mid mt-0.5">
               {so.location.parish.name}
               {so.location.parish.municipality && <> · {so.location.parish.municipality.name}</>}
               {so.location.parish.municipality?.district && <> · {so.location.parish.municipality.district.name}</>}
@@ -522,26 +522,26 @@ function SODetailsTab({ serviceOrder }) {
       {/* Service Type */}
       {so.service_type && (
         <section>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('pages.service_orders.section_service_type')}</h4>
-          <p className="text-sm text-slate-200">{so.service_type.name || so.service_type}</p>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_service_type')}</h4>
+          <p className="text-sm text-brand-darkest">{so.service_type.name || so.service_type}</p>
         </section>
       )}
 
       {/* Execution Date */}
       {so.execution_date && (
         <section>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('pages.service_orders.section_execution_date')}</h4>
-          <p className="text-sm text-slate-200">{formatDate(so.execution_date)}</p>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_execution_date')}</h4>
+          <p className="text-sm text-brand-darkest">{formatDate(so.execution_date)}</p>
         </section>
       )}
 
       {/* Sectors */}
       {so.sectors?.length > 0 && (
         <section>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('pages.service_orders.section_sectors')}</h4>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_sectors')}</h4>
           <div className="flex flex-wrap gap-1.5">
             {so.sectors.map((s) => (
-              <span key={s.id} className="inline-flex items-center px-2 py-0.5 text-xs rounded-full bg-slate-700/50 text-slate-300 border border-slate-600/50">
+              <span key={s.id} className="inline-flex items-center px-2 py-0.5 text-xs rounded-full bg-brand-mid/20 text-brand-mid border border-brand-mid/30">
                 {s.name}
               </span>
             ))}
@@ -552,11 +552,11 @@ function SODetailsTab({ serviceOrder }) {
       {/* Photo */}
       {so.photo_url && (
         <section>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">{t('pages.service_orders.section_photo')}</h4>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_photo')}</h4>
           <img
             src={so.photo_url}
             alt={t('pages.service_orders.photo_preview_alt')}
-            className="h-40 w-full object-cover rounded-lg border border-slate-700/50"
+            className="h-40 w-full object-cover rounded-lg border border-brand-mid/20"
           />
         </section>
       )}
@@ -573,16 +573,16 @@ function EquipmentCard({ eq, index }) {
     under_maintenance:   'bg-orange-500/20 text-orange-300',
     broken:              'bg-red-500/20    text-red-300',
     under_repair:        'bg-purple-500/20 text-purple-300',
-    inactive:            'bg-slate-500/20  text-slate-300',
-    retired:             'bg-gray-500/20   text-gray-300',
+    inactive:            'bg-brand-mid/20  text-brand-mid',
+    retired:             'bg-brand-mid/20  text-brand-mid',
   };
 
   return (
-    <div className="rounded-lg border border-slate-700/50 bg-slate-800/40 p-4 space-y-4">
+    <div className="rounded-lg border border-brand-mid/20 bg-brand-white p-4 space-y-4">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">{t('pages.service_orders.section_equipment')} #{index + 1}</h4>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_equipment')} #{index + 1}</h4>
           <p className="text-sm font-mono text-cyan-400 font-bold">{eq.name}</p>
         </div>
         <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${eqBadgeStyle[eq.status] || eqBadgeStyle.active}`}>
@@ -593,46 +593,46 @@ function EquipmentCard({ eq, index }) {
       {/* Brand & Model */}
       <div className="grid grid-cols-2 gap-4">
         <section>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{t('pages.service_orders.section_brand')}</h4>
-          <p className="text-sm text-slate-200">{eq.brand || t('pages.service_orders.value_missing')}</p>
+          <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_brand')}</h4>
+          <p className="text-sm text-brand-darkest">{eq.brand || t('pages.service_orders.value_missing')}</p>
         </section>
         <section>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{t('pages.service_orders.section_model')}</h4>
-          <p className="text-sm text-slate-200">{eq.model || t('pages.service_orders.value_missing')}</p>
+          <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_model')}</h4>
+          <p className="text-sm text-brand-darkest">{eq.model || t('pages.service_orders.value_missing')}</p>
         </section>
       </div>
 
       {/* Serial Number */}
       <section>
-        <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{t('pages.service_orders.section_serial_number')}</h4>
-        <p className="text-sm font-mono text-slate-200">{eq.serial_number || t('pages.service_orders.value_missing')}</p>
+        <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_serial_number')}</h4>
+        <p className="text-sm font-mono text-brand-darkest">{eq.serial_number || t('pages.service_orders.value_missing')}</p>
       </section>
 
       {/* Revisions */}
       <div className="grid grid-cols-2 gap-4">
         <section>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{t('pages.service_orders.section_last_revision')}</h4>
-          <p className="text-sm text-slate-200">{eq.last_revision_date ? formatDate(eq.last_revision_date) : t('pages.service_orders.value_missing')}</p>
+          <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_last_revision')}</h4>
+          <p className="text-sm text-brand-darkest">{eq.last_revision_date ? formatDate(eq.last_revision_date) : t('pages.service_orders.value_missing')}</p>
         </section>
         <section>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{t('pages.service_orders.section_next_revision')}</h4>
-          <p className="text-sm text-slate-200">{eq.next_revision_date ? formatDate(eq.next_revision_date) : t('pages.service_orders.value_missing')}</p>
+          <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_next_revision')}</h4>
+          <p className="text-sm text-brand-darkest">{eq.next_revision_date ? formatDate(eq.next_revision_date) : t('pages.service_orders.value_missing')}</p>
         </section>
       </div>
 
       {/* Manager */}
       {eq.manager && (
         <section>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{t('pages.service_orders.section_manager')}</h4>
-          <p className="text-sm text-slate-200">{eq.manager.name}</p>
+          <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_manager')}</h4>
+          <p className="text-sm text-brand-darkest">{eq.manager.name}</p>
         </section>
       )}
 
       {/* Description */}
       {eq.description && (
         <section>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{t('pages.service_orders.section_description')}</h4>
-          <p className="text-sm text-slate-200">{eq.description}</p>
+          <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_description')}</h4>
+          <p className="text-sm text-brand-darkest">{eq.description}</p>
         </section>
       )}
     </div>
@@ -690,14 +690,14 @@ function ClientLocationSelector({ isOpen, onClientLocationChange }) {
   if (!isOpen || !clientId || locations.length === 0) return null;
 
   return (
-    <div className="rounded-lg border border-indigo-500/30 bg-indigo-950/20 p-3 space-y-1.5">
-      <label className="block text-xs font-semibold text-indigo-300 uppercase tracking-wider">
+    <div className="rounded-lg border border-brand-accent/30 bg-brand-accent/5 p-3 space-y-1.5">
+      <label className="block text-xs font-semibold text-brand-accent uppercase tracking-wider">
         {t('pages.service_orders.job_site_label')}
       </label>
       <select
         value={selectedId}
         onChange={handleChange}
-        className="w-full rounded-lg bg-slate-700 border border-slate-600 text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-full rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
       >
         <option value="">— {t('pages.service_orders.job_site_none')} —</option>
         {locations.map(cl => (
@@ -707,7 +707,7 @@ function ClientLocationSelector({ isOpen, onClientLocationChange }) {
           </option>
         ))}
       </select>
-      <p className="text-xs text-slate-500">{t('pages.service_orders.job_site_helper')}</p>
+      <p className="text-xs text-brand-mid">{t('pages.service_orders.job_site_helper')}</p>
     </div>
   );
 }
@@ -717,7 +717,7 @@ function SOEquipmentTab({ serviceOrder }) {
   const eqList = serviceOrder?.equipments;
   if (!eqList || eqList.length === 0) {
     return (
-      <div className="flex items-center justify-center h-40 text-slate-500">
+      <div className="flex items-center justify-center h-40 text-brand-mid">
         <p className="text-sm">{t('pages.service_orders.no_equipment_assigned')}</p>
       </div>
     );

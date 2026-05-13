@@ -10,26 +10,26 @@ export default function Profile({ user }) {
     <AppLayout title={t('pages.profile.page_title')}>
       <div className="h-full overflow-y-auto w-full">
         <div className="max-w-7xl mx-auto py-8 px-6">
-        <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">{t('pages.profile.page_title')}</h1>
+        <h1 className="mb-6 text-2xl font-bold text-brand-darkest">{t('pages.profile.page_title')}</h1>
 
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <h5 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">{t('pages.profile.section_user_info')}</h5>
+        <div className="rounded-xl border border-brand-mid/20 bg-brand-white p-6 shadow-sm">
+          <h5 className="mb-4 text-lg font-semibold text-brand-darkest">{t('pages.profile.section_user_info')}</h5>
 
           <dl className="space-y-3 text-sm">
             <div className="flex justify-between">
-              <dt className="font-medium text-gray-500 dark:text-gray-400">{t('pages.profile.label_name')}</dt>
-              <dd className="text-gray-900 dark:text-white">{user.full_name}</dd>
+              <dt className="font-medium text-brand-mid">{t('pages.profile.label_name')}</dt>
+              <dd className="text-brand-darkest">{user.full_name}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="font-medium text-gray-500 dark:text-gray-400">{t('pages.profile.label_email')}</dt>
-              <dd className="text-gray-900 dark:text-white">{user.email}</dd>
+              <dt className="font-medium text-brand-mid">{t('pages.profile.label_email')}</dt>
+              <dd className="text-brand-darkest">{user.email}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="font-medium text-gray-500 dark:text-gray-400">{t('pages.profile.label_role')}</dt>
-              <dd className="capitalize text-gray-900 dark:text-white">{user.role}</dd>
+              <dt className="font-medium text-brand-mid">{t('pages.profile.label_role')}</dt>
+              <dd className="capitalize text-brand-darkest">{user.role}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="font-medium text-gray-500 dark:text-gray-400">{t('pages.profile.label_status')}</dt>
+              <dt className="font-medium text-brand-mid">{t('pages.profile.label_status')}</dt>
               <dd>
                 <Badge variant={statusVariant}>
                   {user.status}
@@ -38,11 +38,11 @@ export default function Profile({ user }) {
             </div>
           </dl>
 
-          <hr className="my-4 border-gray-200 dark:border-gray-700" />
+          <hr className="my-4 border-brand-mid/20" />
 
           <Link
             href="/dashboard"
-            className="inline-flex items-center rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            className="inline-flex items-center rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
           >
             {t('pages.profile.btn_back')}
           </Link>

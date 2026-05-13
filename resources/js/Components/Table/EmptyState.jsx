@@ -5,14 +5,14 @@ export default function EmptyState({ title, description, icon, action, actionTex
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-5 py-12 text-center">
       {icon ? (
-        <div className="mb-3 text-5xl text-slate-600">{icon}</div>
+        <div className="mb-3 text-5xl text-brand-mid">{icon}</div>
       ) : (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="48"
           height="48"
           fill="currentColor"
-          className="mb-3 text-slate-600"
+          className="mb-3 text-brand-mid"
           viewBox="0 0 16 16"
           aria-hidden="true"
         >
@@ -21,11 +21,11 @@ export default function EmptyState({ title, description, icon, action, actionTex
         </svg>
       )}
 
-      <h5 className="mb-1 font-semibold text-white">{title ?? t('pages.table.empty_title')}</h5>
-      <p className="text-sm text-slate-400">{description ?? t('pages.table.empty_desc')}</p>
+      <h5 className="mb-1 font-semibold text-brand-darkest">{title ?? t('pages.table.empty_title')}</h5>
+      <p className="text-sm text-brand-mid">{description ?? t('pages.table.empty_desc')}</p>
 
       {action && actionText && (
-        <Link href={action} className="mt-3 inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors">
+        <Link href={action} className="mt-3 inline-flex items-center rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 transition-colors">
           {actionText}
         </Link>
       )}

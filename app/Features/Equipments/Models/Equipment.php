@@ -32,6 +32,7 @@ class Equipment extends Model
         'last_revision_date',
         'next_revision_date',
         'description',
+        'cost_per_hour',
     ];
 
     protected $casts = [
@@ -40,6 +41,7 @@ class Equipment extends Model
         'is_loanable' => 'boolean',
         'revision_interval_days' => 'integer',
         'status' => EquipmentStatus::class,
+        'cost_per_hour' => 'decimal:2',
     ];
 
     /**

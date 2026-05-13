@@ -43,7 +43,8 @@ class WorkLog extends Model
 
     public function workers()
     {
-        return $this->belongsToMany(Worker::class, 'work_logs_workers', 'work_log_id', 'worker_id');
+        return $this->belongsToMany(Worker::class, 'work_logs_workers', 'work_log_id', 'worker_id')
+            ->withPivot('cost_per_hour');
     }
 
     public function materials()
@@ -55,6 +56,7 @@ class WorkLog extends Model
     public function equipment()
     {
         return $this->belongsToMany(Equipment::class, 'work_log_equipment', 'work_log_id', 'equipment_id')
+            ->withPivot('cost_per_hour')
             ->withTimestamps();
     }
 

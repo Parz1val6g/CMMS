@@ -40,7 +40,7 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 z-40 bg-slate-900/80 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
+        className={`fixed inset-0 z-40 bg-brand-darkest/80 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
@@ -55,10 +55,10 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
         }`}
       >
         {/* Header */}
-        <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-slate-700 bg-slate-900/50">
+        <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-brand-mid/20 bg-brand-light">
           <div className="flex items-center gap-4 min-w-0">
             {title && (
-              <h2 className="text-lg font-bold text-indigo-400 font-mono truncate">
+              <h2 className="text-lg font-bold text-brand-accent font-mono truncate">
                 {title}
               </h2>
             )}
@@ -67,7 +67,7 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors"
+            className="shrink-0 rounded-lg p-1.5 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors"
             aria-label="Close drawer"
           >
             <X className="h-5 w-5" />
@@ -76,14 +76,14 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
 
         {/* Subtitle */}
         {subtitle && (
-          <div className="shrink-0 px-6 py-3 border-b border-slate-700 bg-slate-800/60">
-            <p className="text-sm text-slate-300">{subtitle}</p>
+          <div className="shrink-0 px-6 py-3 border-b border-brand-mid/20 bg-brand-light">
+            <p className="text-sm text-brand-mid">{subtitle}</p>
           </div>
         )}
 
         {/* Tabs Navigation */}
         {tabs.length > 1 && (
-          <div className="shrink-0 flex border-b border-slate-700 bg-slate-800/30 px-6">
+          <div className="shrink-0 flex border-b border-brand-mid/20 bg-brand-light px-6">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -91,8 +91,8 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
                 onClick={() => setActiveTab(tab.id)}
                 className={`relative px-4 py-3 text-sm font-medium transition-colors ${
                   activeTab === tab.id
-                    ? 'text-indigo-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-indigo-400'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'text-brand-accent after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-brand-accent'
+                    : 'text-brand-mid hover:text-brand-darkest'
                 }`}
               >
                 {tab.label}

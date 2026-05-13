@@ -141,7 +141,7 @@ export default function SOTasksTree({
   /* ── Loading state ────────────────────────────────────────── */
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-40 text-slate-400 gap-2">
+      <div className="flex items-center justify-center h-40 text-brand-mid gap-2">
         <Loader2 className="h-5 w-5 animate-spin" />
         <span className="text-sm">Loading tasks…</span>
       </div>
@@ -161,7 +161,7 @@ export default function SOTasksTree({
   /* ── Empty state ──────────────────────────────────────────── */
   if (tree.length === 0) {
     return (
-      <div className="flex items-center justify-center h-40 text-slate-500">
+      <div className="flex items-center justify-center h-40 text-brand-mid">
         <p className="text-sm">No tasks assigned to this service order.</p>
       </div>
     );
@@ -175,9 +175,9 @@ export default function SOTasksTree({
   return (
     <div>
       {/* Summary */}
-      <div className="flex items-center justify-between mb-4 px-4 py-2 rounded-lg bg-slate-800/40 border border-slate-700/50">
-        <span className="text-xs text-slate-400">
-          <span className="font-semibold text-slate-300">{totalTasks}</span> tasks
+      <div className="flex items-center justify-between mb-4 px-4 py-2 rounded-lg bg-brand-white border border-brand-mid/20">
+        <span className="text-xs text-brand-mid">
+          <span className="font-semibold text-brand-darkest">{totalTasks}</span> tasks
           {completedTasks > 0 && (
             <>
               {' · '}
@@ -185,7 +185,7 @@ export default function SOTasksTree({
             </>
           )}
         </span>
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-brand-mid">
           {totalTasks} task{totalTasks !== 1 ? 's' : ''}
           {subTaskCount > 0 && (
             <> · {subTaskCount} sub-task{subTaskCount !== 1 ? 's' : ''}</>
@@ -194,7 +194,7 @@ export default function SOTasksTree({
       </div>
 
       {/* Tree */}
-      <div className="rounded-lg border border-slate-700/50 overflow-hidden divide-y divide-slate-700/30">
+      <div className="rounded-lg border border-brand-mid/20 overflow-hidden divide-y divide-brand-mid/10">
         {tree.map((node) => (
           <TaskTreeNode
             key={node.item.id}

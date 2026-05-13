@@ -25,13 +25,13 @@ export default function FormInput({
         onChange?.(e);
     }, [onChange]);
 
-    const baseInputClass = `block w-full rounded-lg border bg-slate-800/60 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:ring-1 transition-colors ${hasError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-700 focus:border-indigo-500 focus:ring-indigo-500'
+    const baseInputClass = `block w-full rounded-lg border bg-brand-white px-3 py-2 text-sm text-brand-darkest placeholder:text-brand-mid focus:ring-1 transition-colors ${hasError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-brand-mid/20 focus:border-brand-accent focus:ring-brand-accent'
         }`;
 
     return (
         <div className="mb-4">
             {label && (
-                <label htmlFor={key} className="block text-sm font-medium text-slate-300 mb-1.5">
+                <label htmlFor={key} className="block text-sm font-medium text-brand-mid mb-1.5">
                     {label}
                     {required && <span className="text-red-500 ml-1">*</span>}
                 </label>

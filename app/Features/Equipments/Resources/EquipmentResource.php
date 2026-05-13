@@ -18,6 +18,7 @@ class EquipmentResource extends JsonResource
             'status' => $this->status,
             'is_loanable' => $this->is_loanable,
             'description' => $this->description,
+            'cost_per_hour' => $this->cost_per_hour,
             'revision_interval_days' => $this->revision_interval_days,
             'last_revision_date' => $this->last_revision_date?->format('Y-m-d'),
             'next_revision_date' => $this->next_revision_date?->format('Y-m-d'),

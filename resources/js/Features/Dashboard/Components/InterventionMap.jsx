@@ -74,8 +74,8 @@ function MapInner({ gmapsKey, orders }) {
 
   if (!isLoaded) {
     return (
-      <div className="flex h-full min-h-[320px] items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
-        <p className="text-sm text-gray-500 dark:text-gray-400">A carregar mapa...</p>
+      <div className="flex h-full min-h-[320px] items-center justify-center rounded-lg bg-brand-light">
+        <p className="text-sm text-brand-mid">A carregar mapa...</p>
       </div>
     );
   }
@@ -133,8 +133,8 @@ export default function InterventionMap({ orders }) {
 
   if (!gmapsKey) {
     return (
-      <div className="flex h-full min-h-[320px] items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
-        <p className="text-sm text-gray-500 dark:text-gray-400">Loading Map Configuration...</p>
+      <div className="flex h-full min-h-[320px] items-center justify-center rounded-lg bg-brand-light">
+        <p className="text-sm text-brand-mid">Loading Map Configuration...</p>
       </div>
     );
   }

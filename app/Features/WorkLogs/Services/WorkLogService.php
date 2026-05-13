@@ -94,6 +94,22 @@ class WorkLogService
                 'reviewed_by' => $reviewerId,
                 'reviewed_at' => now(),
             ]);
+
+            // ── Snapshot cost_per_hour into pivot tables ──
+            $workLog->loadMissing('workers', 'equipment');
+
+            foreach ($workLog->workers as $worker) {
+                $workLog->workers()->updateExistingPivot($worker->id, [
+                    'cost_per_hour' => $worker->cost_per_hour,
+                ]);
+            }
+
+            foreach ($workLog->equipment as $equipment) {
+                $workLog->equipment()->updateExistingPivot($equipment->id, [
+                    'cost_per_hour' => $equipment->cost_per_hour,
+                ]);
+            }
+
             $this->releaseEquipment($workLog);
             return $workLog;
         });

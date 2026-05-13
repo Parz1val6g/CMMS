@@ -11,12 +11,12 @@ export default function KanbanColumn({ column, items, renderCardContent, onCardC
     });
 
     return (
-        <div className="flex flex-col flex-1 min-w-[300px] rounded-lg bg-slate-900/50 border border-slate-700 overflow-hidden h-[calc(100vh-200px)]">
+        <div className="flex flex-col flex-1 min-w-[300px] rounded-lg bg-brand-white border border-brand-mid/20 overflow-hidden h-[calc(100vh-200px)]">
             {/* Column Header */}
-            <div className="shrink-0 px-4 py-3 border-b border-slate-700 bg-slate-800/60">
+            <div className="shrink-0 px-4 py-3 border-b border-slate-700 bg-brand-light">
                 <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-slate-100">{column.label}</h3>
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-600 text-xs font-medium text-slate-100">
+                    <h3 className="font-semibold text-brand-darkest">{column.label}</h3>
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-600 text-xs font-medium text-brand-darkest">
                         {items.length}
                     </span>
                 </div>
@@ -41,7 +41,7 @@ export default function KanbanColumn({ column, items, renderCardContent, onCardC
                             />
                         ))
                     ) : (
-                        <div className="flex items-center justify-center h-24 text-slate-500">
+                        <div className="flex items-center justify-center h-24 text-brand-mid">
                             <p className="text-sm">No items</p>
                         </div>
                     )}

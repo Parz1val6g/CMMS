@@ -9,8 +9,8 @@ import CascadingParishSelect from '@/Components/Common/CascadingParishSelect';
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
 const inputClass =
-    'w-full rounded-lg bg-slate-700 border border-slate-600 text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-500';
-const labelClass = 'block text-xs font-medium text-slate-400 mb-1';
+    'w-full rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent placeholder-brand-mid';
+const labelClass = 'block text-xs font-medium text-brand-mid mb-1';
 const errClass   = 'mt-1 text-xs text-red-400';
 
 function emptyLocation() {
@@ -34,7 +34,7 @@ function LocationRow({ loc, index, districts, municipalities, parishes, onChange
         <div className={`rounded-lg border p-4 space-y-3 ${
             loc.is_primary
                 ? 'border-yellow-500/40 bg-yellow-500/5'
-                : 'border-slate-700 bg-slate-800/40'
+                : 'border-brand-mid/20 bg-brand-white'
         }`}>
             {/* Row header */}
             <div className="flex items-center gap-3">
@@ -63,19 +63,19 @@ function LocationRow({ loc, index, districts, municipalities, parishes, onChange
                         className={`p-2 rounded-lg transition-colors ${
                             loc.is_primary
                                 ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-                                : 'bg-slate-700 text-slate-500 hover:text-slate-300 hover:bg-slate-600'
+                                : 'bg-brand-light text-brand-mid hover:text-brand-darkest hover:bg-brand-mid/20'
                         }`}
                     >
                         <Star className="h-4 w-4" fill={loc.is_primary ? 'currentColor' : 'none'} />
                     </button>
-                    <span className="text-xs text-slate-500">{t('pages.client_create.hq_label')}</span>
+                    <span className="text-xs text-brand-mid">{t('pages.client_create.hq_label')}</span>
                 </div>
 
                 {canRemove && (
                     <button
                         type="button"
                         onClick={onRemove}
-                        className="mt-4 p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                        className="mt-4 p-2 rounded-lg text-brand-mid hover:text-red-400 hover:bg-red-500/10 transition-colors"
                         title={t('pages.client_locations.delete_btn')}
                     >
                         <Trash2 className="h-4 w-4" />
@@ -250,15 +250,15 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                 role="dialog"
                 aria-modal="true"
                 aria-label={t('pages.client_create.modal_title')}
-                className="relative w-full max-w-2xl max-h-[92vh] overflow-hidden rounded-xl bg-slate-800 shadow-2xl border border-slate-700 flex flex-col"
+                className="relative w-full max-w-2xl max-h-[92vh] overflow-hidden rounded-xl bg-brand-white shadow-2xl border border-brand-mid/20 flex flex-col"
             >
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-slate-700 px-6 py-4 shrink-0">
-                    <h3 className="text-lg font-semibold text-white">{t('pages.client_create.modal_title')}</h3>
+                <div className="flex items-center justify-between border-b border-brand-mid/20 px-6 py-4 shrink-0">
+                    <h3 className="text-lg font-semibold text-brand-darkest">{t('pages.client_create.modal_title')}</h3>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors"
+                        className="rounded-lg p-1.5 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors"
                         aria-label={t('pages.datamanager.close_aria')}
                     >
                         <X className="h-5 w-5" />
@@ -270,7 +270,7 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
 
                         {/* ── Section 1: Client Info ── */}
                         <section>
-                            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                            <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-3">
                                 {t('pages.client_create.section_info')}
                             </h4>
                             <div className="space-y-3">
@@ -338,17 +338,17 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                         <section>
                             <div className="flex items-center justify-between mb-3">
                                 <div>
-                                    <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                    <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider">
                                         {t('pages.client_create.section_locations')}
                                     </h4>
-                                    <p className="text-xs text-slate-500 mt-0.5">
+                                    <p className="text-xs text-brand-mid mt-0.5">
                                         {t('pages.client_create.section_locations_hint')}
                                     </p>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={addLocation}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white transition-colors"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-brand-light text-brand-mid hover:bg-brand-mid/20 hover:text-brand-darkest transition-colors"
                                 >
                                     <Plus className="h-3.5 w-3.5" />
                                     {t('pages.client_locations.add_btn')}
@@ -387,9 +387,9 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                     </div>
 
                     {/* Footer */}
-                    <div className="flex items-center justify-between gap-3 border-t border-slate-700 px-6 py-4 shrink-0">
+                    <div className="flex items-center justify-between gap-3 border-t border-brand-mid/20 px-6 py-4 shrink-0">
                         {/* Sede status indicator */}
-                        <div className={`flex items-center gap-1.5 text-xs ${hasSede ? 'text-yellow-400' : 'text-slate-500'}`}>
+                        <div className={`flex items-center gap-1.5 text-xs text-brand-mid ${hasSede ? 'text-yellow-400' : 'text-brand-mid'}`}>
                             <Star className="h-3.5 w-3.5" fill={hasSede ? 'currentColor' : 'none'} />
                             {hasSede
                                 ? t('pages.client_create.hq_set')
@@ -401,14 +401,14 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                                 type="button"
                                 onClick={onClose}
                                 disabled={saving}
-                                className="rounded-lg border border-slate-600 bg-slate-700 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-600 transition-colors disabled:opacity-50"
+                                className="rounded-lg border border-brand-mid/20 bg-brand-light px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-mid/20 transition-colors disabled:opacity-50"
                             >
                                 {t('pages.datamanager.cancel_btn')}
                             </button>
                             <button
                                 type="submit"
                                 disabled={saving || !hasSede}
-                                className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                                className="flex items-center gap-2 rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 disabled:opacity-50 transition-colors"
                             >
                                 {saving && <Loader2 className="h-4 w-4 animate-spin" />}
                                 {saving ? t('pages.client_locations.saving') : t('pages.client_create.submit_btn')}
@@ -420,3 +420,4 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
         </div>
     );
 }
+

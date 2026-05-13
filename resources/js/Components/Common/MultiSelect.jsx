@@ -120,7 +120,7 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
       {/* ── Trigger / Tag display ────────────────────────────── */}
       <div
         ref={triggerRef}
-        className="flex min-h-[38px] cursor-pointer flex-wrap items-center gap-1 rounded-lg border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-sm text-slate-200 transition-colors hover:border-slate-600"
+        className="flex min-h-[38px] cursor-pointer flex-wrap items-center gap-1 rounded-lg border border-brand-mid/20 bg-brand-white px-3 py-1.5 text-sm text-brand-darkest transition-colors hover:border-brand-mid"
         onClick={() => { if (isOpen) close(); else open(); }}
         role="combobox"
         aria-expanded={isOpen}
@@ -129,18 +129,18 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (isOpen) close(); else open(); } }}
       >
         {selectedLabels.length === 0 ? (
-          <span className="text-slate-500">{placeholder}</span>
+          <span className="text-brand-mid">{placeholder}</span>
         ) : (
           selectedLabels.map(({ label, value }) => (
             <span
               key={value}
-              className="inline-flex items-center gap-1 rounded-md bg-indigo-500/20 px-2 py-0.5 text-xs font-medium text-indigo-300"
+              className="inline-flex items-center gap-1 rounded-md bg-brand-accent/15 px-2 py-0.5 text-xs font-medium text-brand-accent"
             >
               {label}
               <button
                 type="button"
                 onClick={(e) => removeItem(e, value)}
-                className="inline-flex rounded-sm p-0.5 text-indigo-400 hover:bg-indigo-500/30 hover:text-indigo-200 transition-colors"
+                className="inline-flex rounded-sm p-0.5 text-brand-accent hover:bg-brand-accent/20 hover:text-brand-accent transition-colors"
                 aria-label={`Remove ${label}`}
               >
                 <X className="h-3 w-3" />
@@ -148,7 +148,7 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
             </span>
           ))
         )}
-        <ChevronDown className={`ml-auto h-4 w-4 text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`ml-auto h-4 w-4 text-brand-mid transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
 
       {/* ── Dropdown (fixed positioning to avoid overflow clip) ── */}
@@ -156,29 +156,29 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
         <div
           id={`ms-dropdown-${name}`}
           style={dropdownStyle}
-          className="max-h-60 overflow-auto rounded-lg border border-slate-600 bg-slate-800 shadow-2xl"
+          className="max-h-60 overflow-auto rounded-lg border border-brand-mid/20 bg-brand-white shadow-2xl"
         >
           {/* ── Sticky search bar ──────────────────────────────── */}
           {showSearch && (
-            <div className="sticky top-0 z-10 border-b border-slate-600 bg-slate-800 p-2">
+            <div className="sticky top-0 z-10 border-b border-brand-mid/20 bg-brand-white p-2">
               <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-mid" />
                 <input
                   ref={searchRef}
                   type="text"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   placeholder="Search..."
-                  className="w-full rounded-md border border-slate-600 bg-slate-700/60 py-1.5 pl-8 pr-3 text-sm text-slate-200 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-md border border-brand-mid/20 bg-brand-light py-1.5 pl-8 pr-3 text-sm text-brand-darkest placeholder:text-brand-mid focus:border-brand-accent focus:outline-none focus:ring-1 focus:ring-brand-accent"
                 />
               </div>
             </div>
           )}
 
           {filtered.length === 0 && options.length > 0 ? (
-            <div className="px-3 py-2 text-sm text-slate-500">No matches</div>
+            <div className="px-3 py-2 text-sm text-brand-mid">No matches</div>
           ) : filtered.length === 0 && options.length === 0 ? (
-            <div className="px-3 py-2 text-sm text-slate-500">No options available</div>
+            <div className="px-3 py-2 text-sm text-brand-mid">No options available</div>
           ) : (
             filtered.map((opt) => {
               const isChecked = selected.includes(opt.value);
@@ -187,8 +187,8 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
                   key={opt.value}
                   className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors ${
                     isChecked
-                      ? 'bg-indigo-500/10 text-indigo-300'
-                      : 'text-slate-300 hover:bg-slate-700/50'
+                      ? 'bg-brand-accent/10 text-brand-accent'
+                      : 'text-brand-mid hover:bg-brand-light'
                   }`}
                   onClick={() => toggleItem(opt.value)}
                   role="option"
@@ -198,11 +198,11 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
                     type="checkbox"
                     checked={isChecked}
                     readOnly
-                    className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-indigo-500 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-brand-mid/20 bg-brand-white text-brand-accent focus:ring-brand-accent"
                   />
                   <span className="flex-1">{opt.label}</span>
                   {isChecked && (
-                    <span className="text-xs text-indigo-400">✓</span>
+                    <span className="text-xs text-brand-accent">✓</span>
                   )}
                 </div>
               );

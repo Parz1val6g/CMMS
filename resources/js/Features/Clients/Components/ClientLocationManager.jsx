@@ -80,16 +80,16 @@ function LocationForm({ client, editTarget, onSaved, onCancel, districts, munici
         }
     };
 
-    const inputClass = 'w-full rounded-lg bg-slate-700 border border-slate-600 text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500';
-    const labelClass = 'block text-xs font-medium text-slate-400 mb-1';
+    const inputClass = 'w-full rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent';
+    const labelClass = 'block text-xs font-medium text-brand-mid mb-1';
     const errClass = 'mt-1 text-xs text-red-400';
 
     return (
         <form
             onSubmit={handleSubmit}
-            className="rounded-lg border border-slate-700 bg-slate-800/60 p-4 space-y-4"
+            className="rounded-lg border border-brand-mid/20 bg-brand-white p-4 space-y-4"
         >
-            <h4 className="text-sm font-semibold text-slate-200">
+            <h4 className="text-sm font-semibold text-brand-darkest">
                 {editTarget ? t('pages.client_locations.edit_title') : t('pages.client_locations.add_title')}
             </h4>
 
@@ -110,11 +110,11 @@ function LocationForm({ client, editTarget, onSaved, onCancel, districts, munici
                     <label className="flex items-center gap-2 cursor-pointer">
                         <input
                             type="checkbox"
-                            className="rounded border-slate-600 bg-slate-700 text-indigo-500"
+                            className="rounded border-brand-mid/20 bg-brand-white text-brand-accent"
                             checked={form.is_primary}
                             onChange={e => set('is_primary', e.target.checked)}
                         />
-                        <span className="text-sm text-slate-300">{t('pages.client_locations.field_primary')}</span>
+                        <span className="text-sm text-brand-mid">{t('pages.client_locations.field_primary')}</span>
                     </label>
                 </div>
             </div>
@@ -197,14 +197,14 @@ function LocationForm({ client, editTarget, onSaved, onCancel, districts, munici
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="px-3 py-1.5 text-sm rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 transition-colors"
+                    className="px-3 py-1.5 text-sm rounded-lg border border-brand-mid/20 text-brand-mid hover:bg-brand-light transition-colors"
                 >
                     {t('pages.client_locations.cancel')}
                 </button>
                 <button
                     type="submit"
                     disabled={submitting}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-brand-accent text-brand-white hover:bg-brand-accent/90 disabled:opacity-50 transition-colors"
                 >
                     {submitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
                     {submitting ? t('pages.client_locations.saving') : t('pages.client_locations.save')}
@@ -256,13 +256,13 @@ export default function ClientLocationManager({ client, districts = [], municipa
         <div className="space-y-4">
             {/* Header row */}
             <div className="flex items-center justify-between">
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-brand-mid">
                     {locations.length} {t('pages.client_locations.location_count')}
                 </p>
                 {!showForm && (
                     <button
                         onClick={openCreate}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-brand-accent text-brand-white hover:bg-brand-accent/90 transition-colors"
                     >
                         <Plus className="h-3.5 w-3.5" />
                         {t('pages.client_locations.add_btn')}
@@ -307,14 +307,14 @@ export default function ClientLocationManager({ client, districts = [], municipa
             {locations.map(loc => (
                 <div
                     key={loc.id}
-                    className="rounded-lg border border-slate-700/60 bg-slate-800/40 p-4"
+                    className="rounded-lg border border-brand-mid/20 bg-brand-white p-4"
                 >
                     <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                             {loc.is_primary && (
                                 <Star className="h-3.5 w-3.5 text-yellow-400 flex-shrink-0" fill="currentColor" />
                             )}
-                            <span className="text-sm font-semibold text-slate-200 truncate">{loc.name}</span>
+                            <span className="text-sm font-semibold text-brand-darkest truncate">{loc.name}</span>
                             {loc.is_primary && (
                                 <span className="inline-flex items-center px-1.5 py-0.5 text-xs rounded bg-yellow-500/20 text-yellow-300">
                                     {t('pages.client_locations.primary_badge')}
@@ -324,14 +324,14 @@ export default function ClientLocationManager({ client, districts = [], municipa
                         <div className="flex items-center gap-1 flex-shrink-0">
                             <button
                                 onClick={() => openEdit(loc)}
-                                className="p-1.5 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-700 transition-colors"
+                                className="p-1.5 rounded text-brand-mid hover:text-brand-darkest hover:bg-brand-light transition-colors"
                                 title={t('pages.client_locations.edit_btn')}
                             >
                                 <Pencil className="h-3.5 w-3.5" />
                             </button>
                             <button
                                 onClick={() => handleDelete(loc)}
-                                className="p-1.5 rounded text-slate-400 hover:text-red-400 hover:bg-slate-700 transition-colors"
+                                className="p-1.5 rounded text-brand-mid hover:text-red-400 hover:bg-brand-light transition-colors"
                                 title={t('pages.client_locations.delete_btn')}
                             >
                                 <Trash2 className="h-3.5 w-3.5" />
@@ -342,17 +342,17 @@ export default function ClientLocationManager({ client, districts = [], municipa
                     {loc.location && (
                         <div className="mt-2 space-y-0.5">
                             {loc.location.street_address && (
-                                <p className="text-xs text-slate-400 flex items-center gap-1.5">
+                                <p className="text-xs text-brand-mid flex items-center gap-1.5">
                                     <MapPin className="h-3 w-3 flex-shrink-0" />
                                     {loc.location.street_address}
                                     {loc.location.postal_code ? `, ${loc.location.postal_code}` : ''}
                                 </p>
                             )}
                             {loc.location.parish?.name && (
-                                <p className="text-xs text-slate-500 pl-4">{loc.location.parish.name}</p>
+                                <p className="text-xs text-brand-mid pl-4">{loc.location.parish.name}</p>
                             )}
                             {loc.location.landmark && (
-                                <p className="text-xs text-slate-500 pl-4 italic">{loc.location.landmark}</p>
+                                <p className="text-xs text-brand-mid pl-4 italic">{loc.location.landmark}</p>
                             )}
                         </div>
                     )}

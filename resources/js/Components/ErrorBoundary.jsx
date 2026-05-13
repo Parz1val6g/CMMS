@@ -32,15 +32,15 @@ export default class ErrorBoundary extends Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div className="flex h-screen w-screen items-center justify-center bg-slate-900">
+                <div className="flex h-screen w-screen items-center justify-center bg-brand-light">
                     <div className="text-center max-w-md px-6">
-                        <h1 className="text-2xl font-bold text-white mb-2">Algo correu mal</h1>
-                        <p className="text-slate-400 mb-6 text-sm">
+                        <h1 className="text-2xl font-bold text-brand-darkest mb-2">Algo correu mal</h1>
+                        <p className="text-brand-mid mb-6 text-sm">
                             Ocorreu um erro inesperado. Por favor, recarregue a página.
                         </p>
                         <button
                             onClick={() => window.location.reload()}
-                            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+                            className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-white hover:bg-brand-accent/90 transition-colors"
                         >
                             Recarregar Página
                         </button>

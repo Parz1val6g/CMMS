@@ -12,6 +12,7 @@ class WorkerResource extends JsonResource
         return [
             'id' => $this->id,
             'team_id' => $this->team_id,
+            'cost_per_hour' => $this->cost_per_hour,
             // For form pre-fill: separate first/last names and phone
             'first_name' => $this->whenLoaded('user', fn() => $this->user->first_name),
             'last_name' => $this->whenLoaded('user', fn() => $this->user->last_name),

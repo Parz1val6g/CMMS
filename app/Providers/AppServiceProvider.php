@@ -23,6 +23,12 @@ class AppServiceProvider extends ServiceProvider
         \App\Features\Tasks\Models\Task::observe(\App\Shared\Observers\AuditObserver::class);
         \App\Features\MiniTasks\Models\MiniTask::observe(\App\Shared\Observers\AuditObserver::class);
         \App\Features\WorkLogs\Models\WorkLog::observe(\App\Shared\Observers\AuditObserver::class);
+
+        // ── Cost History Observers ──
+        // Captures cost_per_hour changes on Equipment/Worker into cost_histories table.
+        // Dual-oberver: both AuditObserver (above) AND CostHistory observers below run independently.
+        \App\Features\Equipments\Models\Equipment::observe(\App\Features\Equipments\Observers\EquipmentObserver::class);
+        \App\Features\Workers\Models\Worker::observe(\App\Features\Workers\Observers\WorkerObserver::class);
         \App\Shared\Models\Role::observe(\App\Shared\Observers\AuditObserver::class);
         \App\Features\Equipments\Models\Equipment::observe(\App\Shared\Observers\AuditObserver::class);
 
