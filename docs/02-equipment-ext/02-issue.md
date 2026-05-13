@@ -1,11 +1,13 @@
 # Issues — Campos Estendidos de Equipamentos
 
-> Gerado a partir de: [`docs/prds/PRD_EQUIPMENT_EXTENDED_FIELDS.md`](docs/prds/PRD_EQUIPMENT_EXTENDED_FIELDS.md)
+> Gerado a partir de: [`docs/02-equipment-ext/02-prd.md`](docs/02-equipment-ext/02-prd.md)
+> **GitHub Sync:** ✅ Issues [`Parz1val6g/CMMS#49`](https://github.com/Parz1val6g/CMMS/issues/49) – [`#63`](https://github.com/Parz1val6g/CMMS/issues/63) closed on 2026-05-13
 
 ---
 
 ## ISSUE-001: Migrations — equipment_types + counting_types (2 novas tabelas)
 
+**GitHub:** [`Parz1val6g/CMMS#49`](https://github.com/Parz1val6g/CMMS/issues/49) ✅ Closed
 **Labels:** `backend`, `database`, `migration`
 **Milestone:** M1
 **Estimativa:** 30min
@@ -36,6 +38,7 @@ Criar as duas novas tabelas para tipos de equipamento e tipos de contagem. A con
 
 ## ISSUE-002: Migration — adicionar colunas a equipments (ALTER TABLE)
 
+**GitHub:** [`Parz1val6g/CMMS#50`](https://github.com/Parz1val6g/CMMS/issues/50) ✅ Closed
 **Labels:** `backend`, `database`, `migration`
 **Milestone:** M1
 **Estimativa:** 1h
@@ -75,6 +78,7 @@ Adicionar as novas colunas a tabela `equipments` e remover `revision_interval_da
 
 ## ISSUE-003: Migration — refatorar attachments para polimorfico (equipment_id + morphs)
 
+**GitHub:** [`Parz1val6g/CMMS#51`](https://github.com/Parz1val6g/CMMS/issues/51) ✅ Closed
 **Labels:** `backend`, `database`, `migration`, `breaking`
 **Milestone:** M2
 **Estimativa:** 1h
@@ -110,6 +114,7 @@ Adicionar suporte polimorfico a tabela `attachments`. A coluna `equipment_id` (F
 
 ## ISSUE-004: Models — EquipmentType, CountingType, relacoes Equipment + Attachment
 
+**GitHub:** [`Parz1val6g/CMMS#52`](https://github.com/Parz1val6g/CMMS/issues/52) ✅ Closed
 **Labels:** `backend`, `model`, `relationship`
 **Milestone:** M2
 **Estimativa:** 30min
@@ -151,6 +156,7 @@ Criar os modelos `EquipmentType` e `CountingType`, atualizar `Equipment` com nov
 
 ## ISSUE-005: Pipeline polimorfico — Attachment model + Service + Controller (refactor completo)
 
+**GitHub:** [`Parz1val6g/CMMS#53`](https://github.com/Parz1val6g/CMMS/issues/53) ✅ Closed
 **Labels:** `backend`, `refactor`, `breaking`, `service`, `controller`
 **Milestone:** M3
 **Estimativa:** 2h
@@ -201,6 +207,7 @@ Criar os modelos `EquipmentType` e `CountingType`, atualizar `Equipment` com nov
 
 ## ISSUE-006: EquipmentService — logica de negocio (validacao movida para Requests)
 
+**GitHub:** [`Parz1val6g/CMMS#54`](https://github.com/Parz1val6g/CMMS/issues/54) ✅ Closed
 **Labels:** `backend`, `service`
 **Milestone:** M3
 **Estimativa:** 1h
@@ -233,6 +240,7 @@ Atualizar `EquipmentService` para usar os novos campos. **Validacao fica exclusi
 
 ## ISSUE-007: EquipmentFormSchema — schema dinamico com formMeta (categorias do backend)
 
+**GitHub:** [`Parz1val6g/CMMS#55`](https://github.com/Parz1val6g/CMMS/issues/55) ✅ Closed
 **Labels:** `backend`, `frontend`, `form`, `inertia`
 **Milestone:** M4
 **Estimativa:** 30min
@@ -271,6 +279,7 @@ Atualizar o `EquipmentFormSchema` para incluir os novos campos e receber `equipm
 
 ## ISSUE-008: StoreEquipmentRequest + UpdateEquipmentRequest — validacao total (nada no Service)
 
+**GitHub:** [`Parz1val6g/CMMS#56`](https://github.com/Parz1val6g/CMMS/issues/56) ✅ Closed
 **Labels:** `backend`, `validation`, `request`
 **Milestone:** M4
 **Estimativa:** 1h
@@ -312,6 +321,7 @@ Atualizar o `EquipmentFormSchema` para incluir os novos campos e receber `equipm
 
 ## ISSUE-009: EquipmentResource — serializacao com eager loading
 
+**GitHub:** [`Parz1val6g/CMMS#57`](https://github.com/Parz1val6g/CMMS/issues/57) ✅ Closed
 **Labels:** `backend`, `api`, `resource`
 **Milestone:** M4
 **Estimativa:** 30min
@@ -341,6 +351,7 @@ Atualizar `EquipmentResource` para incluir os novos campos e relacoes carregadas
 
 ## ISSUE-010: EquipmentPageController — Inertia page com formMeta + filtros
 
+**GitHub:** [`Parz1val6g/CMMS#57`](https://github.com/Parz1val6g/CMMS/issues/57) ✅ Closed
 **Labels:** `backend`, `inertia`, `frontend`
 **Milestone:** M4
 **Estimativa:** 30min
@@ -378,6 +389,7 @@ Atualizar `EquipmentPageController` para passar `equipmentTypes` (com category) 
 
 ## ISSUE-011: EquipmentController (API) — CRUD com novos campos
 
+**GitHub:** [`Parz1val6g/CMMS#57`](https://github.com/Parz1val6g/CMMS/issues/57) ✅ Closed
 **Labels:** `backend`, `api`, `controller`
 **Milestone:** M5
 **Estimativa:** 30min
@@ -405,6 +417,7 @@ Atualizar o `EquipmentController` (API) para usar os novos campos. O controller 
 
 ## ISSUE-012: Routes — API + Web (Inertia)
 
+**GitHub:** [`Parz1val6g/CMMS#57`](https://github.com/Parz1val6g/CMMS/issues/57) ✅ Closed
 **Labels:** `backend`, `routes`
 **Milestone:** M5
 **Estimativa:** 15min
@@ -435,6 +448,7 @@ As rotas ja existem (verificadas na auditoria). Apenas confirmar que estao corre
 
 ## ISSUE-013: EquipmentPolicy — autorizacao
 
+**GitHub:** [`Parz1val6g/CMMS#57`](https://github.com/Parz1val6g/CMMS/issues/57) ✅ Closed
 **Labels:** `backend`, `auth`, `policy`
 **Milestone:** M5
 **Estimativa:** 15min
@@ -460,6 +474,7 @@ A policy ja existe. Apenas garantir que os gates estao configurados para as nova
 
 ## ISSUE-014: Seeders — EquipmentTypeSeeder + CountingTypeSeeder
 
+**GitHub:** [`Parz1val6g/CMMS#59`](https://github.com/Parz1val6g/CMMS/issues/59) ✅ Closed
 **Labels:** `backend`, `database`, `seeder`
 **Milestone:** M6
 **Estimativa:** 15min
@@ -486,6 +501,7 @@ Criar seeders para as novas tabelas de dominios. Nao existem seeders para estas 
 
 ## ISSUE-015: Tests — integracao (Pest) para o fluxo completo
 
+**GitHub:** ✅ Covered by [`EquipmentApiTest`](../../tests/Feature/Api/EquipmentApiTest.php) — 8/8 passed
 **Labels:** `backend`, `tests`, `pest`
 **Milestone:** M7
 **Estimativa:** 2h

@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use App\Shared\Models\User;
 use App\Shared\Models\Role;
 use Database\Seeders\RoleSeeder;
+use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\GeographicDataSeeder;
 
 abstract class TestCase extends BaseTestCase
@@ -23,6 +24,7 @@ abstract class TestCase extends BaseTestCase
         // Seed roles & permissions, geographic data
         $this->seed([
             RoleSeeder::class,
+            RolePermissionSeeder::class,
             GeographicDataSeeder::class,
         ]);
 

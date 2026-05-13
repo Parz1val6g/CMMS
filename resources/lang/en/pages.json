@@ -246,6 +246,8 @@
         "teams": "Teams",
         "workers": "Workers",
         "service_types": "Service Types",
+        "equipment_types": "Equipment Types",
+        "counting_types": "Counting Types",
         "materials": "Materials",
         "exports": "Exports",
         "notifications": "Notifications",

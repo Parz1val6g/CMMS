@@ -20,7 +20,10 @@ return new class extends Migration {
             $table->unique(['work_log_id', 'material_id']);
         });
 
-        DB::statement('ALTER TABLE work_logs_materials ADD CONSTRAINT check_qty_positive CHECK (quantity_used > 0)');
+        // SQLite does not support ALTER TABLE ADD CONSTRAINT
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE work_logs_materials ADD CONSTRAINT check_qty_positive CHECK (quantity_used > 0)');
+        }
     }
 
     public function down(): void

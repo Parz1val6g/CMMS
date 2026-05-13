@@ -2,7 +2,7 @@
 
 **Task:** 04-logic-migration  
 **DomÃ­nio:** 03-loans  
-**Base:** [`04-grill-me.md`](docs/03-loans/04-logic-migration/04-grill-me.md)
+**Base:** [`04-grill-me.md`](04-grill-me.md)
 
 ---
 
@@ -44,9 +44,9 @@ Extrair loans para mÃ³dulo `LoanOrders` independente com tabela prÃ³pria, modelo
 
 ### Deep Modules
 
-**LoanOrderService** — encapsula todo o ciclo de vida: create (valida disponibilidade, lock pessimista, cria task checkout), initiateReturn (cria task devolucao), cancel (release equipments para ACTIVE). Interface reduzida com 3 metodos publicos.
+**LoanOrderService** ï¿½ encapsula todo o ciclo de vida: create (valida disponibilidade, lock pessimista, cria task checkout), initiateReturn (cria task devolucao), cancel (release equipments para ACTIVE). Interface reduzida com 3 metodos publicos.
 
-**LoanOrderPolicy** — gates independentes: viewAny, view, create, initiateReturn, cancel. Herda BasePolicy.
+**LoanOrderPolicy** ï¿½ gates independentes: viewAny, view, create, initiateReturn, cancel. Herda BasePolicy.
 
 ### Schema Changes
 
@@ -66,12 +66,12 @@ cancel(): release equipments (markAsActive()), status CANCELLED
 
 ### API Contracts
 
-POST /api/loan-orders — StoreLoanOrderRequest, retorna LoanOrderResource
-GET /api/loan-orders — listagem paginada com filters
-GET /api/loan-orders/{id} — detalhe com equipments + tasks
-POST /api/loan-orders/{id}/return — initiateReturn
-POST /api/loan-orders/{id}/cancel — cancel
-DELETE /api/loan-orders/{id} — soft delete (apenas PENDING ou CANCELLED)
+POST /api/loan-orders ï¿½ StoreLoanOrderRequest, retorna LoanOrderResource
+GET /api/loan-orders ï¿½ listagem paginada com filters
+GET /api/loan-orders/{id} ï¿½ detalhe com equipments + tasks
+POST /api/loan-orders/{id}/return ï¿½ initiateReturn
+POST /api/loan-orders/{id}/cancel ï¿½ cancel
+DELETE /api/loan-orders/{id} ï¿½ soft delete (apenas PENDING ou CANCELLED)
 
 ### Modules to Create
 
@@ -105,19 +105,19 @@ Frontend TaskTreeNode.jsx: remover showReturnBtn.
 
 All modules will be tested. Prior art in codebase: ServiceOrderApiTest, ServiceOrderPoliciesTest, cascade tests.
 
-**LoanOrderServiceTest** — ciclo de vida completo: create (PENDING), initiateReturn (cria Task), cancel (CANCELLED + equipment released). Cenarios de erro: equipamento indisponivel, duplo cancel, cancel de CHECKED_OUT, lock concorrente.
+**LoanOrderServiceTest** ï¿½ ciclo de vida completo: create (PENDING), initiateReturn (cria Task), cancel (CANCELLED + equipment released). Cenarios de erro: equipamento indisponivel, duplo cancel, cancel de CHECKED_OUT, lock concorrente.
 
-**LoanOrderPolicyTest** — gates por role: admin full access, manager com create/initiateReturn, worker sem acesso.
+**LoanOrderPolicyTest** ï¿½ gates por role: admin full access, manager com create/initiateReturn, worker sem acesso.
 
-**LoanOrderApiTest** — CRUD endpoints: 200/201/401/403/422 responses.
+**LoanOrderApiTest** ï¿½ CRUD endpoints: 200/201/401/403/422 responses.
 
-**Frontend test** — renderizacao da pagina /loans, formulario create com validacao, workflow tabs.
+**Frontend test** ï¿½ renderizacao da pagina /loans, formulario create com validacao, workflow tabs.
 
-**Migration test** — soft-ref copia dados corretamente, rollback funcional.
+**Migration test** ï¿½ soft-ref copia dados corretamente, rollback funcional.
 
 ## Out of Scope
 
-- Loan portal para entidades externas (Task 7 — 07-loan-portal)
+- Loan portal para entidades externas (Task 7 ï¿½ 07-loan-portal)
 - Sistema de multas por atraso na devolucao
 - Notificacoes email/SMS para loans
 - Relatorios/analytics especificos de loans

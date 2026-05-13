@@ -17,7 +17,10 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
-        DB::statement('ALTER TABLE mini_tasks_workers_teams ADD CONSTRAINT check_worker_or_team CHECK ((worker_id IS NOT NULL AND team_id IS NULL) OR (worker_id IS NULL AND team_id IS NOT NULL))');
+        // SQLite does not support ALTER TABLE ADD CONSTRAINT
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE mini_tasks_workers_teams ADD CONSTRAINT check_worker_or_team CHECK ((worker_id IS NOT NULL AND team_id IS NULL) OR (worker_id IS NULL AND team_id IS NOT NULL))');
+        }
     }
 
     public function down(): void

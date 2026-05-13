@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -33,10 +34,13 @@ return new class extends Migration {
         }
 
         // 3. Drop the old FK constraint and column
-        Schema::table('service_orders', function (Blueprint $table) {
-            $table->dropForeign(['equipment_id']);
-            $table->dropColumn('equipment_id');
-        });
+        // SQLite does not support dropping foreign keys or columns with indexes
+        if (DB::getDriverName() !== 'sqlite') {
+            Schema::table('service_orders', function (Blueprint $table) {
+                $table->dropForeign(['equipment_id']);
+                $table->dropColumn('equipment_id');
+            });
+        }
     }
 
     public function down(): void

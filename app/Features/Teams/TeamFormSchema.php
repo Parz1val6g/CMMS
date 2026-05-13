@@ -4,7 +4,8 @@ namespace App\Features\Teams;
 
 use App\Features\Sectors\Models\Sector;
 use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextInput, SelectInput};
+use App\Core\Forms\Fields\{TextInput, SelectInput, SearchableSelect};
+use App\Shared\Models\User;
 
 class TeamFormSchema
 {
@@ -22,6 +23,13 @@ class TeamFormSchema
                     ->setLabel(__('forms.teams.sector'))
                     ->setOptions(self::sectorOptions())
                     ->setRules('required|exists:sectors,id')
+            )
+            ->field(
+                SearchableSelect::make('responsible_id')
+                    ->setLabel(__('forms.teams.responsible'))
+                    ->setRequired()
+                    ->setOptions(self::responsibleOptions())
+                    ->setRules('required|exists:users,id')
             );
     }
 
@@ -38,6 +46,12 @@ class TeamFormSchema
                     ->setLabel(__('forms.teams.sector'))
                     ->setOptions(self::sectorOptions())
                     ->setRules('sometimes|exists:sectors,id')
+            )
+            ->field(
+                SearchableSelect::make('responsible_id')
+                    ->setLabel(__('forms.teams.responsible'))
+                    ->setOptions(self::responsibleOptions())
+                    ->setRules('sometimes|exists:users,id')
             );
     }
 
@@ -45,6 +59,16 @@ class TeamFormSchema
     {
         return Sector::orderBy('name')->get(['id', 'name'])
             ->map(fn($s) => ['value' => $s->id, 'label' => $s->name])
+            ->toArray();
+    }
+
+    private static function responsibleOptions(): array
+    {
+        return User::whereHas('roles', fn($q) => $q->where('name', 'worker'))
+            ->whereDoesntHave('worker')
+            ->orderBy('first_name')
+            ->get(['id', 'first_name', 'last_name'])
+            ->map(fn($u) => ['value' => $u->id, 'label' => $u->first_name . ' ' . $u->last_name])
             ->toArray();
     }
 }

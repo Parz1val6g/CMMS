@@ -4,7 +4,7 @@
 
 ---
 
-## ISSUE-001: Migrations — adicionar colunas cost_per_hour (5 migrations)
+## ISSUE-001: Migrations — adicionar colunas cost_per_hour (5 migrations) [GH-#41](https://github.com/Parz1val6g/CMMS/issues/41)
 
 **Labels:** `backend`, `database`, `migration`
 **Milestone:** M1
@@ -32,7 +32,7 @@ Criar 5 migrations para adicionar suporte ao campo `cost_per_hour` (decimal 10,2
 
 ---
 
-## ISSUE-002: Modelos — cast e fillable para cost_per_hour + WorkLog pivot
+## ISSUE-002: Modelos — cast e fillable para cost_per_hour + WorkLog pivot [GH-#42](https://github.com/Parz1val6g/CMMS/issues/42)
 
 **Labels:** `backend`, `model`
 **Milestone:** M1
@@ -64,7 +64,7 @@ Atualizar os modelos para reconhecerem o novo campo e criar o modelo `CostHistor
 
 ---
 
-## ISSUE-003: Observers — EquipmentObserver e WorkerObserver
+## ISSUE-003: Observers — EquipmentObserver e WorkerObserver [GH-#43](https://github.com/Parz1val6g/CMMS/issues/43)
 
 **Labels:** `backend`, `observer`
 **Milestone:** M2
@@ -95,7 +95,7 @@ Criar observers que registam automaticamente as alterações de `cost_per_hour` 
 
 ---
 
-## ISSUE-004: Snapshot — WorkLogService::approve()
+## ISSUE-004: Snapshot — WorkLogService::approve() [GH-#44](https://github.com/Parz1val6g/CMMS/issues/44)
 
 **Labels:** `backend`, `service`, `business-logic`
 **Milestone:** M3
@@ -121,7 +121,7 @@ No momento da aprovação de um work log, copiar o `cost_per_hour` atual de cada
 
 ---
 
-## ISSUE-005: Formulários — EquipmentFormSchema e WorkerFormSchema
+## ISSUE-005: Formulários — EquipmentFormSchema e WorkerFormSchema [GH-#45](https://github.com/Parz1val6g/CMMS/issues/45)
 
 **Labels:** `frontend`, `form`, `react`, `inertia`
 **Milestone:** M4
@@ -150,7 +150,7 @@ Adicionar campo `cost_per_hour` (NumberInput) aos formulários de criação e ed
 
 ---
 
-## ISSUE-006: API Resources — EquipmentResource e WorkerResource
+## ISSUE-006: API Resources — EquipmentResource e WorkerResource [GH-#46](https://github.com/Parz1val6g/CMMS/issues/46)
 
 **Labels:** `backend`, `api`
 **Milestone:** M5
@@ -173,7 +173,7 @@ Expor `cost_per_hour` nas respostas da API.
 
 ---
 
-## ISSUE-007: Traduções — EN e PT_PT
+## ISSUE-007: Traduções — EN e PT_PT [GH-#47](https://github.com/Parz1val6g/CMMS/issues/47)
 
 **Labels:** `i18n`, `translations`
 **Milestone:** M6
@@ -204,7 +204,7 @@ Adicionar as chaves de tradução para os novos campos de formulário.
 
 ---
 
-## ISSUE-008: Seeders — cost_per_hour nos factories existentes
+## ISSUE-008: Seeders — cost_per_hour nos factories existentes [GH-#48](https://github.com/Parz1val6g/CMMS/issues/48)
 
 **Labels:** `backend`, `testing`, `seeder`
 **Milestone:** M6
@@ -225,5 +225,5 @@ Atualizar factories/seeders para incluir `cost_per_hour` nos dados de exemplo.
 
 
 **Publicadas em GitHub:**
-- [#5 RC-001](https://github.com/Parz1val6g/CMMS/issues/5) . [#6 RC-002](https://github.com/Parz1val6g/CMMS/issues/6) . [#7 RC-003](https://github.com/Parz1val6g/CMMS/issues/7) . [#8 RC-004](https://github.com/Parz1val6g/CMMS/issues/8)
-- [#9 RC-005](https://github.com/Parz1val6g/CMMS/issues/9) . [#10 RC-006](https://github.com/Parz1val6g/CMMS/issues/10) . [#11 RC-007](https://github.com/Parz1val6g/CMMS/issues/11) . [#12 RC-008](https://github.com/Parz1val6g/CMMS/issues/12)
+- [#41 RC-001](https://github.com/Parz1val6g/CMMS/issues/41) . [#42 RC-002](https://github.com/Parz1val6g/CMMS/issues/42) . [#43 RC-003](https://github.com/Parz1val6g/CMMS/issues/43) . [#44 RC-004](https://github.com/Parz1val6g/CMMS/issues/44)
+- [#45 RC-005](https://github.com/Parz1val6g/CMMS/issues/45) . [#46 RC-006](https://github.com/Parz1val6g/CMMS/issues/46) . [#47 RC-007](https://github.com/Parz1val6g/CMMS/issues/47) . [#48 RC-008](https://github.com/Parz1val6g/CMMS/issues/48)

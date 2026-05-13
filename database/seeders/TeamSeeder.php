@@ -30,14 +30,19 @@ class TeamSeeder extends Seeder
             }
         }
 
+        $users = DB::table('users')->where('status', 'active')->pluck('id');
+        $userIdx = 0;
+
         foreach ($teams as $team) {
             DB::table('teams')->insert([
                 'id' => Str::uuid(),
                 'sector_id' => $team['sector_id'],
                 'name' => $team['name'],
+                'responsible_id' => $users[$userIdx % $users->count()],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+            $userIdx++;
         }
     }
 }

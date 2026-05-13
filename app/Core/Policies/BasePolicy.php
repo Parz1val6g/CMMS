@@ -94,4 +94,9 @@ class BasePolicy
     {
         return $this->hasRole($user, 'supervisor');
     }
+
+    protected function isTeamManager(User $user): bool
+    {
+        return $this->hasRole($user, 'team_manager');
+    }
 }

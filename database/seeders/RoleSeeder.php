@@ -21,6 +21,7 @@ class RoleSeeder extends Seeder
             'mini_task_manager',
             'work_log_manager',
             'sector_manager',
+            'team_manager',
         ];
 
         $existing = DB::table('roles')->whereIn('name', $roles)->pluck('name');

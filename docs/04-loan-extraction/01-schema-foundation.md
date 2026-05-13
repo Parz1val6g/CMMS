@@ -1,7 +1,7 @@
 # Issue: Schema Foundation
 **GitHub:** [#28](https://github.com/Parz1val6g/CMMS/issues/28)
 
-**Parent:** [`05-prd.md`](../03-loans/04-logic-migration/05-prd.md)
+**Parent:** [`04-prd.md`](04-prd.md)
 
 ## What to Build
 

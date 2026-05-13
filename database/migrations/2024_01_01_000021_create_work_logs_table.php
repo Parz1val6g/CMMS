@@ -13,7 +13,12 @@ return new class extends Migration {
             $table->foreignUuid('mini_task_id')->constrained('mini_tasks')->cascadeOnDelete();
             $table->timestamp('started_at');
             $table->timestamp('completed_at')->nullable();
-            $table->integer('duration_minutes')->storedAs('TIMESTAMPDIFF(MINUTE, started_at, completed_at)');
+            // SQLite does not support TIMESTAMPDIFF in generated columns
+            if (DB::getDriverName() !== 'sqlite') {
+                $table->integer('duration_minutes')->storedAs('TIMESTAMPDIFF(MINUTE, started_at, completed_at)');
+            } else {
+                $table->integer('duration_minutes')->nullable();
+            }
             $table->string('description', 250);
             $table->string('status', 20)->default('in_progress');
             $table->foreignUuid('reviewed_by')->nullable()->constrained('users')->nullOnDelete();
@@ -24,7 +29,10 @@ return new class extends Migration {
             $table->index('created_at');
         });
 
-        DB::statement('ALTER TABLE work_logs ADD CONSTRAINT check_time_order CHECK (completed_at > started_at)');
+        // SQLite does not support ALTER TABLE ADD CONSTRAINT
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE work_logs ADD CONSTRAINT check_time_order CHECK (completed_at > started_at)');
+        }
     }
 
     public function down(): void

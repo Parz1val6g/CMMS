@@ -64,9 +64,14 @@ class User extends Authenticatable
         return $this->hasOne(Client::class);
     }
 
-    public function workerProfile()
+    public function worker()
     {
         return $this->hasOne(Worker::class);
+    }
+
+    public function workerProfile()
+    {
+        return $this->worker();
     }
 
     public function managedServiceOrders()

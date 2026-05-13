@@ -59,6 +59,8 @@ export const sections = [
     label: t('pages.sidebar.section_settings'),
     items: [
       { label: t('pages.sidebar.service_types'), icon: Package, href: '/service-types', dev: false },
+      { label: t('pages.sidebar.equipment_types'), icon: Wrench, href: '/equipment-types', dev: false },
+      { label: t('pages.sidebar.counting_types'), icon: Wrench, href: '/counting-types', dev: false },
       { label: t('pages.sidebar.materials'), icon: Package, href: '/materials', dev: false },
       { label: t('pages.sidebar.exports'), icon: Download, href: '/exports', dev: true },
       { label: t('pages.sidebar.notifications'), icon: Bell, href: '/notifications', dev: true },
