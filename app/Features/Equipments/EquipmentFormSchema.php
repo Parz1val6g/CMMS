@@ -5,9 +5,29 @@ namespace App\Features\Equipments;
 use App\Core\Enums\EquipmentStatus;
 use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextInput, SelectInput, CheckboxInput, NumberInput, TextAreaInput};
+use App\Features\Equipments\Models\CountingType;
+use App\Features\Equipments\Models\EquipmentType;
 
 class EquipmentFormSchema
 {
+    private static function equipmentTypeOptions(): array
+    {
+        return EquipmentType::where('active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'category'])
+            ->map(fn ($et) => ['value' => $et->id, 'label' => $et->name . ($et->category ? " ({$et->category})" : '')])
+            ->toArray();
+    }
+
+    private static function countingTypeOptions(): array
+    {
+        return CountingType::where('active', true)
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->map(fn ($ct) => ['value' => $ct->id, 'label' => $ct->name])
+            ->toArray();
+    }
+
     public static function create(): FormSchema
     {
         return FormSchema::make(__('forms.equipments.create_title'))
@@ -33,11 +53,49 @@ class EquipmentFormSchema
                     ->setRules('nullable|string|max:150')
             )
             ->field(
+                SelectInput::make('equipment_type_id')
+                    ->setLabel(__('forms.equipments.equipment_type'))
+                    ->setOptions(self::equipmentTypeOptions())
+                    ->setRequired()
+                    ->setRules('required|string|max:36')
+            )
+            ->field(
                 TextInput::make('serial_number')
                     ->setLabel(__('forms.equipments.serial_number'))
-                    ->setRequired()
                     ->helperText(__('forms.equipments.serial_number_helper'))
-                    ->setRules('required|string|max:250|unique:equipments,serial_number')
+                    ->setRules('nullable|string|max:250|unique:equipments,serial_number')
+            )
+            ->field(
+                TextInput::make('license_plate')
+                    ->setLabel(__('forms.equipments.license_plate'))
+                    ->helperText(__('forms.equipments.license_plate_helper'))
+                    ->setRules('nullable|string|max:20')
+            )
+            ->field(
+                TextInput::make('internal_reference')
+                    ->setLabel(__('forms.equipments.internal_reference'))
+                    ->helperText(__('forms.equipments.internal_reference_helper'))
+                    ->setRules('nullable|string|max:250|unique:equipments,internal_reference')
+            )
+            ->field(
+                NumberInput::make('manufacturing_year')
+                    ->setLabel(__('forms.equipments.manufacturing_year'))
+                    ->helperText(__('forms.equipments.manufacturing_year_helper'))
+                    ->range(1900, 2099)
+                    ->setRules('nullable|integer|min:1900|max:2099')
+            )
+            ->field(
+                TextInput::make('inspection_date')
+                    ->setLabel(__('forms.equipments.inspection_date'))
+                    ->helperText(__('forms.equipments.inspection_date_helper'))
+                    ->setRules('nullable|date')
+            )
+            ->field(
+                SelectInput::make('counting_type_id')
+                    ->setLabel(__('forms.equipments.counting_type'))
+                    ->setOptions(self::countingTypeOptions())
+                    ->helperText(__('forms.equipments.counting_type_helper'))
+                    ->setRules('nullable|string|max:36')
             )
             ->field(
                 CheckboxInput::make('is_loanable')
@@ -46,7 +104,7 @@ class EquipmentFormSchema
                     ->setRules('boolean')
             )
             ->field(
-                NumberInput::make('revision_interval_days')
+                NumberInput::make('revision_interval')
                     ->setLabel(__('forms.equipments.revision_interval'))
                     ->helperText(__('forms.equipments.revision_interval_helper'))
                     ->helpExamples(['30', '90', '365'])
@@ -92,9 +150,42 @@ class EquipmentFormSchema
                     ->setRules('nullable|string|max:150')
             )
             ->field(
+                SelectInput::make('equipment_type_id')
+                    ->setLabel(__('forms.equipments.equipment_type'))
+                    ->setOptions(self::equipmentTypeOptions())
+                    ->setRules('sometimes|string|max:36')
+            )
+            ->field(
                 TextInput::make('serial_number')
                     ->setLabel(__('forms.equipments.serial_number'))
                     ->setRules('sometimes|string|max:250|unique:equipments,serial_number')
+            )
+            ->field(
+                TextInput::make('license_plate')
+                    ->setLabel(__('forms.equipments.license_plate'))
+                    ->setRules('nullable|string|max:20')
+            )
+            ->field(
+                TextInput::make('internal_reference')
+                    ->setLabel(__('forms.equipments.internal_reference'))
+                    ->setRules('nullable|string|max:250|unique:equipments,internal_reference')
+            )
+            ->field(
+                NumberInput::make('manufacturing_year')
+                    ->setLabel(__('forms.equipments.manufacturing_year'))
+                    ->range(1900, 2099)
+                    ->setRules('nullable|integer|min:1900|max:2099')
+            )
+            ->field(
+                TextInput::make('inspection_date')
+                    ->setLabel(__('forms.equipments.inspection_date'))
+                    ->setRules('nullable|date')
+            )
+            ->field(
+                SelectInput::make('counting_type_id')
+                    ->setLabel(__('forms.equipments.counting_type'))
+                    ->setOptions(self::countingTypeOptions())
+                    ->setRules('nullable|string|max:36')
             )
             ->field(
                 SelectInput::make('status')
@@ -108,7 +199,7 @@ class EquipmentFormSchema
                     ->setRules('boolean')
             )
             ->field(
-                NumberInput::make('revision_interval_days')
+                NumberInput::make('revision_interval')
                     ->setLabel(__('forms.equipments.revision_interval'))
                     ->setRules('nullable|integer|min:1')
             )

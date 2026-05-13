@@ -34,12 +34,14 @@ class EquipmentFactory extends Factory
                 'Cortador de Asfalto',
                 'Perfurador Pneumático',
             ]) . ' - ' . $this->faker->randomNumber(4),
+            'brand' => $this->faker->randomElement(['DeWalt', 'Makita', 'Bosch', 'Hilti', 'Stihl', 'Atlas Copco', 'CAT', 'JCB']),
+            'model' => strtoupper($this->faker->bothify('??-####')),
             'serial_number' => strtoupper($this->faker->unique()->bothify('??-####-##')),
             'manager_id' => User::inRandomOrder()->first()?->id ?? User::factory()->create()->id,
             // Pick from all enum values; the EquipmentStatus cast on the model handles hydration
             'status' => $this->faker->randomElement(array_map(fn(EquipmentStatus $s) => $s->value, EquipmentStatus::cases())),
             'is_loanable' => $this->faker->boolean(85),
-            'revision_interval_days' => $this->faker->randomElement([90, 180, 365, 730]),
+            'revision_interval' => $this->faker->randomElement([90, 180, 365, 730]),
             'last_revision_date' => (function () {
                 $dt = $this->faker->dateTimeBetween('-6 months', 'now');
                 if ($dt->format('Y-m-d') === '2026-03-29' && $dt->format('H') === '01') {

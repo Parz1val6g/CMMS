@@ -22,7 +22,10 @@ return new class extends Migration {
             $table->index('mini_task_id');
         });
 
-        DB::statement('ALTER TABLE attachments ADD CONSTRAINT check_attachment_entity CHECK ((service_order_id IS NOT NULL AND mini_task_id IS NULL) OR (service_order_id IS NULL AND mini_task_id IS NOT NULL))');
+        // SQLite does not support ALTER TABLE ADD CONSTRAINT
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE attachments ADD CONSTRAINT check_attachment_entity CHECK ((service_order_id IS NOT NULL AND mini_task_id IS NULL) OR (service_order_id IS NULL AND mini_task_id IS NOT NULL))');
+        }
     }
 
     public function down(): void

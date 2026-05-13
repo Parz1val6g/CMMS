@@ -16,26 +16,28 @@ class AttachmentController extends Controller
     ) {}
 
     /**
-     * Upload a new attachment
+     * Upload a new attachment (polymorphic: equipment_id XOR attachable_type+attachable_id)
      */
     public function store(Request $request): JsonResponse
     {
         $this->authorize('create', Attachment::class);
 
         $request->validate([
-            'file' => ['required', 'file', 'max:10240', 'mimes:jpeg,png,jpg,webp,pdf,doc,docx,xls,xlsx,csv'], // 10MB max + Strict Mimes
-            'service_order_id' => ['nullable', 'exists:service_orders,id', 'prohibits:mini_task_id'],
-            'mini_task_id' => ['nullable', 'exists:mini_tasks,id', 'prohibits:service_order_id'],
+            'file' => ['required', 'file', 'max:10240', 'mimes:jpeg,png,jpg,webp,pdf,doc,docx,xls,xlsx,csv'],
+            'equipment_id' => ['nullable', 'exists:equipments,id', 'prohibits:attachable_type,attachable_id'],
+            'attachable_type' => ['nullable', 'string', 'max:255', 'prohibits:equipment_id'],
+            'attachable_id' => ['nullable', 'string', 'max:36', 'prohibits:equipment_id'],
         ]);
 
-        if (!$request->service_order_id && !$request->mini_task_id) {
-            return response()->json(['message' => 'Must provide either service_order_id or mini_task_id.'], 422);
+        if (!$request->equipment_id && !$request->attachable_type) {
+            return response()->json(['message' => 'Must provide either equipment_id or attachable_type+attachable_id.'], 422);
         }
 
         $attachment = $this->attachmentService->upload(
             $request->file('file'),
-            $request->service_order_id,
-            $request->mini_task_id
+            $request->attachable_type,
+            $request->attachable_id,
+            $request->equipment_id,
         );
 
         return response()->json([

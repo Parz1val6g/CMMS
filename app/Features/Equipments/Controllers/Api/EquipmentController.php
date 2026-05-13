@@ -28,7 +28,7 @@ class EquipmentController extends Controller
         Gate::authorize('viewAny', Equipment::class);
 
         $query = $this->filterService->apply(
-            Equipment::with(['manager']),
+            Equipment::with(['manager', 'equipmentType', 'countingType']),
             $request->only(['search', 'status', 'from_date', 'to_date', 'sort']),
             ['name', 'serial_number', 'brand', 'model', 'status', 'description']
         );
@@ -59,7 +59,7 @@ class EquipmentController extends Controller
             $request->validated(),
             $request->user()->id
         );
-        $equipment->load(['manager']);
+        $equipment->load(['manager', 'equipmentType', 'countingType']);
 
         return new EquipmentResource($equipment);
     }
@@ -68,7 +68,7 @@ class EquipmentController extends Controller
     {
         Gate::authorize('view', $equipment);
 
-        $equipment->load(['manager']);
+        $equipment->load(['manager', 'equipmentType', 'countingType']);
 
         return new EquipmentResource($equipment);
     }
@@ -78,7 +78,7 @@ class EquipmentController extends Controller
         Gate::authorize('update', $equipment);
 
         $updated = $this->equipmentService->update($equipment, $request->validated());
-        $updated->load(['manager']);
+        $updated->load(['manager', 'equipmentType', 'countingType']);
 
         return new EquipmentResource($updated);
     }

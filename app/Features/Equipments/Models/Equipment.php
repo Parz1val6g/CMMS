@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
+use App\Shared\Models\Attachment;
 use App\Shared\Models\User;
 use App\Features\WorkLogs\Models\WorkLog;
 use App\Features\ServiceOrders\Models\ServiceOrder;
@@ -28,18 +30,26 @@ class Equipment extends Model
         'manager_id',
         'status',
         'is_loanable',
-        'revision_interval_days',
         'last_revision_date',
         'next_revision_date',
         'description',
         'cost_per_hour',
+        'equipment_type_id',
+        'license_plate',
+        'internal_reference',
+        'manufacturing_year',
+        'inspection_date',
+        'counting_type_id',
+        'revision_interval',
     ];
 
     protected $casts = [
         'last_revision_date' => 'datetime',
         'next_revision_date' => 'datetime',
         'is_loanable' => 'boolean',
-        'revision_interval_days' => 'integer',
+        'manufacturing_year' => 'integer',
+        'inspection_date' => 'date',
+        'revision_interval' => 'integer',
         'status' => EquipmentStatus::class,
         'cost_per_hour' => 'decimal:2',
     ];
@@ -88,11 +98,35 @@ class Equipment extends Model
     }
 
     /**
+     * Equipment type (vehicle, general, etc.)
+     */
+    public function equipmentType(): BelongsTo
+    {
+        return $this->belongsTo(EquipmentType::class, 'equipment_type_id');
+    }
+
+    /**
+     * Counting type (unit, hour, km, etc.)
+     */
+    public function countingType(): BelongsTo
+    {
+        return $this->belongsTo(CountingType::class, 'counting_type_id');
+    }
+
+    /**
      * Equipment revisions (approval history)
      */
     public function revisions(): HasMany
     {
         return $this->hasMany(EquipmentRevision::class, 'equipment_id');
+    }
+
+    /**
+     * Polymorphic attachments
+     */
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
     }
 
     // ─── Scopes ───────────────────────────────────────────────────

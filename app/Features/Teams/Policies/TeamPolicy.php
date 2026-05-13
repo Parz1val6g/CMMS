@@ -31,6 +31,11 @@ class TeamPolicy extends BasePolicy
                 ->exists();
         }
 
+        // team_manager can only view their own team
+        if ($this->isTeamManager($user)) {
+            return $team->responsible_id === $user->id;
+        }
+
         return true;
     }
 
@@ -41,7 +46,19 @@ class TeamPolicy extends BasePolicy
 
     public function update(User $user, Team $team): bool
     {
-        return $this->hasPermission($user, 'update', 'teams');
+        if (!$this->hasPermission($user, 'update', 'teams')) {
+            return false;
+        }
+
+        if ($this->isSectorManager($user)) {
+            return $team->sector->head_id === $user->id;
+        }
+
+        if ($this->isTeamManager($user)) {
+            return $team->responsible_id === $user->id;
+        }
+
+        return true;
     }
 
     public function delete(User $user, Team $team): bool

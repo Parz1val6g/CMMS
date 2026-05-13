@@ -1,7 +1,7 @@
 # Issue: Cleanup ServiceOrders - Remove Loan Branches
 **GitHub:** [#34](https://github.com/Parz1val6g/CMMS/issues/34)
 
-**Parent:** [`05-prd.md`](../03-loans/04-logic-migration/05-prd.md)
+**Parent:** [`04-prd.md`](04-prd.md)
 
 ## What to Build
 
@@ -56,7 +56,7 @@ After the data migration is complete, strip all loan-related code from the Servi
 - Remove `workflowType` and `onInitiateReturn` and `hasReturnTask` props
 - Clean up related conditional rendering
 
-**Clear [migration flag](docs/03-loans/04-logic-migration/05-prd.md)**: Add a final migration to drop `workflow_type` column from `service_orders` table and `migrated_to_loan_id` flag (if no longer needed).
+**Clear [migration flag](04-prd.md)**: Add a final migration to drop `workflow_type` column from `service_orders` table and `migrated_to_loan_id` flag (if no longer needed).
 
 ## Acceptance Criteria
 

@@ -124,6 +124,13 @@ class RolePermissionSeeder extends Seeder
                 ],
                 'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
             ],
+            'team_manager' => [
+                'resources' => [
+                    PermissionResource::TEAMS,
+                    PermissionResource::PROFILE,
+                ],
+                'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
+            ],
         ];
 
         foreach ($roleResourceActions as $roleName => $config) {

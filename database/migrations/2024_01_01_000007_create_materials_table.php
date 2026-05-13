@@ -17,7 +17,10 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
-        DB::statement('ALTER TABLE materials ADD CONSTRAINT check_stock_qty CHECK (stock_quantity >= 0)');
+        // SQLite does not support ALTER TABLE ADD CONSTRAINT
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE materials ADD CONSTRAINT check_stock_qty CHECK (stock_quantity >= 0)');
+        }
     }
 
     public function down(): void

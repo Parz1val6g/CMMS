@@ -5,7 +5,9 @@ namespace App\Features\Equipments\Controllers\Web;
 use App\Core\Enums\EquipmentStatus;
 use App\Core\Services\FilterService;
 use App\Core\Traits\FiltersAdvancedRules;
+use App\Features\Equipments\Models\CountingType;
 use App\Features\Equipments\Models\Equipment;
+use App\Features\Equipments\Models\EquipmentType;
 use App\Features\Equipments\EquipmentFormSchema;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -25,7 +27,7 @@ class EquipmentPageController extends Controller
         Gate::authorize('viewAny', Equipment::class);
 
         $query = $this->filterService->apply(
-            Equipment::with(['manager']),
+            Equipment::with(['manager', 'equipmentType', 'countingType']),
             $request->only(['search', 'status', 'from_date', 'to_date', 'sort']),
             ['name', 'serial_number', 'brand', 'model', 'status', 'description']
         );
@@ -50,12 +52,24 @@ class EquipmentPageController extends Controller
                 'brand'                  => $e->brand,
                 'model'                  => $e->model,
                 'serial_number'          => $e->serial_number,
+                'license_plate'          => $e->license_plate,
                 'status'                 => $e->status,
                 'is_loanable'            => $e->is_loanable,
-                'revision_interval_days' => $e->revision_interval_days,
+                'internal_reference'     => $e->internal_reference,
+                'manufacturing_year'     => $e->manufacturing_year,
+                'inspection_date'        => $e->inspection_date?->format('Y-m-d'),
+                'revision_interval'      => $e->revision_interval,
                 'last_revision_date'     => $e->last_revision_date?->format('Y-m-d'),
                 'next_revision'          => $e->next_revision_date?->format('Y-m-d'),
                 'description'            => $e->description,
+                'equipment_type'         => $e->equipmentType ? [
+                    'id'   => $e->equipmentType->id,
+                    'name' => $e->equipmentType->name,
+                ] : null,
+                'counting_type'          => $e->countingType ? [
+                    'id'   => $e->countingType->id,
+                    'name' => $e->countingType->name,
+                ] : null,
                 'manager'                => $e->manager ? [
                     'id'   => $e->manager->id,
                     'name' => $e->manager->first_name . ' ' . $e->manager->last_name,
@@ -66,6 +80,9 @@ class EquipmentPageController extends Controller
         $createSchema = EquipmentFormSchema::create();
         $updateSchema = EquipmentFormSchema::update();
 
+        $equipmentTypes = EquipmentType::where('active', true)->orderBy('name')->get(['id', 'name', 'category']);
+        $countingTypes = CountingType::where('active', true)->orderBy('name')->get(['id', 'name']);
+
         return Inertia::render('Equipments/Pages/Index', [
             'equipments' => $items,
             'columns' => [
@@ -73,6 +90,8 @@ class EquipmentPageController extends Controller
                 ['key' => 'brand', 'label' => 'Marca'],
                 ['key' => 'model', 'label' => 'Modelo'],
                 ['key' => 'serial_number', 'label' => 'Nº Série'],
+                ['key' => 'equipment_type', 'label' => 'Tipo Equip.'],
+                ['key' => 'license_plate', 'label' => 'Matrícula'],
                 ['key' => 'status', 'label' => 'Estado'],
                 ['key' => 'is_loanable', 'label' => 'Emprestável'],
                 ['key' => 'next_revision_date', 'label' => 'Próx. Revisão', 'sortable' => true],
@@ -88,14 +107,19 @@ class EquipmentPageController extends Controller
                 'destroy' => url('/api/equipments/__ID__'),
                 'show' => url('/api/equipments/__ID__'),
             ],
+            'formMeta' => [
+                'equipmentTypes' => $equipmentTypes,
+                'countingTypes' => $countingTypes,
+            ],
             'advancedFilterFields' => [
-                ['value' => 'name',          'label' => 'Nome'],
-                ['value' => 'brand',         'label' => 'Marca'],
-                ['value' => 'model',         'label' => 'Modelo'],
-                ['value' => 'serial_number', 'label' => 'Nº Série'],
-                ['value' => 'status',        'label' => 'Estado', 'type' => 'select', 'options' => EquipmentStatus::options()],
-                ['value' => 'description',   'label' => 'Descrição'],
-                ['value' => 'created_at',    'label' => 'Criado'],
+                ['value' => 'name',             'label' => 'Nome'],
+                ['value' => 'brand',            'label' => 'Marca'],
+                ['value' => 'model',            'label' => 'Modelo'],
+                ['value' => 'serial_number',    'label' => 'Nº Série'],
+                ['value' => 'equipment_type_id','label' => 'Tipo Equip.'],
+                ['value' => 'status',           'label' => 'Estado', 'type' => 'select', 'options' => EquipmentStatus::options()],
+                ['value' => 'description',      'label' => 'Descrição'],
+                ['value' => 'created_at',       'label' => 'Criado'],
             ],
             'filterSchema' => [
                 ['key' => 'search', 'label' => 'Pesquisa', 'type' => 'text', 'placeholder' => 'Pesquisar...'],

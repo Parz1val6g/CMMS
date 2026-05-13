@@ -1,6 +1,6 @@
 # Issues — Team Responsible Feature
 
-> Gerado a partir de: [`docs/01-inventory/03-team-responsibles/01-prd.md`](01-prd.md)
+> Gerado a partir de: [`docs/03-team-responsibles/03-prd.md`](03-prd.md)
 > Publicado em: [github.com/Parz1val6g/CMMS/issues](https://github.com/Parz1val6g/CMMS/issues)
 
 ---

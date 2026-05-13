@@ -1,7 +1,7 @@
 # Issue: Final Tests + Audit
 **GitHub:** [#35](https://github.com/Parz1val6g/CMMS/issues/35)
 
-**Parent:** [`05-prd.md`](../03-loans/04-logic-migration/05-prd.md)
+**Parent:** [`04-prd.md`](04-prd.md)
 
 ## What to Build
 

@@ -2,6 +2,14 @@
 
 namespace App\Core\Forms;
 
+use App\Core\Forms\Fields\CheckboxInput;
+use App\Core\Forms\Fields\EmailInput;
+use App\Core\Forms\Fields\FileInput;
+use App\Core\Forms\Fields\MapInput;
+use App\Core\Forms\Fields\NumberInput;
+use App\Core\Forms\Fields\SelectInput;
+use App\Core\Forms\Fields\SectionHeader;
+use App\Core\Forms\Fields\TextAreaInput;
 use Illuminate\Validation\Rule;
 use Psr\Log\LoggerInterface;
 

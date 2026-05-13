@@ -27,6 +27,8 @@ class DatabaseSeeder extends Seeder
             ServiceTypeSeeder::class,
             UnitSeeder::class,
             MaterialSeeder::class,
+            EquipmentTypeSeeder::class,      // predefined equipment types
+            CountingTypeSeeder::class,       // predefined counting types
             EquipmentSeeder::class,          // all statuses: active, maintenance, reserved, inactive
             AppSettingSeeder::class,
 

@@ -29,7 +29,7 @@ class TeamController extends Controller
         Gate::authorize('viewAny', Team::class);
 
         $query = $this->filterService->apply(
-            Team::with(['sector']),
+            Team::with(['sector', 'responsible']),
             $request->only(['search', 'sort']),
             ['name']
         );
@@ -61,7 +61,7 @@ class TeamController extends Controller
         Gate::authorize('create', Team::class);
 
         $team = $this->teamService->create($request->validated());
-        $team->load(['sector']);
+        $team->load(['sector', 'responsible']);
 
         return new TeamResource($team);
     }
@@ -70,7 +70,7 @@ class TeamController extends Controller
     {
         Gate::authorize('view', $team);
 
-        $team->load(['sector']);
+        $team->load(['sector', 'responsible']);
 
         return new TeamResource($team);
     }
@@ -80,7 +80,7 @@ class TeamController extends Controller
         Gate::authorize('update', $team);
 
         $updated = $this->teamService->update($team, $request->validated());
-        $updated->load(['sector']);
+        $updated->load(['sector', 'responsible']);
 
         return new TeamResource($updated);
     }

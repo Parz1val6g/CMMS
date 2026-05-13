@@ -1,7 +1,7 @@
 # Issue: Create Loan Order - Full Backend + API
 **GitHub:** [#30](https://github.com/Parz1val6g/CMMS/issues/30)
 
-**Parent:** [`05-prd.md`](../03-loans/04-logic-migration/05-prd.md)
+**Parent:** [`04-prd.md`](04-prd.md)
 
 ## What to Build
 

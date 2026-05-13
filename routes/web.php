@@ -48,6 +48,12 @@ Route::middleware(['auth', 'web.access'])->group(function () {
     // Equipments (Loan workflow)
     require base_path('app/Features/Equipments/Routes/web.php');
 
+    // Equipment Types
+    require base_path('app/Features/Equipments/Routes/equipment_types_web.php');
+
+    // Counting Types
+    require base_path('app/Features/Equipments/Routes/counting_types_web.php');
+
     // Exports
     require base_path('app/Features/Export/Routes/web.php');
 

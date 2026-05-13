@@ -35,6 +35,12 @@ Route::prefix('exports')->group(base_path('app/Features/Export/Routes/api.php'))
 // Register Equipments Routes
 Route::prefix('equipments')->group(base_path('app/Features/Equipments/Routes/api.php'));
 
+// Register Equipment Types Routes
+Route::prefix('equipment-types')->group(base_path('app/Features/Equipments/Routes/equipment_types_api.php'));
+
+// Register Counting Types Routes
+Route::prefix('counting-types')->group(base_path('app/Features/Equipments/Routes/counting_types_api.php'));
+
 // Register Unit Routes
 Route::prefix('units')->group(base_path('routes/api/units.php'));
 

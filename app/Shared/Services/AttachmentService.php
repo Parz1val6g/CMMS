@@ -1,40 +1,51 @@
 <?php
+
 namespace App\Shared\Services;
+
 use App\Shared\Models\Attachment;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+
 class AttachmentService
 {
     /**
-     * Upload and attach a file.
+     * Upload and attach a file to any attachable entity.
+     *
+     * @param  UploadedFile       $file
+     * @param  string|null        $attachableType  Morph type (ServiceOrder::class, MiniTask::class, Equipment::class)
+     * @param  string|null        $attachableId    Morph ID
+     * @param  string|null        $equipmentId     Direct FK to equipment (optional, for convenience)
+     * @return Attachment
      */
-    public function upload(UploadedFile $file, ?string $serviceOrderId = null, ?string $miniTaskId = null): Attachment
-    {
-        // Enforce strict business logic from db_tables.sql
-        if ($serviceOrderId && $miniTaskId)
-            throw new InvalidArgumentException('Attachment cannot belong to both a Service Order and a Mini Task.');
+    public function upload(
+        UploadedFile $file,
+        ?string $attachableType = null,
+        ?string $attachableId = null,
+        ?string $equipmentId = null,
+    ): Attachment {
+        if (($attachableType && !$attachableId) || (!$attachableType && $attachableId)) {
+            throw new InvalidArgumentException('Both attachable_type and attachable_id must be provided together.');
+        }
 
-        if (!$serviceOrderId && !$miniTaskId)
-            throw new InvalidArgumentException('Attachment must belong to either a Service Order or a Mini Task.');
-
-        // Keep local storage highly organized
-        $folder = $serviceOrderId ? "service-orders/{$serviceOrderId}" : "mini-tasks/{$miniTaskId}";
+        $short = $attachableType ? class_basename($attachableType) : 'orphan';
+        $folder = $equipmentId ? "equipment/{$equipmentId}" : Str::plural(strtolower($short)) . "/{$attachableId}";
         $path = $file->store("attachments/{$folder}", 'public');
 
-        // Use server-generated UUID filename — never trust client-supplied names
         $ext = $file->getClientOriginalExtension();
         $safeName = Str::uuid() . '.' . $ext;
 
         return Attachment::create([
-            'service_order_id' => $serviceOrderId,
-            'mini_task_id' => $miniTaskId,
+            'equipment_id' => $equipmentId,
+            'attachable_type' => $attachableType,
+            'attachable_id' => $attachableId,
             'file_path' => $path,
             'file_name' => $safeName,
             'mime_type' => $file->getMimeType(),
         ]);
     }
+
     /**
      * Safely delete the file from disk and the database record.
      */

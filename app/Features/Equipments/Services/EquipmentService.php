@@ -20,12 +20,19 @@ class EquipmentService
                 'name' => $data['name'],
                 'brand' => $data['brand'] ?? null,
                 'model' => $data['model'] ?? null,
-                'serial_number' => $data['serial_number'],
+                'serial_number' => $data['serial_number'] ?? null,
                 'manager_id' => $managerId,
                 'status' => EquipmentStatus::ACTIVE->value,
                 'is_loanable' => $data['is_loanable'] ?? true,
                 'description' => $data['description'] ?? null,
-                'revision_interval_days' => $data['revision_interval_days'] ?? 365,
+                'equipment_type_id' => $data['equipment_type_id'] ?? null,
+                'license_plate' => $data['license_plate'] ?? null,
+                'cost_per_hour' => $data['cost_per_hour'] ?? null,
+                'internal_reference' => $data['internal_reference'] ?? null,
+                'manufacturing_year' => $data['manufacturing_year'] ?? null,
+                'inspection_date' => $data['inspection_date'] ?? null,
+                'counting_type_id' => $data['counting_type_id'] ?? null,
+                'revision_interval' => $data['revision_interval'] ?? 365,
             ]);
         });
     }
