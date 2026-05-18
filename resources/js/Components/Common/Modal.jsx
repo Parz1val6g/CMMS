@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import FormField from '@/Components/Common/FormField';
 import FormInput from '@/Components/Common/FormInput';
+import EquipmentLoanItems from '@/Components/Common/EquipmentLoanItems';
 import { X } from 'lucide-react';
 import { useToast } from '@/Components/Toast/ToastContext';
 import { t } from '@/utils/i18n';
@@ -11,6 +12,20 @@ const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.conte
 
 /* ── Fields to hide per workflow type ────────────────────────── */
 // BACKEND: StoreServiceOrderRequest — prohibited fields for workflow_type=loan
+function evalCondition({ operator, value }, fieldValue) {
+  switch (operator) {
+    case '==':     return fieldValue === value;
+    case '!=':     return fieldValue !== value;
+    case '>':      return fieldValue > value;
+    case '<':      return fieldValue < value;
+    case '>=':     return fieldValue >= value;
+    case '<=':     return fieldValue <= value;
+    case 'in':     return Array.isArray(value) && value.includes(fieldValue);
+    case 'not_in': return !Array.isArray(value) || !value.includes(fieldValue);
+    default:       return true;
+  }
+}
+
 const LOAN_HIDDEN = new Set([
   'service_type_id',
   'sector_ids',
@@ -41,6 +56,9 @@ function collectFormData(form, fields, formValues) {
       const lngField = f.metadata?.lngField ?? 'longitude';
       if (form.elements[latField]) data[latField] = form.elements[latField].value;
       if (form.elements[lngField]) data[lngField] = form.elements[lngField].value;
+    } else if (f.type === 'checkbox' || f.type === 'toggle') {
+      // Boolean toggles use React state — DOM el.value is always "on"/"off"
+      data[name] = formValues[name] ?? false;
     } else {
       const el = form.elements[name];
       if (!el) return;
@@ -56,8 +74,22 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
   const [formValues, setFormValues] = useState({});
+  const [equipmentDetails, setEquipmentDetails] = useState({});
   const [workflowType, setWorkflowType] = useState('regular');
   const toast = useToast();
+
+  /* ── Locked workers — derived from selected team_ids ─────── */
+  const lockedWorkerIds = useMemo(() => {
+    const isObj = !Array.isArray(formSchema) && formSchema !== null;
+    const schemaFields = isObj ? (formSchema?.inputs ?? []) : formSchema;
+    const workerField = schemaFields.find(f => (f.key ?? f.name) === 'worker_ids');
+    const workerOpts = workerField?.options ?? [];
+    const selectedTeams = Array.isArray(formValues.team_ids) ? formValues.team_ids : [];
+    if (selectedTeams.length === 0) return [];
+    return workerOpts
+      .filter(w => w.team_id && selectedTeams.includes(w.team_id))
+      .map(w => w.value);
+  }, [formValues.team_ids, formSchema]);
   /* ── Extract fields & schemaTitle from formSchema ──────────── */
   const { fields, schemaTitle } = useMemo(() => {
     const isObj = !Array.isArray(formSchema) && formSchema !== null;
@@ -90,15 +122,19 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
     return () => document.removeEventListener('toggle-change', handler);
   }, [open]);
 
-  /* ── Compute visible fields based on workflow type ───────── */
+  /* ── Compute visible fields based on workflow type + field conditions ── */
   const visibleFields = useMemo(() => {
     return fields.filter(f => {
       const key = f.key ?? f.name ?? '';
-      if (workflowType === 'loan') return !LOAN_HIDDEN.has(key);
-      if (workflowType === 'regular') return !REGULAR_HIDDEN.has(key);
+      if (workflowType === 'loan' && LOAN_HIDDEN.has(key)) return false;
+      if (workflowType === 'regular' && REGULAR_HIDDEN.has(key)) return false;
+      if (f.condition) {
+        const cv = formValues[f.condition.field] ?? '';
+        return evalCondition(f.condition, cv);
+      }
       return true;
     });
-  }, [fields, workflowType]);
+  }, [fields, formValues, workflowType]);
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose?.(); };
@@ -115,12 +151,36 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
   
   /* ── Generic onChange to update formValues state ─────────── */
   const updateValue = useCallback((name, val) => {
-    setFormValues(prev => ({ ...prev, [name]: val }));
-    // Also write to native form element for backward compat
+    setFormValues(prev => {
+      const next = { ...prev, [name]: val };
+      if (name === 'team_ids') {
+        const isObj = !Array.isArray(formSchema) && formSchema !== null;
+        const schemaFields = isObj ? (formSchema?.inputs ?? []) : formSchema;
+        const workerField = schemaFields.find(f => (f.key ?? f.name) === 'worker_ids');
+        const workerOpts = workerField?.options ?? [];
+        const selectedTeams = Array.isArray(val) ? val : [];
+        const newLockedIds = workerOpts
+          .filter(w => w.team_id && selectedTeams.includes(w.team_id))
+          .map(w => w.value);
+        const existingWorkers = Array.isArray(prev.worker_ids) ? prev.worker_ids : [];
+        const prevLockedIds = workerOpts
+          .filter(w => w.team_id && Array.isArray(prev.team_ids) && prev.team_ids.includes(w.team_id))
+          .map(w => w.value);
+        const keptWorkers = existingWorkers.filter(id => !prevLockedIds.includes(id));
+        next.worker_ids = [...new Set([...keptWorkers, ...newLockedIds])];
+      }
+      return next;
+    });
     const el = formRef.current?.elements[name];
     if (el) el.value = val;
-    // Notify external listeners (e.g. ClientLocationSelector)
     document.dispatchEvent(new CustomEvent('modal-field-change', { detail: { name, value: val } }));
+  }, [formSchema]);
+
+  const updateEquipmentDetail = useCallback((equipmentId, field, value) => {
+    setEquipmentDetails(prev => ({
+      ...prev,
+      [equipmentId]: { ...prev[equipmentId], [field]: value },
+    }));
   }, []);
 
   /* ── Listen for autofill-location events (from ClientLocationSelector) ── */
@@ -139,7 +199,18 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
 
     // If an external onSubmit was provided, delegate to it
     if (externalSubmit) {
-      externalSubmit(e, formValues);
+      const ids = formValues.equipment_ids ?? [];
+      if (ids.length > 0 && Object.keys(equipmentDetails).length > 0) {
+        const equipments = ids.map(id => ({
+          equipment_id: id,
+          start_date: equipmentDetails[id]?.start_date ?? null,
+          end_date: equipmentDetails[id]?.end_date ?? null,
+          needs_operator: equipmentDetails[id]?.needs_operator ?? false,
+        }));
+        externalSubmit({ ...formValues, equipments });
+      } else {
+        externalSubmit(formValues);
+      }
       return;
     }
 
@@ -227,51 +298,88 @@ export default function Modal({ entityName = 'Record', title, formSchema = [], r
           {/* Global error */}
           {errors._general && (
             <div className="px-6 pt-2">
-              <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-300">{errors._general}</div>
+              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{errors._general}</div>
             </div>
           )}
 
           <div className="overflow-y-auto px-6 py-4 max-h-[60vh] space-y-4">
-            {/* ── Legacy: children at top when injectAfterField not set ── */}
-            {!injectAfterField && children}
-            {visibleFields.flatMap((field, i) => {
-              const key = field.key ?? field.name ?? '';
+            {/* Render fields with optional inline injections */}
+            {visibleFields.map((field, i) => {
               const name = field.name ?? field.key;
               const fieldError = errors[name]?.join?.(' ') ?? errors[name];
               const currentVal = formValues[name] ?? '';
 
-              // Build field element
-              const basicInputTypes = ['text', 'email', 'number', 'password', 'phone', 'url'];
-              const el = basicInputTypes.includes(field.type)
-                ? (
-                    <FormInput
-                      key={i}
-                      field={field}
-                      value={currentVal}
-                      onChange={(e) => updateValue(name, e.target.value)}
-                      error={fieldError}
-                    />
-                  )
-                : (
-                    <FormField
-                      key={i}
-                      field={field}
-                      value={currentVal}
-                      error={fieldError}
-                      onChange={(val) => updateValue(name, val)}
-                    />
-                  );
+              // Determine if we should inject content after this field
+              const shouldInjectAfter = injectAfterField && (
+                (typeof injectAfterField === 'string' && injectAfterField === name) ||
+                (Array.isArray(injectAfterField) && injectAfterField.some(entry => entry.fieldKey === name))
+              );
 
-              // Inject children after the target field
-              const isInjectPoint = injectAfterField && key === injectAfterField;
-              return isInjectPoint && children ? [el, <div key="injected-children">{children}</div>] : el;
+              // Get injected content for this field
+              const injectedContent = Array.isArray(injectAfterField)
+                ? injectAfterField.find(entry => entry.fieldKey === name)?.content
+                : null;
+
+              return (
+                <div key={i}>
+                  {/* Use FormInput for basic input types (uncontrolled via defaultValue) */}
+                  {(() => {
+                    const basicInputTypes = ['text', 'email', 'number', 'password', 'phone', 'url'];
+                    if (basicInputTypes.includes(field.type)) {
+                      return (
+                        <FormInput
+                          field={field}
+                          value={currentVal}
+                          onChange={(e) => updateValue(name, e.target.value)}
+                          error={fieldError}
+                        />
+                      );
+                    }
+
+                    if (field.type === 'equipment-loan-section') {
+                      const equipmentIds = formValues.equipment_ids ?? [];
+                      const options = field.metadata?.options ?? [];
+                      return (
+                        <EquipmentLoanItems
+                          equipmentOptions={options}
+                          selectedIds={equipmentIds}
+                          values={equipmentDetails}
+                          onChange={updateEquipmentDetail}
+                        />
+                      );
+                    }
+
+                    // Use FormField for complex types (map, select, file, etc)
+                    const fieldLockedValues = name === 'worker_ids' ? lockedWorkerIds : [];
+                    return (
+                      <FormField
+                        field={field}
+                        value={currentVal}
+                        error={fieldError}
+                        onChange={(val) => updateValue(name, val)}
+                        lockedValues={fieldLockedValues}
+                      />
+                    );
+                  })()}
+
+                  {/* Inject content after this field if specified */}
+                  {shouldInjectAfter && (
+                    <>
+                      {typeof injectAfterField === 'string' ? children : injectedContent}
+                    </>
+                  )}
+                </div>
+              );
             })}
+
+            {/* Fallback: render children at end if no injectAfterField specified */}
+            {!injectAfterField && children}
           </div>
 
           <div className="flex items-center justify-end gap-3 border-t border-brand-mid/20 px-6 py-4">
             <button
               type="button"
-              className="rounded-lg border border-brand-mid/20 bg-brand-light px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-mid/10 transition-colors"
+              className="rounded-lg border border-brand-mid/20 bg-brand-white px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-light transition-colors"
               onClick={onClose}
               disabled={saving}
             >
