@@ -18,27 +18,26 @@ class TeamService
     public function create(array $data): Team
     {
         return $this->transactions->execute(function () use ($data) {
-            $user = User::findOrFail($data['responsible_id']);
+            $responsibleId = $data['responsible_id'] ?? null;
 
-            if (Worker::where('user_id', $user->id)->exists()) {
-                throw ValidationException::withMessages([
-                    'responsible_id' => __('validation.custom.responsible_already_worker'),
-                ]);
+            if ($responsibleId) {
+                $alreadyWorker = Worker::where('user_id', $responsibleId)->exists();
+                if ($alreadyWorker) {
+                    throw ValidationException::withMessages([
+                        'responsible_id' => [__('validation.custom.responsible_already_worker')],
+                    ]);
+                }
             }
 
             $team = Team::create([
-                'sector_id' => $data['sector_id'],
-                'name' => $data['name'],
-                'responsible_id' => $data['responsible_id'],
+                'sector_id'      => $data['sector_id'],
+                'responsible_id' => $responsibleId,
+                'name'           => $data['name'],
             ]);
 
-            $this->ensureRole($user, 'team_manager');
-            $this->ensureRole($user, 'worker');
-
-            Worker::create([
-                'user_id' => $user->id,
-                'team_id' => $team->id,
-            ]);
+            if ($responsibleId) {
+                $this->assignWorkerAndRoles($responsibleId, $team->id);
+            }
 
             return $team;
         });
@@ -47,18 +46,10 @@ class TeamService
     public function update(Team $team, array $data): Team
     {
         return $this->transactions->execute(function () use ($team, $data) {
-            if (isset($data['responsible_id']) && $data['responsible_id'] !== $team->responsible_id) {
-                $user = User::findOrFail($data['responsible_id']);
+            $newResponsibleId = $data['responsible_id'] ?? $team->responsible_id;
 
-                $this->ensureRole($user, 'team_manager');
-                $this->ensureRole($user, 'worker');
-
-                if (!Worker::where('user_id', $user->id)->where('team_id', $team->id)->exists()) {
-                    Worker::create([
-                        'user_id' => $user->id,
-                        'team_id' => $team->id,
-                    ]);
-                }
+            if ($newResponsibleId && $newResponsibleId !== $team->responsible_id) {
+                $this->assignWorkerAndRoles($newResponsibleId, $team->id);
             }
 
             $team->update($data);
@@ -73,13 +64,27 @@ class TeamService
         });
     }
 
-    private function ensureRole(User $user, string $roleName): void
+    private function assignWorkerAndRoles(string|int $userId, string|int $teamId): void
     {
-        if ($user->roles()->where('name', $roleName)->exists()) {
-            return;
+        $workerExists = Worker::where('user_id', $userId)
+            ->where('team_id', $teamId)
+            ->exists();
+
+        if (!$workerExists) {
+            Worker::create([
+                'user_id' => $userId,
+                'team_id' => $teamId,
+            ]);
         }
 
-        $role = Role::where('name', $roleName)->firstOrFail();
-        $user->roles()->attach($role);
+        $user = User::find($userId);
+        if ($user) {
+            foreach (['team_manager', 'worker'] as $roleName) {
+                $role = Role::where('name', $roleName)->first();
+                if ($role && !$user->roles()->where('name', $roleName)->exists()) {
+                    $user->roles()->attach($role->id);
+                }
+            }
+        }
     }
 }

@@ -17,10 +17,12 @@ class RoleSeeder extends Seeder
             'supervisor',
             'worker',
             'client',
+            'entidade',
             'task_manager',
             'mini_task_manager',
             'work_log_manager',
             'sector_manager',
+            'ticket_manager',
             'team_manager',
         ];
 
