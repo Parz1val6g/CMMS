@@ -37,9 +37,12 @@ class RolePermissionSeeder extends Seeder
                     PermissionResource::MATERIALS,
                     PermissionResource::UNITS,
                     PermissionResource::ATTACHMENTS,
+                    PermissionResource::LOAN_ORDERS,
+                    PermissionResource::ENTITIES,
                     PermissionResource::PROFILE,
                     PermissionResource::SESSIONS,
                     PermissionResource::LOGIN_HISTORIES,
+                    PermissionResource::TICKETS,
                 ],
                 // manager can view all operational, create+update on most
                 'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
@@ -124,9 +127,30 @@ class RolePermissionSeeder extends Seeder
                 ],
                 'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
             ],
+            'ticket_manager' => [
+                'resources' => [
+                    PermissionResource::TICKETS,
+                    PermissionResource::PROFILE,
+                ],
+                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE, PermissionAction::DELETE],
+            ],
+            'entidade' => [
+                'resources' => [
+                    PermissionResource::LOAN_ORDERS,
+                    PermissionResource::ENTITIES,
+                    PermissionResource::PROFILE,
+                ],
+                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE],
+            ],
             'team_manager' => [
                 'resources' => [
                     PermissionResource::TEAMS,
+                    PermissionResource::WORKERS,
+                    PermissionResource::MINI_TASKS,
+                    PermissionResource::WORK_LOGS,
+                    PermissionResource::TASKS,
+                    PermissionResource::EQUIPMENTS,
+                    PermissionResource::LOCATIONS,
                     PermissionResource::PROFILE,
                 ],
                 'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
