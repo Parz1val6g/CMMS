@@ -6,6 +6,7 @@ use App\Core\Traits\HasAutoReference;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Features\MiniTasks\Models\Pivots\MiniTaskAssignment;
+use App\Features\MiniTasks\Models\Pivots\MiniTaskMaterial;
 use App\Features\Tasks\Models\Task;
 use App\Shared\Models\User;
 use App\Features\Workers\Models\Worker;
@@ -53,6 +54,7 @@ class MiniTask extends Model
     
     public function materials() {
         return $this->belongsToMany(Material::class, 'mini_tasks_materials', 'mini_task_id', 'material_id')
+            ->using(MiniTaskMaterial::class)
             ->withPivot('planned_quantity');
     }
     

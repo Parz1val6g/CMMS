@@ -14,9 +14,15 @@ class StoreLoanOrderRequest extends FormRequest
 
     public function rules(): array
     {
+        $isEntity = $this->user()->isEntity();
+
         return [
-            'entity_id'       => ['required', 'uuid', 'exists:entities,id'],
-            'manager_id'      => ['required', 'uuid', 'exists:users,id'],
+            'entity_id'  => $isEntity
+                ? ['nullable', 'uuid', 'exists:entities,id']
+                : ['required', 'uuid', 'exists:entities,id'],
+            'manager_id' => $isEntity
+                ? ['nullable', 'uuid', 'exists:users,id']
+                : ['required', 'uuid', 'exists:users,id'],
             'equipment_ids'   => ['sometimes', 'array'],
             'equipment_ids.*' => ['uuid', 'exists:equipments,id'],
             'equipments'                  => ['nullable', 'array'],

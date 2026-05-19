@@ -1,100 +1,180 @@
 import { useState, useCallback } from 'react';
 import { router } from '@inertiajs/react';
 import { t } from '@/utils/i18n';
-import { labelFor, badgeStyle } from '@/utils/enums';
+import { labelFor } from '@/utils/enums';
 import { formatDate } from '@/utils/format';
+import { CheckCircle, XCircle, LogOut, RotateCcw, Package, Loader2 } from 'lucide-react';
 
-function DetailRow({ label, value }) {
+/* ── Shared badge palette (light-background, WCAG AA) ─────────────── */
+const STATUS_BADGE = {
+  pending:     'bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-300/60',
+  approved:    'bg-blue-50 text-blue-800 ring-1 ring-inset ring-blue-300/60',
+  checked_out: 'bg-purple-50 text-purple-800 ring-1 ring-inset ring-purple-300/60',
+  returned:    'bg-green-50 text-green-800 ring-1 ring-inset ring-green-300/60',
+  cancelled:   'bg-red-50 text-red-800 ring-1 ring-inset ring-red-300/60',
+};
+
+function StatusBadge({ value }) {
+  const cls = STATUS_BADGE[String(value ?? '').toLowerCase()]
+    ?? 'bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-300/60';
   return (
-    <div className="d-flex mb-2">
-      <span className="text-brand-mid fw-semibold" style={{ minWidth: 110 }}>{label}</span>
-      <span className="text-brand-white">{value ?? t('pages.loan_orders.value_missing')}</span>
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cls}`}>
+      {labelFor(value)}
+    </span>
+  );
+}
+
+/* ── Reusable field block: label above value ──────────────────────── */
+function Field({ label, value, children }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{label}</span>
+      {children ?? (
+        <span className="text-sm text-gray-800 font-medium">
+          {value ?? <span className="text-gray-400 font-normal italic">—</span>}
+        </span>
+      )}
     </div>
   );
 }
 
+/* ── Section header ───────────────────────────────────────────────── */
+function SectionTitle({ children }) {
+  return (
+    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3 mt-6 first:mt-0 pb-1.5 border-b border-gray-100">
+      {children}
+    </h3>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   TAB: DETALHES
+   ════════════════════════════════════════════════════════════════════ */
 function DetailsTab({ lo }) {
   return (
-    <div className="p-3">
-      <h6 className="text-brand-accent fw-bold mb-3">{t('pages.loan_orders.section_description')}</h6>
-      <p className="text-brand-white mb-4">{lo.description || t('pages.loan_orders.value_missing')}</p>
+    <div className="space-y-0">
 
+      {/* Descrição */}
+      <SectionTitle>{t('pages.loan_orders.section_description')}</SectionTitle>
+      <p className="text-sm text-gray-700 leading-relaxed">
+        {lo.description || <span className="text-gray-400 italic">{t('pages.loan_orders.value_missing')}</span>}
+      </p>
+
+      {/* Entidade */}
       {lo.entity && (
         <>
-          <h6 className="text-brand-accent fw-bold mb-3 mt-4">{t('pages.loan_orders.section_entity')}</h6>
-          <DetailRow label={t('pages.loan_orders.card_client_label')} value={lo.entity.name} />
-          {lo.entity.entity_type && (
-            <DetailRow label={t('pages.loan_orders.entity_type_label')} value={labelFor(lo.entity.entity_type)} />
-          )}
-          {lo.entity.nif && (
-            <DetailRow label={t('pages.loan_orders.label_nif')} value={lo.entity.nif} />
-          )}
+          <SectionTitle>{t('pages.loan_orders.section_entity')}</SectionTitle>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+            <Field label={t('pages.loan_orders.card_client_label')} value={lo.entity.name} />
+            {lo.entity.entity_type && (
+              <Field label={t('pages.loan_orders.entity_type_label')} value={labelFor(lo.entity.entity_type)} />
+            )}
+            {lo.entity.nif && (
+              <Field label={t('pages.loan_orders.label_nif')} value={lo.entity.nif} />
+            )}
+          </div>
         </>
       )}
 
-      <h6 className="text-brand-accent fw-bold mb-3 mt-4">{t('pages.loan_orders.section_manager')}</h6>
-      <DetailRow label={t('pages.loan_orders.card_manager_label')} value={lo.manager?.name} />
-
-      {lo.location && (
-        <>
-          <h6 className="text-brand-accent fw-bold mb-3 mt-4">{t('pages.loan_orders.section_location')}</h6>
-          <DetailRow label={t('pages.loan_orders.parish_label')} value={lo.location.parish?.name} />
-          <DetailRow label={t('pages.loan_orders.street_label')} value={lo.location.street} />
-          <DetailRow label={t('pages.loan_orders.reference_label')} value={lo.location.reference_point} />
-        </>
-      )}
-
-      <h6 className="text-brand-accent fw-bold mb-3 mt-4">{t('pages.loan_orders.section_status')}</h6>
-      <div className="mb-2">
-        <span className={badgeStyle(lo.status)}>{labelFor(lo.status)}</span>
+      {/* Gestor */}
+      <SectionTitle>{t('pages.loan_orders.section_manager')}</SectionTitle>
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+        <Field
+          label={t('pages.loan_orders.card_manager_label')}
+          value={lo.manager?.name ?? <span className="text-gray-400 italic">{t('pages.loan_orders.value_missing')}</span>}
+        />
       </div>
 
-      <DetailRow label={t('pages.loan_orders.section_created_at')} value={formatDate(lo.created_at)} />
-      {lo.approved_at && <DetailRow label={t('pages.loan_orders.section_approved_at')} value={formatDate(lo.approved_at)} />}
-      {lo.checked_out_at && <DetailRow label={t('pages.loan_orders.section_checked_out_at')} value={formatDate(lo.checked_out_at)} />}
-      {lo.returned_at && <DetailRow label={t('pages.loan_orders.section_returned_at')} value={formatDate(lo.returned_at)} />}
-      {lo.cancelled_at && <DetailRow label={t('pages.loan_orders.section_cancelled_at')} value={formatDate(lo.cancelled_at)} />}
+      {/* Localização */}
+      {lo.location && (
+        <>
+          <SectionTitle>{t('pages.loan_orders.section_location')}</SectionTitle>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+            <Field label={t('pages.loan_orders.parish_label')} value={lo.location.parish?.name} />
+            <Field label={t('pages.loan_orders.street_label')} value={lo.location.street} />
+            {lo.location.landmark && (
+              <Field label={t('pages.loan_orders.reference_label')} value={lo.location.landmark} />
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Estado e Datas */}
+      <SectionTitle>{t('pages.loan_orders.section_status')}</SectionTitle>
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+        <Field label="Estado">
+          <StatusBadge value={lo.status} />
+        </Field>
+        <Field label={t('pages.loan_orders.section_created_at')} value={formatDate(lo.created_at)} />
+        {lo.approved_at  && <Field label={t('pages.loan_orders.section_approved_at')}    value={formatDate(lo.approved_at)} />}
+        {lo.checked_out_at && <Field label={t('pages.loan_orders.section_checked_out_at')} value={formatDate(lo.checked_out_at)} />}
+        {lo.returned_at  && <Field label={t('pages.loan_orders.section_returned_at')}    value={formatDate(lo.returned_at)} />}
+        {lo.cancelled_at && <Field label={t('pages.loan_orders.section_cancelled_at')}   value={formatDate(lo.cancelled_at)} />}
+      </div>
     </div>
   );
 }
 
+/* ════════════════════════════════════════════════════════════════════
+   TAB: EQUIPAMENTO
+   ════════════════════════════════════════════════════════════════════ */
+const EQ_BADGE = {
+  true:  'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200',
+  false: 'bg-gray-100 text-gray-500 ring-1 ring-inset ring-gray-200',
+};
+
 function EquipmentCard({ eq }) {
-  const eqBadgeStyle = badgeStyle(eq.is_loanable ? 'available' : 'unavailable');
+  const available = Boolean(eq.is_loanable);
+  const badgeCls = EQ_BADGE[String(available)];
+
   return (
-    <div className="card bg-brand-dark border-brand-mid mb-2 shadow-sm">
-      <div className="card-body py-2 px-3">
-        <div className="d-flex justify-content-between align-items-start">
-          <div>
-            <h6 className="text-brand-white fw-bold mb-1">{eq.name}</h6>
-            <small className="text-brand-mid d-block">
-              {t('pages.loan_orders.brand_label')} {eq.brand || t('pages.loan_orders.value_missing')}
-            </small>
-            {eq.model && (
-              <small className="text-brand-mid d-block">
-                {t('pages.loan_orders.model_label')} {eq.model}
-              </small>
-            )}
-            <small className="text-brand-mid d-block">
-              {t('pages.loan_orders.serial_label')} {eq.serial_number || t('pages.loan_orders.value_missing')}
-            </small>
-            {eq.start_date && (
-              <small className="text-brand-mid d-block">
-                {t('pages.loan_orders.start_date')}: {formatDate(eq.start_date)}
-                {eq.end_date && ` — ${formatDate(eq.end_date)}`}
-              </small>
-            )}
-            {eq.needs_operator && (
-              <small className="text-brand-accent d-block">{t('pages.loan_orders.needs_operator')}</small>
-            )}
-          </div>
-          <span className={`badge ${eqBadgeStyle}`}>
-            {eq.is_loanable ? t('pages.loan_orders.status_loanable') : t('pages.loan_orders.status_not_loanable')}
-          </span>
+    <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 mb-3 last:mb-0">
+      {/* Name + badge */}
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <Package size={15} className="text-gray-400 shrink-0" />
+          <span className="text-sm font-semibold text-gray-900 truncate">{eq.name}</span>
         </div>
-        {eq.description && (
-          <p className="text-brand-mid small mt-1 mb-0">{eq.description}</p>
+        <span className={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeCls}`}>
+          {available ? t('pages.loan_orders.status_loanable') : t('pages.loan_orders.status_not_loanable')}
+        </span>
+      </div>
+
+      {/* Metadata row */}
+      <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-gray-500">
+        {eq.brand && (
+          <span><span className="text-gray-400">{t('pages.loan_orders.brand_label')}</span> {eq.brand}</span>
+        )}
+        {eq.model && (
+          <span><span className="text-gray-400">{t('pages.loan_orders.model_label')}</span> {eq.model}</span>
+        )}
+        <span>
+          <span className="text-gray-400">{t('pages.loan_orders.serial_label')}</span>{' '}
+          {eq.serial_number || '—'}
+        </span>
+        {eq.start_date && (
+          <span>
+            <span className="text-gray-400">Período:</span>{' '}
+            {formatDate(eq.start_date)}
+            {eq.end_date && ` — ${formatDate(eq.end_date)}`}
+          </span>
         )}
       </div>
+
+      {/* Operator indicator */}
+      {eq.needs_operator && (
+        <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-md bg-brand-accent/10 px-2.5 py-1 text-xs font-medium text-brand-accent">
+          <CheckCircle size={12} />
+          {t('pages.loan_orders.needs_operator')}
+        </div>
+      )}
+
+      {/* Description */}
+      {eq.description && (
+        <p className="mt-2.5 text-xs text-gray-500 leading-relaxed border-t border-gray-100 pt-2.5">
+          {eq.description}
+        </p>
+      )}
     </div>
   );
 }
@@ -102,10 +182,15 @@ function EquipmentCard({ eq }) {
 function EquipmentTab({ lo }) {
   const equipments = lo.equipments ?? [];
   if (!equipments.length) {
-    return <div className="p-3 text-brand-mid">{t('pages.loan_orders.no_equipment_assigned')}</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+        <Package size={32} className="mb-2 opacity-40" />
+        <p className="text-sm">{t('pages.loan_orders.no_equipment_assigned')}</p>
+      </div>
+    );
   }
   return (
-    <div className="p-3">
+    <div>
       {equipments.map((eq, i) => (
         <EquipmentCard key={eq.id ?? i} eq={eq} />
       ))}
@@ -113,166 +198,205 @@ function EquipmentTab({ lo }) {
   );
 }
 
+/* ════════════════════════════════════════════════════════════════════
+   TAB: TAREFAS
+   ════════════════════════════════════════════════════════════════════ */
 function TasksTab({ lo }) {
   const tasks = lo.tasks ?? [];
   if (!tasks.length) {
-    return <div className="p-3 text-brand-mid">{t('pages.loan_orders.no_tasks')}</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+        <CheckCircle size={32} className="mb-2 opacity-40" />
+        <p className="text-sm">{t('pages.loan_orders.no_tasks')}</p>
+      </div>
+    );
   }
   return (
-    <div className="p-3">
+    <div className="space-y-3">
       {tasks.map((task) => (
-        <div key={task.id} className="card bg-brand-dark border-brand-mid mb-2 shadow-sm">
-          <div className="card-body py-2 px-3">
-            <div className="d-flex justify-content-between align-items-start">
-              <div>
-                <h6 className="text-brand-white fw-bold mb-1">
-                  {task.reference}
-                  <span className={`badge ${badgeStyle(task.status)} ms-2`}>{labelFor(task.status)}</span>
-                </h6>
-                <small className="text-brand-mid d-block">{task.description}</small>
-                {task.manager && (
-                  <small className="text-brand-mid d-block mt-1">
-                    {t('pages.loan_orders.card_manager_label')} {task.manager.name}
-                  </small>
-                )}
-              </div>
-            </div>
+        <div key={task.id} className="rounded-xl border border-gray-100 bg-gray-50 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-sm font-semibold text-gray-900">{task.reference}</span>
+            <StatusBadge value={task.status} />
           </div>
+          {task.description && (
+            <p className="text-xs text-gray-500 mb-2">{task.description}</p>
+          )}
+          {task.manager && (
+            <p className="text-xs text-gray-400">
+              {t('pages.loan_orders.card_manager_label')} <span className="text-gray-600">{task.manager.name}</span>
+            </p>
+          )}
         </div>
       ))}
     </div>
   );
 }
 
+/* ════════════════════════════════════════════════════════════════════
+   TAB: HISTÓRICO + AÇÕES
+   ════════════════════════════════════════════════════════════════════ */
 function HistoryTab({ lo }) {
   const events = [];
-  if (lo.created_at) events.push({ date: lo.created_at, label: t('pages.loan_orders.section_created_at') });
+
+  if (lo.created_at) {
+    events.push({ date: lo.created_at, label: t('pages.loan_orders.section_created_at'), type: 'neutral' });
+  }
   if (lo.approved_at) {
-    const approvedDetail = lo.approved_by
+    const label = lo.approved_by
       ? `${t('pages.loan_orders.section_approved_at')} — ${t('pages.loan_orders.section_approved_by')}: ${lo.approved_by.name}`
       : t('pages.loan_orders.section_approved_at');
-    events.push({ date: lo.approved_at, label: approvedDetail });
+    events.push({ date: lo.approved_at, label, type: 'success' });
   }
-  if (lo.checked_out_at) events.push({ date: lo.checked_out_at, label: t('pages.loan_orders.section_checked_out_at') });
-  if (lo.returned_at) events.push({ date: lo.returned_at, label: t('pages.loan_orders.section_returned_at') });
+  if (lo.checked_out_at) {
+    events.push({ date: lo.checked_out_at, label: t('pages.loan_orders.section_checked_out_at'), type: 'info' });
+  }
+  if (lo.returned_at) {
+    events.push({ date: lo.returned_at, label: t('pages.loan_orders.section_returned_at'), type: 'success' });
+  }
   if (lo.cancelled_at) {
-    const cancelledDetail = lo.cancelled_by
+    const label = lo.cancelled_by
       ? `${t('pages.loan_orders.section_cancelled_at')} — ${t('pages.loan_orders.section_cancelled_by')}: ${lo.cancelled_by.name}`
       : t('pages.loan_orders.section_cancelled_at');
-    events.push({ date: lo.cancelled_at, label: cancelledDetail });
+    events.push({ date: lo.cancelled_at, label, type: 'danger' });
   }
 
+  const dotColor = { neutral: 'bg-gray-300', success: 'bg-green-400', info: 'bg-blue-400', danger: 'bg-red-400' };
+
   return (
-    <div className="p-3">
-      {events.length === 0 && <div className="text-brand-mid">{t('pages.loan_orders.value_missing')}</div>}
-      {events.map((ev, i) => (
-        <div key={i} className="d-flex align-items-start mb-3">
-          <div className="me-3 mt-1" style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--brand-accent)', flexShrink: 0 }} />
-          <div>
-            <div className="text-brand-white fw-semibold small">{ev.label}</div>
-            <div className="text-brand-mid small">{formatDate(ev.date)}</div>
+    <div>
+      {events.length === 0 ? (
+        <p className="text-sm text-gray-400 italic">{t('pages.loan_orders.value_missing')}</p>
+      ) : (
+        <ol className="relative border-l border-gray-200 ml-2 space-y-5">
+          {events.map((ev, i) => (
+            <li key={i} className="ml-5">
+              <span className={`absolute -left-[5px] flex h-2.5 w-2.5 rounded-full ring-2 ring-white ${dotColor[ev.type]}`} />
+              <p className="text-sm font-medium text-gray-700">{ev.label}</p>
+              <time className="text-xs text-gray-400">{formatDate(ev.date)}</time>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      {/* Notes */}
+      {[
+        { key: 'notes_cancel',   label: t('pages.loan_orders.section_notes_cancel') },
+        { key: 'notes_checkout', label: t('pages.loan_orders.section_notes_checkout') },
+        { key: 'notes_return',   label: t('pages.loan_orders.section_notes_return') },
+      ].map(({ key, label }) =>
+        lo[key] ? (
+          <div key={key} className="mt-5 rounded-lg bg-gray-50 border border-gray-100 px-4 py-3">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{label}</p>
+            <p className="text-sm text-gray-700 leading-relaxed">{lo[key]}</p>
           </div>
-        </div>
-      ))}
-      {lo.notes_cancel && (
-        <div className="mt-3 p-2 bg-brand-darkest rounded">
-          <small className="text-brand-mid fw-semibold">{t('pages.loan_orders.section_notes_cancel')}:</small>
-          <p className="text-brand-white small mb-0 mt-1">{lo.notes_cancel}</p>
-        </div>
-      )}
-      {lo.notes_checkout && (
-        <div className="mt-3 p-2 bg-brand-darkest rounded">
-          <small className="text-brand-mid fw-semibold">{t('pages.loan_orders.section_notes_checkout')}:</small>
-          <p className="text-brand-white small mb-0 mt-1">{lo.notes_checkout}</p>
-        </div>
-      )}
-      {lo.notes_return && (
-        <div className="mt-3 p-2 bg-brand-darkest rounded">
-          <small className="text-brand-mid fw-semibold">{t('pages.loan_orders.section_notes_return')}:</small>
-          <p className="text-brand-white small mb-0 mt-1">{lo.notes_return}</p>
-        </div>
+        ) : null
       )}
     </div>
   );
 }
 
-function ActionButtons({ lo, onAction }) {
-  const [cancelling, setCancelling] = useState(false);
-  const [returning, setReturning] = useState(false);
-  const [approving, setApproving] = useState(false);
-  const [checkingOut, setCheckingOut] = useState(false);
+function ActionButtons({ lo, onAction, entityMode = false }) {
+  const [loading, setLoading] = useState({});
 
-  const handleCancel = useCallback(() => {
-    if (!confirm(t('pages.loan_orders.action_cancel_confirm'))) return;
-    setCancelling(true);
-    router.post(`/api/loan-orders/${lo.id}/cancel`, {}, {
+  const act = useCallback((key, url, confirmMsg, errMsg) => {
+    if (!confirm(confirmMsg)) return;
+    setLoading((s) => ({ ...s, [key]: true }));
+    router.post(url, {}, {
       preserveScroll: true,
-      onSuccess: () => { setCancelling(false); onAction(); },
-      onError: () => { setCancelling(false); alert('Failed to cancel'); },
+      onSuccess: () => { setLoading((s) => ({ ...s, [key]: false })); onAction(); },
+      onError:   () => { setLoading((s) => ({ ...s, [key]: false })); alert(errMsg); },
     });
-  }, [lo.id, onAction]);
+  }, [onAction]);
 
-  const handleInitiateReturn = useCallback(() => {
-    if (!confirm(t('pages.loan_orders.action_initiate_return_confirm'))) return;
-    setReturning(true);
-    router.post(`/api/loan-orders/${lo.id}/return`, {}, {
-      preserveScroll: true,
-      onSuccess: () => { setReturning(false); onAction(); },
-      onError: () => { setReturning(false); alert('Failed to initiate return'); },
-    });
-  }, [lo.id, onAction]);
-
-  const handleApprove = useCallback(() => {
-    if (!confirm(t('pages.loan_orders.action_approve_confirm'))) return;
-    setApproving(true);
-    router.post(`/api/loan-orders/${lo.id}/approve`, {}, {
-      preserveScroll: true,
-      onSuccess: () => { setApproving(false); onAction(); },
-      onError: () => { setApproving(false); alert('Failed to approve'); },
-    });
-  }, [lo.id, onAction]);
-
-  const handleCheckout = useCallback(() => {
-    if (!confirm(t('pages.loan_orders.action_checkout_confirm'))) return;
-    setCheckingOut(true);
-    router.post(`/api/loan-orders/${lo.id}/checkout`, {}, {
-      preserveScroll: true,
-      onSuccess: () => { setCheckingOut(false); onAction(); },
-      onError: () => { setCheckingOut(false); alert('Failed to checkout'); },
-    });
-  }, [lo.id, onAction]);
-
-  const isPending = lo.status === 'pending';
-  const isApproved = lo.status === 'approved';
+  const isPending    = lo.status === 'pending';
+  const isApproved   = lo.status === 'approved';
   const isCheckedOut = lo.status === 'checked_out';
 
+  // Entity users can only cancel their own pending orders
+  if (entityMode) {
+    if (!isPending) return null;
+    return (
+      <div className="mt-6 pt-5 border-t border-gray-100">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Ações</p>
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => act('cancel', `/api/loan-orders/${lo.id}/cancel`,
+              t('pages.loan_orders.action_cancel_confirm'), 'Failed to cancel')}
+            disabled={loading.cancel}
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white hover:bg-red-50 hover:border-red-300 hover:text-red-700 disabled:opacity-60 text-gray-700 text-sm font-medium px-4 py-2 transition-colors"
+          >
+            {loading.cancel ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />}
+            {t('pages.loan_orders.action_cancel')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isPending && !isApproved && !isCheckedOut) return null;
+
   return (
-    <div className="px-3 py-2 border-top border-brand-mid d-flex gap-2 flex-wrap">
-      {isPending && (
-        <button className="btn btn-outline-success btn-sm flex-fill" onClick={handleApprove} disabled={approving}>
-          {approving ? '...' : t('pages.loan_orders.action_approve')}
-        </button>
-      )}
-      {isApproved && (
-        <button className="btn btn-outline-accent btn-sm flex-fill" onClick={handleCheckout} disabled={checkingOut}>
-          {checkingOut ? '...' : t('pages.loan_orders.action_checkout')}
-        </button>
-      )}
-      {isCheckedOut && (
-        <button className="btn btn-outline-accent btn-sm flex-fill" onClick={handleInitiateReturn} disabled={returning}>
-          {returning ? '...' : t('pages.loan_orders.action_initiate_return')}
-        </button>
-      )}
-      {isPending && (
-        <button className="btn btn-outline-danger btn-sm flex-fill" onClick={handleCancel} disabled={cancelling}>
-          {cancelling ? '...' : t('pages.loan_orders.action_cancel')}
-        </button>
-      )}
+    <div className="mt-6 pt-5 border-t border-gray-100">
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Ações</p>
+      <div className="flex flex-wrap gap-3">
+
+        {isPending && (
+          <button
+            onClick={() => act('approve', `/api/loan-orders/${lo.id}/approve`,
+              t('pages.loan_orders.action_approve_confirm'), 'Failed to approve')}
+            disabled={loading.approve}
+            className="inline-flex items-center gap-2 rounded-lg bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition-colors"
+          >
+            {loading.approve ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
+            {t('pages.loan_orders.action_approve')}
+          </button>
+        )}
+
+        {isApproved && (
+          <button
+            onClick={() => act('checkout', `/api/loan-orders/${lo.id}/checkout`,
+              t('pages.loan_orders.action_checkout_confirm'), 'Failed to checkout')}
+            disabled={loading.checkout}
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-accent hover:bg-brand-accent/90 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition-colors"
+          >
+            {loading.checkout ? <Loader2 size={14} className="animate-spin" /> : <LogOut size={14} />}
+            {t('pages.loan_orders.action_checkout')}
+          </button>
+        )}
+
+        {isCheckedOut && (
+          <button
+            onClick={() => act('return', `/api/loan-orders/${lo.id}/return`,
+              t('pages.loan_orders.action_initiate_return_confirm'), 'Failed to initiate return')}
+            disabled={loading.return}
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition-colors"
+          >
+            {loading.return ? <Loader2 size={14} className="animate-spin" /> : <RotateCcw size={14} />}
+            {t('pages.loan_orders.action_initiate_return')}
+          </button>
+        )}
+
+        {isPending && (
+          <button
+            onClick={() => act('cancel', `/api/loan-orders/${lo.id}/cancel`,
+              t('pages.loan_orders.action_cancel_confirm'), 'Failed to cancel')}
+            disabled={loading.cancel}
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-60 text-gray-700 text-sm font-medium px-4 py-2 transition-colors"
+          >
+            {loading.cancel ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />}
+            {t('pages.loan_orders.action_cancel')}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
 
-export default function LoanOrderDrawerTabs(loanOrder, { onAction }) {
+/* ════════════════════════════════════════════════════════════════════
+   EXPORT — Tab definitions consumed by WorkspaceDrawer
+   ════════════════════════════════════════════════════════════════════ */
+export default function LoanOrderDrawerTabs(loanOrder, { onAction, entityMode = false }) {
   return [
     {
       id: 'details',
@@ -295,7 +419,7 @@ export default function LoanOrderDrawerTabs(loanOrder, { onAction }) {
       component: (
         <>
           <HistoryTab lo={loanOrder} />
-          <ActionButtons lo={loanOrder} onAction={onAction} />
+          <ActionButtons lo={loanOrder} onAction={onAction} entityMode={entityMode} />
         </>
       ),
     },

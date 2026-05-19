@@ -13,6 +13,8 @@ class LoanOrderPolicy extends BasePolicy
 {
     public function viewAny(User $user): bool
     {
+        if ($user->isEntity()) return true;
+
         return $this->hasPermission(
             $user,
             PermissionAction::VIEW->value,
@@ -31,6 +33,8 @@ class LoanOrderPolicy extends BasePolicy
 
     public function create(User $user): bool
     {
+        if ($user->isEntity()) return true;
+
         return $this->hasPermission(
             $user,
             PermissionAction::CREATE->value,

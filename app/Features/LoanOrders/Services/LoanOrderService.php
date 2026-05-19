@@ -21,7 +21,7 @@ class LoanOrderService
         private AvailabilityService $availability
     ) {}
 
-    public function create(array $data, string $managerId): LoanOrder
+    public function create(array $data, ?string $managerId): LoanOrder
     {
         return $this->transactions->execute(function () use ($data, $managerId) {
             // Support both flat equipment_ids and nested equipments array

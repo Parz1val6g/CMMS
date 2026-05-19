@@ -13,6 +13,7 @@ class RoleName
     public const SUPERVISOR = 'supervisor';
     public const WORKER = 'worker';
     public const CLIENT = 'client';
+    public const ENTITY = 'entidade';
     public const TASK_MANAGER = 'task_manager';
     public const MINI_TASK_MANAGER = 'mini_task_manager';
     public const WORK_LOG_MANAGER = 'work_log_manager';

@@ -2,6 +2,7 @@
 
 namespace App\Shared\Models;
 
+use App\Core\Enums\RoleName;
 use App\Core\Traits\Base;
 use App\Core\Traits\LogsAuditTrail;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,7 +35,12 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->roles()->where('name', 'admin')->exists();
+        return $this->roles()->where('name', RoleName::ADMIN)->exists();
+    }
+
+    public function isEntity(): bool
+    {
+        return $this->roles()->where('name', RoleName::ENTITY)->exists();
     }
 
     public function roles()

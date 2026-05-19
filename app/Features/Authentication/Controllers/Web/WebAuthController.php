@@ -50,6 +50,10 @@ class WebAuthController extends Controller
 
         $request->session()->regenerate();
 
+        if ($user->isEntity()) {
+            return redirect()->route('portal.index');
+        }
+
         return redirect()->intended(route('dashboard'));
     }
 

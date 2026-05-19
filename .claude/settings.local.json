@@ -97,7 +97,19 @@
       "Bash(python3 *)",
       "Bash(xargs cat)",
       "Bash(rtk npm *)",
-      "Skill(grill-me)"
+      "Skill(grill-me)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\joelt\\\\project\" -Force | Where-Object { $_.Name -notin @\\('vendor','node_modules','.git'\\) } | Select-Object Name, PSIsContainer | Sort-Object PSIsContainer -Descending | Format-Table -AutoSize)",
+      "PowerShell(Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip = [System.IO.Compression.ZipFile]::OpenRead\\(\"C:\\\\Users\\\\joelt\\\\project\\\\package.zip\"\\); $zip.Entries | Select-Object FullName | Sort-Object FullName | Format-Table -AutoSize; $zip.Dispose\\(\\))",
+      "PowerShell(Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip = [System.IO.Compression.ZipFile]::OpenRead\\(\"C:\\\\Users\\\\joelt\\\\project\\\\project.zip\"\\); $zip.Entries | Select-Object FullName | Sort-Object FullName | Format-Table -AutoSize -Wrap; $zip.Dispose\\(\\))",
+      "PowerShell(Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip = [System.IO.Compression.ZipFile]::OpenRead\\(\"C:\\\\Users\\\\joelt\\\\project\\\\project.zip\"\\); $entries = $zip.Entries | Select-Object -ExpandProperty FullName | Sort-Object; $zip.Dispose\\(\\); $rootItems = $entries | Where-Object { $_ -notmatch '/' -or $_ -match '^[^/]+/$' } | ForEach-Object { $_ -replace '/$','' } | Select-Object -Unique; $rootItems)",
+      "PowerShell(Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip = [System.IO.Compression.ZipFile]::OpenRead\\(\"C:\\\\Users\\\\joelt\\\\project\\\\project.zip\"\\); $sql = $zip.Entries | Where-Object { $_.FullName -eq \"db_tables.sql\" }; $zip.Dispose\\(\\); $sql)",
+      "PowerShell(gh repo *)",
+      "PowerShell(gh api *)",
+      "PowerShell(gh auth *)",
+      "PowerShell(New-Item *)",
+      "PowerShell(php artisan route:list --path=portal 2>&1)",
+      "PowerShell(php artisan config:clear 2>&1; php artisan route:cache 2>&1)",
+      "PowerShell(php artisan tinker --execute=\"echo file_get_contents\\(storage_path\\('logs/laravel.log'\\)\\);\" 2>&1 | Select-Object -Last 60)"
     ]
   },
   "spinnerTipsEnabled": false

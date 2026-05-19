@@ -4,66 +4,50 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Environment
 
-**The project runs inside Docker containers.** All commands must be prefixed with `docker exec` or run inside the container shell.
+The project runs natively on the host machine (no Docker).
 
-```bash
-# Access the app container shell
-docker exec -it project-app-1 sh
+**Services:**
+| Service | Port |
+|---|---|
+| Laravel (`php artisan serve`) | 8000 |
+| Vite (HMR) | 5173 |
+| MySQL | 3306 |
+| Redis | 6379 |
 
-# Or run commands directly from host
-docker exec project-app-1 php artisan migrate
-```
-
-**Services (defined in `docker-compose.yml`):**
-| Service | Image | Port |
-|---|---|---|
-| `app` | Custom (PHP 8.2 + nginx/php-fpm) | 80 |
-| `node` | node:22-alpine | 5173 (Vite HMR) |
-| `mysql` | mysql:8.0 | 3307→3306 |
-| `redis` | redis:7-alpine | 6379 |
-
-Database credentials: `splnet_db` / `splnet` / `splnet` (root: `root`).
-
-The `app` entrypoint (`docker/entrypoint.sh`) runs `php artisan migrate --force` and conditionally seeds the DB on every container start.
+Database credentials: `splnet_db` / `splnet` / `splnet`.
 
 ## Commands
 
 ```bash
-# Build and start all containers
-docker compose up -d --build
+# Full dev stack (Laravel + queue + logs + Vite, all in one)
+composer dev
 
-# Stop all containers (data persists via named volumes)
-docker compose down
+# First-time setup
+composer setup
 
-# Stop and delete volumes (full reset)
-docker compose down -v
+# Run migrations
+php artisan migrate --force
 
-# Rebuild only the app container (e.g. after Dockerfile or entrypoint changes)
-docker compose up -d --build app
+# Run seeders
+php artisan db:seed --force
 
-# Full dev stack (inside app container)
-docker exec project-app-1 composer dev
+# Full DB reset + seed
+php artisan migrate:refresh --seed --force
 
-# Run migrations (inside app container)
-docker exec project-app-1 php artisan migrate --force
+# Tests
+composer test
 
-# Run seeders (inside app container)
-docker exec project-app-1 php artisan db:seed --force
+# Frontend dev server only
+npm run dev
 
-# Full DB reset + seed (inside app container)
-docker exec project-app-1 php artisan migrate:refresh --seed --force
-
-# Tests (inside app container)
-docker exec project-app-1 composer test
-
-# Frontend build (inside node container)
-docker exec project-node-1 npm run build
+# Frontend production build
+npm run build
 
 # Run a one-off command via tinker
-docker exec project-app-1 php artisan tinker --execute="echo User::count();"
+php artisan tinker --execute="echo User::count();"
 ```
 
-Tests run against an in-memory SQLite database (configured in `phpunit.xml`). The app database is MySQL via the `mysql` Docker container.
+Tests run against an in-memory SQLite database (configured in `phpunit.xml`). The app database is MySQL.
 
 ## Architecture
 
@@ -127,6 +111,30 @@ Completion propagates upward: all WorkLogs done → MiniTask done → Task done 
 **Frontend state** — Pinia stores in `resources/js/stores/` (authStore, clientStore, taskStore, uiStore, settingsStore). API calls go through composables (`useFetch`, `useForm`) and services in `resources/js/services/api/`.
 
 **Frontend routing** — Inertia resolves pages dynamically from `resources/js/Features/**/*.jsx`. The `@` path alias points to `resources/js/`.
+
+### Sidebar Navigation Taxonomy
+
+Defined in `resources/js/Layouts/data/sidebar.js`. Section labels are i18n keys in `resources/lang/*/pages.json` under `pages.sidebar.*`.
+
+**Structure (do not reorganise without good reason):**
+
+| Section | Key | Items |
+|---|---|---|
+| *(unlabelled)* | — | Dashboard |
+| Gestão de Trabalho | `section_operational` | Tickets · Ordens de Serviço · Tarefas · Mini-Tarefas · Work Logs |
+| Ativos | `section_assets` | Equipamentos · Empréstimos |
+| Partes | `section_entities` | Clientes · Entidades · Localizações |
+| Recursos Humanos | `section_hr` | Sectores · Equipas · Trabalhadores |
+| Relatórios | `section_reports` | Analytics · Exportações |
+| Dados Mestre | `section_settings` | Tipos Serviço · Tipos Equipamento · Tipos Contagem · Materiais |
+| *(footer)* | — | Notificações · Configurações · Admin |
+
+**Placement rules — why things are where they are:**
+- **Equipamentos + Empréstimos in Ativos**, not Operacional — equipment is an asset catalog, loans are its operational workflow. They belong together, separate from the service-order cascade.
+- **Analytics + Exportações in Relatórios**, not Dados Mestre — reporting is a business tool, not system configuration. Burying BI under Settings is an ERP anti-pattern.
+- **Notificações in footer**, not Dados Mestre — it is a personal system utility, not configuration or a lookup table.
+- **Section renamed "Dados Mestre"** (was "Configurações") — the old name created a naming conflict with the footer "Configurações" button (`/settings`). Same label, two different destinations.
+- **Section renamed "Partes"** (was "Entidades") — the old section contained an item also called "Entidades", causing a label collision.
 
 ### Authentication
 
