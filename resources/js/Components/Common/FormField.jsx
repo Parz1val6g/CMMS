@@ -2,19 +2,17 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import MultiSelect from '@/Components/Common/MultiSelect';
 import SearchableSelect from '@/Components/Common/SearchableSelect';
+import ToggleSwitch from '@/Components/Common/ToggleSwitch';
+import RepeaterInput from '@/Components/Common/RepeaterInput';
 import { toScalar } from '@/Utils/url';
 
 const SEARCH_THRESHOLD = 8;
 
 function SectionHeader({ label }) {
   return (
-    <div className="flex items-center gap-2 py-2">
-      <hr className="flex-1 border-brand-mid/20" />
-      <span className="shrink-0 text-xs font-semibold uppercase tracking-wider text-brand-mid">
-        {label}
-      </span>
-      <hr className="flex-1 border-brand-mid/20" />
-    </div>
+    <h4 className="text-sm font-semibold text-gray-700 mt-6 mb-4 pb-2 border-b border-brand-mid/20">
+      {label}
+    </h4>
   );
 }
 
@@ -140,7 +138,7 @@ function MapPicker({ field, value }) {
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" className="mr-1 inline text-brand-accent" viewBox="0 0 16 16">
             <path fillRule="evenodd" d="M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999z" />
           </svg>
-          Select on Map
+          Selecionar no Mapa
         </label>
         {(lat && lng) && (
           <span className="inline-flex items-center rounded bg-brand-accent/10 px-2 py-0.5 text-xs font-medium text-brand-accent">
@@ -157,7 +155,7 @@ function MapPicker({ field, value }) {
       >
         {!loaded && (
           <div className="flex h-full items-center justify-center text-sm text-brand-mid">
-            Loading map...
+            A carregar mapa...
           </div>
         )}
       </div>
@@ -167,17 +165,18 @@ function MapPicker({ field, value }) {
       <input type="hidden" name={lngField} value={lng} readOnly />
 
       <p className="text-xs text-brand-mid">
-        Click on the map or drag the marker to set coordinates
+        Clique no mapa ou arraste o marcador para definir as coordenadas
       </p>
     </div>
   );
 }
 
-function StandardField({ field, value = '', error, onChange }) {
+function StandardField({ field, value = '', error, onChange, lockedValues = [] }) {
   const type = field.type ?? 'text';
   const name = field.name ?? field.key ?? '';
   const required = !!field.required;
   const step = field.step ?? null;
+  const min = field.min ?? null;
   const pattern = field.pattern ?? null;
   const options = field.options ?? null;
   const isMultiple = !!field.multiple;
@@ -187,7 +186,7 @@ function StandardField({ field, value = '', error, onChange }) {
 
   /* Normalize select/multiselect options */
   const opts = options ?? [];
-  const ph = field.placeholder ?? 'Select...';
+  const ph = field.placeholder ?? 'Selecione...';
 
   // Track changes on native DOM element for form serialization
   const handleInputChange = (val) => {
@@ -205,6 +204,7 @@ function StandardField({ field, value = '', error, onChange }) {
           placeholder={ph}
           showSearch={opts.length > SEARCH_THRESHOLD}
           onChange={handleInputChange}
+          lockedValues={lockedValues}
         />
       );
     }
@@ -244,12 +244,9 @@ function StandardField({ field, value = '', error, onChange }) {
 
   if (type === 'checkbox') {
     return (
-      <input
-        type="checkbox"
-        name={name}
-        className="h-4 w-4 rounded border-brand-mid/20 bg-brand-white text-brand-accent focus:ring-brand-accent"
+      <ToggleSwitch
         checked={!!value}
-        onChange={(e) => handleInputChange(e.target.checked)}
+        onChange={handleInputChange}
       />
     );
   }
@@ -263,6 +260,7 @@ function StandardField({ field, value = '', error, onChange }) {
       onChange={(e) => handleInputChange(e.target.value)}
       required={required}
       step={step ?? undefined}
+      min={min ?? undefined}
       pattern={pattern ?? undefined}
     />
   );
@@ -293,7 +291,7 @@ function ToggleField({ field, value = '', onChange }) {
   };
 
   return (
-    <div className="flex rounded-lg border border-brand-mid/20 bg-brand-white p-0.5">
+    <div className="flex rounded-lg border border-brand-mid/20 bg-brand-light p-0.5">
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -359,8 +357,8 @@ function FileDropzone({ name, required, error, onChange }) {
         className={`relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors ${error
             ? 'border-red-500 bg-red-50'
             : dragOver
-              ? 'border-brand-accent bg-brand-accent/5'
-              : 'border-brand-mid/20 bg-brand-white hover:border-brand-mid/30'
+              ? 'border-brand-accent bg-brand-accent/10'
+              : 'border-brand-mid/20 bg-brand-light hover:border-brand-accent'
           }`}
       >
         <svg className={`mb-2 h-8 w-8 ${error ? 'text-red-500' : 'text-brand-mid'}`} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -389,7 +387,7 @@ function FileDropzone({ name, required, error, onChange }) {
   );
 }
 
-export default function FormField({ field, value = '', error, onChange }) {
+export default function FormField({ field, value = '', error, onChange, lockedValues = [] }) {
   const type = field.type ?? 'text';
   const label = field.label ?? '';
 
@@ -405,15 +403,19 @@ export default function FormField({ field, value = '', error, onChange }) {
     return <ToggleField field={field} value={value} onChange={onChange} />;
   }
 
+  if (type === 'repeater') {
+    return <RepeaterInput field={field} value={value} onChange={onChange} />;
+  }
+
   return (
     <div className="mb-4">
       {label && (
-        <label className="block text-sm font-medium text-brand-darkest mb-1.5">
+        <label className="block text-sm font-medium text-brand-mid mb-1.5">
           {label}
           {field.required && <span className="ml-1 text-red-500">*</span>}
         </label>
       )}
-      <StandardField field={field} value={value} error={error} onChange={onChange} />
+      <StandardField field={field} value={value} error={error} onChange={onChange} lockedValues={lockedValues} />
       {error && (
         <p className="text-xs text-red-500 mt-1.5">{error}</p>
       )}

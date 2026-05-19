@@ -8,7 +8,6 @@ use App\Features\MiniTasks\Listeners\CheckWorkLogsCompletion;
 use App\Features\Notifications\Listeners\SendServiceOrderCreatedNotification;
 use App\Features\ServiceOrders\Events\ServiceOrderCreatedEvent;
 use App\Features\ServiceOrders\Listeners\CheckTaskCompletion;
-use App\Features\ServiceOrders\Listeners\CreateLoanTasks;
 use App\Features\Tasks\Events\TaskCompletedEvent;
 use App\Features\Tasks\Listeners\CheckMiniTasksCompletion;
 use App\Features\WorkLogs\Events\WorkLogCompletedEvent;
@@ -20,7 +19,6 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         ServiceOrderCreatedEvent::class => [
             SendServiceOrderCreatedNotification::class,
-            CreateLoanTasks::class,
         ],
         UserCreatedEvent::class => [
             CreateClientProfile::class,

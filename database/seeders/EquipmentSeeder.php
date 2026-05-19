@@ -2,74 +2,81 @@
 
 namespace Database\Seeders;
 
-use App\Core\Enums\EquipmentStatus;
 use App\Features\Equipments\Models\Equipment;
-use App\Shared\Models\User;
+use App\Core\Enums\EquipmentStatus;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class EquipmentSeeder extends Seeder
 {
-    /**
-     * Seed equipment covering all EquipmentStatus enum values.
-     */
     public function run(): void
     {
-        // Equipment manager user (created by UserSeeder)
-        $equipmentManager = User::whereHas('roles', fn($q) => $q->where('name', 'equipment_manager'))->first();
+        $types = DB::table('equipment_types')->pluck('id', 'name');
+        $counting = DB::table('counting_types')->pluck('id', 'name');
+        $equipManagerId = DB::table('users')->where('email', 'pedro.carvalho@cm-mangualde.pt')->value('id');
 
-        if (!$equipmentManager) {
-            $this->command->error('❌ equipment_manager user not found. Run UserSeeder first.');
-            return;
-        }
+        $items = [
+            // ── Vehicle Fleet ──
+            ['type' => 'Camião', 'name' => 'Camião de Carga MAN TGS 18.480',        'serial' => 'MAN-TGS18-480-2019',  'status' => EquipmentStatus::ACTIVE,           'loanable' => false, 'cost' => 45.00,  'revision' => 365, 'internal' => 'VEI-001', 'year' => 2019],
+            ['type' => 'Camião', 'name' => 'Camião Basculante Volvo FMX 500',       'serial' => 'VOL-FMX500-2021-01',   'status' => EquipmentStatus::ACTIVE,           'loanable' => false, 'cost' => 55.00,  'revision' => 365, 'internal' => 'VEI-002', 'year' => 2021],
+            ['type' => 'Escavadora', 'name' => 'Escavadora Caterpillar 320D',       'serial' => 'CAT-320D-Z9B00521',    'status' => EquipmentStatus::ACTIVE,           'loanable' => false, 'cost' => 85.00,  'revision' => 365, 'internal' => 'VEI-003', 'year' => 2018],
+            ['type' => 'Escavadora', 'name' => 'Mini-Escavadora Bobcat E35',        'serial' => 'BOB-E35-B4N710422',    'status' => EquipmentStatus::ACTIVE,           'loanable' => false, 'cost' => 65.00,  'revision' => 365, 'internal' => 'VEI-004', 'year' => 2020],
+            ['type' => 'Retroescavadora', 'name' => 'Retroescavadora JCB 3CX',        'serial' => 'JCB-3CX-LF2019342',   'status' => EquipmentStatus::UNDER_MAINTENANCE, 'loanable' => false, 'cost' => 65.00,  'revision' => 365, 'internal' => 'VEI-005', 'year' => 2017],
+            ['type' => 'Grua', 'name' => 'Grua Telescópica Liebherr LTM 1050',      'serial' => 'LIE-LTM1050-078912',   'status' => EquipmentStatus::ACTIVE,           'loanable' => false, 'cost' => 120.00, 'revision' => 365, 'internal' => 'VEI-006', 'year' => 2016],
 
-        $equipmentData = [
-            // ── Active equipment ──
-            ['name' => 'Escavadora CAT 320D',               'serial_number' => 'CAT-320D-001',  'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => false, 'revision_interval' => 365, 'description' => 'Escavadora pesada para obras de grande escala', 'cost_per_hour' => 85.00],
-            ['name' => 'Compressor de Ar Atlas Copco 250',  'serial_number' => 'ATLAS-250-002', 'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => true,  'revision_interval' => 180, 'description' => 'Compressor portátil para trabalhos de pneumática', 'cost_per_hour' => 25.00],
-            ['name' => 'Martelo Pneumático Bosch',          'serial_number' => 'BOSCH-PH-003',  'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => true,  'revision_interval' => 90,  'description' => 'Martelo para demolição e rotura de pavimento', 'cost_per_hour' => 15.00],
-            ['name' => 'Bomba de Água Diesel',              'serial_number' => 'DIESEL-PUMP-004','status' => EquipmentStatus::ACTIVE->value,      'is_loanable' => true,  'revision_interval' => 180, 'description' => 'Bomba para drenagem de obras', 'cost_per_hour' => 30.00],
-            ['name' => 'Gerador 250 kVA Caterpillar',       'serial_number' => 'CAT-GEN-005',   'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => false, 'revision_interval' => 365, 'description' => 'Gerador industrial para alimentação de canteiros', 'cost_per_hour' => 95.00],
-            ['name' => 'Vibrador de Placas Dinamarca',      'serial_number' => 'DIN-PLATE-007', 'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => true,  'revision_interval' => 120, 'description' => 'Compactador de solo e asfalto', 'cost_per_hour' => 20.00],
-            ['name' => 'Broca Rotativa SPT',                'serial_number' => 'SPT-DRILL-008',  'status' => EquipmentStatus::ACTIVE->value,      'is_loanable' => false, 'revision_interval' => 730, 'description' => 'Sonda rotativa para sondagens geotécnicas', 'cost_per_hour' => 75.00],
-            ['name' => 'Betoneira 350L',                    'serial_number' => 'MIXER-350-009',  'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => true,  'revision_interval' => 180, 'description' => 'Betoneira portátil para pequenas obras', 'cost_per_hour' => 22.00],
-            ['name' => 'Grua Telescópica 25T',              'serial_number' => 'CRANE-25T-010',  'status' => EquipmentStatus::ACTIVE->value,       'is_loanable' => false, 'revision_interval' => 365, 'description' => 'Grua para movimentação de cargas até 25 toneladas', 'cost_per_hour' => 120.00],
-            // ── In Use (on loan) ──
-            ['name' => 'Martelo Demolidor Makita',          'serial_number' => 'MAK-DEM-013',    'status' => EquipmentStatus::IN_USE->value,       'is_loanable' => true,  'revision_interval' => 90,  'description' => 'Martelo demolidor emprestado a obra externa', 'cost_per_hour' => 18.00],
-            // ── Under Maintenance ──
-            ['name' => 'Retroescavadora JCB 3CX',           'serial_number' => 'JCB-3CX-006',    'status' => EquipmentStatus::UNDER_MAINTENANCE->value, 'is_loanable' => false, 'revision_interval' => 365, 'description' => 'Máquina versátil para escavação e carga — em manutenção', 'cost_per_hour' => 65.00],
-            // ── Maintenance Pending ──
-            ['name' => 'Cortador de Asfalto Husqvarna',     'serial_number' => 'HUS-CORT-014',   'status' => EquipmentStatus::MAINTENANCE_PENDING->value, 'is_loanable' => false, 'revision_interval' => 120, 'description' => 'Aguardando revisão programada', 'cost_per_hour' => 35.00],
-            // ── Broken ──
-            ['name' => 'Perfurador Pneumático Atlas',       'serial_number' => 'ATL-PERF-015',   'status' => EquipmentStatus::BROKEN->value,       'is_loanable' => false, 'revision_interval' => 90,  'description' => 'Avariado — necessita reparação urgente', 'cost_per_hour' => 15.00],
-            // ── Under Repair ──
-            ['name' => 'Serrador Circular Stihl',           'serial_number' => 'STI-SER-016',    'status' => EquipmentStatus::UNDER_REPAIR->value,  'is_loanable' => false, 'revision_interval' => 180, 'description' => 'Em reparação na oficina externa', 'cost_per_hour' => 12.00],
-            // ── Reserved ──
-            ['name' => 'Camião de Carga MAN TGS 18.480',   'serial_number' => 'MAN-TGS-011',    'status' => EquipmentStatus::RESERVED->value,     'is_loanable' => false, 'revision_interval' => 365, 'description' => 'Camião de carga reservado para obra na Zona Industrial', 'cost_per_hour' => 45.00],
-            // ── Inactive ──
-            ['name' => 'Gerador Antigo 100 kVA',           'serial_number' => 'OLD-GEN-012',    'status' => EquipmentStatus::INACTIVE->value,     'is_loanable' => false, 'revision_interval' => 0,   'description' => 'Gerador desativado — aguarda abate', 'cost_per_hour' => 0.00],
-            // ── Retired ──
-            ['name' => 'Compressor de Ar Old Ingersoll',    'serial_number' => 'ING-COMP-017',   'status' => EquipmentStatus::RETIRED->value,      'is_loanable' => false, 'revision_interval' => 0,   'description' => 'Equipamento abatido — fora de serviço', 'cost_per_hour' => 0.00],
+            // ── Compressors & Pneumatic Tools ──
+            ['type' => 'Compressor', 'name' => 'Compressor de Ar Atlas Copco XAS 185',  'serial' => 'ATL-XAS185-APF910234', 'status' => EquipmentStatus::IN_USE,      'loanable' => true,  'cost' => 25.00,  'revision' => 180, 'internal' => 'EQP-001', 'year' => 2020],
+            ['type' => 'Martelo Pneumático', 'name' => 'Martelo Pneumático Bosch GSH 16',  'serial' => 'BOS-GSH16-3456789',     'status' => EquipmentStatus::ACTIVE,        'loanable' => true,  'cost' => 15.00,  'revision' => 90,  'internal' => 'EQP-002', 'year' => 2019],
+            ['type' => 'Martelo Pneumático', 'name' => 'Martelo Demolidor Makita HM1812',  'serial' => 'MAK-HM1812-8923456',     'status' => EquipmentStatus::ACTIVE,        'loanable' => true,  'cost' => 18.00,  'revision' => 90,  'internal' => 'EQP-003', 'year' => 2021],
+
+            // ── Water Pumps ──
+            ['type' => 'Bomba de Água', 'name' => 'Bomba Submersível Grundfos SL1.50', 'serial' => 'GRU-SL150-99210683',       'status' => EquipmentStatus::ACTIVE,        'loanable' => true,  'cost' => 30.00,  'revision' => 180, 'internal' => 'EQP-004', 'year' => 2020],
+            ['type' => 'Bomba de Água', 'name' => 'Motobomba Diesel Honda WT40X',     'serial' => 'HON-WT40X-DK510281',       'status' => EquipmentStatus::ACTIVE,        'loanable' => true,  'cost' => 22.00,  'revision' => 180, 'internal' => 'EQP-005', 'year' => 2019],
+
+            // ── Generators ──
+            ['type' => 'Gerador', 'name' => 'Gerador Diesel Caterpillar DE250GC',      'serial' => 'CAT-DE250GC-CAT001234',   'status' => EquipmentStatus::ACTIVE,        'loanable' => false, 'cost' => 95.00,  'revision' => 365, 'internal' => 'EQP-006', 'year' => 2018],
+            ['type' => 'Gerador', 'name' => 'Gerador Portátil Honda EU70iS',           'serial' => 'HON-EU70IS-AS849201',      'status' => EquipmentStatus::INACTIVE,      'loanable' => true,  'cost' => 12.00,  'revision' => 180, 'internal' => 'EQP-007', 'year' => 2023],
+
+            // ── Concrete & Compaction ──
+            ['type' => 'Betoneira', 'name' => 'Betoneira Elétrica IMER 350L',            'serial' => 'IME-350L-BT340912',      'status' => EquipmentStatus::ACTIVE,        'loanable' => true,  'cost' => 22.00,  'revision' => 180, 'internal' => 'EQP-008', 'year' => 2021],
+            ['type' => 'Vibrador de Placas', 'name' => 'Placa Vibratória Bomag BPR 70/70', 'serial' => 'BOM-BPR7070-00192834',    'status' => EquipmentStatus::ACTIVE,        'loanable' => true,  'cost' => 20.00,  'revision' => 120, 'internal' => 'EQP-009', 'year' => 2020],
+
+            // ── Cutting & Drilling ──
+            ['type' => 'Cortadora de Asfalto', 'name' => 'Cortadora de Asfalto Husqvarna FS 400', 'serial' => 'HUS-FS400-2021000912',     'status' => EquipmentStatus::MAINTENANCE_PENDING, 'loanable' => false, 'cost' => 35.00,  'revision' => 120, 'internal' => 'EQP-010', 'year' => 2021],
+            ['type' => 'Perfuradora', 'name' => 'Perfuradora de Rocha Atlas Copco RD20', 'serial' => 'ATL-RD20-APC102938',       'status' => EquipmentStatus::BROKEN,        'loanable' => false, 'cost' => 15.00,  'revision' => 90,  'internal' => 'EQP-011', 'year' => 2018],
+
+            // ── Saws ──
+            ['type' => 'Serra Circular', 'name' => 'Serra Circular Stihl TS 420',          'serial' => 'STI-TS420-519284763',     'status' => EquipmentStatus::UNDER_REPAIR,  'loanable' => false, 'cost' => 12.00,  'revision' => 180, 'internal' => 'EQP-012', 'year' => 2019],
+
+            // ── Retired / Old ──
+            ['type' => 'Compressor', 'name' => 'Compressor Ingersoll Rand P185 (Abatido)', 'serial' => 'ING-P185-IR772134',       'status' => EquipmentStatus::RETIRED,       'loanable' => false, 'cost' => 0.00,   'revision' => 0,   'internal' => 'EQP-013', 'year' => 2008],
         ];
 
-        foreach ($equipmentData as $index => $data) {
-            $lastRevision = $data['revision_interval_days'] > 0
-                ? now()->subMonths(rand(1, 6))
-                : null;
+        foreach ($items as $i) {
+            $typeId = $types[$i['type']] ?? null;
+            if (!$typeId) {
+                echo "WARNING: Equipment type '{$i['type']}' not found — skipping.\n";
+                continue;
+            }
 
             Equipment::firstOrCreate(
-                ['serial_number' => $data['serial_number']],
-                array_merge($data, [
-                    'id'                  => Str::uuid(),
-                    'manager_id'          => $equipmentManager->id,
-                    'last_revision_date'  => $lastRevision,
-                    'next_revision_date'  => $lastRevision
-                        ? (clone $lastRevision)->addDays($data['revision_interval'])
-                        : null,
-                ])
+                ['serial_number' => $i['serial']],
+                [
+                    'name'                => $i['name'],
+                    'internal_reference'  => $i['internal'],
+                    'equipment_type_id'   => $typeId,
+                    'manufacturing_year'  => $i['year'],
+                    'counting_type_id'    => $counting['Horas'] ?? null,
+                    'revision_interval'   => $i['revision'],
+                    'status'              => $i['status']->value,
+                    'is_loanable'         => $i['loanable'],
+                    'cost_per_hour'       => $i['cost'],
+                    'manager_id'          => $equipManagerId,
+                ]
             );
         }
 
-        $this->command->info('✅ Equipment seeded: ' . count($equipmentData) . ' items covering all statuses');
+        echo "Equipamento semeado: " . count($items) . " equipamentos\n";
     }
 }

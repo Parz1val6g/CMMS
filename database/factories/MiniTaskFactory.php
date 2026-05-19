@@ -13,11 +13,24 @@ class MiniTaskFactory extends Factory
 {
     protected $model = MiniTask::class;
 
+    private const DESCRIPTIONS = [
+        'Transportar materiais e equipamentos para o local de intervenção',
+        'Preparar e organizar a zona de trabalho com delimitação de segurança',
+        'Executar corte e demolição necessária conforme especificações técnicas',
+        'Aplicar camada de base e nivelamento para preparação da superfície',
+        'Realizar medições e marcações de acordo com o projeto',
+        'Efetuar ligações elétricas e testes de continuidade',
+        'Testar funcionamento do sistema e verificar parâmetros operacionais',
+        'Instalar equipamentos e acessórios conforme manual técnico',
+        'Efetuar reparação localizada de danos identificados na vistoria',
+        'Fazer limpeza final da área e remoção de resíduos de obra',
+    ];
+
     public function definition(): array
     {
         return [
             // task_id, supervisor_id must be provided via state()
-            'description' => fake()->sentence(6),
+            'description' => fake()->randomElement(self::DESCRIPTIONS),
             'status'      => fake()->randomElement(MiniTaskStatus::cases())->value,
         ];
     }

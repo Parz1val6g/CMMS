@@ -6,12 +6,14 @@ axios.defaults.withCredentials = true;
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.headers.common['Accept'] = 'application/json';
 
-// Redirect to login on expired Sanctum token
 axios.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
             window.location.href = '/login';
+        }
+        if (error.response?.status === 403) {
+            console.error('Access denied:', error.response?.data?.message ?? 'Forbidden');
         }
         return Promise.reject(error);
     }

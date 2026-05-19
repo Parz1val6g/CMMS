@@ -30,7 +30,7 @@
       - generic [ref=e43]:
         - img [ref=e44]
         - text: GET
-      - generic [ref=e47]: http://localhost:8000/materials
+      - generic [ref=e47]: http://localhost:80/materials
       - button [ref=e48] [cursor=pointer]:
         - img [ref=e49]
   - generic [ref=e53]:
@@ -218,7 +218,7 @@
       - generic [ref=e374]:
         - generic [ref=e375]:
           - generic [ref=e376]: host
-          - generic [ref=e378]: localhost:8000
+          - generic [ref=e378]: localhost:80
         - generic [ref=e379]:
           - generic [ref=e380]: connection
           - generic [ref=e382]: keep-alive

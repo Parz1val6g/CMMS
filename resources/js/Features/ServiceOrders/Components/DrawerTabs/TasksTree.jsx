@@ -3,6 +3,7 @@ import { router } from '@inertiajs/react';
 import { Loader2, AlertCircle } from 'lucide-react';
 import TaskTreeNode from './TaskTreeNode';
 import buildTaskTree from '../../Utils/buildTaskTree';
+import { csrfHeader } from '@/utils/csrf';
 
 /**
  * SOTasksTree — Hierarchical tasks tree for a Service Order.
@@ -17,7 +18,6 @@ import buildTaskTree from '../../Utils/buildTaskTree';
  */
 export default function SOTasksTree({
   serviceOrderId,
-  workflowType,
   taskApiUrl = '/api/tasks',
   miniTaskApiUrl = '/api/mini-tasks',
 }) {
@@ -40,10 +40,8 @@ export default function SOTasksTree({
     setLoading(true);
     setError(null);
 
-    const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
-
     fetch(`${taskApiUrl}?service_order_id=${serviceOrderId}&per_page=100`, {
-      headers: { Accept: 'application/json', 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' },
+      headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
     })
       .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((body) => {
@@ -68,12 +66,11 @@ export default function SOTasksTree({
     if (tasks.length === 0) return;
 
     let cancelled = false;
-    const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
     Promise.all(
       tasks.map((task) =>
         fetch(`${miniTaskApiUrl}?task_id=${task.id}&per_page=100`, {
-          headers: { Accept: 'application/json', 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' },
+          headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
         })
           .then((r) => (r.ok ? r.json() : { data: [] }))
           .then((body) => ({ taskId: task.id, miniTasks: body.data ?? [] }))
@@ -110,23 +107,6 @@ export default function SOTasksTree({
 
     return buildTaskTree(flat, { parentKey: 'parent_id' });
   }, [tasks, miniTasksMap]);
-
-  /* ── Check if return task already exists in tree ──────────── */
-  const hasReturnTask = useMemo(() => {
-    return tasks.some((t) => t.name === 'Devolução de Equipamento');
-  }, [tasks]);
-
-  /* ── Initiate return via API ────────────────────────────────── */
-  const handleInitiateReturn = useCallback((soId) => {
-    router.post(`/api/service-orders/${soId}/initiate-return`, {}, {
-      onSuccess: () => {
-        window.location.reload();
-      },
-      onError: () => {
-        // Silently ignore — parent component handles error state
-      },
-    });
-  }, []);
 
   /* ── Toggle expand/collapse ────────────────────────────────── */
   const handleToggle = useCallback((id) => {
@@ -202,9 +182,6 @@ export default function SOTasksTree({
             depth={0}
             expandedIds={expandedIds}
             onToggle={handleToggle}
-            workflowType={workflowType}
-            onInitiateReturn={handleInitiateReturn}
-            hasReturnTask={hasReturnTask}
           />
         ))}
       </div>

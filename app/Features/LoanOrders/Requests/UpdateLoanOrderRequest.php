@@ -17,7 +17,6 @@ class UpdateLoanOrderRequest extends FormRequest
     {
         return [
             'entity_id'       => ['sometimes', 'nullable', 'uuid', 'exists:entities,id'],
-            'client_id'       => ['sometimes', 'nullable', 'uuid', 'exists:clients,id'],
             'manager_id'      => ['sometimes', 'uuid', 'exists:users,id'],
             'equipment_ids'   => ['sometimes', 'array', 'min:1'],
             'equipment_ids.*' => ['uuid', 'exists:equipments,id'],

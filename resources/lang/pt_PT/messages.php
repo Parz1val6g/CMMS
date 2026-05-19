@@ -28,6 +28,20 @@ return [
             'new_order_title' => 'Nova Ordem de Serviço Criada',
             'new_order_message' => 'A Ordem de Serviço :process foi criada e atribuída a si.',
         ],
+        'ticket' => [
+            'cannot_update_terminal' => 'Não é possível atualizar um ticket convertido ou cancelado.',
+            'already_terminal' => 'Este ticket já está num estado terminal (convertido ou cancelado).',
+        ],
+        'loan_orders' => [
+            'must_be_pending_to_approve' => 'O empréstimo deve estar com estado PENDENTE para ser aprovado.',
+            'must_be_approved_to_checkout' => 'O empréstimo deve estar APROVADO para levantar.',
+            'must_be_checked_out' => 'O empréstimo deve estar LEVANTADO para devolver.',
+            'cannot_cancel_status' => 'Não é possível cancelar um empréstimo no estado :status. Apenas empréstimos PENDENTES podem ser cancelados.',
+            'equipment_unavailable' => 'Equipamento :ref não está disponível para as datas selecionadas.',
+            'return_task_exists' => 'Já existe uma tarefa de devolução para este empréstimo.',
+            'checkout_must_complete' => 'A tarefa de levantamento deve estar concluída antes de iniciar a devolução.',
+            'cannot_delete' => 'Não é possível eliminar um empréstimo no estado :status.',
+        ],
     ],
     'controllers' => [
         'service_orders' => [
@@ -41,6 +55,22 @@ return [
             'filter_status' => 'Estado',
             'filter_priority' => 'Prioridade',
             'search_placeholder' => 'Pesquisar processo...',
+        ],
+        'tickets' => [
+            'col_description' => 'Descrição',
+            'col_client' => 'Cliente',
+            'col_priority' => 'Prioridade',
+            'col_status' => 'Estado',
+            'col_created' => 'Criado',
+            'filter_status' => 'Estado',
+            'filter_priority' => 'Prioridade',
+        ],
+        'loan_orders' => [
+            'col_reference' => 'Referência',
+            'col_client'    => 'Cliente',
+            'col_manager'   => 'Gestor',
+            'col_status'    => 'Estado',
+            'col_created'   => 'Criado',
         ],
     ],
     'task_names' => [

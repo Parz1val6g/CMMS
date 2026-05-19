@@ -2,27 +2,68 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Environment
+
+**The project runs inside Docker containers.** All commands must be prefixed with `docker exec` or run inside the container shell.
+
+```bash
+# Access the app container shell
+docker exec -it project-app-1 sh
+
+# Or run commands directly from host
+docker exec project-app-1 php artisan migrate
+```
+
+**Services (defined in `docker-compose.yml`):**
+| Service | Image | Port |
+|---|---|---|
+| `app` | Custom (PHP 8.2 + nginx/php-fpm) | 80 |
+| `node` | node:22-alpine | 5173 (Vite HMR) |
+| `mysql` | mysql:8.0 | 3307→3306 |
+| `redis` | redis:7-alpine | 6379 |
+
+Database credentials: `splnet_db` / `splnet` / `splnet` (root: `root`).
+
+The `app` entrypoint (`docker/entrypoint.sh`) runs `php artisan migrate --force` and conditionally seeds the DB on every container start.
+
 ## Commands
 
 ```bash
-# Full dev stack (Laravel server + queue + logs + Vite HMR — all concurrently)
-composer dev
+# Build and start all containers
+docker compose up -d --build
 
-# First-time setup (install deps, .env, app key, migrate, npm install, build)
-composer setup
+# Stop all containers (data persists via named volumes)
+docker compose down
 
-# Tests (clears config cache first, then PHPUnit)
-composer test
+# Stop and delete volumes (full reset)
+docker compose down -v
 
-# Individual commands
-php artisan serve
-php artisan migrate
-php artisan db:seed
-npm run dev
-npm run build
+# Rebuild only the app container (e.g. after Dockerfile or entrypoint changes)
+docker compose up -d --build app
+
+# Full dev stack (inside app container)
+docker exec project-app-1 composer dev
+
+# Run migrations (inside app container)
+docker exec project-app-1 php artisan migrate --force
+
+# Run seeders (inside app container)
+docker exec project-app-1 php artisan db:seed --force
+
+# Full DB reset + seed (inside app container)
+docker exec project-app-1 php artisan migrate:refresh --seed --force
+
+# Tests (inside app container)
+docker exec project-app-1 composer test
+
+# Frontend build (inside node container)
+docker exec project-node-1 npm run build
+
+# Run a one-off command via tinker
+docker exec project-app-1 php artisan tinker --execute="echo User::count();"
 ```
 
-Tests run against an in-memory SQLite database (configured in `phpunit.xml`). The default app database is MySQL via `.env`.
+Tests run against an in-memory SQLite database (configured in `phpunit.xml`). The app database is MySQL via the `mysql` Docker container.
 
 ## Architecture
 

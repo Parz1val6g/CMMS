@@ -37,7 +37,6 @@ class ServiceOrderPresenter
             'manager'       => self::shapeUser($o->manager),
             'location'      => self::shapeLocation($o),
             'service_type'  => $o->serviceType ? ['name' => $o->serviceType->name] : null,
-            'equipments'    => self::shapeEquipments($o),
             // Flatten location fields for edit form pre-fill
             'parish_id'       => $o->location?->parish_id,
             'street'          => $o->location?->street_address,
@@ -77,7 +76,6 @@ class ServiceOrderPresenter
             'manager'       => self::shapeUser($so->manager),
             'location'      => self::shapeLocation($so),
             'service_type'  => $so->serviceType ? ['name' => $so->serviceType->name] : null,
-            'equipments'    => self::shapeEquipmentsDetail($so),
             // Flatten location fields for edit form pre-fill
             'parish_id'       => $so->location?->parish_id,
             'street'          => $so->location?->street_address,
@@ -125,37 +123,6 @@ class ServiceOrderPresenter
             'latitude'  => $o->location->latitude,
             'longitude' => $o->location->longitude,
         ];
-    }
-
-    private static function shapeEquipments(ServiceOrder $o): array
-    {
-        if (!$o->relationLoaded('equipments') || $o->equipments->isEmpty()) return [];
-        return $o->equipments->map(fn($eq) => [
-            'id'                => $eq->id,
-            'name'              => $eq->name,
-            'serial_number'     => $eq->serial_number,
-            'status'            => $eq->status,
-            'is_loanable'       => $eq->is_loanable,
-            'description'       => $eq->description,
-            'last_revision_date' => $eq->last_revision_date?->format('Y-m-d'),
-            'next_revision_date' => $eq->next_revision_date?->format('Y-m-d'),
-        ])->toArray();
-    }
-
-    private static function shapeEquipmentsDetail(ServiceOrder $o): array
-    {
-        if (!$o->relationLoaded('equipments') || $o->equipments->isEmpty()) return [];
-        return $o->equipments->map(fn($eq) => [
-            'id'                => $eq->id,
-            'name'              => $eq->name,
-            'serial_number'     => $eq->serial_number,
-            'status'            => $eq->status,
-            'is_loanable'       => $eq->is_loanable,
-            'description'       => $eq->description,
-            'last_revision_date' => $eq->last_revision_date?->format('Y-m-d'),
-            'next_revision_date' => $eq->next_revision_date?->format('Y-m-d'),
-            'manager'           => $eq->manager ? self::shapeUser($eq->manager) : null,
-        ])->toArray();
     }
 
     private static function shapeTasks(ServiceOrder $so): array

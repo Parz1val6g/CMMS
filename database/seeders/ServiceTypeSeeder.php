@@ -10,31 +10,31 @@ class ServiceTypeSeeder extends Seeder
 {
     public function run(): void
     {
-        $services = [
-            ['name' => 'Pavimentação', 'description' => 'Trabalhos de pavimentação e reparação de vias'],
-            ['name' => 'Iluminação Pública', 'description' => 'Instalação e manutenção de iluminação pública'],
-            ['name' => 'Abastecimento de Água', 'description' => 'Manutenção de sistemas de abastecimento de água'],
-            ['name' => 'Saneamento', 'description' => 'Trabalhos de saneamento e redes de esgotos'],
-            ['name' => 'Limpeza Urbana', 'description' => 'Serviços de limpeza e higiene urbana'],
-            ['name' => 'Gestão de Resíduos', 'description' => 'Coleta e gestão de resíduos municipais'],
-            ['name' => 'Manutenção de Jardins', 'description' => 'Manutenção de áreas verdes e jardins públicos'],
-            ['name' => 'Reparação de Calçadas', 'description' => 'Reparação de passeios e calcetamento'],
-            ['name' => 'Sinalização de Trânsito', 'description' => 'Instalação e manutenção de sinais de trânsito'],
-            ['name' => 'Aprovação de Projetos', 'description' => 'Análise e aprovação de projetos de construção'],
-            ['name' => 'Vistoria de Imóveis', 'description' => 'Inspeção técnica de imóveis'],
-            ['name' => 'Emissão de Licenças', 'description' => 'Processamento de licenças comerciais'],
-            ['name' => 'Reparação de Mobiliário Urbano', 'description' => 'Manutenção de bancos, caixotes e outros móveis'],
-            ['name' => 'Pintura de Fachadas', 'description' => 'Trabalhos de pintura em espaços públicos'],
-            ['name' => 'Instalação de Sinalética', 'description' => 'Colocação de placas informativas e direcionais'],
+        $types = [
+            ['name' => 'Pavimentação',        'description' => 'Reparação e manutenção de pavimentos rodoviários, incluindo tapamento de buracos e fresagem'],
+            ['name' => 'Iluminação Pública',  'description' => 'Instalação, substituição e manutenção de luminárias, candeeiros e projetores de via pública'],
+            ['name' => 'Abastecimento de Água', 'description' => 'Manutenção e reparação de condutas, ramais e acessórios da rede de distribuição de água'],
+            ['name' => 'Saneamento Básico',    'description' => 'Limpeza, desobstrução e reparação de coletores, sarjetas e redes de drenagem de águas residuais'],
+            ['name' => 'Limpeza Urbana',      'description' => 'Varredura mecânica e manual, lavagem de ruas, recolha de resíduos e monos domésticos'],
+            ['name' => 'Recolha de Resíduos',  'description' => 'Recolha seletiva e indiferenciada de resíduos sólidos urbanos e gestão de ecopontos'],
+            ['name' => 'Manutenção de Jardins', 'description' => 'Poda de árvores, corte de relva, plantação de arbustos e manutenção de canteiros e espaços verdes'],
+            ['name' => 'Calcetamento',         'description' => 'Reparação e substituição de calçada portuguesa em passeios, praças e arruamentos pedonais'],
+            ['name' => 'Sinalização de Trânsito', 'description' => 'Instalação, manutenção e pintura de sinais verticais, horizontais e semáforos'],
+            ['name' => 'Aprovação de Projetos','description' => 'Análise técnica, verificação de conformidade e emissão de pareceres para projetos de construção civil'],
+            ['name' => 'Vistoria de Imóveis',  'description' => 'Inspeção técnica de imóveis para efeitos de licenciamento, habitabilidade e segurança estrutural'],
+            ['name' => 'Emissão de Licenças',  'description' => 'Processamento, análise e emissão de licenças comerciais, industriais e de utilização do espaço público'],
+            ['name' => 'Mobiliário Urbano',     'description' => 'Manutenção e substituição de bancos de jardim, papeleiras, abrigos e outros equipamentos urbanos'],
+            ['name' => 'Drenagem Pluvial',     'description' => 'Limpeza e desobstrução de sumidouros, valetas, aquedutos e sistemas de drenagem de águas pluviais'],
+            ['name' => 'Reparação de Edifícios','description' => 'Trabalhos de conservação, pintura e pequenas reparações em edifícios e instalações municipais'],
         ];
 
-        foreach ($services as $service) {
+        foreach ($types as $t) {
             DB::table('service_types')->insert([
-                'id' => Str::uuid(),
-                'name' => $service['name'],
-                'description' => $service['description'],
-                'created_at' => now(),
-                'updated_at' => now(),
+                'id'          => Str::uuid(),
+                'name'        => $t['name'],
+                'description' => $t['description'],
+                'created_at'  => now(),
+                'updated_at'  => now(),
             ]);
         }
     }

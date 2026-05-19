@@ -5,9 +5,6 @@ namespace Database\Seeders;
 use App\Core\Enums\ServiceOrderStatus as SOStatus;
 use App\Core\Enums\Priority;
 use App\Core\Enums\TaskStatus;
-use App\Core\Enums\MiniTaskStatus;
-use App\Core\Enums\WorkLogStatus;
-use App\Core\Enums\WorkflowType;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\Tasks\Models\Task;
 use App\Features\MiniTasks\Models\MiniTask;
@@ -92,8 +89,6 @@ class DevelopmentTestSeeder extends Seeder
             'manager_id'      => $manager->id,
             'location_id'     => $location->id,
             'service_type_id' => null,
-            'workflow_type'   => WorkflowType::STANDARD->value,
-            'equipment_id'    => null,
             'priority'        => Priority::NORMAL->value,
             'execution_date'  => $now->copy()->addDays(3),
             'status'          => SOStatus::IN_PROGRESS->value,
@@ -107,8 +102,6 @@ class DevelopmentTestSeeder extends Seeder
             'manager_id'      => $manager->id,
             'location_id'     => $location->id,
             'service_type_id' => null,
-            'workflow_type'   => WorkflowType::LOAN->value,
-            'equipment_id'    => $loanableEquipments->first()->id,
             'priority'        => Priority::HIGH->value,
             'execution_date'  => $now->copy()->addDays(1),
             'status'          => SOStatus::IN_PROGRESS->value,
@@ -133,7 +126,6 @@ class DevelopmentTestSeeder extends Seeder
                 $task = Task::create([
                     'service_order_id' => $so->id,
                     'manager_id'       => $manager->id,
-                    'name'             => $name,
                     'description'      => "Execução de {$name} conforme especificações técnicas do projeto.",
                     'status'           => $statuses[$i]->value,
                 ]);
@@ -227,7 +219,7 @@ class DevelopmentTestSeeder extends Seeder
             $task = Task::find($mt->task_id);
             $so = ServiceOrder::find($task->service_order_id);
 
-            if ($so->workflow_type === WorkflowType::STANDARD->value) {
+            if ($so->id === $so1->id) {
                 // Attach 2 materials
                 $usedMats = $materials->random(2);
                 foreach ($usedMats as $mat) {

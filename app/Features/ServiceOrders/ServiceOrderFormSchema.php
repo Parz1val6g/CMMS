@@ -2,12 +2,10 @@
 
 namespace App\Features\ServiceOrders;
 
-use App\Core\Enums\EquipmentStatus;
 use App\Core\Enums\Priority;
 use App\Core\Enums\ServiceOrderStatus;
-use App\Core\Enums\WorkflowType;
 use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, FileInput, SectionHeader, MapInput, ToggleInput};
+use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, FileInput, SectionHeader, MapInput};
 use App\Features\Clients\Models\Client;
 use App\Features\Sectors\Models\Sector;
 use App\Features\ServiceTypes\Models\ServiceType;
@@ -19,18 +17,10 @@ class ServiceOrderFormSchema
     public static function create(): FormSchema
     {
         return FormSchema::make(__('forms.service_orders.create_title'))
-            // ── Workflow Type (MUST be first — drives conditional UI) ──
+            // ── Core fields ──
             ->field(
                 SectionHeader::make('section-core')
                     ->setLabel(__('forms.service_orders.section_core'))
-            )
-            ->field(
-                ToggleInput::make('workflow_type')
-                    ->setLabel(__('forms.service_orders.workflow_type'))
-                    ->helperText(__('forms.service_orders.workflow_type_helper'))
-                    ->setOptions(WorkflowType::options())
-                    ->setRequired()
-                    ->setRules('required|string')
             )
             ->field(
                 TextAreaInput::make('description')
@@ -61,14 +51,6 @@ class ServiceOrderFormSchema
                     ->helperText(__('forms.service_orders.client_helper'))
                     ->setOptions(self::clientOptions())
                     ->setRules('nullable|exists:clients,id')
-            )
-            ->field(
-                SelectInput::make('equipment_ids')
-                    ->setLabel(__('forms.service_orders.equipment'))
-                    ->helperText(__('forms.service_orders.equipment_helper'))
-                    ->setOptions(self::equipmentOptions())
-                    ->multiple()
-                    ->setRules('nullable|array')
             )
             ->field(
                 SelectInput::make('service_type_id')
@@ -143,16 +125,10 @@ class ServiceOrderFormSchema
     public static function update(): FormSchema
     {
         return FormSchema::make(__('forms.service_orders.edit_title'))
-            // ── Workflow Type (MUST be first — drives conditional UI) ──
+            // ── Core fields ──
             ->field(
                 SectionHeader::make('section-core')
                     ->setLabel(__('forms.service_orders.section_core'))
-            )
-            ->field(
-                ToggleInput::make('workflow_type')
-                    ->setLabel(__('forms.service_orders.workflow_type'))
-                    ->setOptions(WorkflowType::options())
-                    ->setRules('sometimes|string')
             )
             ->field(
                 TextAreaInput::make('description')
@@ -179,13 +155,6 @@ class ServiceOrderFormSchema
                     ->setLabel(__('forms.service_orders.client'))
                     ->setOptions(self::clientOptions())
                     ->setRules('nullable|exists:clients,id')
-            )
-            ->field(
-                SelectInput::make('equipment_ids')
-                    ->setLabel(__('forms.service_orders.equipment'))
-                    ->setOptions(self::editEquipmentOptions())
-                    ->multiple()
-                    ->setRules('nullable|array')
             )
             ->field(
                 SelectInput::make('service_type_id')
@@ -265,34 +234,6 @@ class ServiceOrderFormSchema
     {
         return Sector::orderBy('name')->get(['id', 'name'])
             ->map(fn($s) => ['value' => $s->id, 'label' => $s->name])
-            ->toArray();
-    }
-
-    private static function equipmentOptions(): array
-    {
-        return \App\Features\Equipments\Models\Equipment::loanable()
-            ->where('status', EquipmentStatus::ACTIVE->value)
-            ->where(function ($q) {
-                $q->whereNull('next_revision_date')
-                  ->orWhere('next_revision_date', '>=', now());
-            })
-            ->get(['id', 'name', 'brand', 'model'])
-            ->map(fn($e) => [
-                'value' => $e->id,
-                'label' => "{$e->name} ({$e->brand} {$e->model})",
-            ])
-            ->toArray();
-    }
-
-    private static function editEquipmentOptions(): array
-    {
-        return \App\Features\Equipments\Models\Equipment::loanable()
-            ->whereIn('status', [EquipmentStatus::ACTIVE->value, EquipmentStatus::IN_USE->value])
-            ->get(['id', 'name', 'brand', 'model'])
-            ->map(fn($e) => [
-                'value' => $e->id,
-                'label' => "{$e->name} ({$e->brand} {$e->model})",
-            ])
             ->toArray();
     }
 

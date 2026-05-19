@@ -5,7 +5,7 @@ export default function Topbar({ breadcrumbs = [] }) {
   return (
     <header className="flex h-16 shrink-0 items-center gap-4 border-b border-brand-mid/20 bg-brand-white px-6">
       {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm">
+      <nav aria-label={t('pages.common.breadcrumb')} className="flex items-center gap-2 text-sm">
         {breadcrumbs.map((crumb, i) => {
           const isLast = i === breadcrumbs.length - 1;
           return (

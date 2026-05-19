@@ -2,7 +2,6 @@
 namespace App\Features\ServiceOrders\Models;
 use App\Core\Enums\Priority;
 use App\Core\Enums\ServiceOrderStatus;
-use App\Core\Enums\WorkflowType;
 use App\Core\Traits\Base;
 use App\Core\Traits\HasAutoReference;
 use App\Core\Traits\LogsAuditTrail;
@@ -14,7 +13,6 @@ use App\Features\Clients\Models\ClientLocation;
 use App\Shared\Models\User;
 use App\Features\Locations\Models\Location;
 use App\Features\ServiceTypes\Models\ServiceType;
-use App\Features\Equipments\Models\Equipment;
 use App\Features\Sectors\Models\Sector;
 use App\Features\Tasks\Models\Task;
 use App\Shared\Models\Attachment;
@@ -39,7 +37,7 @@ class ServiceOrder extends Model
         'manager_id',
         'location_id',
         'service_type_id',
-        'workflow_type',
+        'migrated_to_loan_id',
         'priority',
         'execution_date',
         'status',
@@ -48,10 +46,14 @@ class ServiceOrder extends Model
     ];
     protected $casts = [
         'execution_date' => 'date',
-        'workflow_type' => WorkflowType::class,
         'priority' => Priority::class,
         'status' => ServiceOrderStatus::class,
     ];
+
+    public function migratedToLoan()
+    {
+        return $this->belongsTo(\App\Features\LoanOrders\Models\LoanOrder::class, 'migrated_to_loan_id');
+    }
     protected $appends = ['photo_url'];
 
     public function getPhotoUrlAttribute(): ?string
@@ -82,12 +84,6 @@ class ServiceOrder extends Model
         return $this->belongsTo(ServiceType::class);
     }
 
-    public function equipments()
-    {
-        return $this->belongsToMany(Equipment::class, 'equipment_service_order')
-            ->withTimestamps();
-    }
-
     public function sectors()
     {
         return $this->belongsToMany(Sector::class, 'service_order_sector', 'service_order_id', 'sector_id');
@@ -99,6 +95,6 @@ class ServiceOrder extends Model
     }
     public function attachments()
     {
-        return $this->hasMany(Attachment::class);
+        return $this->morphMany(Attachment::class, 'attachable');
     }
 }

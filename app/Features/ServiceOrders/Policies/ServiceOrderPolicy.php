@@ -17,6 +17,7 @@ class ServiceOrderPolicy extends BasePolicy
 
     public function view(User $user, ServiceOrder $serviceOrder): bool
     {
+        if ($this->isAdmin($user)) return true;
         return $this->isManagerScoped($user, $serviceOrder->manager);
     }
 
@@ -27,21 +28,25 @@ class ServiceOrderPolicy extends BasePolicy
 
     public function update(User $user, ServiceOrder $serviceOrder): bool
     {
+        if ($this->isAdmin($user)) return true;
         return $this->isManagerScoped($user, $serviceOrder->manager);
     }
 
     public function cancel(User $user, ServiceOrder $serviceOrder): bool
     {
+        if ($this->isAdmin($user)) return true;
         return $this->isManagerScoped($user, $serviceOrder->manager);
     }
 
     public function complete(User $user, ServiceOrder $serviceOrder): bool
     {
+        if ($this->isAdmin($user)) return true;
         return $this->isManagerScoped($user, $serviceOrder->manager);
     }
 
     public function delete(User $user, ServiceOrder $serviceOrder): bool
     {
+        if ($this->isAdmin($user)) return true;
         return $this->isManagerScoped($user, $serviceOrder->manager);
     }
 

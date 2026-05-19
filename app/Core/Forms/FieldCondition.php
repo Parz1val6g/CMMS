@@ -4,7 +4,7 @@ namespace App\Core\Forms;
 
 class FieldCondition
 {
-    private const ALLOWED_OPERATORS = ['==', '!=', '<', '>', '<=', '>='];
+    private const ALLOWED_OPERATORS = ['==', '!=', '<', '>', '<=', '>=', 'in', 'not_in'];
 
     public function __construct(
         public readonly string $field,
@@ -42,6 +42,8 @@ class FieldCondition
             '>' => $fieldValue > $this->value,
             '<=' => $fieldValue <= $this->value,
             '>=' => $fieldValue >= $this->value,
+            'in' => is_array($this->value) && in_array($fieldValue, $this->value, true),
+            'not_in' => !is_array($this->value) || !in_array($fieldValue, $this->value, true),
             default => false,
         };
     }

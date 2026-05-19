@@ -1,12 +1,13 @@
 import { useState, useMemo } from 'react';
 import { Search, Package } from 'lucide-react';
+import { t } from '@/utils/i18n';
 
 /* ── Status badge styling ────────────────────────────────────── */
 const EQUIP_STATUS_STYLE = {
-  active:      'bg-green-500/20  text-green-300  border border-green-500/40',
-  maintenance: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40',
-  retired:     'bg-red-500/20    text-red-300    border border-red-500/40',
-  in_use:      'bg-blue-500/20   text-blue-300   border border-blue-500/40',
+  active:      'bg-green-100  text-green-700  border border-green-200',
+  maintenance: 'bg-yellow-100 text-yellow-700 border border-yellow-200',
+  retired:     'bg-red-100    text-red-700    border border-red-200',
+  in_use:      'bg-blue-100   text-blue-700   border border-blue-200',
 };
 
 const EQUIP_STATUS_LABEL = {
@@ -23,7 +24,7 @@ function TypeBadge({ isLoanable }) {
       className={`inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-full ${
         isLoanable
           ? 'bg-brand-accent/15 text-brand-accent border border-brand-accent/30'
-          : 'bg-slate-600/30  text-brand-mid border border-slate-600/40'
+          : 'bg-brand-mid/20  text-brand-mid border border-brand-mid/30'
       }`}
     >
       {isLoanable ? 'Loanable' : 'Fixed'}
@@ -98,13 +99,13 @@ export default function SOMaterialsList({ serviceOrder }) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Filter by name or serial number…"
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-accent/50"
+            placeholder={t('pages.service_orders.equipment_filter_placeholder')}
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest placeholder-brand-mid focus:outline-none focus:ring-2 focus:ring-brand-accent/50"
           />
         </div>
         <div className="flex flex-col items-center justify-center h-40 text-brand-mid gap-2">
           <Search className="h-5 w-5 text-brand-mid" />
-          <p className="text-sm">No equipment matches your filter.</p>
+          <p className="text-sm">{t('pages.service_orders.no_equipment_filter_match')}</p>
         </div>
       </div>
     );
@@ -120,8 +121,8 @@ export default function SOMaterialsList({ serviceOrder }) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Filter by name or serial number…"
-          className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-accent/50"
+          placeholder={t('pages.service_orders.equipment_filter_placeholder')}
+          className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest placeholder-brand-mid focus:outline-none focus:ring-2 focus:ring-brand-accent/50"
         />
       </div>
 
@@ -141,7 +142,7 @@ export default function SOMaterialsList({ serviceOrder }) {
 
           {/* Body */}
           <tbody className="divide-y divide-brand-mid/10">
-            <tr className="bg-slate-800/20 hover:bg-brand-light transition-colors">
+            <tr className="bg-brand-white hover:bg-brand-light transition-colors">
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
                   <Package className="h-4 w-4 text-brand-accent shrink-0" />
@@ -167,7 +168,7 @@ export default function SOMaterialsList({ serviceOrder }) {
                 </span>
               </td>
               <td className="px-4 py-3 text-xs">
-                <RevisionDate date={filtered.next_revision_date} label="Next Revision" />
+                <RevisionDate date={filtered.next_revision_date} label={t('pages.service_orders.next_revision_label')} />
               </td>
             </tr>
           </tbody>

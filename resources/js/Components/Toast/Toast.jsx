@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AlertCircle, CheckCircle, AlertTriangle, Info, X } from 'lucide-react';
+import { t } from '@/utils/i18n';
 
 /**
  * Toast notification component
@@ -80,7 +81,7 @@ export default function Toast({
                         setTimeout(() => onDismiss?.(id), 300);
                     }}
                     className={`ml-auto -mr-1.5 inline-flex flex-shrink-0 rounded-md transition-colors ${config.text} hover:opacity-75`}
-                    aria-label="Dismiss"
+                    aria-label={t('pages.common.dismiss')}
                 >
                     <X className="h-5 w-5" />
                 </button>

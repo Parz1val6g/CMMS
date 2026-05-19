@@ -30,7 +30,7 @@ class FeatureFlags
     public static function requireFeature(string $feature): void
     {
         if (!self::isEnabled($feature)) {
-            abort(403, "Feature '{$feature}' is not available");
+            abort(404, "Feature '{$feature}' is not available");
         }
     }
 

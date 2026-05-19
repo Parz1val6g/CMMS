@@ -9,16 +9,22 @@ class CountingTypeSeeder extends Seeder
 {
     public function run(): void
     {
+        // Deactivate old incorrect types
+        CountingType::whereIn('value', ['unit', 'weight', 'length', 'area', 'volume'])
+            ->update(['active' => false]);
+
         $types = [
-            ['name' => 'Unitário',    'value' => 'unit',     'active' => true],
-            ['name' => 'Peso',        'value' => 'weight',   'active' => true],
-            ['name' => 'Comprimento', 'value' => 'length',   'active' => true],
-            ['name' => 'Área',        'value' => 'area',     'active' => true],
-            ['name' => 'Volume',      'value' => 'volume',   'active' => true],
+            ['name' => 'Quilómetros', 'value' => 'km',      'active' => true],
+            ['name' => 'Horas',       'value' => 'hours',   'active' => true],
+            ['name' => 'Metros',      'value' => 'meters',  'active' => true],
+            ['name' => 'Dias',        'value' => 'days',    'active' => true],
+            ['name' => 'Semanas',     'value' => 'weeks',   'active' => true],
+            ['name' => 'Meses',       'value' => 'months',  'active' => true],
+            ['name' => 'Anos',        'value' => 'years',   'active' => true],
         ];
 
         foreach ($types as $type) {
-            CountingType::firstOrCreate(
+            CountingType::updateOrCreate(
                 ['value' => $type['value']],
                 $type
             );

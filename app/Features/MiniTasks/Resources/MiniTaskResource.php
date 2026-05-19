@@ -11,6 +11,8 @@ class MiniTaskResource extends JsonResource
             'reference' => $this->reference,
             'task_id' => $this->task_id,
             'description' => $this->description,
+            'start_date' => $this->start_date?->format('Y-m-d'),
+            'end_date' => $this->end_date?->format('Y-m-d'),
             'status' => $this->status,
             'created_at' => $this->created_at->toIso8601String(),
 
@@ -59,6 +61,11 @@ class MiniTaskResource extends JsonResource
                     ];
                 });
             }),
+            // Return Planned Equipment
+            'equipment' => $this->whenLoaded('equipment', fn() => $this->equipment->map(fn($e) => [
+                'id'   => $e->id,
+                'name' => $e->name,
+            ])),
         ];
     }
 }

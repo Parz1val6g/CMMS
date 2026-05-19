@@ -5,8 +5,7 @@ namespace App\Features\LoanOrders;
 use App\Core\Enums\EquipmentStatus;
 use App\Core\Enums\LoanOrderStatus;
 use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, SectionHeader, MapInput, ToggleInput};
-use App\Features\Clients\Models\Client;
+use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, SectionHeader, MapInput, ToggleInput, RepeaterInput};
 use App\Features\Entities\Models\Entity;
 use App\Features\Equipments\Models\Equipment;
 use App\Shared\Models\Parish;
@@ -16,98 +15,66 @@ class LoanOrderFormSchema
 {
     public static function create(): FormSchema
     {
+        $equipmentOpts = self::equipmentOptions();
+
         return FormSchema::make(__('forms.loan_orders.create_title'))
-            // ── Requester Section ──
+            ->setColumns(2)
+            // ── Column 1: Requester ──
             ->field(
                 SectionHeader::make('section-requester')
                     ->setLabel(__('forms.loan_orders.section_requester'))
+                    ->setColumn(1)
             )
             ->field(
                 SelectInput::make('entity_id')
                     ->setLabel(__('forms.loan_orders.entity'))
                     ->helperText(__('forms.loan_orders.entity_helper'))
                     ->setOptions(self::entityOptions())
-                    ->setRules('required_without:client_id|nullable|uuid|exists:entities,id')
+                    ->setColumn(1)
+                    ->setRequired(true)
+                    ->setRules('required|uuid|exists:entities,id')
             )
-            ->field(
-                SelectInput::make('client_id')
-                    ->setLabel(__('forms.loan_orders.client'))
-                    ->helperText(__('forms.loan_orders.client_helper'))
-                    ->setOptions(self::clientOptions())
-                    ->setRules('required_without:entity_id|nullable|uuid|exists:clients,id')
-            )
-            // ── Equipment Section ──
-            ->field(
-                SectionHeader::make('section-equipment')
-                    ->setLabel(__('forms.loan_orders.section_equipment'))
-            )
-            ->field(
-                SelectInput::make('equipment_ids')
-                    ->setLabel(__('forms.loan_orders.equipment'))
-                    ->helperText(__('forms.loan_orders.equipment_helper'))
-                    ->setOptions(self::equipmentOptions())
-                    ->multiple()
-                    ->setRules('required|array|min:1')
-            )
-            ->field(
-                ToggleInput::make('needs_operator')
-                    ->setLabel(__('forms.loan_orders.needs_operator'))
-                    ->helperText(__('forms.loan_orders.needs_operator_helper'))
-                    ->setRules('nullable|boolean')
-            )
-            // ── Schedule Section ──
-            ->field(
-                SectionHeader::make('section-schedule')
-                    ->setLabel(__('forms.loan_orders.section_schedule'))
-            )
-            ->field(
-                TextInput::make('start_date')
-                    ->setLabel(__('forms.loan_orders.start_date'))
-                    ->helperText(__('forms.loan_orders.start_date_helper'))
-                    ->setType('date')
-                    ->setRules('required|date')
-            )
-            ->field(
-                TextInput::make('end_date')
-                    ->setLabel(__('forms.loan_orders.end_date'))
-                    ->helperText(__('forms.loan_orders.end_date_helper'))
-                    ->setType('date')
-                    ->setRules('required|date|after_or_equal:start_date')
-            )
-            // ── Manager Section ──
+            // ── Column 1: Manager ──
             ->field(
                 SectionHeader::make('section-manager')
                     ->setLabel(__('forms.loan_orders.section_manager'))
+                    ->setColumn(1)
             )
             ->field(
                 SelectInput::make('manager_id')
                     ->setLabel(__('forms.loan_orders.manager'))
                     ->helperText(__('forms.loan_orders.manager_helper'))
                     ->setOptions(self::managerOptions())
+                    ->setColumn(1)
+                    ->setRequired(true)
                     ->setRules('required|uuid|exists:users,id')
             )
-            // ── Location Section ──
+            // ── Column 2: Address ──
             ->field(
-                SectionHeader::make('section-location')
-                    ->setLabel(__('forms.loan_orders.section_location'))
+                SectionHeader::make('section-address')
+                    ->setLabel(__('forms.loan_orders.section_address'))
+                    ->setColumn(2)
             )
             ->field(
                 SelectInput::make('parish_id')
                     ->setLabel(__('forms.loan_orders.parish'))
                     ->helperText(__('forms.loan_orders.parish_helper'))
                     ->setOptions(self::parishOptions())
+                    ->setColumn(2)
                     ->setRules('nullable|exists:parishes,id')
             )
             ->field(
                 TextInput::make('street')
                     ->setLabel(__('forms.loan_orders.street'))
                     ->helperText(__('forms.loan_orders.street_helper'))
+                    ->setColumn(2)
                     ->setRules('nullable|string|max:255')
             )
             ->field(
                 TextInput::make('reference_point')
                     ->setLabel(__('forms.loan_orders.reference_point'))
                     ->helperText(__('forms.loan_orders.reference_point_helper'))
+                    ->setColumn(2)
                     ->setRules('nullable|string|max:255')
             )
             ->field(
@@ -115,12 +82,44 @@ class LoanOrderFormSchema
                     ->setLabel(__('forms.loan_orders.postal_code'))
                     ->helperText(__('forms.loan_orders.postal_code_helper'))
                     ->helpExamples(['1000-001', '4000-001'])
+                    ->setColumn(2)
                     ->setRules('nullable|string|max:20')
             )
-            // ── Map Picker ──
+            // ── Full-width: Equipment ──
+            ->field(
+                SectionHeader::make('section-equipment')
+                    ->setLabel(__('forms.loan_orders.section_equipment'))
+                    ->setColSpan(2)
+            )
+            ->field(
+                RepeaterInput::make('equipments')
+                    ->setColSpan(2)
+                    ->setMaxItems(5)
+                    ->meta('itemColumns', 4)
+                    ->subFields([
+                        SelectInput::make('equipment_id')
+                            ->setLabel(__('forms.loan_orders.equipment'))
+                            ->setOptions($equipmentOpts)
+                            ->setRequired(true)
+                            ->setRules('required|uuid|exists:equipments,id'),
+                        TextInput::make('start_date')
+                            ->setLabel(__('forms.loan_orders.start_date'))
+                            ->setType('date')
+                            ->setRules('nullable|date'),
+                        TextInput::make('end_date')
+                            ->setLabel(__('forms.loan_orders.end_date'))
+                            ->setType('date')
+                            ->setRules('nullable|date|after_or_equal:start_date'),
+                        ToggleInput::make('needs_operator')
+                            ->setLabel(__('forms.loan_orders.needs_operator'))
+                            ->setRules('nullable|boolean'),
+                    ])
+            )
+            // ── Full-width: Map ──
             ->field(
                 SectionHeader::make('section-map')
                     ->setLabel(__('forms.loan_orders.section_map'))
+                    ->setColSpan(2)
             )
             ->field(
                 MapInput::make('location')
@@ -128,10 +127,11 @@ class LoanOrderFormSchema
                     ->coordinates('latitude', 'longitude')
                     ->setRules('nullable|numeric|between:-90,90')
             )
-            // ── Description Section ──
+            // ── Full-width: Description ──
             ->field(
                 SectionHeader::make('section-description')
                     ->setLabel(__('forms.loan_orders.section_description'))
+                    ->setColSpan(2)
             )
             ->field(
                 TextAreaInput::make('description')
@@ -156,42 +156,31 @@ class LoanOrderFormSchema
                     ->setRules('sometimes|nullable|uuid|exists:entities,id')
             )
             ->field(
-                SelectInput::make('client_id')
-                    ->setLabel(__('forms.loan_orders.client'))
-                    ->setOptions(self::clientOptions())
-                    ->setRules('sometimes|nullable|uuid|exists:clients,id')
-            )
-            ->field(
                 SectionHeader::make('section-equipment')
                     ->setLabel(__('forms.loan_orders.section_equipment'))
             )
             ->field(
-                SelectInput::make('equipment_ids')
-                    ->setLabel(__('forms.loan_orders.equipment'))
-                    ->setOptions(self::editEquipmentOptions())
-                    ->multiple()
-                    ->setRules('sometimes|array|min:1')
-            )
-            ->field(
-                ToggleInput::make('needs_operator')
-                    ->setLabel(__('forms.loan_orders.needs_operator'))
-                    ->setRules('nullable|boolean')
-            )
-            ->field(
-                SectionHeader::make('section-schedule')
-                    ->setLabel(__('forms.loan_orders.section_schedule'))
-            )
-            ->field(
-                TextInput::make('start_date')
-                    ->setLabel(__('forms.loan_orders.start_date'))
-                    ->setType('date')
-                    ->setRules('sometimes|date')
-            )
-            ->field(
-                TextInput::make('end_date')
-                    ->setLabel(__('forms.loan_orders.end_date'))
-                    ->setType('date')
-                    ->setRules('sometimes|date|after_or_equal:start_date')
+                RepeaterInput::make('equipments')
+                    ->setMaxItems(5)
+                    ->meta('itemColumns', 4)
+                    ->subFields([
+                        SelectInput::make('equipment_id')
+                            ->setLabel(__('forms.loan_orders.equipment'))
+                            ->setOptions(self::editEquipmentOptions())
+                            ->setRequired(true)
+                            ->setRules('required|uuid|exists:equipments,id'),
+                        TextInput::make('start_date')
+                            ->setLabel(__('forms.loan_orders.start_date'))
+                            ->setType('date')
+                            ->setRules('nullable|date'),
+                        TextInput::make('end_date')
+                            ->setLabel(__('forms.loan_orders.end_date'))
+                            ->setType('date')
+                            ->setRules('nullable|date|after_or_equal:start_date'),
+                        ToggleInput::make('needs_operator')
+                            ->setLabel(__('forms.loan_orders.needs_operator'))
+                            ->setRules('nullable|boolean'),
+                    ])
             )
             ->field(
                 SectionHeader::make('section-manager')
@@ -280,18 +269,6 @@ class LoanOrderFormSchema
             ->map(fn($e) => [
                 'value' => $e->id,
                 'label' => "{$e->name} ({$e->brand} {$e->model})",
-            ])
-            ->toArray();
-    }
-
-    private static function clientOptions(): array
-    {
-        return Client::join('users', 'users.id', '=', 'clients.user_id')
-            ->orderBy('users.first_name')
-            ->get(['clients.id', 'users.first_name', 'users.last_name'])
-            ->map(fn($c) => [
-                'value' => $c->id,
-                'label' => trim("{$c->first_name} {$c->last_name}"),
             ])
             ->toArray();
     }

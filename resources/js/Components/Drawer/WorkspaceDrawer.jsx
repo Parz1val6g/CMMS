@@ -1,7 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { useFocusTrap } from '@/Hooks/useFocusTrap';
 import { useBodyLock } from '@/Hooks/useBodyLock';
+import { t } from '@/utils/i18n';
+
+const MIN_WIDTH = 320;
+const DEFAULT_WIDTH = 672;
 
 /**
  * WorkspaceDrawer — Generic right-sliding workspace panel.
@@ -14,7 +18,35 @@ import { useBodyLock } from '@/Hooks/useBodyLock';
  */
 export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs = [] }) {
   const [activeTab, setActiveTab] = useState(tabs[0]?.id ?? null);
+  const [width, setWidth] = useState(DEFAULT_WIDTH);
   const panelRef = useRef(null);
+
+  const onResizeStart = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isResizing.current = true;
+    startX.current = e.clientX;
+    startWidth.current = panelRef.current?.offsetWidth ?? DEFAULT_WIDTH;
+
+    const onMouseMove = (ev) => {
+      if (!isResizing.current) return;
+      const delta = startX.current - ev.clientX;
+      const next = Math.min(window.innerWidth * 0.95, Math.max(MIN_WIDTH, startWidth.current + delta));
+      setWidth(next);
+    };
+    const onMouseUp = () => {
+      isResizing.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none';
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }, []);
 
   /* Reset active tab when tabs change or current tab is removed */
   useEffect(() => {
@@ -50,10 +82,19 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
       {/* Drawer Panel */}
       <div
         ref={panelRef}
-        className={`fixed inset-y-0 right-0 z-50 w-full max-w-4xl flex flex-col bg-slate-800 shadow-2xl border-l border-slate-700 overflow-hidden transform transition-transform duration-300 ease-in-out ${
+        style={{ width: `${width}px` }}
+        className={`fixed inset-y-0 right-0 z-50 flex flex-col bg-brand-white shadow-2xl border-l border-brand-mid/20 overflow-hidden transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
+        {/* Resize handle */}
+        <div
+          onMouseDown={onResizeStart}
+          className="absolute left-0 inset-y-0 w-1.5 cursor-ew-resize z-10 group"
+          title={t('pages.common.resize_drawer')}
+        >
+          <div className="absolute left-0 inset-y-0 w-0.5 bg-brand-mid/20 group-hover:bg-brand-accent/60 group-active:bg-brand-accent transition-colors" />
+        </div>
         {/* Header */}
         <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-brand-mid/20 bg-brand-light">
           <div className="flex items-center gap-4 min-w-0">
@@ -68,7 +109,7 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
             type="button"
             onClick={onClose}
             className="shrink-0 rounded-lg p-1.5 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors"
-            aria-label="Close drawer"
+            aria-label={t('pages.common.close_drawer')}
           >
             <X className="h-5 w-5" />
           </button>

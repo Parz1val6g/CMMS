@@ -58,11 +58,16 @@ MorphTo nas tasks: ALTER TABLE tasks ADD COLUMN taskable_id UUID, ADD COLUMN tas
 
 ### Ciclo de Vida
 
-PENDING --checkout-- --return-- --cancel-- --cancel-- valida equipamentos disponiveis, lockForUpdate(), markAsInUse(), cria Task checkout (taskable_type=LoanOrder)
+```
+PENDING ──checkout──► CHECKED_OUT ──return──► RETURNED
+   │
+   └──cancel──► CANCELLED
+```
 
-initiateReturn(): valida CHECKED_OUT, cria Task devolucao
-
-cancel(): release equipments (markAsActive()), status CANCELLED
+- `PENDING → CHECKED_OUT`: valida equipamentos disponíveis, `lockForUpdate()`, `markAsInUse()`, cria Task checkout
+- `CHECKED_OUT → RETURNED`: via `complete()` (Issue 09 — separado), `markAsActive()` nos equipamentos
+- `PENDING → CANCELLED`: release equipments (`markAsActive()`), status CANCELLED
+- `CHECKED_OUT → CANCELLED`: ❌ **bloqueado** — equipamento já foi levantado, tem de ser devolvido primeiro
 
 ### API Contracts
 
@@ -105,7 +110,7 @@ Frontend TaskTreeNode.jsx: remover showReturnBtn.
 
 All modules will be tested. Prior art in codebase: ServiceOrderApiTest, ServiceOrderPoliciesTest, cascade tests.
 
-**LoanOrderServiceTest** � ciclo de vida completo: create (PENDING), initiateReturn (cria Task), cancel (CANCELLED + equipment released). Cenarios de erro: equipamento indisponivel, duplo cancel, cancel de CHECKED_OUT, lock concorrente.
+**LoanOrderServiceTest** � ciclo de vida completo: create (PENDING), initiateReturn (cria Task), cancel (CANCELLED + equipment released). Cenarios de erro: equipamento indisponivel, duplo cancel, cancel de CHECKED_OUT (422 — tem de devolver primeiro), lock concorrente.
 
 **LoanOrderPolicyTest** � gates por role: admin full access, manager com create/initiateReturn, worker sem acesso.
 

@@ -5,8 +5,7 @@ import { useToast } from '@/Components/Toast/ToastContext';
 import { useFocusTrap } from '@/Hooks/useFocusTrap';
 import { useBodyLock } from '@/Hooks/useBodyLock';
 import CascadingParishSelect from '@/Components/Common/CascadingParishSelect';
-
-const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+import { csrfHeader } from '@/utils/csrf';
 
 const inputClass =
     'w-full rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent placeholder-brand-mid';
@@ -91,7 +90,7 @@ function LocationRow({ loc, index, districts, municipalities, parishes, onChange
                         className={inputClass}
                         value={loc.street_address}
                         onChange={e => set('street_address', e.target.value)}
-                        placeholder="Rua da Paz, 123"
+                        placeholder={t('pages.client_locations.street_placeholder')}
                     />
                 </div>
                 <div>
@@ -100,7 +99,7 @@ function LocationRow({ loc, index, districts, municipalities, parishes, onChange
                         className={inputClass}
                         value={loc.postal_code}
                         onChange={e => set('postal_code', e.target.value)}
-                        placeholder="3530-001"
+                        placeholder={t('pages.client_locations.postal_placeholder')}
                     />
                 </div>
             </div>
@@ -211,8 +210,8 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken(),
                     'X-Requested-With': 'XMLHttpRequest',
+                    ...csrfHeader(),
                 },
                 body: JSON.stringify(payload),
             });

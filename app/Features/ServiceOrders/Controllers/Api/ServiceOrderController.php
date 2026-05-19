@@ -29,7 +29,7 @@ class ServiceOrderController extends Controller
         $user = $request->user();
 
         $query = $this->filterService->apply(
-            ServiceOrder::with(['client.user', 'manager', 'location', 'serviceType', 'sectors', 'equipments']),
+            ServiceOrder::with(['client.user', 'manager', 'location', 'serviceType', 'sectors']),
             $request->only(['search', 'status', 'priority', 'from_date', 'to_date', 'sort']),
             ['process', 'description', 'priority', 'status']
         );
@@ -86,7 +86,6 @@ class ServiceOrderController extends Controller
                 ]),
             ]),
             'attachments',
-            'equipments.manager',
         ]);
         return new ServiceOrderResource($serviceOrder);
     }
@@ -96,7 +95,7 @@ class ServiceOrderController extends Controller
         Gate::authorize('update', $serviceOrder);
 
         $updatedOrder = $this->serviceOrderService->update($serviceOrder, $request->validated());
-        $updatedOrder->load(['client.user', 'manager', 'location', 'serviceType', 'sectors', 'equipments']);
+        $updatedOrder->load(['client.user', 'manager', 'location', 'serviceType', 'sectors']);
 
         session()->flash('success', 'Service order updated successfully.');
         return new ServiceOrderResource($updatedOrder);

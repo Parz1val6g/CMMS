@@ -1,6 +1,6 @@
 import { usePage, Link } from '@inertiajs/react';
 import { memo } from 'react';
-import { sections, bottomItems } from '@/Layouts/data/sidebar';
+import { getSections, getBottomItems } from '@/Layouts/data/sidebar';
 import { t } from '@/utils/i18n';
 
 // ── Sub-components ──────────────────────────────────────────────────────
@@ -53,6 +53,8 @@ function NavSection({ section }) {
 
 export default function Sidebar() {
   const { auth } = usePage().props;
+  const sections = getSections();
+  const bottomItems = getBottomItems();
 
   return (
     <aside className="w-64 flex flex-col h-full bg-brand-darkest border-r border-brand-mid/20 shrink-0">

@@ -51,6 +51,12 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
+        "docker-dev": [
+            "docker compose up -d --build"
+        ],
+        "docker-down": [
+            "docker compose down"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

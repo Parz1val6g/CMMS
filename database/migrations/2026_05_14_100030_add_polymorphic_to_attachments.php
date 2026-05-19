@@ -31,15 +31,34 @@ return new class extends Migration {
 
     public function down(): void
     {
-        if (DB::getDriverName() !== 'sqlite') {
-            DB::statement('ALTER TABLE attachments DROP CONSTRAINT attachments_attachable_check');
+        try {
+            Schema::table('attachments', function (Blueprint $table) {
+                $table->dropForeign(['equipment_id']);
+            });
+        } catch (\Throwable) {}
+
+        try {
+            Schema::table('attachments', function (Blueprint $table) {
+                $table->dropIndex(['attachable_type', 'attachable_id']);
+            });
+        } catch (\Throwable) {}
+
+        try {
+            Schema::table('attachments', function (Blueprint $table) {
+                $table->dropIndex(['equipment_id']);
+            });
+        } catch (\Throwable) {}
+
+        if (
+            Schema::hasColumn('attachments', 'attachable_type')
+            || Schema::hasColumn('attachments', 'attachable_id')
+            || Schema::hasColumn('attachments', 'equipment_id')
+        ) {
+            try {
+                Schema::table('attachments', function (Blueprint $table) {
+                    $table->dropColumn(['attachable_type', 'attachable_id', 'equipment_id']);
+                });
+            } catch (\Throwable) {}
         }
-
-        Schema::table('attachments', function (Blueprint $table) {
-            $table->dropIndex(['attachable_type', 'attachable_id']);
-            $table->dropIndex(['equipment_id']);
-
-            $table->dropColumn(['attachable_type', 'attachable_id', 'equipment_id']);
-        });
     }
 };

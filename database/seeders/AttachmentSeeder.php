@@ -20,37 +20,35 @@ class AttachmentSeeder extends Seeder
         // One attachment per service order
         foreach ($serviceOrders as $soId) {
             $attachments[] = [
-                'id'               => Str::uuid(),
-                'service_order_id' => $soId,
-                'mini_task_id'     => null,
-                'file_path'        => "uploads/so/{$soId}/report.pdf",
-                'file_name'        => 'Relatório.pdf',
-                'mime_type'        => 'application/pdf',
-                'created_at'       => now(),
-                'updated_at'       => now(),
+                'id'              => Str::uuid(),
+                'attachable_type' => 'App\\Features\\ServiceOrders\\Models\\ServiceOrder',
+                'attachable_id'   => $soId,
+                'file_path'       => "uploads/so/{$soId}/report.pdf",
+                'file_name'       => 'Relatório.pdf',
+                'mime_type'       => 'application/pdf',
+                'created_at'      => now(),
+                'updated_at'      => now(),
             ];
         }
 
-        // One attachment per mini-task (if any service orders exist)
+        // One attachment per mini-task
         foreach ($miniTasks as $mtId) {
             $attachments[] = [
-                'id'               => Str::uuid(),
-                'service_order_id' => null,
-                'mini_task_id'     => $mtId,
-                'file_path'        => "uploads/mt/{$mtId}/photo.jpg",
-                'file_name'        => 'Fotografia.jpg',
-                'mime_type'        => 'image/jpeg',
-                'created_at'       => now(),
-                'updated_at'       => now(),
+                'id'              => Str::uuid(),
+                'attachable_type' => 'App\\Features\\MiniTasks\\Models\\MiniTask',
+                'attachable_id'   => $mtId,
+                'file_path'       => "uploads/mt/{$mtId}/photo.jpg",
+                'file_name'       => 'Fotografia.jpg',
+                'mime_type'       => 'image/jpeg',
+                'created_at'      => now(),
+                'updated_at'      => now(),
             ];
         }
 
         foreach ($attachments as $att) {
             $exists = DB::table('attachments')
-                ->where(function ($q) use ($att) {
-                    $q->where('service_order_id', $att['service_order_id'])
-                      ->orWhere('mini_task_id', $att['mini_task_id']);
-                })
+                ->where('attachable_type', $att['attachable_type'])
+                ->where('attachable_id', $att['attachable_id'])
                 ->exists();
 
             if (!$exists) {

@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import { labelFor, badgeStyle } from '@/utils/enums';
 import { formatDate } from '@/utils/format';
+import { t } from '@/utils/i18n';
 
 // Helper to resolve nested object properties
 function resolveValue(item, key) {
@@ -71,7 +72,7 @@ function AvatarInitial({ value }) {
 }
 
 function renderCell(item, col) {
-    if (col.render) return col.render(item);
+    if (col.render) return col.render(resolveValue(item, col.key));
 
     const raw = resolveValue(item, col.key);
     const isStatusOrPriority = col.key === 'status' || col.key === 'priority';
@@ -171,8 +172,8 @@ function Row({ item, columns, hasEdit, onEdit, onDelete, onRowClick, selected = 
                             type="button"
                             className="rounded-lg p-1.5 text-brand-mid hover:bg-brand-accent/10 hover:text-brand-accent transition-colors"
                             onClick={(e) => { e.stopPropagation(); onEdit(item); }}
-                            title="Editar"
-                            aria-label={'Editar ' + (item.process ?? item.name ?? '')}
+                            title={t('pages.table.edit_title')}
+                            aria-label={t('pages.table.edit_aria', { name: item.process ?? item.name ?? '' })}
                         >
                             <Pencil className="h-4 w-4" />
                         </button>
@@ -181,8 +182,8 @@ function Row({ item, columns, hasEdit, onEdit, onDelete, onRowClick, selected = 
                                 type="button"
                                 className="rounded-lg p-1.5 text-slate-500 hover:bg-red-500/20 hover:text-red-400 transition-colors"
                                 onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
-                                title="Eliminar"
-                                aria-label={'Eliminar ' + (item.process ?? item.name ?? '')}
+                                title={t('pages.table.delete_title')}
+                                aria-label={t('pages.table.delete_aria', { name: item.process ?? item.name ?? '' })}
                             >
                                 <Trash2 className="h-4 w-4" />
                             </button>

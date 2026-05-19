@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
+import { t } from '@/utils/i18n';
 
 function Field({ label, children }) {
     return (
@@ -12,22 +13,22 @@ function Field({ label, children }) {
 
 function StatusBadge({ status }) {
     const map = {
-        pending:     'bg-slate-700 text-brand-mid',
+        pending:     'bg-brand-light text-brand-mid',
         in_progress: 'bg-brand-accent/15 text-brand-accent',
-        completed:   'bg-emerald-900/60 text-emerald-300',
-        approved:    'bg-teal-900/60 text-teal-300',
-        rejected:    'bg-red-900/60 text-red-300',
+        completed:   'bg-emerald-100 text-emerald-700',
+        approved:    'bg-teal-100 text-teal-700',
+        rejected:    'bg-red-100 text-red-700',
     };
     const labels = {
-        pending:     'Pendente',
-        in_progress: 'Em Progresso',
-        completed:   'Concluído',
-        approved:    'Aprovado',
-        rejected:    'Rejeitado',
+        pending:     t('pages.work_logs.drawer.status_pending'),
+        in_progress: t('pages.work_logs.drawer.status_in_progress'),
+        completed:   t('pages.work_logs.drawer.status_completed'),
+        approved:    t('pages.work_logs.drawer.status_approved'),
+        rejected:    t('pages.work_logs.drawer.status_rejected'),
     };
     const key = status?.value ?? status;
     return (
-        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${map[key] ?? 'bg-slate-700 text-brand-mid'}`}>
+        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${map[key] ?? 'bg-brand-light text-brand-mid'}`}>
             {labels[key] ?? status?.label ?? status ?? '—'}
         </span>
     );
@@ -87,20 +88,20 @@ function GeneralTab({ item }) {
 
     return (
         <div className="grid grid-cols-2 gap-6">
-            <Field label="Referência">
+            <Field label={t('pages.work_logs.drawer.field_reference')}>
                 <span className="font-mono text-brand-accent">{item.reference}</span>
             </Field>
-            <Field label="Estado">
+            <Field label={t('pages.work_logs.drawer.field_status')}>
                 <StatusBadge status={item.status} />
             </Field>
-            <Field label="Mini-Tarefa">
+            <Field label={t('pages.work_logs.drawer.field_mini_task')}>
                 <span className="font-mono text-brand-accent">{item.mini_task?.reference ?? null}</span>
             </Field>
-            <Field label="Criado em">
+            <Field label={t('pages.work_logs.drawer.field_created_at')}>
                 {createdAt}
             </Field>
             <div className="col-span-2">
-                <Field label="Descrição">
+                <Field label={t('pages.work_logs.drawer.field_description')}>
                     {item.description
                         ? <p className="whitespace-pre-wrap leading-relaxed">{item.description}</p>
                         : null}
@@ -114,16 +115,16 @@ function ResourcesTab({ materials = [], equipment = [] }) {
     return (
         <div className="space-y-6">
             <div>
-                <SectionTitle>Materiais Utilizados</SectionTitle>
+                <SectionTitle>{t('pages.work_logs.drawer.section_materials_used')}</SectionTitle>
                 {materials.length === 0
-                    ? <p className="text-sm text-brand-mid">Nenhum material registado.</p>
+                    ? <p className="text-sm text-brand-mid">{t('pages.work_logs.drawer.no_materials')}</p>
                     : (
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-brand-mid/20">
-                                    <th className="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wide text-brand-mid">Material</th>
-                                    <th className="pb-2 pr-4 text-right text-xs font-medium uppercase tracking-wide text-brand-mid">Qtd. Usada</th>
-                                    <th className="pb-2 text-right text-xs font-medium uppercase tracking-wide text-brand-mid">Preço Unit.</th>
+                                    <th className="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wide text-brand-mid">{t('pages.work_logs.drawer.th_material')}</th>
+                                    <th className="pb-2 pr-4 text-right text-xs font-medium uppercase tracking-wide text-brand-mid">{t('pages.work_logs.drawer.th_qty_used')}</th>
+                                    <th className="pb-2 text-right text-xs font-medium uppercase tracking-wide text-brand-mid">{t('pages.work_logs.drawer.th_unit_price')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-brand-mid/10">
@@ -142,16 +143,16 @@ function ResourcesTab({ materials = [], equipment = [] }) {
                 }
             </div>
             <div>
-                <SectionTitle>Equipamentos Utilizados</SectionTitle>
+                <SectionTitle>{t('pages.work_logs.drawer.section_equipment_used')}</SectionTitle>
                 {equipment.length === 0
-                    ? <p className="text-sm text-brand-mid">Nenhum equipamento registado.</p>
+                    ? <p className="text-sm text-brand-mid">{t('pages.work_logs.drawer.no_equipment')}</p>
                     : (
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-brand-mid/20">
-                                    <th className="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wide text-brand-mid">Nome</th>
-                                    <th className="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wide text-brand-mid">Marca / Modelo</th>
-                                    <th className="pb-2 text-left text-xs font-medium uppercase tracking-wide text-brand-mid">Nº Série</th>
+                                    <th className="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wide text-brand-mid">{t('pages.work_logs.drawer.th_name')}</th>
+                                    <th className="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wide text-brand-mid">{t('pages.work_logs.drawer.th_brand_model')}</th>
+                                    <th className="pb-2 text-left text-xs font-medium uppercase tracking-wide text-brand-mid">{t('pages.work_logs.drawer.th_serial')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-brand-mid/10">
@@ -179,17 +180,17 @@ function TimeTab({ startedAt, completedAt, durationMinutes }) {
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
-                <Field label="Início">
+                <Field label={t('pages.work_logs.drawer.field_start')}>
                     {formatDateTime(startedAt)}
                 </Field>
-                <Field label="Fim">
-                    {isFinished ? formatDateTime(completedAt) : <span className="text-amber-400 text-sm">Em curso</span>}
+                <Field label={t('pages.work_logs.drawer.field_end')}>
+                    {isFinished ? formatDateTime(completedAt) : <span className="text-amber-400 text-sm">{t('pages.work_logs.drawer.in_progress_label')}</span>}
                 </Field>
             </div>
 
             <div className="rounded-lg bg-brand-light border border-brand-mid/20 p-6 flex flex-col items-center gap-2">
                 <span className="text-xs font-medium uppercase tracking-wide text-brand-mid">
-                    {isFinished ? 'Duração Total' : 'Tempo Decorrido'}
+                    {isFinished ? t('pages.work_logs.drawer.total_duration') : t('pages.work_logs.drawer.elapsed_time')}
                 </span>
                 {isFinished
                     ? <span className="text-3xl font-mono font-bold text-emerald-400">{formatDuration(durationMinutes)}</span>
@@ -204,9 +205,9 @@ function TimeTab({ startedAt, completedAt, durationMinutes }) {
 
 export default function WorkLogDrawer({ isOpen, onClose, item, loading }) {
     const tabs = item ? [
-        { id: 'general',   label: 'Geral',      component: <GeneralTab item={item} /> },
-        { id: 'resources', label: 'Recursos',   component: <ResourcesTab materials={item.materials ?? []} equipment={item.equipment ?? []} /> },
-        { id: 'time',      label: 'Tempo',      component: <TimeTab startedAt={item.started_at} completedAt={item.completed_at} durationMinutes={item.duration_minutes} /> },
+        { id: 'general',   label: t('pages.work_logs.drawer.tab_general'),      component: <GeneralTab item={item} /> },
+        { id: 'resources', label: t('pages.work_logs.drawer.tab_resources'),   component: <ResourcesTab materials={item.materials ?? []} equipment={item.equipment ?? []} /> },
+        { id: 'time',      label: t('pages.work_logs.drawer.tab_time'),      component: <TimeTab startedAt={item.started_at} completedAt={item.completed_at} durationMinutes={item.duration_minutes} /> },
     ] : [];
 
     return (
@@ -214,7 +215,7 @@ export default function WorkLogDrawer({ isOpen, onClose, item, loading }) {
             isOpen={isOpen}
             onClose={onClose}
             title={item?.reference ?? ''}
-            subtitle={loading ? 'A carregar...' : undefined}
+            subtitle={loading ? t('pages.common.loading') : undefined}
             tabs={tabs}
         />
     );

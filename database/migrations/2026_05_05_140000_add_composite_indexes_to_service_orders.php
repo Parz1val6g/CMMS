@@ -17,11 +17,12 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::table('service_orders', function (Blueprint $table) {
-            $table->dropIndex('so_status_priority_created_idx');
-            $table->dropIndex('so_manager_status_idx');
-            $table->dropIndex('so_client_status_idx');
-            $table->dropIndex('so_workflow_status_idx');
-        });
+        foreach (['so_status_priority_created_idx', 'so_manager_status_idx', 'so_client_status_idx', 'so_workflow_status_idx'] as $index) {
+            try {
+                Schema::table('service_orders', function (Blueprint $table) use ($index) {
+                    $table->dropIndex($index);
+                });
+            } catch (\Throwable) {}
+        }
     }
 };

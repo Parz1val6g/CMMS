@@ -31,6 +31,8 @@ class RolePermissionSeeder extends Seeder
                     PermissionResource::WORK_LOGS,
                     PermissionResource::EQUIPMENTS,
                     PermissionResource::EQUIPMENT_REVISIONS,
+                    PermissionResource::EQUIPMENT_TYPES,
+                    PermissionResource::COUNTING_TYPES,
                     PermissionResource::SECTORS,
                     PermissionResource::TEAMS,
                     PermissionResource::WORKERS,
@@ -51,6 +53,8 @@ class RolePermissionSeeder extends Seeder
                 'resources' => [
                     PermissionResource::EQUIPMENTS,
                     PermissionResource::EQUIPMENT_REVISIONS,
+                    PermissionResource::EQUIPMENT_TYPES,
+                    PermissionResource::COUNTING_TYPES,
                     PermissionResource::ATTACHMENTS,
                     PermissionResource::LOCATIONS,
                     PermissionResource::SECTORS,

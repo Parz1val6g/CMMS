@@ -22,6 +22,7 @@ abstract class FormField
     protected bool $required = false;
     protected ?FieldCondition $condition = null;
     protected ?int $colSpan = null;
+    protected ?int $column = null;
     protected ?string $validationRules = null;
     protected array $metadata = [];
     protected mixed $value = null;
@@ -79,6 +80,11 @@ abstract class FormField
     public function getColSpan(): ?int
     {
         return $this->colSpan;
+    }
+
+    public function getColumn(): ?int
+    {
+        return $this->column;
     }
 
     public function getCondition(): ?FieldCondition
@@ -175,6 +181,21 @@ abstract class FormField
             throw new \InvalidArgumentException('colSpan must be between 1 and 12');
         }
         $this->colSpan = $span;
+        return $this;
+    }
+
+    /**
+     * Fixa este campo numa coluna específica da grelha (1-indexed).
+     * 
+     * @param int $column Número da coluna (1 a 12)
+     * @return $this
+     */
+    public function setColumn(int $column): static
+    {
+        if ($column < 1 || $column > 12) {
+            throw new \InvalidArgumentException('column must be between 1 and 12');
+        }
+        $this->column = $column;
         return $this;
     }
 
@@ -348,6 +369,9 @@ abstract class FormField
         }
         if ($this->colSpan !== null) {
             $data['span'] = $this->colSpan;
+        }
+        if ($this->column !== null) {
+            $data['column'] = $this->column;
         }
         if ($this->validationRules !== null) {
             $data['rules'] = $this->validationRules;

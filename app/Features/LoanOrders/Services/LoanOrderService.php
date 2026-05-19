@@ -88,7 +88,6 @@ class LoanOrderService
             }
 
             $loanOrder = LoanOrder::create([
-                'client_id'            => $data['client_id'] ?? null,
                 'entity_id'            => $data['entity_id'] ?? null,
                 'manager_id'           => $managerId,
                 'location_id'          => $locationId,
@@ -133,7 +132,7 @@ class LoanOrderService
     {
         return $this->transactions->execute(function () use ($loanOrder, $data) {
             $updatable = array_intersect_key($data, array_flip([
-                'client_id', 'entity_id', 'manager_id', 'status', 'description',
+                'entity_id', 'manager_id', 'status', 'description',
             ]));
 
             // Update or create location when location fields are present

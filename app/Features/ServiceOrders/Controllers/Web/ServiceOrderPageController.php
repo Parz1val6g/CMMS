@@ -20,7 +20,7 @@ class ServiceOrderPageController extends Controller
 
         $user = $request->user();
 
-        $orders = ServiceOrder::with(['client.user', 'manager', 'location.parish', 'serviceType', 'equipments', 'sectors'])
+        $orders = ServiceOrder::with(['client.user', 'manager', 'location.parish', 'serviceType', 'sectors'])
             ->when(
                 !$user->isAdmin() && !$user->roles()->where('name', 'sector_manager')->exists(),
                 fn($q) => $q->where('manager_id', $user->id)
@@ -73,7 +73,7 @@ class ServiceOrderPageController extends Controller
     public function show(Request $request, $id)
     {
         $only  = array_values(array_filter(explode(',', $request->query('only', ''))));
-        $query = ServiceOrder::with(['client.user', 'manager', 'location.parish', 'serviceType', 'equipments.manager', 'sectors']);
+        $query = ServiceOrder::with(['client.user', 'manager', 'location.parish', 'serviceType', 'sectors']);
 
         if (empty($only) || in_array('tasks', $only)) {
             $query->with([

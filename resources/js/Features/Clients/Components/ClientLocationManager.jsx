@@ -4,8 +4,7 @@ import { useClientLocations } from '@/Hooks/useClientLocations';
 import { useToast } from '@/Components/Toast/ToastContext';
 import { t } from '@/utils/i18n';
 import CascadingParishSelect from '@/Components/Common/CascadingParishSelect';
-
-const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+import { csrfHeader } from '@/utils/csrf';
 
 function emptyForm() {
     return {
@@ -57,8 +56,8 @@ function LocationForm({ client, editTarget, onSaved, onCancel, districts, munici
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken(),
                     'X-Requested-With': 'XMLHttpRequest',
+                    ...csrfHeader(),
                 },
                 body: JSON.stringify(form),
             });
@@ -101,19 +100,24 @@ function LocationForm({ client, editTarget, onSaved, onCancel, districts, munici
                         className={inputClass}
                         value={form.name}
                         onChange={e => set('name', e.target.value)}
-                        placeholder="HQ, Armazém Norte…"
+                        placeholder={t('pages.client_locations.name_placeholder')}
                         required
                     />
                     {errors.name && <p className={errClass}>{errors.name[0]}</p>}
                 </div>
                 <div className="flex items-end pb-1">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            className="rounded border-brand-mid/20 bg-brand-white text-brand-accent"
-                            checked={form.is_primary}
-                            onChange={e => set('is_primary', e.target.checked)}
-                        />
+                    <label className="flex cursor-pointer items-center gap-3">
+                        <span className="relative inline-flex items-center">
+                            <input
+                                type="checkbox"
+                                className="peer sr-only"
+                                checked={form.is_primary}
+                                onChange={e => set('is_primary', e.target.checked)}
+                            />
+                            <div className="h-5 w-9 rounded-full bg-brand-mid/30 transition-colors peer-checked:bg-brand-accent">
+                                <div className="h-4 w-4 translate-x-0.5 translate-y-0.5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-full" />
+                            </div>
+                        </span>
                         <span className="text-sm text-brand-mid">{t('pages.client_locations.field_primary')}</span>
                     </label>
                 </div>
@@ -127,7 +131,7 @@ function LocationForm({ client, editTarget, onSaved, onCancel, districts, munici
                         className={inputClass}
                         value={form.street_address}
                         onChange={e => set('street_address', e.target.value)}
-                        placeholder="Rua da Liberdade, 45"
+                        placeholder={t('pages.client_locations.street_placeholder')}
                     />
                     {errors.street_address && <p className={errClass}>{errors.street_address[0]}</p>}
                 </div>
@@ -137,7 +141,7 @@ function LocationForm({ client, editTarget, onSaved, onCancel, districts, munici
                         className={inputClass}
                         value={form.postal_code}
                         onChange={e => set('postal_code', e.target.value)}
-                        placeholder="1000-001"
+                        placeholder={t('pages.client_locations.postal_placeholder')}
                     />
                     {errors.postal_code && <p className={errClass}>{errors.postal_code[0]}</p>}
                 </div>
@@ -160,7 +164,7 @@ function LocationForm({ client, editTarget, onSaved, onCancel, districts, munici
                     className={inputClass}
                     value={form.landmark}
                     onChange={e => set('landmark', e.target.value)}
-                    placeholder="Junto à entrada principal"
+                    placeholder={t('pages.client_locations.landmark_placeholder')}
                 />
                 {errors.landmark && <p className={errClass}>{errors.landmark[0]}</p>}
             </div>
@@ -234,9 +238,9 @@ export default function ClientLocationManager({ client, districts = [], municipa
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken(),
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
+                        'X-Requested-With': 'XMLHttpRequest',
+                        ...csrfHeader(),
+                    },
             });
 
             if (res.ok) {
