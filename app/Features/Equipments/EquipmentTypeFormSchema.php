@@ -3,7 +3,7 @@
 namespace App\Features\Equipments;
 
 use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextInput, SelectInput, CheckboxInput, TextAreaInput};
+use App\Core\Forms\Fields\{TextInput, SelectInput, ToggleInput, TextAreaInput};
 
 class EquipmentTypeFormSchema
 {
@@ -37,7 +37,7 @@ class EquipmentTypeFormSchema
                     ->setRules('nullable|string|max:250')
             )
             ->field(
-                CheckboxInput::make('active')
+                ToggleInput::make('active')
                     ->setLabel('Active')
                     ->setRules('boolean')
             );
@@ -64,7 +64,7 @@ class EquipmentTypeFormSchema
                     ->setRules('nullable|string|max:250')
             )
             ->field(
-                CheckboxInput::make('active')
+                ToggleInput::make('active')
                     ->setLabel('Active')
                     ->setRules('boolean')
             );

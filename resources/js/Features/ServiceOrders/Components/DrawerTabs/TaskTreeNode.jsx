@@ -1,33 +1,27 @@
 import { memo } from 'react';
-import { ChevronRight, ChevronDown, RotateCcw } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 
 /* ── Status badge mapping ───────────────────────────────────── */
 const STATUS_STYLE = {
-  pending:     'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40',
-  in_progress: 'bg-blue-500/20  text-blue-300  border border-blue-500/40',
-  completed:   'bg-green-500/20 text-green-300  border border-green-500/40',
-  cancelled:   'bg-red-500/20   text-red-300    border border-red-500/40',
-  blocked:     'bg-orange-500/20 text-orange-300 border border-orange-500/40',
+  pending:     'bg-yellow-100 text-yellow-700 border border-yellow-200',
+  in_progress: 'bg-blue-100  text-blue-700  border border-blue-200',
+  completed:   'bg-green-100 text-green-700  border border-green-200',
+  cancelled:   'bg-red-100   text-red-700    border border-red-200',
+  blocked:     'bg-orange-100 text-orange-700 border border-orange-200',
 };
 
 /* ── Type icon map ─────────────────────────────────────────── */
 const NODE_ICON = {
   task:      'bg-brand-accent/15 text-brand-accent',
-  mini_task: 'bg-slate-600/40  text-brand-mid',
+  mini_task: 'bg-brand-mid/20  text-brand-mid',
 };
 
 /* ── Recursive tree node ────────────────────────────────────── */
-function TaskTreeNode({ node, depth = 0, expandedIds, onToggle, workflowType, onInitiateReturn, hasReturnTask }) {
+function TaskTreeNode({ node, depth = 0, expandedIds, onToggle }) {
   const { item, children } = node;
   const hasChildren = children?.length > 0;
   const isExpanded = expandedIds.has(item.id);
   const isSubTask = depth > 0;
-
-  const showReturnBtn = workflowType === 'loan'
-    && item._type === 'task'
-    && item.name === 'Empréstimo de Equipamento'
-    && item.status === 'completed'
-    && !hasReturnTask;
 
   return (
     <>
@@ -44,7 +38,7 @@ function TaskTreeNode({ node, depth = 0, expandedIds, onToggle, workflowType, on
         {/* Vertical guide line (visible on child containers) */}
         {isSubTask && (
           <div
-            className="absolute inset-y-0 border-l-2 border-slate-700/50"
+            className="absolute inset-y-0 border-l-2 border-brand-mid/20"
             style={{ left: `${10 + (depth - 1) * 24}px` }}
           />
         )}
@@ -52,7 +46,7 @@ function TaskTreeNode({ node, depth = 0, expandedIds, onToggle, workflowType, on
         {/* L-shaped corner connector for sub-tasks */}
         {isSubTask && (
           <div
-            className="absolute top-0 w-3 border-l-2 border-b-2 border-slate-700/50 rounded-bl-lg"
+            className="absolute top-0 w-3 border-l-2 border-b-2 border-brand-mid/20 rounded-bl-lg"
             style={{
               left: `${10 + (depth - 1) * 24}px`,
               height: '50%',
@@ -72,16 +66,16 @@ function TaskTreeNode({ node, depth = 0, expandedIds, onToggle, workflowType, on
             <span className="h-4 w-4 flex items-center justify-center">
               {isSubTask ? (
                 /* Sub-task bullet */
-                <span className="h-1 w-1 rounded-full bg-slate-500" />
+                <span className="h-1 w-1 rounded-full bg-brand-mid" />
               ) : (
-                <span className="h-1.5 w-1.5 rounded-full bg-slate-600" />
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-mid" />
               )}
             </span>
           )}
         </span>
 
         {/* Type badge */}
-        <span className={`shrink-0 inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold rounded ${NODE_ICON[item._type] || 'bg-slate-700 text-brand-mid'}`}>
+        <span className={`shrink-0 inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold rounded ${NODE_ICON[item._type] || 'bg-brand-light text-brand-mid'}`}>
           {item._type === 'task' ? 'T' : 'MT'}
         </span>
 
@@ -89,18 +83,6 @@ function TaskTreeNode({ node, depth = 0, expandedIds, onToggle, workflowType, on
         <span className="flex-1 min-w-0 text-sm font-medium text-brand-darkest truncate group-hover:text-brand-darkest transition-colors">
           {item.name || item.description || '—'}
         </span>
-
-        {/* Initiate Return button (loan workflow only) */}
-        {showReturnBtn && onInitiateReturn && (
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); onInitiateReturn(item.service_order_id); }}
-            className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded bg-brand-accent hover:bg-brand-accent/90 text-white transition-colors shadow-sm"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-            Iniciar Devolução
-          </button>
-        )}
 
         {/* Manager / Assignee */}
         {item.manager?.name && (
@@ -129,7 +111,7 @@ function TaskTreeNode({ node, depth = 0, expandedIds, onToggle, workflowType, on
         <div className="relative">
           {/* Vertical trunk line connecting parent's children chain */}
           <div
-            className="absolute top-0 bottom-0 border-l-2 border-slate-700/50"
+            className="absolute top-0 bottom-0 border-l-2 border-brand-mid/20"
             style={{ left: `${10 + depth * 24}px` }}
           />
           {children.map((child) => (
@@ -139,9 +121,6 @@ function TaskTreeNode({ node, depth = 0, expandedIds, onToggle, workflowType, on
               depth={depth + 1}
               expandedIds={expandedIds}
               onToggle={onToggle}
-              workflowType={workflowType}
-              onInitiateReturn={onInitiateReturn}
-              hasReturnTask={hasReturnTask}
             />
           ))}
         </div>

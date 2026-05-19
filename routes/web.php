@@ -9,6 +9,9 @@ use Inertia\Inertia;
 |--------------------------------------------------------------------------
 */
 
+// Chrome DevTools discovery — return immediately so browser doesn't hang
+Route::get('/.well-known/{any}', fn() => response()->json([], 404))->where('any', '.*');
+
 // ── Gateway ──────────────────────────────────────────────────────────────
 // Guest  → Login page
 // Auth   → Dashboard
@@ -48,12 +51,6 @@ Route::middleware(['auth', 'web.access'])->group(function () {
     // Equipments (Loan workflow)
     require base_path('app/Features/Equipments/Routes/web.php');
 
-    // Equipment Types
-    require base_path('app/Features/Equipments/Routes/equipment_types_web.php');
-
-    // Counting Types
-    require base_path('app/Features/Equipments/Routes/counting_types_web.php');
-
     // Exports
     require base_path('app/Features/Export/Routes/web.php');
 
@@ -65,4 +62,19 @@ Route::middleware(['auth', 'web.access'])->group(function () {
 
     // Admin
     require base_path('app/Features/Admin/Routes/web.php');
+
+    // Tickets
+    require base_path('app/Features/Tickets/Routes/web.php');
+
+    // Loan Orders
+    require base_path('app/Features/LoanOrders/Routes/web.php');
+
+    // Entities
+    require base_path('app/Features/Entities/Routes/web.php');
+
+    // Equipment Types
+    require base_path('app/Features/Equipments/Routes/equipment_types_web.php');
+
+    // Counting Types
+    require base_path('app/Features/Equipments/Routes/counting_types_web.php');
 });

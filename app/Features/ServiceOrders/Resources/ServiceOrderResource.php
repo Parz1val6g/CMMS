@@ -14,7 +14,6 @@ class ServiceOrderResource extends JsonResource
             'priority' => $this->priority,
             'execution_date' => $this->execution_date ? $this->execution_date->format('Y-m-d') : null,
             'status' => $this->status,
-            'workflow_type' => $this->workflow_type,
             'created_at' => $this->created_at->toIso8601String(),
             'photo_url' => $this->photo_url,
 
@@ -49,26 +48,6 @@ class ServiceOrderResource extends JsonResource
             'latitude' => $this->whenLoaded('location', fn() => $this->location->latitude),
             'longitude' => $this->whenLoaded('location', fn() => $this->location->longitude),
             'service_type' => $this->whenLoaded('serviceType'),
-
-            // Loaned equipment collection (for loan workflow)
-            'equipments' => $this->whenLoaded('equipments', function () {
-                return $this->equipments->map(fn($eq) => [
-                    'id'                => $eq->id,
-                    'name'              => $eq->name,
-                    'brand'             => $eq->brand,
-                    'model'             => $eq->model,
-                    'serial_number'     => $eq->serial_number,
-                    'status'            => $eq->status,
-                    'is_loanable'       => $eq->is_loanable,
-                    'description'       => $eq->description,
-                    'last_revision_date' => $eq->last_revision_date?->format('Y-m-d'),
-                    'next_revision_date' => $eq->next_revision_date?->format('Y-m-d'),
-                    'manager'           => $eq->relationLoaded('manager') && $eq->manager ? [
-                        'id'   => $eq->manager->id,
-                        'name' => $eq->manager->first_name . ' ' . $eq->manager->last_name,
-                    ] : null,
-                ]);
-            }),
 
             // Sectors (many-to-many)
             'sectors' => $this->whenLoaded('sectors', function () {

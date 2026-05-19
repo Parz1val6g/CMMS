@@ -14,8 +14,6 @@ const dictionaries = import.meta.glob('/resources/lang/**/*.json', {
   import: 'default',
 });
 
-const currentLocale = /** @type {string} */ (window.__LOCALE__ || 'pt_PT');
-
 /**
  * All loaded dictionaries grouped by locale, then by filename.
  * e.g. { en: { pages: { sidebar: { ... } } }, pt_PT: { ... } }
@@ -34,7 +32,25 @@ for (const [path, mod] of Object.entries(dictionaries)) {
 }
 
 /**
+ * Read current locale dynamically from window.__LOCALE__.
+ * Falls back to 'pt_PT' if not set.
+ * @returns {string}
+ */
+function getLocale() {
+  return window.__LOCALE__ || 'pt_PT';
+}
+
+/**
+ * Update the runtime locale (called after language change before reload).
+ * @param {string} locale
+ */
+export function setLocale(locale) {
+  window.__LOCALE__ = locale;
+}
+
+/**
  * Translate a dot-notation key like 'pages.sidebar.dashboard'.
+ * Reads locale dynamically from window.__LOCALE__ on every call.
  * Falls back to the key itself if not found.
  *
  * @param {string} key - Dot-notation path
@@ -42,8 +58,9 @@ for (const [path, mod] of Object.entries(dictionaries)) {
  * @returns {string}
  */
 export function t(key, replacements = {}) {
+  const locale = getLocale();
   const parts = key.split('.');
-  let val = store[currentLocale];
+  let val = store[locale];
 
   for (const part of parts) {
     if (val && typeof val === 'object' && part in val) {
@@ -56,5 +73,3 @@ export function t(key, replacements = {}) {
   if (typeof val !== 'string') return key;
   return val.replace(/:(\w+)/g, (_, p) => replacements[p] ?? `:${p}`);
 }
-
-export { currentLocale };

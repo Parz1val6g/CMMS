@@ -15,10 +15,9 @@ class StoreLoanOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'entity_id'       => ['required_without:client_id', 'nullable', 'uuid', 'exists:entities,id'],
-            'client_id'       => ['required_without:entity_id', 'nullable', 'uuid', 'exists:clients,id'],
+            'entity_id'       => ['required', 'uuid', 'exists:entities,id'],
             'manager_id'      => ['required', 'uuid', 'exists:users,id'],
-            'equipment_ids'   => ['required', 'array', 'min:1'],
+            'equipment_ids'   => ['sometimes', 'array'],
             'equipment_ids.*' => ['uuid', 'exists:equipments,id'],
             'equipments'                  => ['nullable', 'array'],
             'equipments.*.equipment_id'   => ['required', 'uuid', 'exists:equipments,id'],

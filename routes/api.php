@@ -9,6 +9,7 @@ Route::prefix('auth')->group(base_path('app/Features/Authentication/Routes/api.p
 
 // Register Workflow Routes
 Route::prefix('service-orders')->group(base_path('app/Features/ServiceOrders/Routes/api.php'));
+Route::prefix('loan-orders')->group(base_path('app/Features/LoanOrders/Routes/api.php'));
 Route::prefix('tasks')->group(base_path('app/Features/Tasks/Routes/api.php'));
 Route::prefix('mini-tasks')->group(base_path('app/Features/MiniTasks/Routes/api.php'));
 Route::prefix('work-logs')->group(base_path('app/Features/WorkLogs/Routes/api.php'));
@@ -35,11 +36,11 @@ Route::prefix('exports')->group(base_path('app/Features/Export/Routes/api.php'))
 // Register Equipments Routes
 Route::prefix('equipments')->group(base_path('app/Features/Equipments/Routes/api.php'));
 
-// Register Equipment Types Routes
-Route::prefix('equipment-types')->group(base_path('app/Features/Equipments/Routes/equipment_types_api.php'));
+// Register Tickets Routes
+Route::prefix('tickets')->group(base_path('app/Features/Tickets/Routes/api.php'));
 
-// Register Counting Types Routes
-Route::prefix('counting-types')->group(base_path('app/Features/Equipments/Routes/counting_types_api.php'));
+// Register Entities Routes
+Route::prefix('entities')->group(base_path('app/Features/Entities/Routes/api.php'));
 
 // Register Unit Routes
 Route::prefix('units')->group(base_path('routes/api/units.php'));

@@ -21,9 +21,18 @@ export default function Settings({ user, preferences, appSettings, isAdmin, rout
   /* ── Form Handlers ──────────────────────────────────────────── */
   const handleDetailsSubmit = async (e) => {
     e.preventDefault();
+
+    const langBefore = preferences?.language ?? (window.__LOCALE__ === 'en' ? 'en' : 'pt');
+    const langAfter = e.target.language?.value;
     const r = await submitForm(e.target, apiRoutes.updateUser);
-    if (r.ok) { toast.success(r.message); setTimeout(() => e.target.reset(), 1000); }
-    else toast.error(r.message);
+    if (r.ok) {
+      toast.success(r.message);
+      if (langAfter && langAfter !== langBefore) {
+        // Language changed — update window.__LOCALE__ and reload fully
+        window.__LOCALE__ = langAfter === 'en' ? 'en' : 'pt_PT';
+        setTimeout(() => window.location.reload(), 500);
+      }
+    } else toast.error(r.message);
   };
 
   const handlePasswordSubmit = async (e) => {
@@ -270,12 +279,26 @@ export default function Settings({ user, preferences, appSettings, isAdmin, rout
                 <div className="form-feedback mt-1 hidden text-xs text-red-600" />
               </div>
               <div className="flex items-center gap-3">
-                <input type="checkbox" name="csv_enabled" id="csvEnabled" value="1" defaultChecked={appSettings?.csv_enabled === true || appSettings?.csv_enabled === '1'} className="h-4 w-4 rounded border-brand-mid/20 text-brand-accent focus:ring-brand-accent" />
-                <label htmlFor="csvEnabled" className="text-xs font-bold text-brand-mid">{t('pages.settings.label_csv_export')}</label>
+                <label className="flex cursor-pointer items-center gap-3">
+                  <span className="relative inline-flex items-center">
+                    <input type="checkbox" name="csv_enabled" value="1" defaultChecked={appSettings?.csv_enabled === true || appSettings?.csv_enabled === '1'} className="peer sr-only" />
+                    <div className="h-5 w-9 rounded-full bg-brand-mid/30 transition-colors peer-checked:bg-brand-accent">
+                      <div className="h-4 w-4 translate-x-0.5 translate-y-0.5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-full" />
+                    </div>
+                  </span>
+                  <span className="text-xs font-bold text-brand-mid">{t('pages.settings.label_csv_export')}</span>
+                </label>
               </div>
               <div className="flex items-center gap-3">
-                <input type="checkbox" name="user_registration_enabled" id="regEnabled" value="1" defaultChecked={appSettings?.user_registration_enabled === true || appSettings?.user_registration_enabled === '1'} className="h-4 w-4 rounded border-brand-mid/20 text-brand-accent focus:ring-brand-accent" />
-                <label htmlFor="regEnabled" className="text-xs font-bold text-brand-mid">{t('pages.settings.label_allow_registration')}</label>
+                <label className="flex cursor-pointer items-center gap-3">
+                  <span className="relative inline-flex items-center">
+                    <input type="checkbox" name="user_registration_enabled" value="1" defaultChecked={appSettings?.user_registration_enabled === true || appSettings?.user_registration_enabled === '1'} className="peer sr-only" />
+                    <div className="h-5 w-9 rounded-full bg-brand-mid/30 transition-colors peer-checked:bg-brand-accent">
+                      <div className="h-4 w-4 translate-x-0.5 translate-y-0.5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-full" />
+                    </div>
+                  </span>
+                  <span className="text-xs font-bold text-brand-mid">{t('pages.settings.label_allow_registration')}</span>
+                </label>
               </div>
               <div className="pt-2 text-right">
                 <button type="submit" className="rounded-lg bg-brand-accent px-5 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 transition-colors">{t('pages.settings.btn_save')}</button>

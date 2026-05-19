@@ -10,20 +10,21 @@ class SectorSeeder extends Seeder
 {
     public function run(): void
     {
-        $headUserId = DB::table('users')->where('email', 'maria.santos@cm.pt')->value('id');
+        $users = DB::table('users')->select('id', 'email')->get()->keyBy('email');
 
-        $sectors = [
-            ['name' => 'Departamento de Obras e Viação', 'head_id' => $headUserId],
-            ['name' => 'Departamento de Urbanismo', 'head_id' => $headUserId],
-            ['name' => 'Departamento de Limpeza Urbana', 'head_id' => $headUserId],
-            ['name' => 'Departamento de Água e Saneamento', 'head_id' => $headUserId],
+        $heads = [
+            'Departamento de Obras e Viação'       => 'rui.goncalves@cm-mangualde.pt',
+            'Departamento de Urbanismo'            => 'maria.pereira@cm-mangualde.pt',
+            'Departamento de Limpeza Urbana'       => 'nuno.costa@cm-mangualde.pt',
+            'Departamento de Água e Saneamento'    => 'sofia.marques@cm-mangualde.pt',
         ];
 
-        foreach ($sectors as $sector) {
+        foreach ($heads as $name => $email) {
+            $headId = $users[$email]->id ?? null;
             DB::table('sectors')->insert([
-                'id' => Str::uuid(),
-                'name' => $sector['name'],
-                'head_id' => $sector['head_id'],
+                'id'         => Str::uuid(),
+                'name'       => $name,
+                'head_id'    => $headId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

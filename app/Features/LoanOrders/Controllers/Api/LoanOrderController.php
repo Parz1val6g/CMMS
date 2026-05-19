@@ -29,7 +29,7 @@ class LoanOrderController extends Controller
 
         $user = $request->user();
 
-        $orders = LoanOrder::with(['client.user', 'entity', 'manager', 'location', 'equipments', 'tasks'])
+        $orders = LoanOrder::with(['entity', 'manager', 'location', 'equipments', 'tasks'])
             ->when(!$user->isAdmin(), fn($q) => $q->where('manager_id', $user->id))
             ->latest()
             ->paginate(15);
@@ -44,7 +44,7 @@ class LoanOrderController extends Controller
         $managerId = $request->validated('manager_id');
         $loanOrder = $this->loanOrderService->create($request->validated(), $managerId);
 
-        $loanOrder->load(['client.user', 'entity', 'manager', 'location', 'equipments', 'tasks']);
+        $loanOrder->load(['entity', 'manager', 'location', 'equipments', 'tasks']);
 
         return (new LoanOrderResource($loanOrder))->response()->setStatusCode(201);
     }
@@ -52,12 +52,13 @@ class LoanOrderController extends Controller
     public function show(string $id): LoanOrderResource
     {
         $loanOrder = LoanOrder::with([
-            'client.user',
             'entity',
             'manager',
+            'approvedBy',
+            'cancelledBy',
             'location.parish.municipality.district',
             'equipments',
-            'tasks',
+            'tasks.manager',
         ])->findOrFail($id);
 
         Gate::authorize('view', $loanOrder);
@@ -72,7 +73,7 @@ class LoanOrderController extends Controller
         Gate::authorize('update', $loanOrder);
 
         $updated = $this->loanOrderService->update($loanOrder, $request->validated());
-        $updated->load(['client.user', 'entity', 'manager', 'location', 'equipments', 'tasks']);
+        $updated->load(['entity', 'manager', 'location', 'equipments', 'tasks']);
 
         return new LoanOrderResource($updated);
     }
@@ -95,7 +96,7 @@ class LoanOrderController extends Controller
         Gate::authorize('cancel', $loanOrder);
 
         $cancelled = $this->loanOrderService->cancel($loanOrder, $request->user()->id);
-        $cancelled->load(['client.user', 'manager', 'location', 'equipments', 'tasks']);
+        $cancelled->load(['manager', 'location', 'equipments', 'tasks']);
 
         return new LoanOrderResource($cancelled);
     }
@@ -107,7 +108,7 @@ class LoanOrderController extends Controller
         Gate::authorize('approve', $loanOrder);
 
         $approved = $this->loanOrderService->approve($loanOrder, auth()->id());
-        $approved->load(['client.user', 'entity.user', 'manager', 'location', 'equipments', 'tasks']);
+        $approved->load(['entity.user', 'manager', 'location', 'equipments', 'tasks']);
 
         return (new LoanOrderResource($approved))->response();
     }
@@ -119,7 +120,7 @@ class LoanOrderController extends Controller
         Gate::authorize('checkout', $loanOrder);
 
         $checkedOut = $this->loanOrderService->checkout($loanOrder);
-        $checkedOut->load(['client.user', 'entity.user', 'manager', 'location', 'equipments', 'tasks']);
+        $checkedOut->load(['entity.user', 'manager', 'location', 'equipments', 'tasks']);
 
         return (new LoanOrderResource($checkedOut))->response();
     }
@@ -131,7 +132,7 @@ class LoanOrderController extends Controller
         Gate::authorize('complete', $loanOrder);
 
         $completed = $this->loanOrderService->complete($loanOrder);
-        $completed->load(['client.user', 'entity.user', 'manager', 'location', 'equipments', 'tasks']);
+        $completed->load(['entity.user', 'manager', 'location', 'equipments', 'tasks']);
 
         return (new LoanOrderResource($completed))->response();
     }

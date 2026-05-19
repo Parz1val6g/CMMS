@@ -30,6 +30,10 @@ class SettingsPageController extends Controller
             ->pluck('value', 'key')
             ->toArray();
 
+        if (!isset($preferences['language']) && $user->locale) {
+            $preferences['language'] = $user->locale === 'pt_PT' ? 'pt' : $user->locale;
+        }
+
         $appSettings = AppSetting::pluck('value', 'key')->toArray();
 
         return Inertia::render('Settings/Pages/Settings', [
@@ -61,17 +65,24 @@ class SettingsPageController extends Controller
             'last_name'  => 'required|string|max:250',
             'email'      => 'required|email|max:250|unique:users,email,' . $request->user()->id,
             'phone'      => 'nullable|string|max:20',
+            'language'   => 'nullable|string|in:pt,en',
         ]);
 
         $user = $request->user();
 
         DB::transaction(function () use ($user, $validated) {
-            $user->update([
+            $data = [
                 'first_name' => InputSanitizer::sanitize($validated['first_name']),
                 'last_name'  => InputSanitizer::sanitize($validated['last_name']),
                 'email'      => InputSanitizer::sanitizeEmail($validated['email']),
                 'phone'      => $validated['phone'] ? InputSanitizer::sanitizePhone($validated['phone']) : null,
-            ]);
+            ];
+
+            if (isset($validated['language'])) {
+                $data['locale'] = $validated['language'];
+            }
+
+            $user->update($data);
         });
 
         return redirect()->back()->with('success', __('Profile updated successfully.'));
@@ -85,11 +96,17 @@ class SettingsPageController extends Controller
         Gate::authorize('update', AppSetting::class);
 
         $validated = $request->validate([
-            'app_name' => 'nullable|string|max:250',
-            'locale'   => 'nullable|string|max:10',
+            'company_name'               => 'nullable|string|max:250',
+            'default_language'           => 'nullable|string|in:PT,EN',
+            'default_timezone'           => 'nullable|string|max:50',
+            'currency'                   => 'nullable|string|max:3',
+            'csv_enabled'                => 'nullable|boolean',
+            'user_registration_enabled'  => 'nullable|boolean',
+            'support_email'              => 'nullable|email|max:250',
+            'company_website'            => 'nullable|url|max:250',
         ]);
 
-        DB::transaction(function () use ($validated) {
+        DB::transaction(function () use ($validated, $request) {
             foreach ($validated as $key => $value) {
                 if ($value !== null) {
                     AppSetting::updateOrCreate(
@@ -97,6 +114,18 @@ class SettingsPageController extends Controller
                         ['value' => InputSanitizer::sanitize($value)]
                     );
                 }
+            }
+
+            if ($request->hasFile('logo')) {
+                $path = $request->file('logo')->store('logos', 'public');
+                AppSetting::updateOrCreate(
+                    ['key' => 'logo_path'],
+                    ['value' => $path]
+                );
+            }
+
+            if ($request->boolean('delete_logo')) {
+                AppSetting::where('key', 'logo_path')->delete();
             }
         });
 

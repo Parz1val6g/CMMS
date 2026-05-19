@@ -186,6 +186,11 @@ return [
         'priority' => 'Priority',
         'priority_helper' => 'Urgency level of this ticket',
         'status' => 'Status',
+        'section_location' => 'Location',
+        'parish' => 'Parish / Freguesia',
+        'street' => 'Street',
+        'reference_point' => 'Reference Point',
+        'postal_code' => 'Postal Code',
     ],
 
     'tasks' => [

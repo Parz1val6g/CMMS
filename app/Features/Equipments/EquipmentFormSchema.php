@@ -4,7 +4,7 @@ namespace App\Features\Equipments;
 
 use App\Core\Enums\EquipmentStatus;
 use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextInput, SelectInput, CheckboxInput, NumberInput, TextAreaInput};
+use App\Core\Forms\Fields\{TextInput, SelectInput, ToggleInput, NumberInput, TextAreaInput};
 use App\Features\Equipments\Models\CountingType;
 use App\Features\Equipments\Models\EquipmentType;
 
@@ -25,6 +25,14 @@ class EquipmentFormSchema
             ->orderBy('name')
             ->get(['id', 'name'])
             ->map(fn ($ct) => ['value' => $ct->id, 'label' => $ct->name])
+            ->toArray();
+    }
+
+    private static function vehicleTypeIds(): array
+    {
+        return EquipmentType::where('active', true)
+            ->where('category', 'vehicle')
+            ->pluck('id')
             ->toArray();
     }
 
@@ -64,12 +72,14 @@ class EquipmentFormSchema
                     ->setLabel(__('forms.equipments.serial_number'))
                     ->helperText(__('forms.equipments.serial_number_helper'))
                     ->setRules('nullable|string|max:250|unique:equipments,serial_number')
+                    ->when('equipment_type_id', 'not_in', self::vehicleTypeIds())
             )
             ->field(
                 TextInput::make('license_plate')
                     ->setLabel(__('forms.equipments.license_plate'))
                     ->helperText(__('forms.equipments.license_plate_helper'))
                     ->setRules('nullable|string|max:20')
+                    ->when('equipment_type_id', 'in', self::vehicleTypeIds())
             )
             ->field(
                 TextInput::make('internal_reference')
@@ -98,7 +108,7 @@ class EquipmentFormSchema
                     ->setRules('nullable|string|max:36')
             )
             ->field(
-                CheckboxInput::make('is_loanable')
+                ToggleInput::make('is_loanable')
                     ->setLabel(__('forms.equipments.is_loanable'))
                     ->helperText(__('forms.equipments.is_loanable_helper'))
                     ->setRules('boolean')
@@ -121,6 +131,8 @@ class EquipmentFormSchema
                 NumberInput::make('cost_per_hour')
                     ->setLabel(__('forms.equipments.cost_per_hour'))
                     ->setRequired()
+                    ->step(0.01)
+                    ->min(0)
                     ->setRules('required|numeric|min:0|max:9999.99')
             );
     }
@@ -158,12 +170,16 @@ class EquipmentFormSchema
             ->field(
                 TextInput::make('serial_number')
                     ->setLabel(__('forms.equipments.serial_number'))
-                    ->setRules('sometimes|string|max:250|unique:equipments,serial_number')
+                    ->helperText(__('forms.equipments.serial_number_helper'))
+                    ->setRules('nullable|string|max:250|unique:equipments,serial_number')
+                    ->when('equipment_type_id', 'not_in', self::vehicleTypeIds())
             )
             ->field(
                 TextInput::make('license_plate')
                     ->setLabel(__('forms.equipments.license_plate'))
+                    ->helperText(__('forms.equipments.license_plate_helper'))
                     ->setRules('nullable|string|max:20')
+                    ->when('equipment_type_id', 'in', self::vehicleTypeIds())
             )
             ->field(
                 TextInput::make('internal_reference')
@@ -194,7 +210,7 @@ class EquipmentFormSchema
                     ->setRules("sometimes|in:{$statusInRule}")
             )
             ->field(
-                CheckboxInput::make('is_loanable')
+                ToggleInput::make('is_loanable')
                     ->setLabel(__('forms.equipments.is_loanable'))
                     ->setRules('boolean')
             )
@@ -211,6 +227,8 @@ class EquipmentFormSchema
             ->field(
                 NumberInput::make('cost_per_hour')
                     ->setLabel(__('forms.equipments.cost_per_hour'))
+                    ->step(0.01)
+                    ->min(0)
                     ->setRules('sometimes|numeric|min:0|max:9999.99')
             );
     }

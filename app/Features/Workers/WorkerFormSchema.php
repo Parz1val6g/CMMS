@@ -50,6 +50,8 @@ class WorkerFormSchema
                 NumberInput::make('cost_per_hour')
                     ->setLabel(__('forms.workers.cost_per_hour'))
                     ->setRequired()
+                    ->step(0.01)
+                    ->min(0)
                     ->setRules('required|numeric|min:0|max:9999.99')
             );
     }
@@ -92,6 +94,8 @@ class WorkerFormSchema
             ->field(
                 NumberInput::make('cost_per_hour')
                     ->setLabel(__('forms.workers.cost_per_hour'))
+                    ->step(0.01)
+                    ->min(0)
                     ->setRules('sometimes|numeric|min:0|max:9999.99')
             );
     }

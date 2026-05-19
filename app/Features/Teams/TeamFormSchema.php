@@ -2,10 +2,11 @@
 
 namespace App\Features\Teams;
 
+use App\Core\Enums\RoleName;
 use App\Features\Sectors\Models\Sector;
-use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextInput, SelectInput, SearchableSelect};
 use App\Shared\Models\User;
+use App\Core\Forms\FormSchema;
+use App\Core\Forms\Fields\{TextInput, SelectInput};
 
 class TeamFormSchema
 {
@@ -25,9 +26,9 @@ class TeamFormSchema
                     ->setRules('required|exists:sectors,id')
             )
             ->field(
-                SearchableSelect::make('responsible_id')
+                SelectInput::make('responsible_id')
                     ->setLabel(__('forms.teams.responsible'))
-                    ->setRequired()
+                    ->helperText(__('forms.teams.responsible_helper'))
                     ->setOptions(self::responsibleOptions())
                     ->setRules('required|exists:users,id')
             );
@@ -48,8 +49,9 @@ class TeamFormSchema
                     ->setRules('sometimes|exists:sectors,id')
             )
             ->field(
-                SearchableSelect::make('responsible_id')
+                SelectInput::make('responsible_id')
                     ->setLabel(__('forms.teams.responsible'))
+                    ->helperText(__('forms.teams.responsible_helper'))
                     ->setOptions(self::responsibleOptions())
                     ->setRules('sometimes|exists:users,id')
             );
@@ -64,9 +66,13 @@ class TeamFormSchema
 
     private static function responsibleOptions(): array
     {
-        return User::whereHas('roles', fn($q) => $q->where('name', 'worker'))
-            ->whereDoesntHave('worker')
+        $excludedRoles = [RoleName::WORKER, RoleName::CLIENT];
+
+        return User::whereHas('roles', function ($query) use ($excludedRoles) {
+            $query->whereNotIn('name', $excludedRoles);
+        })
             ->orderBy('first_name')
+            ->orderBy('last_name')
             ->get(['id', 'first_name', 'last_name'])
             ->map(fn($u) => ['value' => $u->id, 'label' => $u->first_name . ' ' . $u->last_name])
             ->toArray();

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "deepseek/deepseek-v4-pro",
+  "small_model": "deepseek/deepseek-v4-flash",
+  "plugin": [
+    "openrtk"
+  ],
+  "lsp": true,
+  "instructions": [
+    "Run all commands natively on the Windows host using PowerShell/CMD.",
+    "Use your small_model (Flash) for routine tasks like file searching, indexing, and boilerplate generation.",
+    "Escalate to your primary model (Pro) for complex reasoning, architectural refactoring, and debugging intricate logic."
+  ]
+}

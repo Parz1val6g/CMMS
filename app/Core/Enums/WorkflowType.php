@@ -2,6 +2,12 @@
 
 namespace App\Core\Enums;
 
+/**
+ * @deprecated Kept for backward compatibility with legacy records.
+ *             Do NOT use in new code. The LOAN case is being replaced by
+ *             the LoanOrders feature module. The cast from ServiceOrder
+ *             model has been removed — workflow_type is now a raw string.
+ */
 enum WorkflowType: string
 {
     case STANDARD = 'regular';

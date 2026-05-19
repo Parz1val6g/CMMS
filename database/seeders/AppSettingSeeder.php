@@ -11,9 +11,9 @@ class AppSettingSeeder extends Seeder
     public function run(): void
     {
         $settings = [
-            ['key' => 'municipality_name', 'value' => 'Câmara Municipal de Lisboa', 'section' => 'general'],
-            ['key' => 'contact_email', 'value' => 'contact@cm.pt', 'section' => 'general'],
-            ['key' => 'contact_phone', 'value' => '+351 21 3100 000', 'section' => 'general'],
+            ['key' => 'municipality_name', 'value' => 'Câmara Municipal de Mangualde', 'section' => 'general'],
+            ['key' => 'contact_email', 'value' => 'geral@cm-mangualde.pt', 'section' => 'general'],
+            ['key' => 'contact_phone', 'value' => '+351 232 610 000', 'section' => 'general'],
             ['key' => 'timezone', 'value' => 'Europe/Lisbon', 'section' => 'general'],
             ['key' => 'locale', 'value' => 'pt', 'section' => 'general'],
             ['key' => 'currency', 'value' => 'EUR', 'section' => 'general'],

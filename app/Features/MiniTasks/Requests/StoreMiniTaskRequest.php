@@ -18,6 +18,10 @@ class StoreMiniTaskRequest extends FormRequest
     {
         $rules = (new FormValidator())->fromSchema(MiniTaskFormSchema::create(), $this->all());
 
+        // Date fields
+        $rules['start_date'] = ['required', 'date'];
+        $rules['end_date']   = ['required', 'date', 'after_or_equal:start_date'];
+
         // Worker/Team array validation
         $rules['worker_ids'] = ['nullable', 'array'];
         $rules['worker_ids.*'] = ['exists:workers,id'];
@@ -28,6 +32,14 @@ class StoreMiniTaskRequest extends FormRequest
         $rules['materials'] = ['nullable', 'array'];
         $rules['materials.*.material_id'] = ['required', 'exists:materials,id'];
         $rules['materials.*.planned_quantity'] = ['required', 'numeric', 'min:0.01'];
+
+        // Simple material_ids (for multiselect, without planned_quantity)
+        $rules['material_ids'] = ['nullable', 'array'];
+        $rules['material_ids.*'] = ['exists:materials,id'];
+
+        // Equipment IDs
+        $rules['equipment_ids'] = ['nullable', 'array'];
+        $rules['equipment_ids.*'] = ['exists:equipments,id'];
 
         return $rules;
     }

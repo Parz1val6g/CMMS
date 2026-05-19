@@ -20,8 +20,9 @@ class DatabaseSeeder extends Seeder
             MunicipalitySeeder::class,       // 278 municipalities (hardcoded from concelho.sql)
             ParishSeeder::class,             // 2882 parishes (hardcoded from freguesias.sql)
 
-                // ── Layer 2: Users (1 per role) ──
+                // ── Layer 2: Users & Entities ──
             UserSeeder::class,               // admin, manager, equipment_manager, supervisor, worker, client
+            EntitySeeder::class,             // municipal and parish councils with entidade users
 
                 // ── Layer 3: Configuration ──
             ServiceTypeSeeder::class,
@@ -49,7 +50,11 @@ class DatabaseSeeder extends Seeder
                 // ── Layer 7: Execution Data ──
             WorkLogSeeder::class,            // all WorkLogStatus values
 
-                // ── Layer 8: Attachments ──
+                // ── Layer 8: Tickets & Loan Orders ──
+            TicketSeeder::class,             // all status×priority combos, converted→SO links
+            LoanOrderSeeder::class,          // full lifecycle: pending→returned/cancelled
+
+                // ── Layer 9: Attachments ──
             AttachmentSeeder::class,
         ]);
     }

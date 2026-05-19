@@ -186,6 +186,11 @@ return [
         'priority' => 'Prioridade',
         'priority_helper' => 'Nível de urgência deste ticket',
         'status' => 'Estado',
+        'section_location' => 'Localização',
+        'parish' => 'Freguesia',
+        'street' => 'Rua',
+        'reference_point' => 'Ponto de Referência',
+        'postal_code' => 'Código Postal',
     ],
 
     'tasks' => [
@@ -240,6 +245,7 @@ return [
         'section_manager'   => 'Gestor',
         'section_description' => 'Descrição',
         'section_location'  => 'Localização',
+        'section_address'   => 'Morada de Instalação',
         'section_map'       => 'Coordenadas no Mapa',
         'parish'            => 'Freguesia',
         'parish_helper'     => 'Selecione a freguesia/região',

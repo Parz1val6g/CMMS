@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { ChevronDown, X, Search } from 'lucide-react';
+import { t } from '@/utils/i18n';
 
 /**
  * Normalize value to an array of primitive IDs.
@@ -11,7 +12,7 @@ function toIds(raw) {
   return arr.map(item => (item && typeof item === 'object' ? item.id : item)).filter(v => v !== undefined && v !== null);
 }
 
-export default function MultiSelect({ name, options = [], value = [], onChange, placeholder = 'Select...', showSearch = true }) {
+export default function MultiSelect({ name, options = [], value = [], onChange, placeholder = 'Select...', showSearch = true, lockedValues = [] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [dropdownStyle, setDropdownStyle] = useState({});
@@ -96,6 +97,8 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
   }, [name]);
 
   const toggleItem = (itemValue) => {
+    // Prevent deselecting locked values
+    if (lockedValues.includes(itemValue) && selected.includes(itemValue)) return;
     const next = selected.includes(itemValue)
       ? selected.filter(v => v !== itemValue)
       : [...selected, itemValue];
@@ -106,6 +109,8 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
 
   const removeItem = (e, itemValue) => {
     e.stopPropagation();
+    // Prevent removing locked values
+    if (lockedValues.includes(itemValue)) return;
     const next = selected.filter(v => v !== itemValue);
     setSelected(next);
     onChange?.(next);
@@ -131,22 +136,31 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
         {selectedLabels.length === 0 ? (
           <span className="text-brand-mid">{placeholder}</span>
         ) : (
-          selectedLabels.map(({ label, value }) => (
-            <span
-              key={value}
-              className="inline-flex items-center gap-1 rounded-md bg-brand-accent/15 px-2 py-0.5 text-xs font-medium text-brand-accent"
-            >
-              {label}
-              <button
-                type="button"
-                onClick={(e) => removeItem(e, value)}
-                className="inline-flex rounded-sm p-0.5 text-brand-accent hover:bg-brand-accent/20 hover:text-brand-accent transition-colors"
-                aria-label={`Remove ${label}`}
+          selectedLabels.map(({ label, value }) => {
+            const isLocked = lockedValues.includes(value);
+            return (
+              <span
+                key={value}
+                className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ${
+                  isLocked
+                    ? 'bg-brand-mid/10 text-brand-mid opacity-60 cursor-not-allowed'
+                    : 'bg-brand-accent/10 text-brand-accent'
+                }`}
               >
-                <X className="h-3 w-3" />
-              </button>
-            </span>
-          ))
+                {label}
+                {!isLocked && (
+                  <button
+                    type="button"
+                    onClick={(e) => removeItem(e, value)}
+                    className="inline-flex rounded-sm p-0.5 text-brand-accent hover:bg-brand-accent/10 hover:text-brand-accent/80 transition-colors"
+                    aria-label={`Remove ${label}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </span>
+            );
+          })
         )}
         <ChevronDown className={`ml-auto h-4 w-4 text-brand-mid transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
@@ -168,7 +182,7 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
                   type="text"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Search..."
+                  placeholder={t('pages.common.search_placeholder')}
                   className="w-full rounded-md border border-brand-mid/20 bg-brand-light py-1.5 pl-8 pr-3 text-sm text-brand-darkest placeholder:text-brand-mid focus:border-brand-accent focus:outline-none focus:ring-1 focus:ring-brand-accent"
                 />
               </div>
@@ -176,7 +190,7 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
           )}
 
           {filtered.length === 0 && options.length > 0 ? (
-            <div className="px-3 py-2 text-sm text-brand-mid">No matches</div>
+            <div className="px-3 py-2 text-sm text-brand-mid">{t('pages.common.no_matches')}</div>
           ) : filtered.length === 0 && options.length === 0 ? (
             <div className="px-3 py-2 text-sm text-brand-mid">No options available</div>
           ) : (
@@ -188,7 +202,7 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
                   className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors ${
                     isChecked
                       ? 'bg-brand-accent/10 text-brand-accent'
-                      : 'text-brand-mid hover:bg-brand-light'
+                      : 'text-brand-darkest hover:bg-brand-light'
                   }`}
                   onClick={() => toggleItem(opt.value)}
                   role="option"

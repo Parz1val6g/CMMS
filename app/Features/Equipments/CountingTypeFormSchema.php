@@ -3,7 +3,7 @@
 namespace App\Features\Equipments;
 
 use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextInput, CheckboxInput};
+use App\Core\Forms\Fields\{TextInput, ToggleInput};
 
 class CountingTypeFormSchema
 {
@@ -22,7 +22,7 @@ class CountingTypeFormSchema
                     ->setRules('nullable|string|max:50')
             )
             ->field(
-                CheckboxInput::make('active')
+                ToggleInput::make('active')
                     ->setLabel('Active')
                     ->setRules('boolean')
             );
@@ -42,7 +42,7 @@ class CountingTypeFormSchema
                     ->setRules('nullable|string|max:50')
             )
             ->field(
-                CheckboxInput::make('active')
+                ToggleInput::make('active')
                     ->setLabel('Active')
                     ->setRules('boolean')
             );

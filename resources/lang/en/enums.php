@@ -56,6 +56,9 @@ return [
         'role_permissions' => 'Role Permissions',
         'profile' => 'Profile',
         'settings' => 'Settings',
+        'tickets' => 'Tickets',
+        'loan_orders' => 'Loan Orders',
+        'entities' => 'Entities',
     ],
 
     'priority' => [
@@ -103,5 +106,33 @@ return [
         'submitted' => 'Pending Approval',
         'approved' => 'Approved',
         'rejected' => 'Rejected',
+    ],
+
+    'ticket_status' => [
+        'open' => 'Open',
+        'in_progress' => 'In Progress',
+        'converted' => 'Converted',
+        'cancelled' => 'Cancelled',
+    ],
+
+    'ticket_priority' => [
+        'low' => 'Low',
+        'normal' => 'Normal',
+        'high' => 'High',
+        'urgent' => 'Urgent',
+    ],
+
+    'loan_order_status' => [
+        'pending'     => 'Pending',
+        'approved'    => 'Approved',
+        'checked_out' => 'Checked Out',
+        'returned'    => 'Returned',
+        'cancelled'   => 'Cancelled',
+    ],
+
+    'entity_type' => [
+        'municipal_council' => 'Municipal Council',
+        'parish_council'    => 'Parish Council',
+        'other'             => 'Other',
     ],
 ];

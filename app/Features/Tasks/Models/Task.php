@@ -21,6 +21,8 @@ class Task extends Model
     protected $fillable = [
         'reference',
         'service_order_id',
+        'taskable_id',
+        'taskable_type',
         'manager_id',
         'description',
         'status',
@@ -28,6 +30,20 @@ class Task extends Model
     protected $casts = [
         'status' => TaskStatus::class,
     ];
+
+    /**
+     * Polymorphic parent — returns either ServiceOrder or LoanOrder.
+     */
+    public function taskable()
+    {
+        return $this->morphTo();
+    }
+
+    /**
+     * Backward-compatible relationship.
+     * Returns null for tasks attached to LoanOrders (taskable_type = LoanOrder).
+     * Use $task->taskable instead for polymorphic access.
+     */
     public function serviceOrder()
     {
         return $this->belongsTo(ServiceOrder::class);

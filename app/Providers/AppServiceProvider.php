@@ -23,12 +23,6 @@ class AppServiceProvider extends ServiceProvider
         \App\Features\Tasks\Models\Task::observe(\App\Shared\Observers\AuditObserver::class);
         \App\Features\MiniTasks\Models\MiniTask::observe(\App\Shared\Observers\AuditObserver::class);
         \App\Features\WorkLogs\Models\WorkLog::observe(\App\Shared\Observers\AuditObserver::class);
-
-        // ── Cost History Observers ──
-        // Captures cost_per_hour changes on Equipment/Worker into cost_histories table.
-        // Dual-oberver: both AuditObserver (above) AND CostHistory observers below run independently.
-        \App\Features\Equipments\Models\Equipment::observe(\App\Features\Equipments\Observers\EquipmentObserver::class);
-        \App\Features\Workers\Models\Worker::observe(\App\Features\Workers\Observers\WorkerObserver::class);
         \App\Shared\Models\Role::observe(\App\Shared\Observers\AuditObserver::class);
         \App\Features\Equipments\Models\Equipment::observe(\App\Shared\Observers\AuditObserver::class);
 
@@ -60,6 +54,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(\App\Shared\Models\Unit::class, \App\Shared\Policies\UnitPolicy::class);
         Gate::policy(\App\Shared\Models\Role::class, \App\Features\Admin\Policies\RolePolicy::class);
         Gate::policy(\App\Shared\Models\UserPreference::class, \App\Shared\Policies\UserPreferencePolicy::class);
+        Gate::policy(\App\Features\Tickets\Models\Ticket::class, \App\Features\Tickets\Policies\TicketPolicy::class);
+        Gate::policy(\App\Features\Entities\Models\Entity::class, \App\Features\Entities\Policies\EntityPolicy::class);
+        Gate::policy(\App\Features\LoanOrders\Models\LoanOrder::class, \App\Features\LoanOrders\Policies\LoanOrderPolicy::class);
 
         // Dashboard access: any active authenticated user can view
         Gate::define('viewDashboard', function ($user) {

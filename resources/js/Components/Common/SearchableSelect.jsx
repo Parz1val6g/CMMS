@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { ChevronDown, Search } from 'lucide-react';
 import { toScalar } from '@/Utils/url';
+import { t } from '@/utils/i18n';
 
 export default function SearchableSelect({ name, options = [], value = '', onChange, placeholder = 'Select...' }) {
   /* ── Normalize incoming value (may be object from Laravel relation) ── */
@@ -121,7 +122,7 @@ export default function SearchableSelect({ name, options = [], value = '', onCha
                 type="text"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                placeholder="Search..."
+                placeholder={t('pages.common.search_placeholder')}
                 className="w-full rounded-md border border-brand-mid/20 bg-brand-light py-1.5 pl-8 pr-3 text-sm text-brand-darkest placeholder:text-brand-mid focus:border-brand-accent focus:outline-none focus:ring-1 focus:ring-brand-accent"
               />
             </div>
@@ -130,7 +131,7 @@ export default function SearchableSelect({ name, options = [], value = '', onCha
           {/* Options list */}
           <div className="max-h-48 overflow-auto">
             {filtered.length === 0 ? (
-              <div className="px-3 py-2 text-sm text-brand-mid">No matches</div>
+              <div className="px-3 py-2 text-sm text-brand-mid">{t('pages.common.no_matches')}</div>
             ) : (
               filtered.map((opt) => (
                 <div

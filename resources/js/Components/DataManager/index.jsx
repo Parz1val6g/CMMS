@@ -7,6 +7,7 @@ import Pagination from '@/Components/Table/Pagination.jsx';
 import EditPanel from './EditPanel.jsx';
 import FilterBar from './FilterBar.jsx';
 import { replaceId, toQueryString } from '@/utils/url';
+import { csrfHeader } from '@/utils/csrf';
 
 /**
  * Normalize API paginated response to Inertia-compatible shape.
@@ -188,14 +189,13 @@ export default function DataManager({
     const confirmBatchDelete = useCallback(async () => {
         if (!routes.destroy || selectedIds.size === 0) return;
         setBatchDeleting(true);
-        const token = document.querySelector('meta[name="csrf-token"]')?.content;
         const ids = [...selectedIds];
 
         const results = await Promise.allSettled(
             ids.map(id =>
                 fetch(replaceId(routes.destroy, id), {
                     method: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': token ?? '', 'X-Requested-With': 'XMLHttpRequest' },
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
                 })
             )
         );
@@ -221,12 +221,11 @@ export default function DataManager({
         if (!routes.destroy || !deleteTarget) return;
         setDeleting(true);
 
-        const token = document.querySelector('meta[name="csrf-token"]')?.content;
         try {
             const url = replaceId(routes.destroy, deleteTarget);
             const res = await fetch(url, {
                 method: 'DELETE',
-                headers: { 'X-CSRF-TOKEN': token ?? '', 'X-Requested-With': 'XMLHttpRequest' },
+                headers: { 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
             });
             if (res.ok) {
                 setDeleteTarget(null);
@@ -388,8 +387,8 @@ export default function DataManager({
                 </div>
             )}
 
-            {/* Kanban View */}
-            {viewMode === 'kanban' && children}
+            {/* Child components (Modals, Drawers, etc.) — always rendered */}
+            {children}
 
             {/* Batch Delete Confirmation Dialog */}
             <DialogModal

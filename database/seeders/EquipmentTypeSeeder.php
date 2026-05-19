@@ -21,7 +21,10 @@ class EquipmentTypeSeeder extends Seeder
             ['name' => 'Grua',            'category' => 'vehicle', 'active' => true],
             ['name' => 'Escavadora',      'category' => 'vehicle', 'active' => true],
             ['name' => 'Retroescavadora', 'category' => 'vehicle', 'active' => true],
-            ['name' => 'Camião',          'category' => 'vehicle', 'active' => true],
+            ['name' => 'Camião',               'category' => 'vehicle', 'active' => true],
+            ['name' => 'Cortadora de Asfalto',  'category' => 'general', 'active' => true],
+            ['name' => 'Perfuradora',           'category' => 'general', 'active' => true],
+            ['name' => 'Serra Circular',        'category' => 'general', 'active' => true],
         ];
 
         foreach ($types as $type) {

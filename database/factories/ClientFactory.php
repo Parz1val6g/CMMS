@@ -16,7 +16,8 @@ class ClientFactory extends Factory
     {
         return [
             // user_id must be provided via state() or seeder
-            'nif' => fake()->unique()->numerify('#########'),
+            // Portuguese company NIF: starts with 5, followed by 8 random digits
+            'nif' => fake()->unique()->numerify('5########'),
         ];
     }
 }

@@ -18,7 +18,7 @@ Add the remaining lifecycle methods to LoanOrderService — initiateReturn and c
 
 `cancel(LoanOrder $loanOrder): LoanOrder` — inside transaction:
 1. Guard: status is not already CANCELLED (idempotent)
-2. Guard: status is PENDING (cannot cancel in-flight CHECKED_OUT — must return first)
+2. Guard: status is PENDING only (equipment must be returned first if CHECKED_OUT)
 3. Set status to CANCELLED, set cancelled_at, set cancelled_by
 4. Release equipments: loop through equipments, `markAsActive()` if IN_USE
 5. Return updated LoanOrder
@@ -51,7 +51,7 @@ Add the remaining lifecycle methods to LoanOrderService — initiateReturn and c
 - Create another loan → checkout task created
 - Complete checkout task → then initiateReturn → return task created
 - Attempt duplicate return → 422
-- Attempt cancel on CHECKED_OUT → 422 (must return first)
+- Attempt cancel on CHECKED_OUT → 422 (must return equipment first)
 - Soft delete loan → 200 + soft-deleted
 
 ## Acceptance Criteria
@@ -61,7 +61,7 @@ Add the remaining lifecycle methods to LoanOrderService — initiateReturn and c
 - [ ] `DELETE /api/loan-orders/{id}` soft-deletes if PENDING or CANCELLED, 422 otherwise
 - [ ] `LoanOrderPolicy` gates all endpoints by role
 - [ ] Idempotent guards: double cancel, duplicate return
-- [ ] State guards: cannot cancel CHECKED_OUT, cannot return PENDING
+- [ ] State guards: cancel allowed from PENDING only, cannot cancel CHECKED_OUT (must return first), cannot return PENDING
 - [ ] Full lifecycle test passes
 
 ## Blocked by

@@ -34,6 +34,11 @@ class ServiceOrderApiTest extends TestCase
 
     public function test_create_service_order_with_valid_data(): void
     {
+        $client = \App\Features\Clients\Models\Client::factory()
+            ->create(['user_id' => $this->manager->id]);
+        $sector = \App\Features\Sectors\Models\Sector::factory()->create([
+            'head_id' => $this->manager->id,
+        ]);
         $parish = Parish::inRandomOrder()->first() ?? Parish::factory()->create();
         $serviceType = ServiceType::factory()->create();
 
@@ -45,23 +50,26 @@ class ServiceOrderApiTest extends TestCase
 
         $response = $this->actingAs($this->manager, 'sanctum')
             ->post('/api/service-orders', [
-                'process' => 'Fix road damage - Rua da Paz',
+                'process'         => 'Fix road damage - Rua da Paz',
+                'manager_id'      => $this->manager->id,
+                'client_id'       => $client->id,
+                'sector_ids'      => [$sector->id],
                 'service_type_id' => $serviceType->id,
-                'priority' => Priority::HIGH->value,
-                'photo' => $photo,
-                'parish_id' => $parish->id,
-                'street' => 'Rua da Paz, nº 123',
-                'postal_code' => '6300-000',
-                'latitude' => 40.3399,
-                'longitude' => -7.2674,
+                'priority'        => Priority::HIGH->value,
+                'photo'           => $photo,
+                'parish_id'       => $parish->id,
+                'street'          => 'Rua da Paz, nº 123',
+                'postal_code'     => '6300-000',
+                'latitude'        => 40.3399,
+                'longitude'       => -7.2674,
             ], ['Accept' => 'application/json']);
 
         $this->assertEquals(201, $response->status());
         $this->assertEquals('pending', $response->json('data.status'));
         $this->assertEquals($this->manager->id, $response->json('data.manager.id'));
+        $this->assertStringStartsWith('OS', $response->json('data.process'));
 
         $this->assertDatabaseHas('service_orders', [
-            'process' => 'Fix road damage - Rua da Paz',
             'manager_id' => $this->manager->id,
         ]);
     }
@@ -74,8 +82,8 @@ class ServiceOrderApiTest extends TestCase
             ]);
 
         $this->assertEquals(422, $response->status());
-        $this->assertArrayHasKey('process', $response->json('errors'));
-        $this->assertArrayHasKey('photo', $response->json('errors'));
+        $this->assertArrayHasKey('manager_id', $response->json('errors'));
+        $this->assertArrayHasKey('sector_ids', $response->json('errors'));
     }
 
     public function test_get_service_order(): void

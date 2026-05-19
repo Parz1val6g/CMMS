@@ -22,6 +22,11 @@ class FormSchema
     protected ?string $title = null;
 
     /**
+     * Número de colunas da grelha (default 1).
+     */
+    protected int $columns = 1;
+
+    /**
      * Array de FormField, indexed por key para evitar duplicatas.
      * 
      * @var array<string, FormField>
@@ -188,6 +193,31 @@ class FormSchema
         return $this->title;
     }
 
+    /**
+     * Define o número de colunas da grelha do formulário.
+     * 
+     * @param int $columns Número de colunas (1-6)
+     * @return $this
+     */
+    public function setColumns(int $columns): static
+    {
+        if ($columns < 1 || $columns > 6) {
+            throw new \InvalidArgumentException('Columns must be between 1 and 6');
+        }
+        $this->columns = $columns;
+        return $this;
+    }
+
+    /**
+     * Obtém o número de colunas.
+     * 
+     * @return int
+     */
+    public function getColumns(): int
+    {
+        return $this->columns;
+    }
+
     // ===== Validação =====
 
     /**
@@ -241,9 +271,12 @@ class FormSchema
             )),
         ];
 
-        // Adiciona title apenas se definido
         if ($this->title !== null) {
             $data['title'] = $this->title;
+        }
+
+        if ($this->columns !== 1) {
+            $data['columns'] = $this->columns;
         }
 
         return $data;

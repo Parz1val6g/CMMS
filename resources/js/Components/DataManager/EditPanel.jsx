@@ -1,11 +1,26 @@
-import { useState, useEffect, useMemo } from 'react';
-import { X } from 'lucide-react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { X, GripVertical } from 'lucide-react';
 import FormField from '@/Components/Common/FormField';
 import { replaceId } from '@/utils/url';
 import { t } from '@/utils/i18n';
+import { csrfHeader } from '@/utils/csrf';
 
 /* ── Fields to hide per workflow type ────────────────────────── */
 // BACKEND: UpdateServiceOrderRequest — prohibited fields for workflow_type=loan
+function evalCondition({ operator, value }, fieldValue) {
+  switch (operator) {
+    case '==':     return fieldValue === value;
+    case '!=':     return fieldValue !== value;
+    case '>':      return fieldValue > value;
+    case '<':      return fieldValue < value;
+    case '>=':     return fieldValue >= value;
+    case '<=':     return fieldValue <= value;
+    case 'in':     return Array.isArray(value) && value.includes(fieldValue);
+    case 'not_in': return !Array.isArray(value) || !value.includes(fieldValue);
+    default:       return true;
+  }
+}
+
 const LOAN_HIDDEN = new Set([
     'service_type_id', 'sector_ids',
 ]);
@@ -81,6 +96,10 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
     const [errors, setErrors] = useState({});
     const [saving, setSaving] = useState(false);
     const [workflowType, setWorkflowType] = useState('');
+    const [panelWidth, setPanelWidth] = useState(384);
+    const resizingRef = useRef(false);
+    const startXRef = useRef(0);
+    const startWidthRef = useRef(0);
 
     /* ── Controlled form values — keyed by field name (#4) ───────── */
     const [formValues, setFormValues] = useState({});
@@ -123,23 +142,84 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
         return () => document.removeEventListener('toggle-change', handler);
     }, []);
 
-    /* ── Compute visible fields based on workflow type ───────── */
+    /* ── Compute visible fields based on workflow type + field conditions ── */
     const visibleFields = useMemo(() => {
         return fields.filter(f => {
             const key = f.key ?? f.name ?? '';
-            if (workflowType === 'loan') return !LOAN_HIDDEN.has(key);
-            if (workflowType === 'regular') return !REGULAR_HIDDEN.has(key);
+            if (workflowType === 'loan' && LOAN_HIDDEN.has(key)) return false;
+            if (workflowType === 'regular' && REGULAR_HIDDEN.has(key)) return false;
+            if (f.condition) {
+                const cv = formValues[f.condition.field] ?? '';
+                return evalCondition(f.condition, cv);
+            }
             return true;
         });
-    }, [fields, workflowType]);
+    }, [fields, formValues, workflowType]);
+
+    /* ── Locked workers — derived from selected team_ids ─────────── */
+    const lockedWorkerIds = useMemo(() => {
+        const workerField = fields.find(f => (f.key ?? f.name) === 'worker_ids');
+        const workerOpts = workerField?.options ?? [];
+        const selectedTeams = Array.isArray(formValues.team_ids) ? formValues.team_ids : [];
+        if (selectedTeams.length === 0) return [];
+        return workerOpts
+            .filter(w => w.team_id && selectedTeams.includes(w.team_id))
+            .map(w => w.value);
+    }, [formValues.team_ids, fields]);
 
     /* ── Field change handler — used by FormField via onChange prop ── */
-    const handleFieldChange = (fieldName, value) => {
+    const handleFieldChange = useCallback((fieldName, value) => {
         setFormValues((prev) => {
-            const updated = { ...prev, [fieldName]: value };
-            return updated;
+            const next = { ...prev, [fieldName]: value };
+            // When team_ids change, auto-include workers belonging to selected teams
+            if (fieldName === 'team_ids') {
+                const workerField = fields.find(f => (f.key ?? f.name) === 'worker_ids');
+                const workerOpts = workerField?.options ?? [];
+                const selectedTeams = Array.isArray(value) ? value : [];
+                const newLockedIds = workerOpts
+                    .filter(w => w.team_id && selectedTeams.includes(w.team_id))
+                    .map(w => w.value);
+                const prevLockedIds = workerOpts
+                    .filter(w => w.team_id && Array.isArray(prev.team_ids) && prev.team_ids.includes(w.team_id))
+                    .map(w => w.value);
+                const existingWorkers = Array.isArray(prev.worker_ids) ? prev.worker_ids : [];
+                const keptWorkers = existingWorkers.filter(id => !prevLockedIds.includes(id));
+                next.worker_ids = [...new Set([...keptWorkers, ...newLockedIds])];
+            }
+            return next;
         });
-    };
+    }, [fields]);
+
+    /* ── Resize ────────────────────────────────────────────── */
+    const onResizeStart = useCallback((e) => {
+        e.preventDefault();
+        resizingRef.current = true;
+        startXRef.current = e.clientX;
+        startWidthRef.current = panelWidth;
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+    }, [panelWidth]);
+
+    useEffect(() => {
+        if (!resizingRef.current) return;
+        const onMove = (e) => {
+            if (!resizingRef.current) return;
+            const delta = startXRef.current - e.clientX;
+            const next = Math.max(280, Math.min(900, startWidthRef.current + delta));
+            setPanelWidth(next);
+        };
+        const onUp = () => {
+            resizingRef.current = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+        return () => {
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+        };
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -165,8 +245,6 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
             }
         });
 
-        const token = document.querySelector('meta[name="csrf-token"]')?.content;
-
         try {
             const url = replaceId(routes.update, selectedItem.id);
             const res = await fetch(url, {
@@ -174,8 +252,8 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': token ?? '',
                     'X-Requested-With': 'XMLHttpRequest',
+                    ...csrfHeader(),
                 },
                 body: JSON.stringify(data),
             });
@@ -199,7 +277,16 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
     if (!selectedItem) return null;
 
     return (
-        <div className="flex w-96 shrink-0 flex-col overflow-y-auto rounded-lg border border-brand-mid/20 bg-brand-white shadow-xl max-h-full">
+        <div className="flex shrink-0 max-h-full relative select-none" style={{ width: panelWidth }}>
+            {/* Resize handle */}
+            <div
+                className="absolute left-0 top-0 bottom-0 w-4 -ml-2 cursor-col-resize z-10 flex items-center justify-center group"
+                onMouseDown={onResizeStart}
+            >
+                <div className="w-1 h-12 rounded-full bg-brand-mid/30 group-hover:bg-brand-accent transition-colors" />
+            </div>
+
+            <div className="flex flex-col overflow-y-auto rounded-lg border border-brand-mid/20 bg-brand-white shadow-xl w-full">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-brand-mid/20 px-4 py-3">
                 <h6 className="text-sm font-bold text-brand-darkest">{t('pages.datamanager.edit_title', { name: entityName })}</h6>
@@ -219,7 +306,7 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
 
                 <div className="flex-1 overflow-y-auto p-4">
                     {Object.keys(errors).length > 0 && (
-                        <div className="mb-3 rounded-lg bg-red-500/10 p-3 text-sm text-red-300">
+                        <div className="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-600">
                             {Object.entries(errors).map(([field, msgs]) => (
                                 <p key={field}>{(Array.isArray(msgs) ? msgs : [msgs]).join(', ')}</p>
                             ))}
@@ -230,6 +317,7 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
                         const fieldName = field.name ?? field.key;
                         const isMap = field.type === 'map' || field.type === 'map-picker';
                         const fieldError = errors[fieldName]?.join?.(' ') ?? errors[fieldName];
+                        const fieldLockedValues = fieldName === 'worker_ids' ? lockedWorkerIds : [];
                         return (
                             <div key={fieldName ?? i} className="mb-4">
                                 <FormField
@@ -237,6 +325,7 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
                                     value={isMap ? formValues : formValues[fieldName]}
                                     error={fieldError}
                                     onChange={(val) => handleFieldChange(fieldName, val)}
+                                    lockedValues={fieldLockedValues}
                                 />
                             </div>
                         );
@@ -256,7 +345,7 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
                         <button
                             type="button"
                             onClick={onClose}
-                            className="inline-flex items-center justify-center rounded-lg border border-brand-mid/20 bg-brand-light px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-mid/10 transition-colors"
+                            className="inline-flex items-center justify-center rounded-lg border border-brand-mid/20 bg-brand-white px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-light transition-colors"
                         >
                             {t('pages.datamanager.cancel_btn')}
                         </button>
@@ -264,7 +353,7 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
                             <button
                                 type="button"
                                 onClick={() => onDelete(selectedItem.id)}
-                                className="inline-flex items-center justify-center rounded-lg border border-red-800/50 px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+                                className="inline-flex items-center justify-center rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
                             >
                                 {t('pages.datamanager.remove_btn')}
                             </button>
@@ -272,6 +361,7 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
                     </div>
                 </div>
             </form>
+        </div>
         </div>
     );
 }

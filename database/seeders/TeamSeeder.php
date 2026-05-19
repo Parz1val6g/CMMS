@@ -10,39 +10,47 @@ class TeamSeeder extends Seeder
 {
     public function run(): void
     {
-        $sectors = DB::table('sectors')->get();
+        $sectors = DB::table('sectors')->select('id', 'name')->get()->keyBy('name');
+        $users   = DB::table('users')->select('id', 'email')->get()->keyBy('email');
 
-        $teams = [];
-        foreach ($sectors as $sector) {
-            if ($sector->name === 'Departamento de Obras e Viação') {
-                $teams[] = ['sector_id' => $sector->id, 'name' => 'Equipa de Pavimentação'];
-                $teams[] = ['sector_id' => $sector->id, 'name' => 'Equipa de Iluminação'];
-                $teams[] = ['sector_id' => $sector->id, 'name' => 'Equipa de Reparações'];
-            } elseif ($sector->name === 'Departamento de Urbanismo') {
-                $teams[] = ['sector_id' => $sector->id, 'name' => 'Equipa de Licenças'];
-                $teams[] = ['sector_id' => $sector->id, 'name' => 'Equipa de Inspeção'];
-            } elseif ($sector->name === 'Departamento de Limpeza Urbana') {
-                $teams[] = ['sector_id' => $sector->id, 'name' => 'Equipa de Limpeza'];
-                $teams[] = ['sector_id' => $sector->id, 'name' => 'Equipa de Jardinagem'];
-            } elseif ($sector->name === 'Departamento de Água e Saneamento') {
-                $teams[] = ['sector_id' => $sector->id, 'name' => 'Equipa de Água'];
-                $teams[] = ['sector_id' => $sector->id, 'name' => 'Equipa de Esgotos'];
+        $responsibleEmail = 'rui.goncalves@cm-mangualde.pt';
+        $responsibleId = $users[$responsibleEmail]->id ?? null;
+
+        $teams = [
+            'Departamento de Obras e Viação' => [
+                'Equipa de Pavimentação',
+                'Equipa de Sinalização',
+                'Equipa de Calcetamento',
+            ],
+            'Departamento de Urbanismo' => [
+                'Equipa de Licenciamento',
+                'Equipa de Fiscalização Técnica',
+            ],
+            'Departamento de Limpeza Urbana' => [
+                'Equipa de Recolha de Resíduos',
+                'Equipa de Manutenção de Jardins',
+                'Equipa de Limpeza de Vias',
+            ],
+            'Departamento de Água e Saneamento' => [
+                'Equipa de Redes de Água',
+                'Equipa de Saneamento',
+            ],
+        ];
+
+        foreach ($teams as $sectorName => $teamList) {
+            $sectorId = $sectors[$sectorName]->id ?? null;
+            if (!$sectorId) continue;
+
+            foreach ($teamList as $teamName) {
+                DB::table('teams')->insert([
+                    'id'             => Str::uuid(),
+                    'name'           => $teamName,
+                    'sector_id'      => $sectorId,
+                    'responsible_id' => $responsibleId,
+                    'created_at'     => now(),
+                    'updated_at'     => now(),
+                ]);
             }
-        }
-
-        $users = DB::table('users')->where('status', 'active')->pluck('id');
-        $userIdx = 0;
-
-        foreach ($teams as $team) {
-            DB::table('teams')->insert([
-                'id' => Str::uuid(),
-                'sector_id' => $team['sector_id'],
-                'name' => $team['name'],
-                'responsible_id' => $users[$userIdx % $users->count()],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            $userIdx++;
         }
     }
 }

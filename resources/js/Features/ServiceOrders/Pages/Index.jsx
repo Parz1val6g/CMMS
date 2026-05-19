@@ -1,4 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import ClientLocationSelector from '../Components/ClientLocationSelector';
+import { csrfHeader } from '@/utils/csrf';
+import { buildCreatePayload } from '../Utils/payload';
 import { labelFor, badgeStyle } from '@/utils/enums';
 import { formatDate } from '@/utils/format';
 import { usePage } from '@inertiajs/react';
@@ -12,13 +15,14 @@ import PhotoListener from '@/Hooks/usePhotoListener';
 import KanbanBoard from '@/Components/Kanban/KanbanBoard';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
 import SOTasksTree from '../Components/DrawerTabs/TasksTree';
-import { useClientLocations } from '@/Hooks/useClientLocations';
 
 export default function ServiceOrdersIndex({ service_orders, columns, formSchema, createFormSchema, routes, filterSchema, advancedFilterFields}) {
   const [showModal, setShowModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [photoPreview, setPhotoPreview] = useState(null);
-  const [clientLocationId, setClientLocationId] = useState('');
+  const [clientLocationId, setClientLocationId] = useState(null);
+  const [locationsDirty, setLocationsDirty] = useState(false);
+  const [currentClientId, setCurrentClientId] = useState(null);
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'kanban'
   const [serviceOrdersState, setServiceOrdersState] = useState(service_orders);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -50,6 +54,32 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     }
   }, [flash]);
 
+  /* ── Track client_id changes for ClientLocationSelector ──── */
+  useEffect(() => {
+    if (!showModal) {
+      setCurrentClientId(null);
+      setClientLocationId(null);
+      setLocationsDirty(false);
+      return;
+    }
+
+    // Read initial value after Modal renders fields
+    const initEl = document.querySelector('select[name="client_id"]');
+    if (initEl?.value) setCurrentClientId(initEl.value);
+
+    const handler = (e) => {
+      if (e.detail.name === 'client_id') {
+        const newId = e.detail.value || null;
+        setCurrentClientId(newId);
+        // Changing client clears any saved location selection
+        setClientLocationId(null);
+        setLocationsDirty(false);
+      }
+    };
+    document.addEventListener('modal-field-change', handler);
+    return () => document.removeEventListener('modal-field-change', handler);
+  }, [showModal]);
+
   /* ── Create form submission via FormData (multipart) ─────── */
   const handleCreate = useCallback(async (e, formValues = {}) => {
     e.preventDefault();
@@ -61,27 +91,24 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     const formData = new FormData(form);
 
     // Append React-controlled multi-select values (not captured by FormData)
-    ['sector_ids', 'equipment_ids'].forEach((key) => {
+    ['sector_ids'].forEach((key) => {
       const vals = formValues[key];
       if (Array.isArray(vals) && vals.length > 0) {
         vals.forEach((v) => formData.append(`${key}[]`, v));
       }
     });
 
-    // Append selected client location if any
-    if (clientLocationId) {
-      formData.append('client_location_id', clientLocationId);
-    }
-
-    const token = document.querySelector('meta[name="csrf-token"]')?.content;
+    // Scenario A/B/C: client location logic
+    const LOCATION_FIELDS = ['parish_id', 'street', 'reference_point', 'postal_code', 'latitude', 'longitude'];
+    buildCreatePayload(formData, clientLocationId, locationsDirty, LOCATION_FIELDS);
 
     try {
       const res = await fetch(routes.store, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
-          'X-CSRF-TOKEN': token ?? '',
           'X-Requested-With': 'XMLHttpRequest',
+          ...csrfHeader(),
         },
         body: formData,
       });
@@ -90,6 +117,8 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
       if (res.ok) {
         setShowModal(false);
         setPhotoPreview(null);
+        setClientLocationId(null);
+        setLocationsDirty(false);
         window.location.reload();
       } else {
         if (body.errors) setFormErrors(body.errors);
@@ -100,13 +129,12 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     } finally {
       savingRef.current = false;
     }
-  }, [routes.store, globalToast]);
+  }, [routes.store, globalToast, clientLocationId, locationsDirty]);
 
   /* ── Open modal for create ────────────────────────────────── */
   const openCreate = useCallback(() => {
     setFormErrors({});
     setPhotoPreview(null);
-    setClientLocationId('');
     setShowModal(true);
   }, []);
 
@@ -152,15 +180,14 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     setServiceOrdersState(Array.isArray(serviceOrdersState) ? updatedItems : { ...serviceOrdersState, data: updatedItems });
 
     // Fire backend request
-    const token = document.querySelector('meta[name="csrf-token"]')?.content;
     try {
       const res = await fetch(`${routes.update.replace(':id', serviceOrderId)}`, {
         method: 'PATCH',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': token ?? '',
           'X-Requested-With': 'XMLHttpRequest',
+          ...csrfHeader(),
         },
         body: JSON.stringify({ status: newStatus }),
       });
@@ -191,9 +218,8 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     setSoError(null);
 
     try {
-      const token = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
       const res = await fetch(`/api/service-orders/${item.id}`, {
-        headers: { Accept: 'application/json', 'X-CSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest' },
+        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const body = await res.json();
@@ -260,17 +286,11 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
 
     // Use detail data if available, fallback to list data
     const data = detail ?? so;
-    const isLoan = data.workflow_type === 'loan';
 
     const tabs = [
       { id: 'details', label: t('pages.service_orders.tab_details'), component: <SODetailsTab serviceOrder={data} /> },
-      { id: 'tasks', label: t('pages.service_orders.tab_tasks'), component: <SOTasksTree serviceOrderId={so.id} workflowType={data.workflow_type} /> },
+      { id: 'tasks', label: t('pages.service_orders.tab_tasks'), component: <SOTasksTree serviceOrderId={so.id} /> },
     ];
-
-    // Equipment tab — loan only
-    if (isLoan) {
-      tabs.push({ id: 'equipment', label: t('pages.service_orders.tab_equipment'), component: <SOEquipmentTab serviceOrder={data} /> });
-    }
 
     return tabs;
   }, [selectedServiceOrder, soDetail, soLoading, soError]);
@@ -387,10 +407,13 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         open={showModal}
         onClose={() => setShowModal(false)}
         onSubmit={handleCreate}
+        injectAfterField="client_id"
       >
         <ClientLocationSelector
           isOpen={showModal}
+          clientId={currentClientId}
           onClientLocationChange={setClientLocationId}
+          onDirtyChange={setLocationsDirty}
         />
       </Modal>
 
@@ -461,7 +484,7 @@ function SODetailsTab({ serviceOrder }) {
         </section>
       </div>
 
-      {/* Priority & Workflow row */}
+      {/* Priority */}
       <div className="grid grid-cols-2 gap-4">
         <section>
           <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_priority')}</h4>
@@ -470,9 +493,9 @@ function SODetailsTab({ serviceOrder }) {
           </span>
         </section>
         <section>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_workflow')}</h4>
-          <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full bg-brand-accent/20 text-brand-accent">
-            {labelFor(so.workflow_type)}
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_status')}</h4>
+          <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${badgeStyle(so.status)}`}>
+            {labelFor(so.status)}
           </span>
         </section>
       </div>
@@ -560,174 +583,6 @@ function SODetailsTab({ serviceOrder }) {
           />
         </section>
       )}
-    </div>
-  );
-}
-
-/* ── Single equipment card (used within SOEquipmentTab) ─────────── */
-function EquipmentCard({ eq, index }) {
-  const eqBadgeStyle = {
-    active:              'bg-green-500/20  text-green-300',
-    in_use:              'bg-blue-500/20   text-blue-300',
-    maintenance_pending: 'bg-yellow-500/20 text-yellow-300',
-    under_maintenance:   'bg-orange-500/20 text-orange-300',
-    broken:              'bg-red-500/20    text-red-300',
-    under_repair:        'bg-purple-500/20 text-purple-300',
-    inactive:            'bg-brand-mid/20  text-brand-mid',
-    retired:             'bg-brand-mid/20  text-brand-mid',
-  };
-
-  return (
-    <div className="rounded-lg border border-brand-mid/20 bg-brand-white p-4 space-y-4">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_equipment')} #{index + 1}</h4>
-          <p className="text-sm font-mono text-cyan-400 font-bold">{eq.name}</p>
-        </div>
-        <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${eqBadgeStyle[eq.status] || eqBadgeStyle.active}`}>
-          {labelFor(eq.status)}
-        </span>
-      </div>
-
-      {/* Brand & Model */}
-      <div className="grid grid-cols-2 gap-4">
-        <section>
-          <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_brand')}</h4>
-          <p className="text-sm text-brand-darkest">{eq.brand || t('pages.service_orders.value_missing')}</p>
-        </section>
-        <section>
-          <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_model')}</h4>
-          <p className="text-sm text-brand-darkest">{eq.model || t('pages.service_orders.value_missing')}</p>
-        </section>
-      </div>
-
-      {/* Serial Number */}
-      <section>
-        <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_serial_number')}</h4>
-        <p className="text-sm font-mono text-brand-darkest">{eq.serial_number || t('pages.service_orders.value_missing')}</p>
-      </section>
-
-      {/* Revisions */}
-      <div className="grid grid-cols-2 gap-4">
-        <section>
-          <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_last_revision')}</h4>
-          <p className="text-sm text-brand-darkest">{eq.last_revision_date ? formatDate(eq.last_revision_date) : t('pages.service_orders.value_missing')}</p>
-        </section>
-        <section>
-          <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_next_revision')}</h4>
-          <p className="text-sm text-brand-darkest">{eq.next_revision_date ? formatDate(eq.next_revision_date) : t('pages.service_orders.value_missing')}</p>
-        </section>
-      </div>
-
-      {/* Manager */}
-      {eq.manager && (
-        <section>
-          <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_manager')}</h4>
-          <p className="text-sm text-brand-darkest">{eq.manager.name}</p>
-        </section>
-      )}
-
-      {/* Description */}
-      {eq.description && (
-        <section>
-          <h4 className="text-xs font-semibold text-brand-mid uppercase tracking-wider mb-1">{t('pages.service_orders.section_description')}</h4>
-          <p className="text-sm text-brand-darkest">{eq.description}</p>
-        </section>
-      )}
-    </div>
-  );
-}
-
-/* ── Cascading client → location selector rendered inside the create Modal ── */
-function ClientLocationSelector({ isOpen, onClientLocationChange }) {
-  const [clientId, setClientId] = useState('');
-  const [selectedId, setSelectedId] = useState('');
-  const { locations } = useClientLocations(clientId || null);
-
-  // Detect client_id changes from Modal's updateValue via custom event
-  useEffect(() => {
-    if (!isOpen) {
-      setClientId('');
-      setSelectedId('');
-      return;
-    }
-
-    const handler = (e) => {
-      if (e.detail.name === 'client_id') {
-        setClientId(e.detail.value || '');
-        setSelectedId('');
-        onClientLocationChange('');
-      }
-    };
-
-    document.addEventListener('modal-field-change', handler);
-    return () => document.removeEventListener('modal-field-change', handler);
-  }, [isOpen, onClientLocationChange]);
-
-  const handleChange = (e) => {
-    const id = e.target.value;
-    setSelectedId(id);
-    onClientLocationChange(id);
-
-    if (!id) return;
-
-    const cl = locations.find(l => l.id === id);
-    if (cl?.location) {
-      document.dispatchEvent(new CustomEvent('autofill-location', {
-        detail: {
-          parish_id:       cl.location.parish_id       ?? '',
-          street:          cl.location.street_address  ?? '',
-          reference_point: cl.location.landmark        ?? '',
-          postal_code:     cl.location.postal_code     ?? '',
-          latitude:        cl.location.latitude        ?? '',
-          longitude:       cl.location.longitude       ?? '',
-        },
-      }));
-    }
-  };
-
-  if (!isOpen || !clientId || locations.length === 0) return null;
-
-  return (
-    <div className="rounded-lg border border-brand-accent/30 bg-brand-accent/5 p-3 space-y-1.5">
-      <label className="block text-xs font-semibold text-brand-accent uppercase tracking-wider">
-        {t('pages.service_orders.job_site_label')}
-      </label>
-      <select
-        value={selectedId}
-        onChange={handleChange}
-        className="w-full rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
-      >
-        <option value="">— {t('pages.service_orders.job_site_none')} —</option>
-        {locations.map(cl => (
-          <option key={cl.id} value={cl.id}>
-            {cl.is_primary ? '★ ' : ''}{cl.name}
-            {cl.location?.street_address ? ` — ${cl.location.street_address}` : ''}
-          </option>
-        ))}
-      </select>
-      <p className="text-xs text-brand-mid">{t('pages.service_orders.job_site_helper')}</p>
-    </div>
-  );
-}
-
-/* ── Equipment tab content (loan-only) — renders a list of equipments ── */
-function SOEquipmentTab({ serviceOrder }) {
-  const eqList = serviceOrder?.equipments;
-  if (!eqList || eqList.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-40 text-brand-mid">
-        <p className="text-sm">{t('pages.service_orders.no_equipment_assigned')}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      {eqList.map((eq, i) => (
-        <EquipmentCard key={eq.id} eq={eq} index={i} />
-      ))}
     </div>
   );
 }

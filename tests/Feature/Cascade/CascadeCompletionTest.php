@@ -37,7 +37,9 @@ class CascadeCompletionTest extends TestCase
             'parish_id' => $parish->id,
             'landmark' => 'Test landmark',
         ]);
-        $client = Client::factory()->create();
+        $client = Client::factory()->create([
+            'user_id' => $this->manager->id,
+        ]);
         $serviceType = ServiceType::factory()->create();
 
         // Create hierarchy: ServiceOrder → Task → MiniTask → WorkLog
@@ -78,21 +80,25 @@ class CascadeCompletionTest extends TestCase
             'completed_at' => now(),
             'status' => WorkLogStatus::SUBMITTED->value,
         ]);
+        \App\Features\WorkLogs\Events\WorkLogCompletedEvent::dispatch($this->workLog);
 
-        // Fire event (triggers CheckWorkLogsCompletion → MiniTaskService::complete)
+        // Manager approves the worklog — triggers cascade (listener checks APPROVED)
+        $this->workLog->update([
+            'status' => WorkLogStatus::APPROVED->value,
+        ]);
         \App\Features\WorkLogs\Events\WorkLogCompletedEvent::dispatch($this->workLog);
 
         // Assert: MiniTask auto-completes
         $this->miniTask->refresh();
-        $this->assertEquals(MiniTaskStatus::COMPLETED->value, $this->miniTask->status);
+        $this->assertEquals(MiniTaskStatus::COMPLETED, $this->miniTask->status);
 
         // Assert: Task auto-completes
         $this->task->refresh();
-        $this->assertEquals(TaskStatus::COMPLETED->value, $this->task->status);
+        $this->assertEquals(TaskStatus::COMPLETED, $this->task->status);
 
         // Assert: ServiceOrder auto-completes
         $this->serviceOrder->refresh();
-        $this->assertEquals(ServiceOrderStatus::COMPLETED->value, $this->serviceOrder->status);
+        $this->assertEquals(ServiceOrderStatus::COMPLETED, $this->serviceOrder->status);
     }
 
     /**
@@ -117,11 +123,11 @@ class CascadeCompletionTest extends TestCase
 
         // Assert: MiniTask does NOT complete (second worklog incomplete)
         $this->miniTask->refresh();
-        $this->assertEquals(MiniTaskStatus::PENDING->value, $this->miniTask->status);
+        $this->assertEquals(MiniTaskStatus::PENDING, $this->miniTask->status);
 
         // Assert: Task does NOT complete
         $this->task->refresh();
-        $this->assertEquals(TaskStatus::PENDING->value, $this->task->status);
+        $this->assertEquals(TaskStatus::PENDING, $this->task->status);
     }
 
     /**
@@ -136,10 +142,14 @@ class CascadeCompletionTest extends TestCase
             'status' => WorkLogStatus::IN_PROGRESS->value,
         ]);
 
-        // Act: Complete both worklogs
+        // Act: Complete and approve both worklogs
         $this->workLog->update([
             'completed_at' => now(),
             'status' => WorkLogStatus::SUBMITTED->value,
+        ]);
+        \App\Features\WorkLogs\Events\WorkLogCompletedEvent::dispatch($this->workLog);
+        $this->workLog->update([
+            'status' => WorkLogStatus::APPROVED->value,
         ]);
         \App\Features\WorkLogs\Events\WorkLogCompletedEvent::dispatch($this->workLog);
 
@@ -148,15 +158,19 @@ class CascadeCompletionTest extends TestCase
             'status' => WorkLogStatus::SUBMITTED->value,
         ]);
         \App\Features\WorkLogs\Events\WorkLogCompletedEvent::dispatch($workLog2);
+        $workLog2->update([
+            'status' => WorkLogStatus::APPROVED->value,
+        ]);
+        \App\Features\WorkLogs\Events\WorkLogCompletedEvent::dispatch($workLog2);
 
         // Assert: Full cascade completes
         $this->miniTask->refresh();
         $this->task->refresh();
         $this->serviceOrder->refresh();
 
-        $this->assertEquals(MiniTaskStatus::COMPLETED->value, $this->miniTask->status);
-        $this->assertEquals(TaskStatus::COMPLETED->value, $this->task->status);
-        $this->assertEquals(ServiceOrderStatus::COMPLETED->value, $this->serviceOrder->status);
+        $this->assertEquals(MiniTaskStatus::COMPLETED, $this->miniTask->status);
+        $this->assertEquals(TaskStatus::COMPLETED, $this->task->status);
+        $this->assertEquals(ServiceOrderStatus::COMPLETED, $this->serviceOrder->status);
     }
 
     /**
@@ -177,7 +191,7 @@ class CascadeCompletionTest extends TestCase
 
         // Assert: Task does NOT complete (second miniTask pending)
         $this->task->refresh();
-        $this->assertEquals(TaskStatus::PENDING->value, $this->task->status);
+        $this->assertEquals(TaskStatus::PENDING, $this->task->status);
     }
 
     /**
@@ -198,6 +212,6 @@ class CascadeCompletionTest extends TestCase
 
         // Assert: ServiceOrder does NOT complete (second task pending)
         $this->serviceOrder->refresh();
-        $this->assertEquals(ServiceOrderStatus::PENDING->value, $this->serviceOrder->status);
+        $this->assertEquals(ServiceOrderStatus::PENDING, $this->serviceOrder->status);
     }
 }

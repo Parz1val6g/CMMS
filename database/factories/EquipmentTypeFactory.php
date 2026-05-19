@@ -12,11 +12,31 @@ class EquipmentTypeFactory extends Factory
 {
     protected $model = EquipmentType::class;
 
+    private const TYPES = [
+        'Veículo'              => 'vehicle',
+        'Gerador'              => 'general',
+        'Compressor'           => 'general',
+        'Betoneira'            => 'general',
+        'Andaime'              => 'general',
+        'Martelo Pneumático'   => 'general',
+        'Bomba de Água'        => 'general',
+        'Vibrador de Placas'   => 'general',
+        'Grua'                 => 'vehicle',
+        'Escavadora'           => 'vehicle',
+        'Retroescavadora'      => 'vehicle',
+        'Camião'               => 'vehicle',
+        'Cortadora de Asfalto' => 'general',
+        'Perfuradora'          => 'general',
+        'Serra Circular'       => 'general',
+    ];
+
     public function definition(): array
     {
+        $name = fake()->unique()->randomElement(array_keys(self::TYPES));
+
         return [
-            'name' => fake()->unique()->word(),
-            'category' => fake()->randomElement(['vehicle', 'general']),
+            'name'     => $name,
+            'category' => self::TYPES[$name],
         ];
     }
 

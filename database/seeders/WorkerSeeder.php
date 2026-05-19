@@ -16,31 +16,29 @@ class WorkerSeeder extends Seeder
         $workerRole = Role::where('name', 'worker')->firstOrFail();
         $teams      = Team::all();
 
-        if ($teams->isEmpty()) {
-            return;
-        }
+        if ($teams->isEmpty()) return;
 
         $workers = [
-            ['first_name' => 'António',   'last_name' => 'Silva'],
-            ['first_name' => 'Pedro',     'last_name' => 'Santos'],
-            ['first_name' => 'João',      'last_name' => 'Oliveira'],
-            ['first_name' => 'José',      'last_name' => 'Ferreira'],
-            ['first_name' => 'Miguel',    'last_name' => 'Costa'],
-            ['first_name' => 'Rosa',      'last_name' => 'Gonçalves'],
-            ['first_name' => 'Rui',       'last_name' => 'Martins'],
-            ['first_name' => 'Mariana',   'last_name' => 'Alves'],
-            ['first_name' => 'Paulo',     'last_name' => 'Ribeiro'],
-            ['first_name' => 'Conceição', 'last_name' => 'Teixeira'],
-            ['first_name' => 'Luís',      'last_name' => 'Fonseca'],
-            ['first_name' => 'Carla',     'last_name' => 'Neves'],
-            ['first_name' => 'André',     'last_name' => 'Pinto'],
-            ['first_name' => 'Teresa',    'last_name' => 'Araújo'],
-            ['first_name' => 'Nuno',      'last_name' => 'Almeida'],
-            ['first_name' => 'Sandra',    'last_name' => 'Rodrigues'],
-            ['first_name' => 'Hélder',    'last_name' => 'Gomes'],
-            ['first_name' => 'Patrícia',  'last_name' => 'Guimarães'],
-            ['first_name' => 'Ricardo',   'last_name' => 'Vieira'],
-            ['first_name' => 'Mónica',    'last_name' => 'Barbosa'],
+            ['first_name' => 'Manuel',    'last_name' => 'Oliveira',     'cost' => 12.50],
+            ['first_name' => 'Francisco', 'last_name' => 'Silva',        'cost' => 14.00],
+            ['first_name' => 'José',      'last_name' => 'Santos',       'cost' => 11.50],
+            ['first_name' => 'Joaquim',   'last_name' => 'Fernandes',    'cost' => 15.00],
+            ['first_name' => 'Fernando',  'last_name' => 'Pinto',        'cost' => 13.00],
+            ['first_name' => 'Américo',   'last_name' => 'Neves',        'cost' => 12.00],
+            ['first_name' => 'Augusto',   'last_name' => 'Mendes',       'cost' => 16.00],
+            ['first_name' => 'Carlos',    'last_name' => 'Coelho',       'cost' => 14.50],
+            ['first_name' => 'Domingos',  'last_name' => 'Simões',       'cost' => 13.50],
+            ['first_name' => 'Vítor',     'last_name' => 'Cardoso',      'cost' => 11.00],
+            ['first_name' => 'Rogério',   'last_name' => 'Azevedo',      'cost' => 15.50],
+            ['first_name' => 'Adelino',   'last_name' => 'Magalhães',    'cost' => 14.00],
+            ['first_name' => 'Alcino',    'last_name' => 'Barbosa',      'cost' => 12.00],
+            ['first_name' => 'Armindo',   'last_name' => 'Fonseca',      'cost' => 16.50],
+            ['first_name' => 'Jorge',     'last_name' => 'Matos',        'cost' => 13.00],
+            ['first_name' => 'Horácio',   'last_name' => 'Araújo',       'cost' => 14.50],
+            ['first_name' => 'Aníbal',    'last_name' => 'Nunes',        'cost' => 15.00],
+            ['first_name' => 'Celestino', 'last_name' => 'Guerra',       'cost' => 12.50],
+            ['first_name' => 'Duarte',    'last_name' => 'Macedo',       'cost' => 13.50],
+            ['first_name' => 'Ernesto',   'last_name' => 'Cruz',         'cost' => 11.00],
         ];
 
         $idx = 0;
@@ -48,12 +46,12 @@ class WorkerSeeder extends Seeder
             for ($i = 0; $i < 3 && $idx < count($workers); $i++, $idx++) {
                 $w = $workers[$idx];
                 $email = strtolower($w['first_name']) . '.' . strtolower($w['last_name'])
-                       . ($idx + 1000) . '@workers.cm.pt';
+                       . '@cm-mangualde.pt';
 
                 $user = User::create([
                     'first_name' => $w['first_name'],
                     'last_name'  => $w['last_name'],
-                    'phone'      => '+3519' . str_pad((string)(10000000 + $idx), 8, '0', STR_PAD_LEFT),
+                    'phone'      => '+351' . (920000000 + $idx),
                     'email'      => $email,
                     'password'   => Hash::make(env('DEV_SEED_PASSWORD', 'password123')),
                     'status'     => 'active',
@@ -61,9 +59,9 @@ class WorkerSeeder extends Seeder
                 $user->roles()->attach($workerRole->id);
 
                 Worker::create([
-                    'user_id' => $user->id,
-                    'team_id' => $team->id,
-                    'cost_per_hour' => 15.00,
+                    'user_id'       => $user->id,
+                    'team_id'       => $team->id,
+                    'cost_per_hour' => $w['cost'],
                 ]);
             }
         }

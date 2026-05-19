@@ -43,7 +43,7 @@ export default function FilterBar({
         setRules([emptyRule(advancedFilterFields)]);
         onAdvancedFiltersChange([], logic);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [advancedFilterFields]);
+    }, [JSON.stringify(advancedFilterFields)]);
 
     const activeRuleCount = rules.filter(
         (r) => r.field && r.operator && (NO_VALUE_OPS.has(r.operator) || r.value)

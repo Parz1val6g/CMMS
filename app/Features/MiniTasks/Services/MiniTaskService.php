@@ -26,6 +26,8 @@ class MiniTaskService
                 'task_id'      => $data['task_id'],
                 'supervisor_id'=> $supervisorId,
                 'description'  => InputSanitizer::sanitize($data['description']),
+                'start_date'   => $data['start_date'] ?? null,
+                'end_date'     => $data['end_date'] ?? null,
                 'status'       => MiniTaskStatus::PENDING->value,
             ]);
 
@@ -36,6 +38,13 @@ class MiniTaskService
                 $materialsSync = [];
                 foreach ($data['materials'] as $material) {
                     $materialsSync[$material['material_id']] = ['planned_quantity' => $material['planned_quantity']];
+                }
+                $miniTask->materials()->sync($materialsSync);
+            } elseif (!empty($data['material_ids'])) {
+                // Simple multiselect (no planned quantity)
+                $materialsSync = [];
+                foreach ($data['material_ids'] as $materialId) {
+                    $materialsSync[$materialId] = ['planned_quantity' => 1];
                 }
                 $miniTask->materials()->sync($materialsSync);
             }

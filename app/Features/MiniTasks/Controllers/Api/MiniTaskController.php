@@ -24,7 +24,7 @@ class MiniTaskController extends Controller
     {
         Gate::authorize('viewAny', MiniTask::class);
 
-        $base = MiniTask::with(['task.serviceOrder', 'supervisor', 'workers.user', 'teams', 'materials.unit']);
+        $base = MiniTask::with(['task.serviceOrder', 'supervisor', 'workers.user', 'teams', 'materials.unit', 'equipment']);
 
         if ($request->filled('task_id')) {
             $request->validate(['task_id' => 'exists:tasks,id']);
@@ -52,7 +52,7 @@ class MiniTaskController extends Controller
 
         $supervisorId = $request->user()->id;
         $miniTask = $this->miniTaskService->create($request->validated(), $supervisorId);
-        $miniTask->load(['supervisor', 'workers.user', 'teams', 'materials.unit']);
+        $miniTask->load(['supervisor', 'workers.user', 'teams', 'materials.unit', 'equipment']);
         return new MiniTaskResource($miniTask);
     }
 
@@ -60,7 +60,7 @@ class MiniTaskController extends Controller
     {
         Gate::authorize('view', $miniTask);
 
-        $miniTask->load(['supervisor', 'workers.user', 'teams', 'materials.unit', 'task', 'workLogs']);
+        $miniTask->load(['supervisor', 'workers.user', 'teams', 'materials.unit', 'equipment', 'task', 'workLogs']);
         return new MiniTaskResource($miniTask);
     }
 
@@ -74,10 +74,12 @@ class MiniTaskController extends Controller
 
         $data = $request->validate([
             'description' => ['sometimes', 'string', 'max:250'],
+            'start_date'  => ['sometimes', 'nullable', 'date'],
+            'end_date'    => ['sometimes', 'nullable', 'date', 'after_or_equal:start_date'],
         ]);
 
         $miniTask->update($data);
-        $miniTask->load(['supervisor', 'workers.user', 'teams', 'materials.unit']);
+        $miniTask->load(['supervisor', 'workers.user', 'teams', 'materials.unit', 'equipment']);
 
         return new MiniTaskResource($miniTask);
     }
@@ -87,7 +89,7 @@ class MiniTaskController extends Controller
         Gate::authorize('complete', $miniTask);
 
         $completedMiniTask = $this->miniTaskService->complete($miniTask);
-        $completedMiniTask->load(['supervisor', 'workers.user', 'teams', 'materials.unit']);
+        $completedMiniTask->load(['supervisor', 'workers.user', 'teams', 'materials.unit', 'equipment']);
         return new MiniTaskResource($completedMiniTask);
     }
 }

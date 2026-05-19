@@ -3,44 +3,42 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class MaterialSeeder extends Seeder
 {
     public function run(): void
     {
-        $unitKg = DB::table('units')->where('abbreviation', 'kg')->first();
-        $unitM2 = DB::table('units')->where('abbreviation', 'm²')->first();
-        $unitM3 = DB::table('units')->where('abbreviation', 'm³')->first();
-        $unitL = DB::table('units')->where('abbreviation', 'l')->first();
-        $unitUn = DB::table('units')->where('abbreviation', 'un')->first();
-        $unitML = DB::table('units')->where('abbreviation', 'ml')->first();
+        $units = DB::table('units')->pluck('id', 'name');
 
         $materials = [
-            ['name' => 'Cimento', 'unit_id' => $unitKg->id, 'stock_quantity' => 500],
-            ['name' => 'Areia Fina', 'unit_id' => $unitM3->id, 'stock_quantity' => 50],
-            ['name' => 'Brita', 'unit_id' => $unitM3->id, 'stock_quantity' => 75],
-            ['name' => 'Asfalto', 'unit_id' => $unitKg->id, 'stock_quantity' => 1000],
-            ['name' => 'Tinta Branca', 'unit_id' => $unitL->id, 'stock_quantity' => 100],
-            ['name' => 'Tinta Vermelha', 'unit_id' => $unitL->id, 'stock_quantity' => 50],
-            ['name' => 'Tubo de PVC', 'unit_id' => $unitML->id, 'stock_quantity' => 200],
-            ['name' => 'Condutor Elétrico', 'unit_id' => $unitML->id, 'stock_quantity' => 500],
-            ['name' => 'Placas de Betão', 'unit_id' => $unitM2->id, 'stock_quantity' => 1000],
-            ['name' => 'Calçada', 'unit_id' => $unitM2->id, 'stock_quantity' => 200],
-            ['name' => 'Borracha', 'unit_id' => $unitKg->id, 'stock_quantity' => 100],
-            ['name' => 'Parafusos Inox', 'unit_id' => $unitKg->id, 'stock_quantity' => 50],
-            ['name' => 'Chapa Metálica', 'unit_id' => $unitM2->id, 'stock_quantity' => 30],
-            ['name' => 'Adesivo de Betão', 'unit_id' => $unitL->id, 'stock_quantity' => 25],
-            ['name' => 'Verniz Protetor', 'unit_id' => $unitL->id, 'stock_quantity' => 40],
+            ['name' => 'Cimento Portland CEM II 32,5N',   'unit' => 'Quilograma',    'stock' => 800],
+            ['name' => 'Areia de Rio Lavada',              'unit' => 'Metro Cúbico',   'stock' => 60],
+            ['name' => 'Brita Calcária 12/25 mm',          'unit' => 'Metro Cúbico',   'stock' => 80],
+            ['name' => 'Betão Betuminoso a Quente AC14',   'unit' => 'Quilograma',    'stock' => 1500],
+            ['name' => 'Calçada de Granito 11x11 cm',      'unit' => 'Metro Quadrado', 'stock' => 250],
+            ['name' => 'Tubo de PVC Corrugado DN200',      'unit' => 'Metro Linear',   'stock' => 300],
+            ['name' => 'Tubo de PEAD DN90 PN10',           'unit' => 'Metro Linear',   'stock' => 200],
+            ['name' => 'Condutor Elétrico Cu 4mm²',        'unit' => 'Metro Linear',   'stock' => 500],
+            ['name' => 'Luminária LED 150W IP66',          'unit' => 'Unidade',        'stock' => 30],
+            ['name' => 'Sinal de Trânsito Vertical 60cm',  'unit' => 'Unidade',        'stock' => 20],
+            ['name' => 'Tinta de Sinalização Branca 25kg', 'unit' => 'Quilograma',    'stock' => 100],
+            ['name' => 'Barreira de Segurança Plástica',   'unit' => 'Unidade',        'stock' => 50],
+            ['name' => 'Geotêxtil Não-Tecido 200g/m²',     'unit' => 'Metro Quadrado', 'stock' => 500],
+            ['name' => 'Argamassa de Reparação Estrutural', 'unit' => 'Quilograma',    'stock' => 60],
+            ['name' => 'Lajeta de Betão 40x40x5 cm',       'unit' => 'Metro Quadrado', 'stock' => 200],
         ];
 
-        foreach ($materials as $material) {
+        foreach ($materials as $mat) {
+            $unitId = $units[$mat['unit']] ?? null;
+            if (!$unitId) continue;
+
             DB::table('materials')->insert([
-                'id' => Str::uuid(),
-                'name' => $material['name'],
-                'unit_id' => $material['unit_id'],
-                'stock_quantity' => $material['stock_quantity'],
+                'id'         => Str::uuid(),
+                'name'       => $mat['name'],
+                'unit_id'    => $unitId,
+                'stock_quantity' => $mat['stock'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

@@ -15,3 +15,10 @@ Schedule::command('app:reconcile-equipment-status', ['--no-interaction'])
     ->dailyAt('03:00')
     ->withoutOverlapping()
     ->runInBackground();
+
+Artisan::command('loan-orders:import-existing {--dry-run : Show what would be imported without writing}', function () {
+    /** @phpstan-ignore-next-line */
+    $this->call(\App\Features\LoanOrders\Console\ImportExistingLoanOrders::class, [
+        '--dry-run' => $this->option('dry-run'),
+    ]);
+})->purpose('Migrate existing loan ServiceOrders into the LoanOrders table');

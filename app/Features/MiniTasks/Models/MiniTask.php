@@ -28,10 +28,14 @@ class MiniTask extends Model
         'task_id',
         'supervisor_id',
         'description',
+        'start_date',
+        'end_date',
         'status',
     ];
     protected $casts = [
         'status' => MiniTaskStatus::class,
+        'start_date' => 'date:Y-m-d',
+        'end_date' => 'date:Y-m-d',
     ];
     public function task() { return $this->belongsTo(Task::class); }
     public function supervisor() { return $this->belongsTo(User::class, 'supervisor_id'); }
@@ -59,5 +63,5 @@ class MiniTask extends Model
     }
 
     public function workLogs() { return $this->hasMany(WorkLog::class); }
-    public function attachments() { return $this->hasMany(Attachment::class); }
+    public function attachments() { return $this->morphMany(Attachment::class, 'attachable'); }
 }

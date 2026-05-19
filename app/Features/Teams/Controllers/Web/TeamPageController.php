@@ -17,7 +17,7 @@ class TeamPageController extends Controller
 
         $user = $request->user();
 
-        $teams = Team::with(['sector'])
+        $teams = Team::with(['sector', 'responsible'])
             ->when(
                 !$user->isAdmin() && $user->roles()->where('name', 'sector_manager')->exists(),
                 fn($q) => $q->whereIn('sector_id', $user->headedSectors()->pluck('id'))
@@ -39,6 +39,7 @@ class TeamPageController extends Controller
                 'id' => $t->id,
                 'name' => $t->name,
                 'sector' => $t->sector ? ['id' => $t->sector->id, 'name' => $t->sector->name] : null,
+                'responsible' => $t->responsible ? ['id' => $t->responsible->id, 'name' => $t->responsible->first_name . ' ' . $t->responsible->last_name] : null,
                 'created_at' => $t->created_at->format('Y-m-d'),
             ]);
 
@@ -50,6 +51,7 @@ class TeamPageController extends Controller
             'columns' => [
                 ['key' => 'name', 'label' => 'Nome', 'sortable' => true],
                 ['key' => 'sector', 'label' => 'Setor'],
+                ['key' => 'responsible', 'label' => 'Responsável'],
                 ['key' => 'created_at', 'label' => 'Criado', 'sortable' => true],
             ],
             'formSchema' => $updateSchema->toArray(),

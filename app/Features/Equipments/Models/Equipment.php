@@ -98,6 +98,17 @@ class Equipment extends Model
     }
 
     /**
+     * Loan orders that involve this equipment (new loan module).
+     */
+    public function loanOrders(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            \App\Features\LoanOrders\Models\LoanOrder::class,
+            'equipment_loan_order'
+        )->withTimestamps();
+    }
+
+    /**
      * Equipment type (vehicle, general, etc.)
      */
     public function equipmentType(): BelongsTo

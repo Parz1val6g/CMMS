@@ -1,4 +1,5 @@
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
+import { t } from '@/utils/i18n';
 
 function Field({ label, children }) {
     return (
@@ -11,22 +12,22 @@ function Field({ label, children }) {
 
 function StatusBadge({ status }) {
     const map = {
-        pending:     'bg-slate-700 text-brand-mid',
+        pending:     'bg-brand-light text-brand-mid',
         in_progress: 'bg-brand-accent/15 text-brand-accent',
         completed:   'bg-emerald-900/60 text-emerald-300',
         blocked:     'bg-red-900/60 text-red-300',
-        cancelled:   'bg-zinc-800 text-zinc-400',
+        cancelled:   'bg-brand-mid/10 text-brand-mid',
     };
     const labels = {
-        pending:     'Pendente',
-        in_progress: 'Em Progresso',
-        completed:   'Concluído',
-        blocked:     'Bloqueado',
-        cancelled:   'Cancelado',
+        pending:     t('pages.mini_tasks.drawer.status_pending'),
+        in_progress: t('pages.mini_tasks.drawer.status_in_progress'),
+        completed:   t('pages.mini_tasks.drawer.status_completed'),
+        blocked:     t('pages.mini_tasks.drawer.status_blocked'),
+        cancelled:   t('pages.mini_tasks.drawer.status_cancelled'),
     };
     const key = status?.value ?? status;
     return (
-        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${map[key] ?? 'bg-slate-700 text-brand-mid'}`}>
+        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${map[key] ?? 'bg-brand-light text-brand-mid'}`}>
             {labels[key] ?? status?.label ?? status ?? '—'}
         </span>
     );
@@ -40,6 +41,11 @@ function SectionTitle({ children }) {
     );
 }
 
+function formatDate(dateStr) {
+    if (!dateStr) return null;
+    return new Date(dateStr + 'T00:00:00').toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
 function GeneralTab({ item }) {
     const createdAt = item.created_at
         ? new Date(item.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -47,23 +53,29 @@ function GeneralTab({ item }) {
 
     return (
         <div className="grid grid-cols-2 gap-6">
-            <Field label="Referência">
-                <span className="font-mono text-brand-accent">{item.reference}</span>
+            <Field label={t('pages.mini_tasks.drawer.field_reference')}>
+                <span className="font-mono text-indigo-400">{item.reference}</span>
             </Field>
-            <Field label="Estado">
+            <Field label={t('pages.mini_tasks.drawer.field_status')}>
                 <StatusBadge status={item.status} />
             </Field>
-            <Field label="Tarefa">
-                <span className="font-mono text-brand-accent">{item.task?.reference ?? null}</span>
+            <Field label={t('pages.mini_tasks.drawer.field_task')}>
+                <span className="font-mono text-indigo-400">{item.task?.reference ?? null}</span>
             </Field>
-            <Field label="Supervisor">
+            <Field label={t('pages.mini_tasks.drawer.field_supervisor')}>
                 {item.supervisor?.name ?? null}
             </Field>
-            <Field label="Criado em">
+            <Field label={t('pages.mini_tasks.drawer.field_start_date')}>
+                {formatDate(item.start_date)}
+            </Field>
+            <Field label={t('pages.mini_tasks.drawer.field_end_date')}>
+                {formatDate(item.end_date)}
+            </Field>
+            <Field label={t('pages.mini_tasks.drawer.field_created_at')}>
                 {createdAt}
             </Field>
             <div className="col-span-2">
-                <Field label="Descrição">
+                <Field label={t('pages.mini_tasks.drawer.field_description')}>
                     {item.description
                         ? <p className="whitespace-pre-wrap leading-relaxed">{item.description}</p>
                         : null}
@@ -77,14 +89,14 @@ function TeamTab({ workers = [], teams = [] }) {
     return (
         <div className="space-y-6">
             <div>
-                <SectionTitle>Trabalhadores</SectionTitle>
+                <SectionTitle>{t('pages.mini_tasks.drawer.section_workers')}</SectionTitle>
                 {workers.length === 0
-                    ? <p className="text-sm text-brand-mid">Nenhum trabalhador atribuído.</p>
+                    ? <p className="text-sm text-brand-mid">{t('pages.mini_tasks.drawer.no_workers')}</p>
                     : (
                         <ul className="space-y-1.5">
                             {workers.map(w => (
                                 <li key={w.id} className="text-sm text-brand-darkest flex items-center gap-2">
-                                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-900/60 text-xs font-medium text-indigo-300">
+                                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand-accent/15 text-xs font-medium text-brand-accent">
                                         {w.name?.charAt(0) ?? '?'}
                                     </span>
                                     {w.name}
@@ -95,9 +107,9 @@ function TeamTab({ workers = [], teams = [] }) {
                 }
             </div>
             <div>
-                <SectionTitle>Equipas</SectionTitle>
+                <SectionTitle>{t('pages.mini_tasks.drawer.section_teams')}</SectionTitle>
                 {teams.length === 0
-                    ? <p className="text-sm text-brand-mid">Nenhuma equipa atribuída.</p>
+                    ? <p className="text-sm text-brand-mid">{t('pages.mini_tasks.drawer.no_teams')}</p>
                     : (
                         <ul className="space-y-1.5">
                             {teams.map(t => (
@@ -111,20 +123,20 @@ function TeamTab({ workers = [], teams = [] }) {
     );
 }
 
-function MaterialsTab({ materials = [] }) {
+function MaterialsTab({ materials = [], equipment = [] }) {
     return (
         <div className="space-y-6">
             <div>
-                <SectionTitle>Materiais Planeados</SectionTitle>
+                <SectionTitle>{t('pages.mini_tasks.drawer.section_materials_planned')}</SectionTitle>
                 {materials.length === 0
-                    ? <p className="text-sm text-brand-mid">Nenhum material planeado.</p>
+                    ? <p className="text-sm text-brand-mid">{t('pages.mini_tasks.drawer.no_materials')}</p>
                     : (
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-brand-mid/20">
-                                    <th className="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wide text-brand-mid">Material</th>
-                                    <th className="pb-2 pr-4 text-right text-xs font-medium uppercase tracking-wide text-brand-mid">Qtd. Planeada</th>
-                                    <th className="pb-2 text-left text-xs font-medium uppercase tracking-wide text-brand-mid">Un.</th>
+                                    <th className="pb-2 pr-4 text-left text-xs font-medium uppercase tracking-wide text-brand-mid">{t('pages.mini_tasks.drawer.th_material')}</th>
+                                    <th className="pb-2 pr-4 text-right text-xs font-medium uppercase tracking-wide text-brand-mid">{t('pages.mini_tasks.drawer.th_planned_qty')}</th>
+                                    <th className="pb-2 text-left text-xs font-medium uppercase tracking-wide text-brand-mid">{t('pages.mini_tasks.drawer.th_unit')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-brand-mid/10">
@@ -141,10 +153,22 @@ function MaterialsTab({ materials = [] }) {
                 }
             </div>
             <div>
-                <SectionTitle>Equipamentos Planeados</SectionTitle>
-                <p className="text-sm text-brand-mid italic">
-                    Planeamento de equipamentos por mini-tarefa ainda não disponível.
-                </p>
+                <SectionTitle>{t('pages.mini_tasks.drawer.section_equipment_planned')}</SectionTitle>
+                {equipment.length === 0
+                    ? <p className="text-sm text-brand-mid">{t('pages.mini_tasks.drawer.no_equipment')}</p>
+                    : (
+                        <ul className="space-y-1.5">
+                            {equipment.map(e => (
+                                <li key={e.id} className="text-sm text-brand-darkest flex items-center gap-2">
+                                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand-mid/20 text-xs font-medium text-brand-mid">
+                                        E
+                                    </span>
+                                    {e.name}
+                                </li>
+                            ))}
+                        </ul>
+                    )
+                }
             </div>
         </div>
     );
@@ -152,9 +176,9 @@ function MaterialsTab({ materials = [] }) {
 
 export default function MiniTaskDrawer({ isOpen, onClose, item, loading }) {
     const tabs = item ? [
-        { id: 'general',   label: 'Geral',      component: <GeneralTab item={item} /> },
-        { id: 'team',      label: 'Equipa',     component: <TeamTab workers={item.workers} teams={item.teams} /> },
-        { id: 'materials', label: 'Materiais',  component: <MaterialsTab materials={item.materials} /> },
+        { id: 'general',   label: t('pages.mini_tasks.drawer.tab_general'),      component: <GeneralTab item={item} /> },
+        { id: 'team',      label: t('pages.mini_tasks.drawer.tab_team'),     component: <TeamTab workers={item.workers} teams={item.teams} /> },
+        { id: 'materials', label: t('pages.mini_tasks.drawer.tab_materials'),  component: <MaterialsTab materials={item.materials} equipment={item.equipment} /> },
     ] : [];
 
     return (
@@ -162,7 +186,7 @@ export default function MiniTaskDrawer({ isOpen, onClose, item, loading }) {
             isOpen={isOpen}
             onClose={onClose}
             title={item?.reference ?? ''}
-            subtitle={loading ? 'A carregar...' : undefined}
+            subtitle={loading ? t('pages.common.loading') : undefined}
             tabs={tabs}
         />
     );

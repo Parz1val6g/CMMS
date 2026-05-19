@@ -69,23 +69,54 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::table('equipments', function (Blueprint $table) {
-            $table->dropUnique(['internal_reference']);
-            $table->dropUnique(['license_plate']);
-            $table->dropIndex(['counting_type_id']);
-            $table->dropIndex(['equipment_type_id']);
+        try {
+            Schema::table('equipments', function (Blueprint $table) {
+                $table->dropForeign(['counting_type_id']);
+            });
+        } catch (\Throwable) {}
 
-            if (!Schema::hasColumn('equipments', 'revision_interval_days')) {
+        try {
+            Schema::table('equipments', function (Blueprint $table) {
+                $table->dropUnique(['internal_reference']);
+            });
+        } catch (\Throwable) {}
+
+        try {
+            Schema::table('equipments', function (Blueprint $table) {
+                $table->dropUnique(['license_plate']);
+            });
+        } catch (\Throwable) {}
+
+        try {
+            Schema::table('equipments', function (Blueprint $table) {
+                $table->dropIndex(['counting_type_id']);
+            });
+        } catch (\Throwable) {}
+
+        try {
+            Schema::table('equipments', function (Blueprint $table) {
+                $table->dropIndex(['equipment_type_id']);
+            });
+        } catch (\Throwable) {}
+
+        if (!Schema::hasColumn('equipments', 'revision_interval_days')) {
+            Schema::table('equipments', function (Blueprint $table) {
                 $table->integer('revision_interval_days')->nullable();
-            }
+            });
+        }
 
-            $table->dropColumn([
-                'revision_interval',
-                'counting_type_id',
-                'inspection_date',
-                'manufacturing_year',
-                'internal_reference',
-            ]);
-        });
+        $dropCols = [];
+        foreach (['revision_interval', 'counting_type_id', 'inspection_date', 'manufacturing_year', 'internal_reference'] as $col) {
+            if (Schema::hasColumn('equipments', $col)) {
+                $dropCols[] = $col;
+            }
+        }
+        if (!empty($dropCols)) {
+            try {
+                Schema::table('equipments', function (Blueprint $table) use ($dropCols) {
+                    $table->dropColumn($dropCols);
+                });
+            } catch (\Throwable) {}
+        }
     }
 };

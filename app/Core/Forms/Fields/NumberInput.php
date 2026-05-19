@@ -6,25 +6,47 @@ use App\Core\Forms\FormField;
 class NumberInput extends FormField
 {
     protected ?string $type = 'number';
+    protected ?float $min = null;
+    protected ?float $max = null;
+    protected ?float $step = null;
 
     public function __construct(string $key)
     {
         parent::__construct($key);
-        // Sensible defaults for number fields
-        $this->validationTiming = 'blur'; // Validate on blur only
+        $this->validationTiming = 'blur';
     }
 
-    /**
-     * Set min and max constraints via metadata.
-     */
-    public function range(?int $min = null, ?int $max = null): static
+    public function min(float $min): static
     {
-        if ($min !== null) {
-            $this->meta('min', $min);
-        }
-        if ($max !== null) {
-            $this->meta('max', $max);
-        }
+        $this->min = $min;
         return $this;
+    }
+
+    public function max(float $max): static
+    {
+        $this->max = $max;
+        return $this;
+    }
+
+    public function step(float $step): static
+    {
+        $this->step = $step;
+        return $this;
+    }
+
+    public function range(?float $min = null, ?float $max = null): static
+    {
+        if ($min !== null) $this->min = $min;
+        if ($max !== null) $this->max = $max;
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        $data = parent::toArray();
+        if ($this->min !== null) $data['min'] = $this->min;
+        if ($this->max !== null) $data['max'] = $this->max;
+        if ($this->step !== null) $data['step'] = $this->step;
+        return $data;
     }
 }

@@ -24,7 +24,8 @@ class User extends Authenticatable
         'phone',
         'email',
         'password',
-        'status'
+        'status',
+        'locale',
     ];
 
     protected $hidden = [
@@ -62,6 +63,11 @@ class User extends Authenticatable
     public function clientProfile()
     {
         return $this->hasOne(Client::class);
+    }
+
+    public function entityProfile()
+    {
+        return $this->hasOne(\App\Features\Entities\Models\Entity::class);
     }
 
     public function worker()

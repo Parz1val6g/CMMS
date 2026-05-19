@@ -47,6 +47,9 @@ export default function FormInput({
                 required={required}
                 className={baseInputClass}
                 placeholder={field?.placeholder || fieldConfig?.placeholder}
+                step={field?.step ?? fieldConfig?.step ?? undefined}
+                min={field?.min ?? fieldConfig?.min ?? undefined}
+                max={field?.max ?? fieldConfig?.max ?? undefined}
             />
 
             {serverError && (
