@@ -142,6 +142,80 @@ class LoanOrderFormSchema
             );
     }
 
+    public static function entityCreate(): FormSchema
+    {
+        $equipmentOpts = self::equipmentOptions();
+
+        return FormSchema::make(__('forms.loan_orders.create_title'))
+            ->setColumns(2)
+            ->field(
+                SectionHeader::make('section-address')
+                    ->setLabel(__('forms.loan_orders.section_address'))
+                    ->setColumn(1)
+            )
+            ->field(
+                SelectInput::make('parish_id')
+                    ->setLabel(__('forms.loan_orders.parish'))
+                    ->helperText(__('forms.loan_orders.parish_helper'))
+                    ->setOptions(self::parishOptions())
+                    ->setColumn(1)
+                    ->setRules('nullable|exists:parishes,id')
+            )
+            ->field(
+                TextInput::make('street')
+                    ->setLabel(__('forms.loan_orders.street'))
+                    ->setColumn(1)
+                    ->setRules('nullable|string|max:255')
+            )
+            ->field(
+                TextInput::make('postal_code')
+                    ->setLabel(__('forms.loan_orders.postal_code'))
+                    ->setColumn(1)
+                    ->setRules('nullable|string|max:20')
+            )
+            ->field(
+                SectionHeader::make('section-equipment')
+                    ->setLabel(__('forms.loan_orders.section_equipment'))
+                    ->setColSpan(2)
+            )
+            ->field(
+                RepeaterInput::make('equipments')
+                    ->setColSpan(2)
+                    ->setMaxItems(5)
+                    ->meta('itemColumns', 4)
+                    ->subFields([
+                        SelectInput::make('equipment_id')
+                            ->setLabel(__('forms.loan_orders.equipment'))
+                            ->setOptions($equipmentOpts)
+                            ->setRequired(true)
+                            ->setRules('required|uuid|exists:equipments,id'),
+                        TextInput::make('start_date')
+                            ->setLabel(__('forms.loan_orders.start_date'))
+                            ->setType('date')
+                            ->setRules('nullable|date'),
+                        TextInput::make('end_date')
+                            ->setLabel(__('forms.loan_orders.end_date'))
+                            ->setType('date')
+                            ->setRules('nullable|date|after_or_equal:start_date'),
+                        ToggleInput::make('needs_operator')
+                            ->setLabel(__('forms.loan_orders.needs_operator'))
+                            ->setRules('nullable|boolean'),
+                    ])
+            )
+            ->field(
+                SectionHeader::make('section-description')
+                    ->setLabel(__('forms.loan_orders.section_description'))
+                    ->setColSpan(2)
+            )
+            ->field(
+                TextAreaInput::make('description')
+                    ->setLabel(__('forms.loan_orders.description'))
+                    ->helperText(__('forms.loan_orders.description_helper'))
+                    ->setRows(3)
+                    ->setRules('nullable|string|max:2000')
+            );
+    }
+
     public static function update(): FormSchema
     {
         return FormSchema::make(__('forms.loan_orders.edit_title'))

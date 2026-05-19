@@ -15,6 +15,9 @@ export const STATUS_LABELS = {
     // WorkLog specific
     approved:    'Aprovado',
     rejected:    'Rejeitado',
+    // LoanOrder specific
+    checked_out: 'Em Empréstimo',
+    returned:    'Devolvido',
     // Equipment
     active:              'Ativo',
     in_use:              'Em Uso',
@@ -63,6 +66,8 @@ const STATUS_VARIANT = {
   pending: 'warning', in_progress: 'info', completed: 'success',
   cancelled: 'danger', canceled: 'danger', done: 'success',
   finished: 'success', active: 'info',
+  // LoanOrder statuses
+  approved: 'info', checked_out: 'teal', returned: 'success',
   // Equipment statuses
   in_use: 'info', maintenance_pending: 'warning', under_maintenance: 'warning',
   broken: 'danger', under_repair: 'danger', inactive: 'neutral', retired: 'neutral',

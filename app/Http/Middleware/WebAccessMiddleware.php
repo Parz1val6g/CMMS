@@ -19,6 +19,11 @@ class WebAccessMiddleware
             return $next($request);
         }
 
+        // Entity users go to their own portal — allow through
+        if ($user->isEntity()) {
+            return $next($request);
+        }
+
         // Roles blocked from web access
         $blockedRoles = ['worker', 'client'];
 

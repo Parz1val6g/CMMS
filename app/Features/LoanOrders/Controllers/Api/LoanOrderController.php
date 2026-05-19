@@ -30,7 +30,10 @@ class LoanOrderController extends Controller
         $user = $request->user();
 
         $orders = LoanOrder::with(['entity', 'manager', 'location', 'equipments', 'tasks'])
-            ->when(!$user->isAdmin(), fn($q) => $q->where('manager_id', $user->id))
+            ->when($user->isEntity(), fn($q) =>
+                $q->whereHas('entity', fn($eq) => $eq->where('user_id', $user->id))
+            )
+            ->when(!$user->isAdmin() && !$user->isEntity(), fn($q) => $q->where('manager_id', $user->id))
             ->latest()
             ->paginate(15);
 
@@ -41,8 +44,18 @@ class LoanOrderController extends Controller
     {
         Gate::authorize('create', LoanOrder::class);
 
-        $managerId = $request->validated('manager_id');
-        $loanOrder = $this->loanOrderService->create($request->validated(), $managerId);
+        $data = $request->validated();
+
+        // Entity users: auto-fill their own entity_id
+        if ($request->user()->isEntity() && empty($data['entity_id'])) {
+            $entity = $request->user()->entityProfile;
+            if ($entity) {
+                $data['entity_id'] = $entity->id;
+            }
+        }
+
+        $managerId = $data['manager_id'] ?? null;
+        $loanOrder = $this->loanOrderService->create($data, $managerId);
 
         $loanOrder->load(['entity', 'manager', 'location', 'equipments', 'tasks']);
 
