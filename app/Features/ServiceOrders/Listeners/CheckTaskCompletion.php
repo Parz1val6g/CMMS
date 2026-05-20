@@ -5,20 +5,21 @@ namespace App\Features\ServiceOrders\Listeners;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Enums\TaskStatus;
 use App\Core\Enums\WorkflowType;
+use App\Core\Services\TransactionHandler;
+use App\Features\Notifications\Services\NotificationService;
 use App\Features\Tasks\Events\TaskCompletedEvent;
-use App\Features\ServiceOrders\Services\ServiceOrderService;
 
 class CheckTaskCompletion
 {
     public function __construct(
-        private ServiceOrderService $serviceOrderService
+        private TransactionHandler $transactions,
+        private NotificationService $notificationService
     ) {}
 
     public function handle(TaskCompletedEvent $event): void
     {
         $serviceOrder = $event->task->serviceOrder;
 
-        // Loan guard: don't close SO if Task 2 ("Devolução") doesn't exist yet
         if ($serviceOrder->workflow_type === WorkflowType::LOAN->value) {
             $hasTask2 = $serviceOrder->tasks()
                 ->where('name', 'Devolução de Equipamento')
@@ -33,7 +34,16 @@ class CheckTaskCompletion
             ->exists();
 
         if (!$hasIncompleteTasks) {
-            $this->serviceOrderService->complete($serviceOrder);
+            $this->transactions->execute(function () use ($serviceOrder) {
+                $serviceOrder->update(['status' => ServiceOrderStatus::AWAITING_APPROVAL->value]);
+            });
+
+            $this->notificationService->create(
+                $serviceOrder->manager_id,
+                __('notifications.service_order.awaiting_approval.title'),
+                __('notifications.service_order.awaiting_approval.message', ['process' => $serviceOrder->process]),
+                'service_order_awaiting_approval'
+            );
         }
     }
 }

@@ -6,6 +6,7 @@
 export const STATUS_LABELS = {
     // ServiceOrder / Task / MiniTask / WorkLog
     pending:     'Pendente',
+    awaiting_approval: 'A Aguardar Aprovação',
     in_progress: 'Em Progresso',
     completed:   'Concluído',
     cancelled:   'Cancelado',
@@ -63,9 +64,9 @@ const BADGE_VARIANT = {
 
 /** Business value → semantic variant mapping */
 const STATUS_VARIANT = {
-  pending: 'warning', in_progress: 'info', completed: 'success',
-  cancelled: 'danger', canceled: 'danger', done: 'success',
-  finished: 'success', active: 'info',
+  pending: 'warning', awaiting_approval: 'urgent', in_progress: 'info',
+  completed: 'success', cancelled: 'danger', canceled: 'danger',
+  done: 'success', finished: 'success', active: 'info',
   // LoanOrder statuses
   approved: 'info', checked_out: 'teal', returned: 'success',
   // Equipment statuses
