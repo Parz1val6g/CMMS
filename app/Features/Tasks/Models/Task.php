@@ -9,6 +9,7 @@ use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Shared\Models\User;
 use App\Features\Sectors\Models\Sector;
 use App\Features\MiniTasks\Models\MiniTask;
+use App\Features\Tasks\Models\TaskRejection;
 
 class Task extends Model
 {
@@ -62,5 +63,10 @@ class Task extends Model
     public function miniTasks()
     {
         return $this->hasMany(MiniTask::class);
+    }
+
+    public function rejections()
+    {
+        return $this->hasMany(TaskRejection::class);
     }
 }

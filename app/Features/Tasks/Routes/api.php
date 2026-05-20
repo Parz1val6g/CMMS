@@ -10,5 +10,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/{task}', [TaskController::class, 'update']);
     Route::post('/{task}/cancel', [TaskController::class, 'cancel']);
     Route::post('/{task}/complete', [TaskController::class, 'complete']);
+    Route::post('/{task}/reject', [TaskController::class, 'reject']);
+    Route::get('/{task}/rejections', [TaskController::class, 'rejections']);
     Route::delete('/{task}', [TaskController::class, 'destroy']);
 });

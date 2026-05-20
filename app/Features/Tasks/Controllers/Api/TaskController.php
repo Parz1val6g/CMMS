@@ -4,8 +4,10 @@ namespace App\Features\Tasks\Controllers\Api;
 
 use App\Core\Services\FilterService;
 use App\Features\Tasks\Models\Task;
+use App\Features\Tasks\Requests\RejectTaskRequest;
 use App\Features\Tasks\Requests\StoreTaskRequest;
 use App\Features\Tasks\Requests\UpdateTaskRequest;
+use App\Features\Tasks\Resources\TaskRejectionResource;
 use App\Features\Tasks\Resources\TaskResource;
 use App\Features\Tasks\Services\TaskService;
 use Illuminate\Http\JsonResponse;
@@ -117,5 +119,30 @@ class TaskController extends Controller
         $completedTask = $this->taskService->complete($task);
         $completedTask->load(['sectors', 'manager']);
         return new TaskResource($completedTask);
+    }
+
+    public function reject(RejectTaskRequest $request, Task $task): TaskResource
+    {
+        Gate::authorize('reject', $task);
+
+        $rejectedTask = $this->taskService->reject(
+            $task,
+            $request->user(),
+            $request->validated('reason')
+        );
+        $rejectedTask->load(['sectors', 'manager']);
+        return new TaskResource($rejectedTask);
+    }
+
+    public function rejections(Task $task): AnonymousResourceCollection
+    {
+        Gate::authorize('view', $task);
+
+        $rejections = $task->rejections()
+            ->with('rejectedBy')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return TaskRejectionResource::collection($rejections);
     }
 }

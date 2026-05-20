@@ -30,6 +30,8 @@ return [
             'new_order_message' => 'Service Order :process has been created and assigned to you.',
             'task_awaiting_approval_title' => 'Task :reference requires approval',
             'task_awaiting_approval_body' => 'All mini-tasks have been completed. Please review and approve this task.',
+            'task_rejected_title' => 'Task :reference was rejected',
+            'task_rejected_body' => 'The task was rejected. Reason: :reason',
         ],
         'ticket' => [
             'cannot_update_terminal' => 'Cannot update a converted or cancelled ticket.',
