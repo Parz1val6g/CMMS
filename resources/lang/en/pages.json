@@ -541,7 +541,19 @@
             "status_completed": "Completed",
             "status_blocked": "Blocked",
             "status_cancelled": "Cancelled",
-            "btn_complete": "Complete Task"
+            "btn_complete": "Complete Task",
+            "btn_reject": "Reject",
+            "btn_rejecting": "Rejecting...",
+            "tab_rejections": "Rejections",
+            "reject_title": "Reject Task",
+            "reject_description": "Provide a reason for rejecting this task. The task will return to In Progress.",
+            "reject_reason_label": "Reason",
+            "reject_reason_placeholder": "Explain why the task needs rework...",
+            "th_date": "Date",
+            "th_rejected_by": "Rejected by",
+            "th_reason": "Reason",
+            "no_rejections": "No rejections recorded.",
+            "reject_error": "Failed to reject task. Please try again."
         }
     },
     "mini_tasks": {

@@ -30,6 +30,8 @@ return [
             'new_order_message' => 'A Ordem de Serviço :process foi criada e atribuída a si.',
             'task_awaiting_approval_title' => 'Tarefa :reference aguarda aprovação',
             'task_awaiting_approval_body' => 'Todas as mini-tarefas foram concluídas. Por favor, reveja e aprove esta tarefa.',
+            'task_rejected_title' => 'Tarefa :reference foi rejeitada',
+            'task_rejected_body' => 'A tarefa foi rejeitada. Motivo: :reason',
         ],
         'ticket' => [
             'cannot_update_terminal' => 'Não é possível atualizar um ticket convertido ou cancelado.',
