@@ -57,8 +57,12 @@ class TaskService
     }
     public function complete(Task $task): Task
     {
-        if ($task->status === TaskStatus::COMPLETED->value) {
+        if ($task->status === TaskStatus::COMPLETED) {
             return $task; 
+        }
+
+        if ($task->status !== TaskStatus::AWAITING_APPROVAL) {
+            throw new InvalidArgumentException('Task must be in awaiting approval status to complete.');
         }
         
         return $this->transactions->execute(function () use ($task) {

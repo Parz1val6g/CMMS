@@ -536,10 +536,12 @@
             "th_status": "Status",
             "no_mini_tasks": "No mini-tasks associated.",
             "status_pending": "Pending",
+            "status_awaiting_approval": "Awaiting Approval",
             "status_in_progress": "In Progress",
             "status_completed": "Completed",
             "status_blocked": "Blocked",
-            "status_cancelled": "Cancelled"
+            "status_cancelled": "Cancelled",
+            "btn_complete": "Complete Task"
         }
     },
     "mini_tasks": {

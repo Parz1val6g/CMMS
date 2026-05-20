@@ -15,6 +15,7 @@ use App\Core\Enums\WorkLogStatus;
 use App\Core\Enums\TaskStatus;
 use App\Core\Enums\MiniTaskStatus;
 use App\Core\Enums\ServiceOrderStatus;
+use App\Features\Notifications\Models\Notification;
 
 class CascadeCompletionTest extends TestCase
 {
@@ -70,35 +71,35 @@ class CascadeCompletionTest extends TestCase
     }
 
     /**
-     * Test: Complete WorkLog → MiniTask auto-completes (if all WorkLogs done)
-     * Triggers: WorkLogCompletedEvent → CheckWorkLogsCompletion listener
+     * Test: Complete WorkLog → MiniTask auto-completes → Task moves to AWAITING_APPROVAL
+     * Triggers: WorkLogCompletedEvent → CheckWorkLogsCompletion → MiniTaskCompletedEvent → CheckMiniTasksCompletion
      */
-    public function test_worklog_submitted_triggers_cascade_to_completed(): void
+    public function test_worklog_submitted_triggers_task_to_awaiting_approval(): void
     {
-        // Act: Mark worklog as submitted (completed_at set, status = submitted)
         $this->workLog->update([
             'completed_at' => now(),
             'status' => WorkLogStatus::SUBMITTED->value,
         ]);
         \App\Features\WorkLogs\Events\WorkLogCompletedEvent::dispatch($this->workLog);
 
-        // Manager approves the worklog — triggers cascade (listener checks APPROVED)
         $this->workLog->update([
             'status' => WorkLogStatus::APPROVED->value,
         ]);
         \App\Features\WorkLogs\Events\WorkLogCompletedEvent::dispatch($this->workLog);
 
-        // Assert: MiniTask auto-completes
         $this->miniTask->refresh();
         $this->assertEquals(MiniTaskStatus::COMPLETED, $this->miniTask->status);
 
-        // Assert: Task auto-completes
         $this->task->refresh();
-        $this->assertEquals(TaskStatus::COMPLETED, $this->task->status);
+        $this->assertEquals(TaskStatus::AWAITING_APPROVAL, $this->task->status);
 
-        // Assert: ServiceOrder auto-completes
         $this->serviceOrder->refresh();
-        $this->assertEquals(ServiceOrderStatus::COMPLETED, $this->serviceOrder->status);
+        $this->assertNotEquals(ServiceOrderStatus::COMPLETED, $this->serviceOrder->status);
+
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $this->task->manager_id,
+            'type' => 'task_awaiting_approval',
+        ]);
     }
 
     /**
@@ -131,18 +132,16 @@ class CascadeCompletionTest extends TestCase
     }
 
     /**
-     * Test: All WorkLogs completed → Full cascade propagates
+     * Test: All WorkLogs completed → Task moves to AWAITING_APPROVAL
      */
-    public function test_all_worklogs_completed_cascades_fully(): void
+    public function test_all_worklogs_completed_cascades_to_awaiting_approval(): void
     {
-        // Arrange: Create second worklog (no completed_at initially)
         $workLog2 = WorkLog::factory()->create([
             'mini_task_id' => $this->miniTask->id,
             'completed_at' => null,
             'status' => WorkLogStatus::IN_PROGRESS->value,
         ]);
 
-        // Act: Complete and approve both worklogs
         $this->workLog->update([
             'completed_at' => now(),
             'status' => WorkLogStatus::SUBMITTED->value,
@@ -163,14 +162,18 @@ class CascadeCompletionTest extends TestCase
         ]);
         \App\Features\WorkLogs\Events\WorkLogCompletedEvent::dispatch($workLog2);
 
-        // Assert: Full cascade completes
         $this->miniTask->refresh();
         $this->task->refresh();
         $this->serviceOrder->refresh();
 
         $this->assertEquals(MiniTaskStatus::COMPLETED, $this->miniTask->status);
-        $this->assertEquals(TaskStatus::COMPLETED, $this->task->status);
-        $this->assertEquals(ServiceOrderStatus::COMPLETED, $this->serviceOrder->status);
+        $this->assertEquals(TaskStatus::AWAITING_APPROVAL, $this->task->status);
+        $this->assertNotEquals(ServiceOrderStatus::COMPLETED, $this->serviceOrder->status);
+
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $this->task->manager_id,
+            'type' => 'task_awaiting_approval',
+        ]);
     }
 
     /**

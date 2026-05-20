@@ -1,24 +1,29 @@
 <?php
 namespace App\Features\Tasks\Listeners;
 use App\Core\Enums\MiniTaskStatus;
+use App\Core\Enums\TaskStatus;
 use App\Features\MiniTasks\Events\MiniTaskCompletedEvent;
-use App\Features\Tasks\Services\TaskService;
+use App\Features\Notifications\Services\NotificationService;
 class CheckMiniTasksCompletion
 {
     public function __construct(
-        private TaskService $taskService
+        private NotificationService $notificationService
     ) {
     }
     public function handle(MiniTaskCompletedEvent $event): void
     {
         $task = $event->miniTask->task;
-        // Check if there are ANY mini-tasks for this task that are NOT completed
         $hasIncompleteMiniTasks = $task->miniTasks()
             ->where('status', '!=', MiniTaskStatus::COMPLETED->value)
             ->exists();
-        // If none are incomplete, it means ALL are completed! Auto-complete the Task.
         if (!$hasIncompleteMiniTasks) {
-            $this->taskService->complete($task);
+            $task->update(['status' => TaskStatus::AWAITING_APPROVAL->value]);
+            $this->notificationService->create(
+                $task->manager_id,
+                __('messages.services.notifications.task_awaiting_approval_title', ['reference' => $task->reference]),
+                __('messages.services.notifications.task_awaiting_approval_body'),
+                'task_awaiting_approval'
+            );
         }
     }
 }

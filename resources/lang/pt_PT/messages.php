@@ -28,6 +28,8 @@ return [
         'notifications' => [
             'new_order_title' => 'Nova Ordem de Serviço Criada',
             'new_order_message' => 'A Ordem de Serviço :process foi criada e atribuída a si.',
+            'task_awaiting_approval_title' => 'Tarefa :reference aguarda aprovação',
+            'task_awaiting_approval_body' => 'Todas as mini-tarefas foram concluídas. Por favor, reveja e aprove esta tarefa.',
         ],
         'ticket' => [
             'cannot_update_terminal' => 'Não é possível atualizar um ticket convertido ou cancelado.',
