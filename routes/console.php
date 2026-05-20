@@ -9,6 +9,12 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+// Daily notification: alert managers of service orders whose execution date is today
+Schedule::command('app:notify-service-order-start')
+    ->daily()
+    ->withoutOverlapping()
+    ->runInBackground();
+
 // Nightly reconciliation: reset any IN_USE equipment with no active loan order.
 // Catches edge cases that slipped past the service layer (manual DB ops, bugs, etc.)
 Schedule::command('app:reconcile-equipment-status', ['--no-interaction'])
