@@ -43,11 +43,13 @@ class ServiceOrder extends Model
         'status',
         'photo_path',
         'description',
+        'start_notified_at',
     ];
     protected $casts = [
         'execution_date' => 'date',
         'priority' => Priority::class,
         'status' => ServiceOrderStatus::class,
+        'start_notified_at' => 'datetime',
     ];
 
     public function migratedToLoan()
