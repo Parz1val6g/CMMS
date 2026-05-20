@@ -5,8 +5,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/', [ServiceOrderController::class, 'index']);
     Route::post('/', [ServiceOrderController::class, 'store']);
+    Route::post('/{serviceOrder}/activate', [ServiceOrderController::class, 'activate']);
     Route::post('/{serviceOrder}/complete', [ServiceOrderController::class, 'complete']);
-    Route::post('/{serviceOrder}/initiate-return', [ServiceOrderController::class, 'initiateReturn']);
     Route::get('/{serviceOrder}', [ServiceOrderController::class, 'show']);
     Route::put('/{serviceOrder}', [ServiceOrderController::class, 'update']);
     Route::post('/{serviceOrder}/cancel', [ServiceOrderController::class, 'cancel']);

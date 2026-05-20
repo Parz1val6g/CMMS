@@ -6,7 +6,6 @@ use App\Features\ServiceOrders\Requests\StoreServiceOrderRequest;
 use App\Features\ServiceOrders\Requests\UpdateServiceOrderRequest;
 use App\Features\ServiceOrders\Resources\ServiceOrderResource;
 use App\Features\ServiceOrders\Services\ServiceOrderService;
-use App\Features\Tasks\Resources\TaskResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -110,6 +109,15 @@ class ServiceOrderController extends Controller
         return new ServiceOrderResource($cancelledOrder);
     }
 
+    public function activate(ServiceOrder $serviceOrder): ServiceOrderResource
+    {
+        Gate::authorize('activate', $serviceOrder);
+
+        $activatedOrder = $this->serviceOrderService->activate($serviceOrder);
+        $activatedOrder->load(['client.user', 'manager', 'location', 'serviceType', 'sectors']);
+        return new ServiceOrderResource($activatedOrder);
+    }
+
     public function complete(ServiceOrder $serviceOrder): ServiceOrderResource
     {
         Gate::authorize('complete', $serviceOrder);
@@ -117,14 +125,6 @@ class ServiceOrderController extends Controller
         $completedOrder = $this->serviceOrderService->complete($serviceOrder);
         $completedOrder->load(['client.user', 'manager', 'location', 'serviceType', 'sectors']);
         return new ServiceOrderResource($completedOrder);
-    }
-
-    public function initiateReturn(ServiceOrder $serviceOrder): TaskResource
-    {
-        Gate::authorize('update', $serviceOrder);
-
-        $task = $this->serviceOrderService->initiateReturn($serviceOrder);
-        return new TaskResource($task);
     }
 
     public function destroy(ServiceOrder $serviceOrder): JsonResponse
