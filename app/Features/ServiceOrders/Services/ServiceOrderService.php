@@ -123,7 +123,7 @@ class ServiceOrderService
             $serviceOrder->update($soFields);
 
             if (array_key_exists('sector_ids', $data)) {
-                $serviceOrder->sectors()->sync($data['sector_ids']);
+                $this->syncSectors($serviceOrder, $data['sector_ids']);
             }
 
             return $serviceOrder;
@@ -171,6 +171,49 @@ class ServiceOrderService
             $serviceOrder->update(['location_id' => $location->id]);
         }
     }
+
+    private function syncSectors(ServiceOrder $serviceOrder, array $incomingSectorIds): void
+    {
+        $currentSectorIds = $serviceOrder->sectors()->pluck('id')->all();
+
+        $removedSectorIds = array_diff($currentSectorIds, $incomingSectorIds);
+
+        if (!empty($removedSectorIds)) {
+            $hasTaskForRemoved = Task::where('service_order_id', $serviceOrder->id)
+                ->whereHas('sectors', fn($q) => $q->whereIn('sectors.id', $removedSectorIds))
+                ->exists();
+
+            if ($hasTaskForRemoved) {
+                throw new InvalidArgumentException(
+                    __('messages.services.service_order.cannot_remove_sector_with_tasks')
+                );
+            }
+        }
+
+        $serviceOrder->sectors()->sync($incomingSectorIds);
+
+        $newSectorIds = array_diff($incomingSectorIds, $currentSectorIds);
+
+        $canAutoCreate = in_array($serviceOrder->status, [
+            ServiceOrderStatus::IN_PROGRESS,
+            ServiceOrderStatus::AWAITING_APPROVAL,
+        ]);
+
+        if (!empty($newSectorIds) && $canAutoCreate) {
+            $newSectors = $serviceOrder->sectors()->whereIn('sectors.id', $newSectorIds)->get();
+
+            foreach ($newSectors as $sector) {
+                $task = Task::create([
+                    'service_order_id' => $serviceOrder->id,
+                    'manager_id'       => $serviceOrder->manager_id,
+                    'description'      => $serviceOrder->process . ' - ' . $sector->name,
+                    'status'           => TaskStatus::PENDING->value,
+                ]);
+                $task->sectors()->sync([$sector->id]);
+            }
+        }
+    }
+
     public function cancel(ServiceOrder $serviceOrder): ServiceOrder
     {
         if ($serviceOrder->status === ServiceOrderStatus::COMPLETED) {
