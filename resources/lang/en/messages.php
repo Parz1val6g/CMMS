@@ -18,6 +18,7 @@ return [
             'checkout_must_complete' => 'Equipment checkout task must be completed before initiating return.',
             'already_completed' => 'This service order is already completed.',
             'incomplete_tasks' => 'Manager Approval Denied: Not all tasks are completed yet.',
+            'cannot_activate_non_pending' => 'Only pending service orders can be activated.',
         ],
         'equipment' => [
             'invalid_status' => "Invalid status value ':value'.",

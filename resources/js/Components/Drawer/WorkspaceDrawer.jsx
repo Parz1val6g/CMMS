@@ -15,8 +15,9 @@ const DEFAULT_WIDTH = 672;
  * @param {string|ReactNode} title   - Header title
  * @param {string|ReactNode} subtitle - Optional subtitle below header
  * @param {Array<{id:string, label:string, component:ReactNode}>} tabs - Tab definitions
+ * @param {ReactNode}        headerActions - Optional actions rendered left of the close button
  */
-export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs = [] }) {
+export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs = [], headerActions = null }) {
   const [activeTab, setActiveTab] = useState(tabs[0]?.id ?? null);
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const panelRef = useRef(null);
@@ -105,14 +106,17 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
             )}
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="shrink-0 rounded-lg p-1.5 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors"
-            aria-label={t('pages.common.close_drawer')}
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            {headerActions}
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg p-1.5 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors"
+              aria-label={t('pages.common.close_drawer')}
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         {/* Subtitle */}

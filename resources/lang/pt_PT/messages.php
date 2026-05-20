@@ -18,6 +18,7 @@ return [
             'checkout_must_complete' => 'A tarefa de empréstimo de equipamento deve estar concluída antes de iniciar a devolução.',
             'already_completed' => 'Esta ordem de serviço já está concluída.',
             'incomplete_tasks' => 'Aprovação do Gestor Negada: Nem todas as tarefas estão concluídas.',
+            'cannot_activate_non_pending' => 'Apenas ordens de serviço pendentes podem ser ativadas.',
         ],
         'equipment' => [
             'invalid_status' => "Valor de estado inválido ':value'.",
