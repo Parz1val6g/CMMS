@@ -9,7 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("UPDATE service_orders SET execution_date = updated_at WHERE execution_date IS NULL");
+        DB::statement("UPDATE service_orders SET execution_date = COALESCE(updated_at, NOW()) WHERE execution_date IS NULL");
 
         Schema::table('service_orders', function (Blueprint $table) {
             $table->date('execution_date')->nullable(false)->change();
