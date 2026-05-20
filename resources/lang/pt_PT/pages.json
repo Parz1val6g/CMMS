@@ -541,7 +541,19 @@
             "status_completed": "Concluído",
             "status_blocked": "Bloqueado",
             "status_cancelled": "Cancelado",
-            "btn_complete": "Concluir Tarefa"
+            "btn_complete": "Concluir Tarefa",
+            "btn_reject": "Rejeitar",
+            "btn_rejecting": "A rejeitar...",
+            "tab_rejections": "Rejeições",
+            "reject_title": "Rejeitar Tarefa",
+            "reject_description": "Indique o motivo da rejeição. A tarefa voltará a Em Progresso.",
+            "reject_reason_label": "Motivo",
+            "reject_reason_placeholder": "Explique por que a tarefa precisa de correção...",
+            "th_date": "Data",
+            "th_rejected_by": "Rejeitado por",
+            "th_reason": "Motivo",
+            "no_rejections": "Nenhuma rejeição registada.",
+            "reject_error": "Falha ao rejeitar a tarefa. Tente novamente."
         }
     },
     "mini_tasks": {

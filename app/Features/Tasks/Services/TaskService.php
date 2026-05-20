@@ -3,13 +3,17 @@ namespace App\Features\Tasks\Services;
 use App\Core\Enums\TaskStatus;
 use App\Core\Helpers\InputSanitizer;
 use App\Core\Services\TransactionHandler;
+use App\Features\Notifications\Services\NotificationService;
 use App\Features\Tasks\Events\TaskCompletedEvent;
 use App\Features\Tasks\Models\Task;
+use App\Features\Tasks\Models\TaskRejection;
+use App\Shared\Models\User;
 use InvalidArgumentException;
 class TaskService
 {
     public function __construct(
-        private TransactionHandler $transactions
+        private TransactionHandler $transactions,
+        private NotificationService $notifications
     ) {}
 
     public function create(array $data, string $managerId): Task
@@ -68,6 +72,32 @@ class TaskService
         return $this->transactions->execute(function () use ($task) {
             $task->update(['status' => TaskStatus::COMPLETED->value]);
             TaskCompletedEvent::dispatch($task);
+            return $task;
+        });
+    }
+
+    public function reject(Task $task, User $rejectedBy, string $reason): Task
+    {
+        if ($task->status !== TaskStatus::AWAITING_APPROVAL) {
+            throw new InvalidArgumentException('Task must be in awaiting approval status to be rejected.');
+        }
+
+        return $this->transactions->execute(function () use ($task, $rejectedBy, $reason) {
+            TaskRejection::create([
+                'task_id' => $task->id,
+                'rejected_by_id' => $rejectedBy->id,
+                'reason' => $reason,
+            ]);
+
+            $task->update(['status' => TaskStatus::IN_PROGRESS->value]);
+
+            $this->notifications->create(
+                $task->manager_id,
+                __('messages.services.notifications.task_rejected_title', ['reference' => $task->reference]),
+                __('messages.services.notifications.task_rejected_body', ['reason' => $reason]),
+                'task_rejected'
+            );
+
             return $task;
         });
     }
