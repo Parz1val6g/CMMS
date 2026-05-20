@@ -30,6 +30,13 @@ class ServiceOrderFormSchema
                     ->setRules('nullable|string|max:2000')
             )
             ->field(
+                TextInput::make('execution_date')
+                    ->setLabel(__('forms.service_orders.execution_date'))
+                    ->setType('date')
+                    ->setRequired()
+                    ->setRules('required|date')
+            )
+            ->field(
                 SelectInput::make('sector_ids')
                     ->setLabel(__('forms.service_orders.sectors'))
                     ->setRequired()

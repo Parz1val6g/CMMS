@@ -62,6 +62,7 @@ class ServiceOrderApiTest extends TestCase
                 'postal_code'     => '6300-000',
                 'latitude'        => 40.3399,
                 'longitude'       => -7.2674,
+                'execution_date'  => '2026-06-01',
             ], ['Accept' => 'application/json']);
 
         $this->assertEquals(201, $response->status());
@@ -84,6 +85,49 @@ class ServiceOrderApiTest extends TestCase
         $this->assertEquals(422, $response->status());
         $this->assertArrayHasKey('manager_id', $response->json('errors'));
         $this->assertArrayHasKey('sector_ids', $response->json('errors'));
+    }
+
+    public function test_create_service_order_without_execution_date_returns_422(): void
+    {
+        $sector = \App\Features\Sectors\Models\Sector::factory()->create([
+            'head_id' => $this->manager->id,
+        ]);
+        $parish = Parish::inRandomOrder()->first() ?? Parish::factory()->create();
+
+        $response = $this->actingAs($this->manager, 'sanctum')
+            ->postJson('/api/service-orders', [
+                'manager_id' => $this->manager->id,
+                'sector_ids' => [$sector->id],
+                'parish_id'  => $parish->id,
+                'street'     => 'Rua do Teste, 1',
+            ]);
+
+        $this->assertEquals(422, $response->status());
+        $this->assertArrayHasKey('execution_date', $response->json('errors'));
+    }
+
+    public function test_create_service_order_with_execution_date_persists_correctly(): void
+    {
+        $sector = \App\Features\Sectors\Models\Sector::factory()->create([
+            'head_id' => $this->manager->id,
+        ]);
+        $parish = Parish::inRandomOrder()->first() ?? Parish::factory()->create();
+
+        $response = $this->actingAs($this->manager, 'sanctum')
+            ->postJson('/api/service-orders', [
+                'manager_id'     => $this->manager->id,
+                'sector_ids'     => [$sector->id],
+                'parish_id'      => $parish->id,
+                'street'         => 'Rua do Teste, 1',
+                'execution_date' => '2026-06-15',
+            ]);
+
+        $this->assertEquals(201, $response->status());
+        $this->assertEquals('2026-06-15', $response->json('data.execution_date'));
+        $this->assertDatabaseHas('service_orders', [
+            'manager_id'     => $this->manager->id,
+            'execution_date' => '2026-06-15 00:00:00',
+        ]);
     }
 
     public function test_get_service_order(): void

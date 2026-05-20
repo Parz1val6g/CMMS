@@ -55,6 +55,7 @@ class ServiceOrderService
                 'priority'           => $data['priority'] ?? null,
                 'description'        => $data['description'] ?? null,
                 'photo_path'         => $photoPath,
+                'execution_date'     => $data['execution_date'],
                 'status'             => ServiceOrderStatus::PENDING->value,
             ]);
 
@@ -150,7 +151,7 @@ class ServiceOrderService
     }
     public function cancel(ServiceOrder $serviceOrder): ServiceOrder
     {
-        if ($serviceOrder->status === ServiceOrderStatus::COMPLETED->value) {
+        if ($serviceOrder->status === ServiceOrderStatus::COMPLETED) {
             throw new InvalidArgumentException(__('messages.services.service_order.cannot_cancel_completed'));
         }
         return $this->transactions->execute(function () use ($serviceOrder) {
@@ -197,7 +198,7 @@ class ServiceOrderService
 
     public function complete(ServiceOrder $serviceOrder): ServiceOrder
     {
-        if ($serviceOrder->status === ServiceOrderStatus::COMPLETED->value) {
+        if ($serviceOrder->status === ServiceOrderStatus::COMPLETED) {
             throw new InvalidArgumentException(__('messages.services.service_order.already_completed'));
         }
         $hasIncompleteTasks = $serviceOrder->tasks()
