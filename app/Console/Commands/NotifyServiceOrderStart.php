@@ -29,7 +29,13 @@ class NotifyServiceOrderStart extends Command
             ->whereNull('start_notified_at')
             ->get();
 
+        $notified = 0;
+
         foreach ($orders as $order) {
+            if (!$order->manager_id) {
+                continue;
+            }
+
             $this->transactions->execute(function () use ($order) {
                 $this->notificationService->create(
                     userId: $order->manager_id,
@@ -40,9 +46,11 @@ class NotifyServiceOrderStart extends Command
 
                 $order->update(['start_notified_at' => now()]);
             });
+
+            $notified++;
         }
 
-        $this->info(sprintf('Notified %d service order(s).', $orders->count()));
+        $this->info(sprintf('Notified %d service order(s).', $notified));
 
         return self::SUCCESS;
     }
