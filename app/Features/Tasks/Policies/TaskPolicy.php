@@ -36,6 +36,11 @@ class TaskPolicy extends BasePolicy
         return $this->hasPermission($user, 'cancel', 'tasks') || $this->isOwner($user, $task->manager);
     }
 
+    public function complete(User $user, Task $task): bool
+    {
+        return $this->isAdmin($user) || $this->isOwner($user, $task->manager);
+    }
+
     public function delete(User $user, Task $task): bool
     {
         return $this->hasPermission($user, 'delete', 'tasks') || $this->isOwner($user, $task->manager);
