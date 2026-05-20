@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, usePage } from '@inertiajs/react';
-import { ExternalLink, Play } from 'lucide-react';
+import { Check, ExternalLink, Play } from 'lucide-react';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
 import { t } from '@/utils/i18n';
 import { csrfHeader } from '@/utils/csrf';
@@ -16,15 +16,16 @@ const PRIORITY_BADGE = {
 const PRIORITY_LABEL = { urgent: 'Urgente', high: 'Alta', normal: 'Normal', low: 'Baixa' };
 
 const STATUS_BADGE = {
-  pending:     'bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-300/60',
-  in_progress: 'bg-blue-50 text-blue-800 ring-1 ring-inset ring-blue-300/60',
-  completed:   'bg-green-50 text-green-800 ring-1 ring-inset ring-green-300/60',
-  cancelled:   'bg-red-50 text-red-800 ring-1 ring-inset ring-red-300/60',
+  pending:           'bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-300/60',
+  awaiting_approval: 'bg-amber-50 text-amber-800 ring-1 ring-inset ring-amber-300/60',
+  in_progress:       'bg-blue-50 text-blue-800 ring-1 ring-inset ring-blue-300/60',
+  completed:         'bg-green-50 text-green-800 ring-1 ring-inset ring-green-300/60',
+  cancelled:         'bg-red-50 text-red-800 ring-1 ring-inset ring-red-300/60',
 };
 
 const STATUS_LABEL = {
-  pending: 'Pendente', in_progress: 'Em Progresso',
-  completed: 'Concluído', cancelled: 'Cancelado',
+  pending: 'Pendente', awaiting_approval: 'A Aguardar Aprovação',
+  in_progress: 'Em Progresso', completed: 'Concluído', cancelled: 'Cancelado',
 };
 
 function Field({ label, children }) {
@@ -130,18 +131,20 @@ function DetailTab({ order }) {
   );
 }
 
-export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, onActivated }) {
+export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, onActivated, onCompleted }) {
   const { props: pageProps } = usePage();
   const authUser = pageProps?.auth?.user;
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [activating, setActivating] = useState(false);
   const [activateError, setActivateError] = useState(false);
+  const [completing, setCompleting] = useState(false);
 
   const status = order?.status?.value ?? order?.status;
   const isAdmin = authUser?.roles?.some(r => r.name === 'admin');
   const isManager = authUser?.id && order?.manager?.id && String(authUser.id) === String(order.manager.id);
   const canActivate = status === 'pending' && (isAdmin || isManager);
+  const canComplete = status === 'awaiting_approval' && (isAdmin || isManager);
 
   const handleActivate = async () => {
     setActivating(true);
@@ -166,6 +169,20 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
     setShowConfirm(true);
   };
 
+  const handleComplete = async () => {
+    setCompleting(true);
+    try {
+      const res = await fetch(`/api/service-orders/${order.id}/complete`, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
+      });
+      if (!res.ok) throw new Error();
+      onCompleted?.();
+    } finally {
+      setCompleting(false);
+    }
+  };
+
   const activateButton = canActivate ? (
     <button
       type="button"
@@ -174,6 +191,18 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
     >
       <Play size={12} />
       {t('pages.service_orders.btn_activate')}
+    </button>
+  ) : null;
+
+  const completeButton = canComplete ? (
+    <button
+      type="button"
+      onClick={handleComplete}
+      disabled={completing}
+      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors disabled:opacity-50"
+    >
+      <Check size={12} />
+      {completing ? '…' : t('pages.service_orders.btn_complete')}
     </button>
   ) : null;
 
@@ -189,7 +218,7 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
         title={order?.process ?? ''}
         subtitle={order ? (STATUS_LABEL[order.status?.value ?? order.status] ?? '') : ''}
         tabs={tabs}
-        headerActions={activateButton}
+        headerActions={<>{completeButton}{activateButton}</>}
       />
       <ConfirmDialog
         open={showConfirm}
