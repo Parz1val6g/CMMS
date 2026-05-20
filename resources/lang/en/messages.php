@@ -32,6 +32,8 @@ return [
             'task_awaiting_approval_body' => 'All mini-tasks have been completed. Please review and approve this task.',
             'task_rejected_title' => 'Task :reference was rejected',
             'task_rejected_body' => 'The task was rejected. Reason: :reason',
+            'service_order_start_title' => 'Service Order Execution Reminder',
+            'service_order_start_message' => 'Service Order :process is scheduled for execution today.',
         ],
         'ticket' => [
             'cannot_update_terminal' => 'Cannot update a converted or cancelled ticket.',
