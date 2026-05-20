@@ -8,7 +8,6 @@ use App\Core\Helpers\InputSanitizer;
 use App\Core\Services\TransactionHandler;
 use App\Features\Locations\Models\Location;
 use App\Features\MiniTasks\Models\MiniTask;
-use App\Features\Sectors\Models\Sector;
 use App\Features\ServiceOrders\Events\ServiceOrderCompletedEvent;
 use App\Features\ServiceOrders\Events\ServiceOrderCreatedEvent;
 use App\Features\ServiceOrders\Models\ServiceOrder;
@@ -59,22 +58,10 @@ class ServiceOrderService
                 'status'             => ServiceOrderStatus::PENDING->value,
             ]);
 
-            // 4. Sync sectors and auto-create one Task per sector
+            // 4. Sync sectors (Tasks are created on activate, not on create)
             $sectorIds = $data['sector_ids'] ?? [];
             if (!empty($sectorIds)) {
                 $serviceOrder->sectors()->sync($sectorIds);
-
-                $sectors = Sector::whereIn('id', $sectorIds)->get();
-                foreach ($sectors as $sector) {
-                    $task = Task::create([
-                        'service_order_id' => $serviceOrder->id,
-                        'manager_id'       => $managerId,
-                        'description'      => $serviceOrder->process . ' - ' . $sector->name,
-                        'status'           => TaskStatus::PENDING->value,
-                    ]);
-
-                    $task->sectors()->sync([$sector->id]);
-                }
             }
 
             ServiceOrderCreatedEvent::dispatch($serviceOrder);
@@ -82,6 +69,41 @@ class ServiceOrderService
             return $serviceOrder;
         });
     }
+    public function activate(ServiceOrder $serviceOrder): ServiceOrder
+    {
+        return $this->transactions->execute(function () use ($serviceOrder) {
+            $fresh = ServiceOrder::lockForUpdate()->findOrFail($serviceOrder->id);
+
+            if ($fresh->status !== ServiceOrderStatus::PENDING) {
+                throw new InvalidArgumentException(__('messages.services.service_order.cannot_activate_non_pending'));
+            }
+
+            $existingSectorIds = $fresh->tasks()
+                ->with('sectors')
+                ->get()
+                ->flatMap(fn(Task $t) => $t->sectors->pluck('id'))
+                ->all();
+
+            $sectors = $fresh->sectors()
+                ->whereNotIn('sectors.id', $existingSectorIds)
+                ->get();
+
+            foreach ($sectors as $sector) {
+                $task = Task::create([
+                    'service_order_id' => $fresh->id,
+                    'manager_id'       => $fresh->manager_id,
+                    'description'      => $fresh->process . ' - ' . $sector->name,
+                    'status'           => TaskStatus::PENDING->value,
+                ]);
+                $task->sectors()->sync([$sector->id]);
+            }
+
+            $fresh->update(['status' => ServiceOrderStatus::IN_PROGRESS->value]);
+
+            return $fresh;
+        });
+    }
+
     public function update(ServiceOrder $serviceOrder, array $data): ServiceOrder
     {
         if ($serviceOrder->status === ServiceOrderStatus::COMPLETED || $serviceOrder->status === ServiceOrderStatus::CANCELLED) {

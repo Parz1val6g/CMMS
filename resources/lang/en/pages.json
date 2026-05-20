@@ -210,7 +210,14 @@
         "job_site_helper": "Selecting a site pre-fills the address fields below.",
         "equipment_filter_placeholder": "Filter by name or serial number\u2026",
         "no_equipment_filter_match": "No equipment matches your filter.",
-        "next_revision_label": "Next Revision"
+        "next_revision_label": "Next Revision",
+        "btn_activate": "Activate",
+        "activate_confirm_title": "Activate Service Order",
+        "activate_confirm_body": "This will create tasks for each sector and move the order to In Progress. Continue?",
+        "activate_confirm_ok": "Activate",
+        "activate_confirm_cancel": "Cancel",
+        "activate_success": "Service order activated successfully.",
+        "activate_failed": "Failed to activate service order."
     },
     "index_pages": {
         "mgmt_title": ":entity Management"

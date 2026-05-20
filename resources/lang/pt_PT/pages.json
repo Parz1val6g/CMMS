@@ -210,7 +210,14 @@
         "job_site_helper": "Selecionar um local preenche automaticamente os campos de morada.",
         "equipment_filter_placeholder": "Filtrar por nome ou número de série…",
         "no_equipment_filter_match": "Nenhum equipamento corresponde ao filtro.",
-        "next_revision_label": "Próxima Revisão"
+        "next_revision_label": "Próxima Revisão",
+        "btn_activate": "Ativar",
+        "activate_confirm_title": "Ativar Ordem de Serviço",
+        "activate_confirm_body": "Isto irá criar tarefas por setor e mover a ordem para Em Progresso. Continuar?",
+        "activate_confirm_ok": "Ativar",
+        "activate_confirm_cancel": "Cancelar",
+        "activate_success": "Ordem de serviço ativada com sucesso.",
+        "activate_failed": "Falha ao ativar a ordem de serviço."
     },
     "index_pages": {
         "mgmt_title": "Gestão de :entity"

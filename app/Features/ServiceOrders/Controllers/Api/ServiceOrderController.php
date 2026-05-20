@@ -110,6 +110,15 @@ class ServiceOrderController extends Controller
         return new ServiceOrderResource($cancelledOrder);
     }
 
+    public function activate(ServiceOrder $serviceOrder): ServiceOrderResource
+    {
+        Gate::authorize('activate', $serviceOrder);
+
+        $activatedOrder = $this->serviceOrderService->activate($serviceOrder);
+        $activatedOrder->load(['client.user', 'manager', 'location', 'serviceType', 'sectors']);
+        return new ServiceOrderResource($activatedOrder);
+    }
+
     public function complete(ServiceOrder $serviceOrder): ServiceOrderResource
     {
         Gate::authorize('complete', $serviceOrder);
