@@ -15,6 +15,7 @@ const DEFAULT_WIDTH = 672;
  * @param {string|ReactNode} title   - Header title
  * @param {string|ReactNode} subtitle - Optional subtitle below header
  * @param {Array<{id:string, label:string, component:ReactNode}>} tabs - Tab definitions
+ * @param {ReactNode}        headerActions - Optional actions rendered left of the close button
  */
 export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs = [], headerActions = null }) {
   const [activeTab, setActiveTab] = useState(tabs[0]?.id ?? null);

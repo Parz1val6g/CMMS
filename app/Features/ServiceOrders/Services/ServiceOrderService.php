@@ -71,34 +71,36 @@ class ServiceOrderService
     }
     public function activate(ServiceOrder $serviceOrder): ServiceOrder
     {
-        if ($serviceOrder->status !== ServiceOrderStatus::PENDING) {
-            throw new InvalidArgumentException(__('messages.services.service_order.cannot_activate_non_pending'));
-        }
-
         return $this->transactions->execute(function () use ($serviceOrder) {
-            $existingSectorIds = $serviceOrder->tasks()
+            $fresh = ServiceOrder::lockForUpdate()->findOrFail($serviceOrder->id);
+
+            if ($fresh->status !== ServiceOrderStatus::PENDING) {
+                throw new InvalidArgumentException(__('messages.services.service_order.cannot_activate_non_pending'));
+            }
+
+            $existingSectorIds = $fresh->tasks()
                 ->with('sectors')
                 ->get()
                 ->flatMap(fn(Task $t) => $t->sectors->pluck('id'))
                 ->all();
 
-            $sectors = $serviceOrder->sectors()
+            $sectors = $fresh->sectors()
                 ->whereNotIn('sectors.id', $existingSectorIds)
                 ->get();
 
             foreach ($sectors as $sector) {
                 $task = Task::create([
-                    'service_order_id' => $serviceOrder->id,
-                    'manager_id'       => $serviceOrder->manager_id,
-                    'description'      => $serviceOrder->process . ' - ' . $sector->name,
+                    'service_order_id' => $fresh->id,
+                    'manager_id'       => $fresh->manager_id,
+                    'description'      => $fresh->process . ' - ' . $sector->name,
                     'status'           => TaskStatus::PENDING->value,
                 ]);
                 $task->sectors()->sync([$sector->id]);
             }
 
-            $serviceOrder->update(['status' => ServiceOrderStatus::IN_PROGRESS->value]);
+            $fresh->update(['status' => ServiceOrderStatus::IN_PROGRESS->value]);
 
-            return $serviceOrder;
+            return $fresh;
         });
     }
 

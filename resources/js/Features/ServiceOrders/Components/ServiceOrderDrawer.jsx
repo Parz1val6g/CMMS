@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link } from '@inertiajs/react';
-import { usePage } from '@inertiajs/react';
+import { createPortal } from 'react-dom';
+import { Link, usePage } from '@inertiajs/react';
 import { ExternalLink, Play } from 'lucide-react';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
 import { t } from '@/utils/i18n';
@@ -45,9 +45,9 @@ function Badge({ map, labelMap, value }) {
   );
 }
 
-function ConfirmDialog({ open, onConfirm, onCancel, loading }) {
+function ConfirmDialog({ open, onConfirm, onCancel, loading, error }) {
   if (!open) return null;
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
         <h3 className="text-base font-semibold text-gray-900 mb-2">
@@ -56,6 +56,11 @@ function ConfirmDialog({ open, onConfirm, onCancel, loading }) {
         <p className="text-sm text-gray-600 mb-5">
           {t('pages.service_orders.activate_confirm_body')}
         </p>
+        {error && (
+          <p className="text-sm text-red-600 mb-4">
+            {t('pages.service_orders.activate_failed')}
+          </p>
+        )}
         <div className="flex justify-end gap-3">
           <button
             type="button"
@@ -75,7 +80,8 @@ function ConfirmDialog({ open, onConfirm, onCancel, loading }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -130,6 +136,7 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [activating, setActivating] = useState(false);
+  const [activateError, setActivateError] = useState(false);
 
   const status = order?.status?.value ?? order?.status;
   const isAdmin = authUser?.roles?.some(r => r.name === 'admin');
@@ -138,6 +145,7 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
 
   const handleActivate = async () => {
     setActivating(true);
+    setActivateError(false);
     try {
       const res = await fetch(`/api/service-orders/${order.id}/activate`, {
         method: 'POST',
@@ -147,16 +155,21 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
       setShowConfirm(false);
       onActivated?.();
     } catch {
-      // keep dialog open so user sees it didn't work; parent can handle toast
+      setActivateError(true);
     } finally {
       setActivating(false);
     }
   };
 
+  const handleOpenConfirm = () => {
+    setActivateError(false);
+    setShowConfirm(true);
+  };
+
   const activateButton = canActivate ? (
     <button
       type="button"
-      onClick={() => setShowConfirm(true)}
+      onClick={handleOpenConfirm}
       className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-brand-accent hover:opacity-90 transition-opacity"
     >
       <Play size={12} />
@@ -183,6 +196,7 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
         onConfirm={handleActivate}
         onCancel={() => setShowConfirm(false)}
         loading={activating}
+        error={activateError}
       />
     </>
   );

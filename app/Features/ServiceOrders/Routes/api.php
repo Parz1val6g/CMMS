@@ -9,6 +9,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/{serviceOrder}/complete', [ServiceOrderController::class, 'complete']);
     Route::get('/{serviceOrder}', [ServiceOrderController::class, 'show']);
     Route::put('/{serviceOrder}', [ServiceOrderController::class, 'update']);
+    Route::post('/{serviceOrder}/initiate-return', [ServiceOrderController::class, 'initiateReturn']);
     Route::post('/{serviceOrder}/cancel', [ServiceOrderController::class, 'cancel']);
     Route::delete('/{serviceOrder}', [ServiceOrderController::class, 'destroy']);
 });

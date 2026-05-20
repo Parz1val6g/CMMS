@@ -41,6 +41,14 @@ class ServiceOrderActivateTest extends TestCase
             ->postJson("/api/service-orders/{$order->id}/activate");
 
         $this->assertEquals(2, Task::where('service_order_id', $order->id)->count());
+
+        foreach ([$sector1->id, $sector2->id] as $sectorId) {
+            $this->assertTrue(
+                Task::where('service_order_id', $order->id)
+                    ->whereHas('sectors', fn($q) => $q->where('sectors.id', $sectorId))
+                    ->exists()
+            );
+        }
     }
 
     public function test_activate_does_not_duplicate_existing_tasks(): void
