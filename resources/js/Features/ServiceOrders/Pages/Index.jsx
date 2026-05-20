@@ -152,6 +152,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
   const statusColumns = [
     { id: 'pending', label: t('pages.service_orders.col_pending'), color: 'bg-yellow-500/20 text-yellow-300 border-yellow-500' },
     { id: 'in_progress', label: t('pages.service_orders.col_in_progress'), color: 'bg-blue-500/20 text-blue-300 border-blue-500' },
+    { id: 'awaiting_approval', label: t('pages.service_orders.col_awaiting_approval'), color: 'bg-orange-500/20 text-orange-300 border-orange-500' },
     { id: 'completed', label: t('pages.service_orders.col_completed'), color: 'bg-green-500/20 text-green-300 border-green-500' },
     { id: 'cancelled', label: t('pages.service_orders.col_cancelled'), color: 'bg-red-500/20 text-red-300 border-red-500' },
   ];

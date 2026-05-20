@@ -198,7 +198,7 @@ class CascadeCompletionTest extends TestCase
     }
 
     /**
-     * Test: Multiple Tasks with one incomplete block ServiceOrder completion
+     * Test: Incomplete Tasks block ServiceOrder completion
      */
     public function test_incomplete_tasks_block_serviceorder_completion(): void
     {
@@ -216,5 +216,23 @@ class CascadeCompletionTest extends TestCase
         // Assert: ServiceOrder does NOT complete (second task pending)
         $this->serviceOrder->refresh();
         $this->assertEquals(ServiceOrderStatus::PENDING, $this->serviceOrder->status);
+    }
+
+    /**
+     * Test: All Tasks COMPLETED → ServiceOrder moves to AWAITING_APPROVAL (not COMPLETED)
+     * Triggers: TaskCompletedEvent → CheckTaskCompletion listener
+     */
+    public function test_all_tasks_completed_sets_serviceorder_to_awaiting_approval(): void
+    {
+        $this->task->update(['status' => TaskStatus::COMPLETED->value]);
+        \App\Features\Tasks\Events\TaskCompletedEvent::dispatch($this->task);
+
+        $this->serviceOrder->refresh();
+        $this->assertEquals(ServiceOrderStatus::AWAITING_APPROVAL, $this->serviceOrder->status);
+
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $this->serviceOrder->manager_id,
+            'type' => 'service_order_awaiting_approval',
+        ]);
     }
 }

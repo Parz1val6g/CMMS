@@ -281,6 +281,7 @@ export default function Dashboard({ kpis, attention, mapOrders, period: initialP
         order={drawerOrder}
         loading={drawerLoading && !drawerOrder}
         onClose={closeDrawer}
+        onCompleted={() => { closeDrawer(); refresh(); }}
       />
       <TaskDrawer
         isOpen={drawerLoading || !!drawerTask}
