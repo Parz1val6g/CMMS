@@ -109,4 +109,13 @@ class TaskController extends Controller
         $task->delete();
         return response()->json(['message' => 'Task deleted successfully']);
     }
+
+    public function complete(Task $task): TaskResource
+    {
+        Gate::authorize('complete', $task);
+
+        $completedTask = $this->taskService->complete($task);
+        $completedTask->load(['sectors', 'manager']);
+        return new TaskResource($completedTask);
+    }
 }
