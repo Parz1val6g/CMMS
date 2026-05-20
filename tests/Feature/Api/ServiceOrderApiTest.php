@@ -196,7 +196,21 @@ class ServiceOrderApiTest extends TestCase
         $this->assertSoftDeleted('service_orders', ['id' => $order->id]);
     }
 
-    public function test_complete_service_order(): void
+    public function test_complete_service_order_from_awaiting_approval(): void
+    {
+        $order = ServiceOrder::factory()->create([
+            'manager_id' => $this->manager->id,
+            'status' => ServiceOrderStatus::AWAITING_APPROVAL->value,
+        ]);
+
+        $response = $this->actingAs($this->manager, 'sanctum')
+            ->postJson("/api/service-orders/{$order->id}/complete");
+
+        $this->assertEquals(200, $response->status());
+        $this->assertEquals('completed', $response->json('data.status'));
+    }
+
+    public function test_cannot_complete_service_order_from_pending(): void
     {
         $order = ServiceOrder::factory()->create([
             'manager_id' => $this->manager->id,
@@ -206,8 +220,47 @@ class ServiceOrderApiTest extends TestCase
         $response = $this->actingAs($this->manager, 'sanctum')
             ->postJson("/api/service-orders/{$order->id}/complete");
 
+        $this->assertEquals(422, $response->status());
+    }
+
+    public function test_cannot_complete_service_order_from_in_progress(): void
+    {
+        $order = ServiceOrder::factory()->create([
+            'manager_id' => $this->manager->id,
+            'status' => ServiceOrderStatus::IN_PROGRESS->value,
+        ]);
+
+        $response = $this->actingAs($this->manager, 'sanctum')
+            ->postJson("/api/service-orders/{$order->id}/complete");
+
+        $this->assertEquals(422, $response->status());
+    }
+
+    public function test_cancel_service_order(): void
+    {
+        $order = ServiceOrder::factory()->create([
+            'manager_id' => $this->manager->id,
+            'status' => ServiceOrderStatus::PENDING->value,
+        ]);
+
+        $response = $this->actingAs($this->manager, 'sanctum')
+            ->postJson("/api/service-orders/{$order->id}/cancel");
+
         $this->assertEquals(200, $response->status());
-        $this->assertEquals('completed', $response->json('data.status'));
+        $this->assertEquals('cancelled', $response->json('data.status'));
+    }
+
+    public function test_cannot_cancel_awaiting_approval_service_order(): void
+    {
+        $order = ServiceOrder::factory()->create([
+            'manager_id' => $this->manager->id,
+            'status' => ServiceOrderStatus::AWAITING_APPROVAL->value,
+        ]);
+
+        $response = $this->actingAs($this->manager, 'sanctum')
+            ->postJson("/api/service-orders/{$order->id}/cancel");
+
+        $this->assertEquals(422, $response->status());
     }
 
     public function test_cannot_update_others_service_order(): void

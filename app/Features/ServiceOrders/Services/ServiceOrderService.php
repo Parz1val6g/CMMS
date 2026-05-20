@@ -176,6 +176,9 @@ class ServiceOrderService
         if ($serviceOrder->status === ServiceOrderStatus::COMPLETED) {
             throw new InvalidArgumentException(__('messages.services.service_order.cannot_cancel_completed'));
         }
+        if ($serviceOrder->status === ServiceOrderStatus::AWAITING_APPROVAL) {
+            throw new InvalidArgumentException(__('messages.services.service_order.cannot_cancel_awaiting_approval'));
+        }
         return $this->transactions->execute(function () use ($serviceOrder) {
             $serviceOrder->update(['status' => ServiceOrderStatus::CANCELLED->value]);
             return $serviceOrder;
@@ -220,8 +223,8 @@ class ServiceOrderService
 
     public function complete(ServiceOrder $serviceOrder): ServiceOrder
     {
-        if ($serviceOrder->status === ServiceOrderStatus::COMPLETED) {
-            throw new InvalidArgumentException(__('messages.services.service_order.already_completed'));
+        if ($serviceOrder->status !== ServiceOrderStatus::AWAITING_APPROVAL) {
+            throw new InvalidArgumentException(__('messages.services.service_order.cannot_complete_not_awaiting_approval'));
         }
         $hasIncompleteTasks = $serviceOrder->tasks()
             ->where('status', '!=', TaskStatus::COMPLETED->value)
