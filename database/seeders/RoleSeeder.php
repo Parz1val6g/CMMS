@@ -24,6 +24,7 @@ class RoleSeeder extends Seeder
             'sector_manager',
             'ticket_manager',
             'team_manager',
+            'attendant',
         ];
 
         $existing = DB::table('roles')->whereIn('name', $roles)->pluck('name');
