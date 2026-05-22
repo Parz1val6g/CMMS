@@ -31,6 +31,17 @@ return [
         'import' => 'Importar',
         'restore' => 'Restaurar',
         'force_delete' => 'Eliminação Forçada',
+        'cancel' => 'Cancelar',
+        'complete' => 'Concluir',
+        'reject' => 'Rejeitar',
+        'activate' => 'Ativar',
+        'approve' => 'Aprovar',
+        'checkout' => 'Levantar',
+        'convert' => 'Converter',
+        'initiate_return' => 'Iniciar Devolução',
+        'assign_workers' => 'Atribuir Trabalhadores',
+        'assign_materials' => 'Atribuir Materiais',
+        'assign_equipment' => 'Atribuir Equipamento',
     ],
 
     'permission_resource' => [
