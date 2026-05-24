@@ -75,6 +75,9 @@ Route::middleware(['auth', 'web.access'])->group(function () {
     // Entity Portal
     require base_path('app/Features/EntityPortal/Routes/web.php');
 
+    // Manager Portal
+    require base_path('app/Features/ManagerPortal/Routes/web.php');
+
     // Equipment Types
     require base_path('app/Features/Equipments/Routes/equipment_types_web.php');
 
