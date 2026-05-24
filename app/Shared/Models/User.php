@@ -43,6 +43,11 @@ class User extends Authenticatable
         return $this->roles()->where('name', RoleName::ENTITY)->exists();
     }
 
+    public function isManagerOrAdmin(): bool
+    {
+        return $this->roles()->whereIn('name', [RoleName::MANAGER, RoleName::ADMIN])->exists();
+    }
+
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
