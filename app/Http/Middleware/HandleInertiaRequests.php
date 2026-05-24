@@ -52,6 +52,7 @@ class HandleInertiaRequests extends Middleware
         'viewServiceTypes'       => 'service_types:view',
         'createServiceTypes'     => 'service_types:create',
         'viewLoanOrders'         => 'loan_orders:view',
+        'viewTickets'            => 'tickets:view',
         'viewNotifications'      => 'notifications:view',
         'viewSettings'           => 'settings:view',
     ];
@@ -66,6 +67,8 @@ class HandleInertiaRequests extends Middleware
         $user = $request->user();
 
         $can = null;
+        $availableRoles = [];
+        $activeRole = null;
 
         if ($user) {
             $permissionManager = app(PermissionManager::class);
@@ -85,6 +88,11 @@ class HandleInertiaRequests extends Middleware
                     return [$key => in_array($permission, $permissions, true)];
                 })
                 ->toArray();
+
+            $availableRoles = $user->roles()->get()->map(fn($role) => [
+                'name'  => $role->name,
+                'label' => __('enums.role_name.' . $role->name),
+            ]);
         }
 
         return [
@@ -97,7 +105,9 @@ class HandleInertiaRequests extends Middleware
                     'email'      => $user->email,
                 ] : null,
             ],
-            'can' => $can,
+            'can'             => $can,
+            'availableRoles'  => $availableRoles,
+            'activeRole'      => $activeRole,
             'flash' => [
                 'success' => $request->session()->get('success')
                     ? e($request->session()->get('success')) : null,
