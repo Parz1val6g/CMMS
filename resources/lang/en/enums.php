@@ -31,6 +31,17 @@ return [
         'import' => 'Import',
         'restore' => 'Restore',
         'force_delete' => 'Force Delete',
+        'cancel' => 'Cancel',
+        'complete' => 'Complete',
+        'reject' => 'Reject',
+        'activate' => 'Activate',
+        'approve' => 'Approve',
+        'checkout' => 'Check Out',
+        'convert' => 'Convert',
+        'initiate_return' => 'Initiate Return',
+        'assign_workers' => 'Assign Workers',
+        'assign_materials' => 'Assign Materials',
+        'assign_equipment' => 'Assign Equipment',
     ],
 
     'permission_resource' => [

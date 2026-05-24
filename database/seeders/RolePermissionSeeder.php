@@ -159,6 +159,13 @@ class RolePermissionSeeder extends Seeder
                 ],
                 'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
             ],
+            'attendant' => [
+                'resources' => [
+                    PermissionResource::SERVICE_ORDERS,
+                    PermissionResource::PROFILE,
+                ],
+                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE],
+            ],
         ];
 
         foreach ($roleResourceActions as $roleName => $config) {
@@ -179,6 +186,61 @@ class RolePermissionSeeder extends Seeder
                             'role_id'     => $roleId,
                             'resource'    => $resource->value,
                             'action'      => $action->value,
+                            'description' => null,
+                            'created_at'  => now(),
+                            'updated_at'  => now(),
+                        ]);
+                    }
+                }
+            }
+        }
+
+        // Custom abilities — per-resource action grants not covered by the matrix above
+        $customAbilities = [
+            'manager' => [
+                'service_orders' => ['activate', 'complete', 'cancel'],
+                'tasks'          => ['cancel'],
+                'mini_tasks'     => ['assign_workers', 'assign_materials', 'assign_equipment', 'complete'],
+                'loan_orders'    => ['approve', 'checkout', 'cancel', 'complete', 'initiate_return'],
+                'work_logs'      => ['complete', 'approve', 'reject'],
+            ],
+            'supervisor' => [
+                'service_orders' => ['complete'],
+                'tasks'          => ['complete', 'cancel', 'reject'],
+            ],
+            'task_manager' => [
+                'tasks'      => ['complete', 'cancel', 'reject'],
+                'mini_tasks' => ['assign_workers', 'assign_materials', 'assign_equipment', 'complete'],
+            ],
+            'mini_task_manager' => [
+                'mini_tasks' => ['assign_workers', 'assign_materials', 'assign_equipment', 'complete'],
+            ],
+            'work_log_manager' => [
+                'work_logs' => ['complete', 'approve', 'reject'],
+            ],
+            'ticket_manager' => [
+                'tickets' => ['convert', 'reject'],
+            ],
+        ];
+
+        foreach ($customAbilities as $roleName => $resourceActions) {
+            $roleId = $roles[$roleName] ?? null;
+            if (!$roleId) continue;
+
+            foreach ($resourceActions as $resource => $actions) {
+                foreach ($actions as $action) {
+                    $exists = DB::table('role_permissions')
+                        ->where('role_id', $roleId)
+                        ->where('resource', $resource)
+                        ->where('action', $action)
+                        ->exists();
+
+                    if (!$exists) {
+                        DB::table('role_permissions')->insert([
+                            'id'          => Str::uuid(),
+                            'role_id'     => $roleId,
+                            'resource'    => $resource,
+                            'action'      => $action,
                             'description' => null,
                             'created_at'  => now(),
                             'updated_at'  => now(),
