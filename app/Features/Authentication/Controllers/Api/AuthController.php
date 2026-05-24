@@ -4,6 +4,7 @@ use App\Features\Authentication\Requests\LoginRequest;
 use App\Features\Authentication\Resources\UserResource;
 use App\Shared\Models\User;
 use App\Core\Enums\SystemStatus;
+use App\Core\Services\PermissionManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -93,5 +94,27 @@ class AuthController extends Controller
         // Delete the current access token
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Logged out successfully']);
+    }
+
+    /**
+     * Switch the active role stored in the session (session-based auth only).
+     */
+    public function switchRole(Request $request, PermissionManager $permissionManager): JsonResponse
+    {
+        $data = $request->validate([
+            'role' => ['required', 'string'],
+        ]);
+
+        $user = $request->user();
+        $role = $data['role'];
+
+        if (!$user->roles()->where('name', $role)->exists()) {
+            abort(403, 'Role not assigned to user.');
+        }
+
+        $request->session()->put('active_role', $role);
+        $permissionManager->invalidateUserPermissions($user);
+
+        return response()->json(['success' => true]);
     }
 }

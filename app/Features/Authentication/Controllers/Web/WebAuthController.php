@@ -54,7 +54,34 @@ class WebAuthController extends Controller
             return redirect()->route('portal.index');
         }
 
+        $roleCount = $user->roles()->count();
+
+        if ($roleCount > 1) {
+            return redirect()->route('select-role');
+        }
+
+        if ($roleCount === 1) {
+            $request->session()->put('active_role', $user->roles()->first()->name);
+        }
+
         return redirect()->intended(route('dashboard'));
+    }
+
+    /**
+     * Show the role selection page for users with multiple roles.
+     */
+    public function showSelectRole(Request $request): \Inertia\Response
+    {
+        $user = $request->user();
+
+        $availableRoles = $user->roles()->get()->map(fn($role) => [
+            'name'  => $role->name,
+            'label' => __('enums.role_name.' . $role->name),
+        ]);
+
+        return \Inertia\Inertia::render('Authentication/Pages/SelectRole', [
+            'availableRoles' => $availableRoles,
+        ]);
     }
 
     /**
