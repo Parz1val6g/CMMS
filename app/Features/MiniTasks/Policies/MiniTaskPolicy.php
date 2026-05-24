@@ -2,6 +2,8 @@
 
 namespace App\Features\MiniTasks\Policies;
 
+use App\Core\Enums\PermissionAction;
+use App\Core\Enums\PermissionResource;
 use App\Core\Policies\BasePolicy;
 use App\Features\MiniTasks\Models\MiniTask;
 use App\Shared\Models\User;
@@ -41,6 +43,8 @@ class MiniTaskPolicy extends BasePolicy
 
     public function complete(User $user, MiniTask $miniTask): bool
     {
-        return $this->hasPermission($user, 'complete', 'mini_tasks') || $this->isOwner($user, $miniTask->supervisor);
+        if ($this->isAdmin($user)) return true;
+        return $this->hasPermission($user, PermissionAction::COMPLETE->value, PermissionResource::MINI_TASKS->value)
+            || $this->isOwner($user, $miniTask->supervisor);
     }
 }

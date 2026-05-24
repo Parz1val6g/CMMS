@@ -35,14 +35,14 @@ class ServiceOrderPoliciesTest extends TestCase
         $this->assertEquals(200, $response->status());
     }
 
-    public function test_manager_cannot_view_others_service_order(): void
+    public function test_manager_can_view_others_service_order_with_permission(): void
     {
         $otherManager = $this->createUser('manager');
 
         $response = $this->actingAs($otherManager, 'sanctum')
             ->getJson("/api/service-orders/{$this->serviceOrder->id}");
 
-        $this->assertEquals(403, $response->status());
+        $this->assertEquals(200, $response->status());
     }
 
     public function test_worker_cannot_view_service_order(): void

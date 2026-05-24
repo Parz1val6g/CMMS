@@ -2,6 +2,8 @@
 
 namespace App\Features\WorkLogs\Policies;
 
+use App\Core\Enums\PermissionAction;
+use App\Core\Enums\PermissionResource;
 use App\Core\Policies\BasePolicy;
 use App\Features\WorkLogs\Models\WorkLog;
 use App\Shared\Models\User;
@@ -36,21 +38,25 @@ class WorkLogPolicy extends BasePolicy
 
     public function complete(User $user, WorkLog $workLog): bool
     {
+        if ($this->isAdmin($user)) return true;
         $isAssignedWorker = $workLog->workers()->where('workers.user_id', $user->id)->exists();
-        return $this->hasPermission($user, 'complete', 'work_logs') || $isAssignedWorker;
+        return $this->hasPermission($user, PermissionAction::COMPLETE->value, PermissionResource::WORK_LOGS->value)
+            || $isAssignedWorker;
     }
 
     public function approve(User $user, WorkLog $workLog): bool
     {
-        // Only the mini-task supervisor or manager can approve
+        if ($this->isAdmin($user)) return true;
         $isSupervisor = $this->isOwner($user, $workLog->miniTask?->supervisor);
-        return $this->hasPermission($user, 'approve', 'work_logs') || $isSupervisor || $this->isAdmin($user);
+        return $this->hasPermission($user, PermissionAction::APPROVE->value, PermissionResource::WORK_LOGS->value)
+            || $isSupervisor;
     }
 
     public function reject(User $user, WorkLog $workLog): bool
     {
-        // Only the mini-task supervisor or manager can reject
+        if ($this->isAdmin($user)) return true;
         $isSupervisor = $this->isOwner($user, $workLog->miniTask?->supervisor);
-        return $this->hasPermission($user, 'reject', 'work_logs') || $isSupervisor || $this->isAdmin($user);
+        return $this->hasPermission($user, PermissionAction::REJECT->value, PermissionResource::WORK_LOGS->value)
+            || $isSupervisor;
     }
 }

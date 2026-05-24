@@ -18,7 +18,8 @@ class ServiceOrderPolicy extends BasePolicy
     public function view(User $user, ServiceOrder $serviceOrder): bool
     {
         if ($this->isAdmin($user)) return true;
-        return $this->isManagerScoped($user, $serviceOrder->manager);
+        if ($this->isManagerScoped($user, $serviceOrder->manager)) return true;
+        return $this->hasPermission($user, PermissionAction::VIEW->value, PermissionResource::SERVICE_ORDERS->value);
     }
 
     public function create(User $user): bool
@@ -35,19 +36,22 @@ class ServiceOrderPolicy extends BasePolicy
     public function cancel(User $user, ServiceOrder $serviceOrder): bool
     {
         if ($this->isAdmin($user)) return true;
-        return $this->isManagerScoped($user, $serviceOrder->manager);
+        return $this->hasPermission($user, PermissionAction::CANCEL->value, PermissionResource::SERVICE_ORDERS->value)
+            && $this->isManagerScoped($user, $serviceOrder->manager);
     }
 
     public function activate(User $user, ServiceOrder $serviceOrder): bool
     {
         if ($this->isAdmin($user)) return true;
-        return $user->id === $serviceOrder->manager_id;
+        return $this->hasPermission($user, PermissionAction::ACTIVATE->value, PermissionResource::SERVICE_ORDERS->value)
+            && $this->isManagerScoped($user, $serviceOrder->manager);
     }
 
     public function complete(User $user, ServiceOrder $serviceOrder): bool
     {
         if ($this->isAdmin($user)) return true;
-        return $this->isManagerScoped($user, $serviceOrder->manager);
+        return $this->hasPermission($user, PermissionAction::COMPLETE->value, PermissionResource::SERVICE_ORDERS->value)
+            && $this->isManagerScoped($user, $serviceOrder->manager);
     }
 
     public function delete(User $user, ServiceOrder $serviceOrder): bool
