@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Core\Services\PermissionManager;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -10,40 +11,49 @@ class HandleInertiaRequests extends Middleware
     protected $rootView = 'app';
 
     /**
-     * Each entry maps a frontend key to [ability, model|null].
-     * null model → ability-only check (e.g. a Gate::define without a model).
-     * Adding a new permission requires a single line here — nowhere else.
+     * Flat map: frontend key => 'resource:action' string.
+     * Adding a new permission requires a single line here.
      */
     private const CAN_CHECKS = [
-        'viewDashboard'      => ['viewDashboard', null],
-        'viewUsers'          => ['viewAny',  \App\Shared\Models\User::class],
-        'manageUsers'        => ['create',   \App\Shared\Models\User::class],
-        'viewRoles'          => ['viewAny',  \App\Shared\Models\Role::class],
-        'manageRoles'        => ['create',   \App\Shared\Models\Role::class],
-        'viewServiceOrders'  => ['viewAny',  \App\Features\ServiceOrders\Models\ServiceOrder::class],
-        'createServiceOrders'=> ['create',   \App\Features\ServiceOrders\Models\ServiceOrder::class],
-        'viewTasks'          => ['viewAny',  \App\Features\Tasks\Models\Task::class],
-        'createTasks'        => ['create',   \App\Features\Tasks\Models\Task::class],
-        'viewMiniTasks'      => ['viewAny',  \App\Features\MiniTasks\Models\MiniTask::class],
-        'viewWorkLogs'       => ['viewAny',  \App\Features\WorkLogs\Models\WorkLog::class],
-        'viewClients'        => ['viewAny',  \App\Features\Clients\Models\Client::class],
-        'createClients'      => ['create',   \App\Features\Clients\Models\Client::class],
-        'viewEquipments'     => ['viewAny',  \App\Features\Equipments\Models\Equipment::class],
-        'createEquipments'   => ['create',   \App\Features\Equipments\Models\Equipment::class],
-        'viewMaterials'      => ['viewAny',  \App\Features\Materials\Models\Material::class],
-        'createMaterials'    => ['create',   \App\Features\Materials\Models\Material::class],
-        'viewLocations'      => ['viewAny',  \App\Features\Locations\Models\Location::class],
-        'createLocations'    => ['create',   \App\Features\Locations\Models\Location::class],
-        'viewSectors'        => ['viewAny',  \App\Features\Sectors\Models\Sector::class],
-        'createSectors'      => ['create',   \App\Features\Sectors\Models\Sector::class],
-        'viewTeams'          => ['viewAny',  \App\Features\Teams\Models\Team::class],
-        'createTeams'        => ['create',   \App\Features\Teams\Models\Team::class],
-        'viewWorkers'        => ['viewAny',  \App\Features\Workers\Models\Worker::class],
-        'createWorkers'      => ['create',   \App\Features\Workers\Models\Worker::class],
-        'viewServiceTypes'   => ['viewAny',  \App\Features\ServiceTypes\Models\ServiceType::class],
-        'createServiceTypes' => ['create',   \App\Features\ServiceTypes\Models\ServiceType::class],
-        'viewNotifications'  => ['viewAny',  \App\Features\Notifications\Models\Notification::class],
-        'viewSettings'       => ['viewAny',  \App\Shared\Models\AppSetting::class],
+        'viewDashboard'          => 'viewDashboard',
+        'viewUsers'              => 'users:view',
+        'manageUsers'            => 'users:create',
+        'viewRoles'              => 'roles:view',
+        'manageRoles'            => 'roles:create',
+        'viewServiceOrders'      => 'service_orders:view',
+        'createServiceOrders'    => 'service_orders:create',
+        'activateServiceOrder'   => 'service_orders:activate',
+        'completeServiceOrder'   => 'service_orders:complete',
+        'viewTasks'              => 'tasks:view',
+        'createTasks'            => 'tasks:create',
+        'completeTask'           => 'tasks:complete',
+        'viewMiniTasks'          => 'mini_tasks:view',
+        'assignWorkers'          => 'mini_tasks:assign_workers',
+        'assignMaterials'        => 'mini_tasks:assign_materials',
+        'assignEquipment'        => 'mini_tasks:assign_equipment',
+        'viewWorkLogs'           => 'work_logs:view',
+        'viewClients'            => 'clients:view',
+        'createClients'          => 'clients:create',
+        'viewEntities'           => 'entities:view',
+        'viewEquipments'         => 'equipments:view',
+        'createEquipments'       => 'equipments:create',
+        'viewEquipmentTypes'     => 'equipment_types:view',
+        'viewCountingTypes'      => 'counting_types:view',
+        'viewMaterials'          => 'materials:view',
+        'createMaterials'        => 'materials:create',
+        'viewLocations'          => 'locations:view',
+        'createLocations'        => 'locations:create',
+        'viewSectors'            => 'sectors:view',
+        'createSectors'          => 'sectors:create',
+        'viewTeams'              => 'teams:view',
+        'createTeams'            => 'teams:create',
+        'viewWorkers'            => 'workers:view',
+        'createWorkers'          => 'workers:create',
+        'viewServiceTypes'       => 'service_types:view',
+        'createServiceTypes'     => 'service_types:create',
+        'viewLoanOrders'         => 'loan_orders:view',
+        'viewNotifications'      => 'notifications:view',
+        'viewSettings'           => 'settings:view',
     ];
 
     public function version(Request $request): ?string
@@ -55,6 +65,28 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
+        $can = null;
+
+        if ($user) {
+            $permissionManager = app(PermissionManager::class);
+            $activeRole = $request->session()->get('active_role');
+
+            if ($activeRole) {
+                $permissions = $permissionManager->activeRolePermissions($user, $activeRole);
+            } else {
+                $permissions = $permissionManager->userPermissions($user);
+            }
+
+            $can = collect(self::CAN_CHECKS)
+                ->mapWithKeys(function ($permission, $key) use ($user, $permissions) {
+                    if ($key === 'viewDashboard') {
+                        return [$key => $user->can('viewDashboard')];
+                    }
+                    return [$key => in_array($permission, $permissions, true)];
+                })
+                ->toArray();
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
@@ -65,21 +97,13 @@ class HandleInertiaRequests extends Middleware
                     'email'      => $user->email,
                 ] : null,
             ],
-            'can' => $user
-                ? collect(self::CAN_CHECKS)
-                    ->mapWithKeys(fn ($check, $key) => [
-                        $key => $check[1] ? $user->can($check[0], $check[1]) : $user->can($check[0]),
-                    ])
-                    ->toArray()
-                : null,
+            'can' => $can,
             'flash' => [
                 'success' => $request->session()->get('success')
                     ? e($request->session()->get('success')) : null,
                 'error'   => $request->session()->get('error')
                     ? e($request->session()->get('error')) : null,
             ],
-            // Scoped to authenticated users only; move to specific page controllers
-            // if the key should be absent from non-map pages.
             'googleMapsApiKey' => $user ? config('services.google_maps.api_key') : null,
         ];
     }

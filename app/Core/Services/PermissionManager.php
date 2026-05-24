@@ -51,4 +51,22 @@ class PermissionManager
                 ->toArray();
         });
     }
+
+    public function activeRolePermissions(User $user, string $role): array
+    {
+        $cacheKey = "user_permissions:{$user->id}:{$role}";
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user, $role) {
+            $roleId = $user->roles()->where('name', $role)->value('id');
+
+            if (!$roleId) {
+                return [];
+            }
+
+            return \App\Shared\Models\RolePermission::where('role_id', $roleId)
+                ->get(['resource', 'action'])
+                ->map(fn($p) => "{$p->resource}:{$p->action}")
+                ->toArray();
+        });
+    }
 }
