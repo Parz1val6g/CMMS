@@ -26,8 +26,6 @@ class TeamController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', Team::class);
-
         $query = $this->filterService->apply(
             Team::with(['sector', 'responsible']),
             $request->only(['search', 'sort']),
@@ -58,8 +56,6 @@ class TeamController extends Controller
 
     public function store(StoreTeamRequest $request): TeamResource
     {
-        Gate::authorize('create', Team::class);
-
         $team = $this->teamService->create($request->validated());
         $team->load(['sector', 'responsible']);
 

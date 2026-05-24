@@ -23,8 +23,6 @@ class WorkLogController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', WorkLog::class);
-
         $base = WorkLog::with(['miniTask.task', 'workers.user', 'materials', 'reviewer']);
 
         if ($request->filled('mini_task_id')) {
@@ -49,8 +47,6 @@ class WorkLogController extends Controller
 
     public function store(StoreWorkLogRequest $request): WorkLogResource
     {
-        Gate::authorize('create', WorkLog::class);
-
         $data = $request->validated();
 
         if (!empty($data['materials'])) {

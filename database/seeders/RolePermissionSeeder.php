@@ -199,9 +199,9 @@ class RolePermissionSeeder extends Seeder
         $customAbilities = [
             'manager' => [
                 'service_orders' => ['activate', 'complete', 'cancel', 'delete'],
-                'tasks'          => ['cancel'],
+                'tasks'          => ['cancel', 'complete', 'reject'],
                 'mini_tasks'     => ['assign_workers', 'assign_materials', 'assign_equipment', 'complete'],
-                'loan_orders'    => ['approve', 'checkout', 'cancel', 'complete', 'initiate_return'],
+                'loan_orders'    => ['approve', 'checkout', 'cancel', 'complete', 'initiate_return', 'delete'],
                 'work_logs'      => ['complete', 'approve', 'reject'],
             ],
             'supervisor' => [

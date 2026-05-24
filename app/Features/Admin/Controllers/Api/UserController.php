@@ -28,8 +28,6 @@ class UserController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', User::class);
-
         $query = $this->filterService->apply(
             User::with(['roles']),
             $request->only(['search', 'sort']),
@@ -56,7 +54,6 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request): UserResource
     {
-        Gate::authorize('create', User::class);
         $data = $request->validated();
 
         // Internal Creation: Generate a random secure password for new employees/clients

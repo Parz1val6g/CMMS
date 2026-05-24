@@ -26,8 +26,6 @@ class ServiceTypeController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', ServiceType::class);
-
         $query = $this->filterService->apply(
             ServiceType::query(),
             $request->only(['search', 'sort']),
@@ -46,8 +44,6 @@ class ServiceTypeController extends Controller
 
     public function store(StoreServiceTypeRequest $request): ServiceTypeResource
     {
-        Gate::authorize('create', ServiceType::class);
-
         $serviceType = $this->serviceTypeService->create($request->validated());
 
         return new ServiceTypeResource($serviceType);

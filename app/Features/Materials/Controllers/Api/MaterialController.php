@@ -25,8 +25,6 @@ class MaterialController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', Material::class);
-
         $query = $this->filterService->apply(
             Material::with(['unit']),
             $request->only(['search', 'sort']),
@@ -45,8 +43,6 @@ class MaterialController extends Controller
 
     public function store(StoreMaterialRequest $request): MaterialResource
     {
-        Gate::authorize('create', Material::class);
-
         $material = $this->materialService->create($request->validated());
         $material->load(['unit']);
 
