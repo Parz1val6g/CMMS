@@ -51,45 +51,42 @@ class LoanOrderPolicy extends BasePolicy
     public function approve(User $user, LoanOrder $loanOrder): bool
     {
         if ($this->isAdmin($user)) return true;
-        return $this->isManagerScoped($user, $loanOrder->manager)
+        return $this->hasPermission($user, PermissionAction::APPROVE->value, PermissionResource::LOAN_ORDERS->value)
+            && $this->isManagerScoped($user, $loanOrder->manager)
             && $loanOrder->status === LoanOrderStatus::PENDING;
     }
 
     public function checkout(User $user, LoanOrder $loanOrder): bool
     {
         if ($this->isAdmin($user)) return true;
-        return $this->isManagerScoped($user, $loanOrder->manager)
+        return $this->hasPermission($user, PermissionAction::CHECKOUT->value, PermissionResource::LOAN_ORDERS->value)
+            && $this->isManagerScoped($user, $loanOrder->manager)
             && $loanOrder->status === LoanOrderStatus::APPROVED;
     }
 
     public function cancel(User $user, LoanOrder $loanOrder): bool
     {
         if ($this->isAdmin($user)) return true;
-        if ($loanOrder->status === LoanOrderStatus::CANCELLED) {
-            return true;
-        }
-        if (!$loanOrder->status->isPending()) {
-            return false;
-        }
-        if ($this->isManagerScoped($user, $loanOrder->manager)) {
-            return true;
-        }
-        if ($loanOrder->entity?->user_id === $user->id) {
-            return true;
-        }
+        if ($loanOrder->status === LoanOrderStatus::CANCELLED) return true;
+        if (!$loanOrder->status->isPending()) return false;
+        if (!$this->hasPermission($user, PermissionAction::CANCEL->value, PermissionResource::LOAN_ORDERS->value)) return false;
+        if ($this->isManagerScoped($user, $loanOrder->manager)) return true;
+        if ($loanOrder->entity?->user_id === $user->id) return true;
         return false;
     }
 
     public function complete(User $user, LoanOrder $loanOrder): bool
     {
         if ($this->isAdmin($user)) return true;
-        return $this->isManagerScoped($user, $loanOrder->manager);
+        return $this->hasPermission($user, PermissionAction::COMPLETE->value, PermissionResource::LOAN_ORDERS->value)
+            && $this->isManagerScoped($user, $loanOrder->manager);
     }
 
     public function initiateReturn(User $user, LoanOrder $loanOrder): bool
     {
         if ($this->isAdmin($user)) return true;
-        return $this->isManagerScoped($user, $loanOrder->manager);
+        return $this->hasPermission($user, PermissionAction::INITIATE_RETURN->value, PermissionResource::LOAN_ORDERS->value)
+            && $this->isManagerScoped($user, $loanOrder->manager);
     }
 
     public function delete(User $user, LoanOrder $loanOrder): bool
