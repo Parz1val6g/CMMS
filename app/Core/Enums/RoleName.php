@@ -18,6 +18,9 @@ class RoleName
     public const MINI_TASK_MANAGER = 'mini_task_manager';
     public const WORK_LOG_MANAGER = 'work_log_manager';
     public const SECTOR_MANAGER = 'sector_manager';
+    public const TICKET_MANAGER = 'ticket_manager';
+    public const TEAM_MANAGER = 'team_manager';
+    public const ATTENDANT = 'attendant';
 
     private static ?Collection $allRoles = null;
 
