@@ -201,9 +201,20 @@ function BottomUserRow({ auth, isCollapsed, onTooltipShow, onTooltipHide, onLogo
    MAIN SIDEBAR
    ════════════════════════════════════════════════════════════════ */
 export default function Sidebar() {
-  const { props: { auth }, url } = usePage();
+  const { props: { auth, can }, url } = usePage();
   const sections    = getSections();
   const bottomItems = getBottomItems();
+
+  const visibleSections = useMemo(() => {
+    return sections.map((section) => ({
+      ...section,
+      items: section.items.filter((item) => !item.can || can?.[item.can]),
+    })).filter((section) => section.items.length > 0);
+  }, [sections, can]);
+
+  const visibleBottomItems = useMemo(() => {
+    return bottomItems.filter((item) => !item.can || can?.[item.can]);
+  }, [bottomItems, can]);
 
   /* ── Collapsed state — persisted across navigations ── */
   const [isCollapsed, setIsCollapsed] = useState(
@@ -322,7 +333,7 @@ export default function Sidebar() {
 
         {/* ── Scrollable navigation ───────────────────────────── */}
         <div ref={navRef} onScroll={saveScroll} className="flex-1 overflow-y-auto space-y-1 px-2 py-3">
-          {sections.map((section, i) => (
+          {visibleSections.map((section, i) => (
             <NavSection
               key={section.label ?? `s-${i}`}
               section={section}
@@ -343,7 +354,7 @@ export default function Sidebar() {
             isCollapsed ? 'px-2' : 'px-2',
           ].join(' ')}
         >
-          {bottomItems.map((item) => (
+          {visibleBottomItems.map((item) => (
             <NavItem
               key={item.href}
               item={item}
