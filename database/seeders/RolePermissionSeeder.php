@@ -198,7 +198,7 @@ class RolePermissionSeeder extends Seeder
         // Custom abilities — per-resource action grants not covered by the matrix above
         $customAbilities = [
             'manager' => [
-                'service_orders' => ['activate', 'complete', 'cancel'],
+                'service_orders' => ['activate', 'complete', 'cancel', 'delete'],
                 'tasks'          => ['cancel'],
                 'mini_tasks'     => ['assign_workers', 'assign_materials', 'assign_equipment', 'complete'],
                 'loan_orders'    => ['approve', 'checkout', 'cancel', 'complete', 'initiate_return'],

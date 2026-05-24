@@ -24,8 +24,6 @@ class ServiceOrderController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', ServiceOrder::class);
-
         $user = $request->user();
 
         $query = $this->filterService->apply(
@@ -57,8 +55,6 @@ class ServiceOrderController extends Controller
 
     public function store(StoreServiceOrderRequest $request): ServiceOrderResource
     {
-        Gate::authorize('create', ServiceOrder::class);
-
         $managerId = $request->validated('manager_id');
         $serviceOrder = $this->serviceOrderService->create($request->validated(), $managerId);
 
