@@ -26,8 +26,6 @@ class SectorController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', Sector::class);
-
         $query = $this->filterService->apply(
             Sector::with(['head']),
             $request->only(['search', 'sort']),
@@ -54,8 +52,6 @@ class SectorController extends Controller
 
     public function store(StoreSectorRequest $request): SectorResource
     {
-        Gate::authorize('create', Sector::class);
-
         $sector = $this->sectorService->create($request->validated());
         $sector->load(['head']);
 

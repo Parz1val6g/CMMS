@@ -23,8 +23,6 @@ class TicketController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', Ticket::class);
-
         $user = $request->user();
 
         $query = Ticket::with(['client.user', 'serviceType', 'ticketManager']);
@@ -41,8 +39,6 @@ class TicketController extends Controller
 
     public function store(StoreTicketRequest $request): TicketResource
     {
-        Gate::authorize('create', Ticket::class);
-
         $managerId = $request->user()->id;
         $ticket = $this->ticketService->create($request->validated(), $managerId);
 

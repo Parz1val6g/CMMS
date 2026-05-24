@@ -27,8 +27,6 @@ class TaskController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', Task::class);
-
         $query = $this->filterService->apply(
             Task::with(['sectors', 'manager', 'serviceOrder']),
             $request->only(['search', 'status', 'priority', 'from_date', 'to_date', 'sort']),
@@ -67,8 +65,6 @@ class TaskController extends Controller
 
     public function store(StoreTaskRequest $request): TaskResource
     {
-        Gate::authorize('create', Task::class);
-
         $task = $this->taskService->create(
             $request->validated(),
             $request->user()->id
