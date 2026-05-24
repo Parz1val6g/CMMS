@@ -15,3 +15,6 @@ if (config('features.registration_enabled')) {
 
 // Logout â€” requires auth, POST only, invalidates session
 Route::middleware('auth')->post('/logout', [WebAuthController::class, 'logout'])->name('logout');
+
+// Select role — requires auth, shows role picker for multi-role users
+Route::middleware(['auth', 'web.access'])->get('/select-role', [WebAuthController::class, 'showSelectRole'])->name('select-role');
