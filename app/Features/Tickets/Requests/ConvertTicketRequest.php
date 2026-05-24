@@ -10,7 +10,7 @@ class ConvertTicketRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('convert', $this->route('ticket'));
+        return true;
     }
 
     public function rules(): array
