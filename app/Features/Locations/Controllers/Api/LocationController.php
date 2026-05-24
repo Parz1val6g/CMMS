@@ -25,8 +25,6 @@ class LocationController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', Location::class);
-
         $query = $this->filterService->apply(
             Location::with(['parish.municipality']),
             $request->only(['search', 'sort']),
@@ -45,8 +43,6 @@ class LocationController extends Controller
 
     public function store(StoreLocationRequest $request): LocationResource
     {
-        Gate::authorize('create', Location::class);
-
         $location = $this->locationService->create($request->validated());
         $location->load(['parish.municipality']);
 

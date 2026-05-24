@@ -26,8 +26,6 @@ class CountingTypeController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', CountingType::class);
-
         $query = $this->filterService->apply(
             CountingType::query(),
             $request->only(['search', 'sort']),
@@ -46,8 +44,6 @@ class CountingTypeController extends Controller
 
     public function store(StoreCountingTypeRequest $request): CountingTypeResource
     {
-        Gate::authorize('create', CountingType::class);
-
         $countingType = $this->countingTypeService->create($request->validated());
 
         return new CountingTypeResource($countingType);

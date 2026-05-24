@@ -26,8 +26,6 @@ class WorkerController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', Worker::class);
-
         $query = Worker::with(['user', 'team']);
 
         if ($request->has('team_id')) {
@@ -64,8 +62,6 @@ class WorkerController extends Controller
 
     public function store(StoreWorkerRequest $request): WorkerResource
     {
-        Gate::authorize('create', Worker::class);
-
         $worker = $this->workerService->create($request->validated());
         $worker->load(['user', 'team']);
 
