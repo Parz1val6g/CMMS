@@ -65,6 +65,7 @@ class TicketPolicy extends BasePolicy
             return false;
         }
 
-        return $this->isAdmin($user) || $this->hasRole($user, 'manager');
+        if ($this->isAdmin($user)) return true;
+        return $this->hasPermission($user, PermissionAction::CONVERT->value, PermissionResource::TICKETS->value);
     }
 }

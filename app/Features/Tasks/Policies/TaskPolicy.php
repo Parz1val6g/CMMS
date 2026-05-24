@@ -2,6 +2,8 @@
 
 namespace App\Features\Tasks\Policies;
 
+use App\Core\Enums\PermissionAction;
+use App\Core\Enums\PermissionResource;
 use App\Core\Policies\BasePolicy;
 use App\Features\Tasks\Models\Task;
 use App\Shared\Models\User;
@@ -33,17 +35,20 @@ class TaskPolicy extends BasePolicy
 
     public function cancel(User $user, Task $task): bool
     {
-        return $this->hasPermission($user, 'cancel', 'tasks') || $this->isOwner($user, $task->manager);
+        if ($this->isAdmin($user)) return true;
+        return $this->hasPermission($user, PermissionAction::CANCEL->value, PermissionResource::TASKS->value);
     }
 
     public function complete(User $user, Task $task): bool
     {
-        return $this->isAdmin($user) || $this->isOwner($user, $task->manager);
+        if ($this->isAdmin($user)) return true;
+        return $this->hasPermission($user, PermissionAction::COMPLETE->value, PermissionResource::TASKS->value);
     }
 
     public function reject(User $user, Task $task): bool
     {
-        return $this->isAdmin($user) || $this->isOwner($user, $task->manager);
+        if ($this->isAdmin($user)) return true;
+        return $this->hasPermission($user, PermissionAction::REJECT->value, PermissionResource::TASKS->value);
     }
 
     public function delete(User $user, Task $task): bool
