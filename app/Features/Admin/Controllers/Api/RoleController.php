@@ -22,8 +22,6 @@ class RoleController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', Role::class);
-
         $query = $this->filterService->apply(
             Role::with(['permissions']),
             $request->only(['search', 'sort']),
@@ -44,8 +42,6 @@ class RoleController extends Controller
 
     public function store(StoreRoleRequest $request): RoleResource
     {
-        Gate::authorize('create', Role::class);
-
         $role = Role::create($request->validated());
         $role->load(['permissions']);
         return new RoleResource($role);

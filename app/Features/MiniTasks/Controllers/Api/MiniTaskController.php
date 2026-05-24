@@ -22,8 +22,6 @@ class MiniTaskController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', MiniTask::class);
-
         $base = MiniTask::with(['task.serviceOrder', 'supervisor', 'workers.user', 'teams', 'materials.unit', 'equipment']);
 
         if ($request->filled('task_id')) {
@@ -48,8 +46,6 @@ class MiniTaskController extends Controller
 
     public function store(StoreMiniTaskRequest $request): MiniTaskResource
     {
-        Gate::authorize('create', MiniTask::class);
-
         $supervisorId = $request->user()->id;
         $miniTask = $this->miniTaskService->create($request->validated(), $supervisorId);
         $miniTask->load(['supervisor', 'workers.user', 'teams', 'materials.unit', 'equipment']);

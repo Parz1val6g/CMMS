@@ -21,8 +21,6 @@ class EntityController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', Entity::class);
-
         $entities = Entity::with(['user', 'location'])
             ->withCount('loanOrders')
             ->latest()
@@ -33,8 +31,6 @@ class EntityController extends Controller
 
     public function store(StoreEntityRequest $request): JsonResponse
     {
-        Gate::authorize('create', Entity::class);
-
         $data = array_merge($request->validated(), [
             'user_id' => $request->user()->id,
         ]);

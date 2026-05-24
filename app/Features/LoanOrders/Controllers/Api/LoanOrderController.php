@@ -25,8 +25,6 @@ class LoanOrderController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', LoanOrder::class);
-
         $user = $request->user();
 
         $orders = LoanOrder::with(['entity', 'manager', 'location', 'equipments', 'tasks'])
@@ -42,8 +40,6 @@ class LoanOrderController extends Controller
 
     public function store(StoreLoanOrderRequest $request): JsonResponse
     {
-        Gate::authorize('create', LoanOrder::class);
-
         $data = $request->validated();
 
         // Entity users: auto-fill their own entity_id

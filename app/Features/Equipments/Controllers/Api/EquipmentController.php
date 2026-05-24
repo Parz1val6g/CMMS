@@ -25,8 +25,6 @@ class EquipmentController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', Equipment::class);
-
         $query = $this->filterService->apply(
             Equipment::with(['manager', 'equipmentType', 'countingType']),
             $request->only(['search', 'status', 'from_date', 'to_date', 'sort']),
@@ -53,8 +51,6 @@ class EquipmentController extends Controller
 
     public function store(StoreEquipmentRequest $request): EquipmentResource
     {
-        Gate::authorize('create', Equipment::class);
-
         $equipment = $this->equipmentService->create(
             $request->validated(),
             $request->user()->id

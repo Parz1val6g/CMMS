@@ -26,8 +26,6 @@ class ClientController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize('viewAny', Client::class);
-
         $query = Client::with(['user']);
 
         if ($request->has('search')) {
@@ -58,8 +56,6 @@ class ClientController extends Controller
 
     public function store(StoreClientRequest $request): ClientResource
     {
-        Gate::authorize('create', Client::class);
-
         $client = $this->clientService->create($request->validated());
         $client->load(['user', 'clientLocations.location.parish']);
 
