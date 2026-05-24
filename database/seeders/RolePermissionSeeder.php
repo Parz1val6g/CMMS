@@ -161,6 +161,39 @@ class RolePermissionSeeder extends Seeder
             ],
         ];
 
+        // Per-resource overrides — grant extra actions beyond the role's default set
+        $extraPermissions = [
+            ['role' => 'manager', 'resource' => PermissionResource::SERVICE_ORDERS, 'actions' => [
+                PermissionAction::DELETE,
+                PermissionAction::CANCEL,
+                PermissionAction::ACTIVATE,
+                PermissionAction::COMPLETE,
+            ]],
+        ];
+
+        foreach ($extraPermissions as $extra) {
+            $roleId = $roles[$extra['role']] ?? null;
+            if (!$roleId) continue;
+            foreach ($extra['actions'] as $action) {
+                $exists = DB::table('role_permissions')
+                    ->where('role_id', $roleId)
+                    ->where('resource', $extra['resource']->value)
+                    ->where('action', $action->value)
+                    ->exists();
+                if (!$exists) {
+                    DB::table('role_permissions')->insert([
+                        'id'          => Str::uuid(),
+                        'role_id'     => $roleId,
+                        'resource'    => $extra['resource']->value,
+                        'action'      => $action->value,
+                        'description' => null,
+                        'created_at'  => now(),
+                        'updated_at'  => now(),
+                    ]);
+                }
+            }
+        }
+
         foreach ($roleResourceActions as $roleName => $config) {
             $roleId = $roles[$roleName] ?? null;
             if (!$roleId) continue;
