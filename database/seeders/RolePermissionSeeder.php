@@ -138,6 +138,13 @@ class RolePermissionSeeder extends Seeder
                 ],
                 'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE, PermissionAction::DELETE],
             ],
+            'attendant' => [
+                'resources' => [
+                    PermissionResource::SERVICE_ORDERS,
+                    PermissionResource::PROFILE,
+                ],
+                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE],
+            ],
             'entidade' => [
                 'resources' => [
                     PermissionResource::LOAN_ORDERS,
@@ -168,6 +175,60 @@ class RolePermissionSeeder extends Seeder
                 PermissionAction::CANCEL,
                 PermissionAction::ACTIVATE,
                 PermissionAction::COMPLETE,
+            ]],
+            ['role' => 'manager', 'resource' => PermissionResource::TASKS, 'actions' => [
+                PermissionAction::CANCEL,
+            ]],
+            ['role' => 'manager', 'resource' => PermissionResource::MINI_TASKS, 'actions' => [
+                PermissionAction::ASSIGN_WORKERS,
+                PermissionAction::ASSIGN_MATERIALS,
+                PermissionAction::ASSIGN_EQUIPMENT,
+            ]],
+            ['role' => 'manager', 'resource' => PermissionResource::LOAN_ORDERS, 'actions' => [
+                PermissionAction::APPROVE,
+                PermissionAction::CHECKOUT,
+                PermissionAction::CANCEL,
+                PermissionAction::COMPLETE,
+                PermissionAction::INITIATE_RETURN,
+            ]],
+            ['role' => 'manager', 'resource' => PermissionResource::WORK_LOGS, 'actions' => [
+                PermissionAction::COMPLETE,
+                PermissionAction::APPROVE,
+                PermissionAction::REJECT,
+            ]],
+            ['role' => 'supervisor', 'resource' => PermissionResource::SERVICE_ORDERS, 'actions' => [
+                PermissionAction::COMPLETE,
+            ]],
+            ['role' => 'supervisor', 'resource' => PermissionResource::TASKS, 'actions' => [
+                PermissionAction::COMPLETE,
+                PermissionAction::CANCEL,
+                PermissionAction::REJECT,
+            ]],
+            ['role' => 'task_manager', 'resource' => PermissionResource::TASKS, 'actions' => [
+                PermissionAction::COMPLETE,
+                PermissionAction::CANCEL,
+                PermissionAction::REJECT,
+            ]],
+            ['role' => 'task_manager', 'resource' => PermissionResource::MINI_TASKS, 'actions' => [
+                PermissionAction::ASSIGN_WORKERS,
+                PermissionAction::ASSIGN_MATERIALS,
+                PermissionAction::ASSIGN_EQUIPMENT,
+                PermissionAction::COMPLETE,
+            ]],
+            ['role' => 'mini_task_manager', 'resource' => PermissionResource::MINI_TASKS, 'actions' => [
+                PermissionAction::ASSIGN_WORKERS,
+                PermissionAction::ASSIGN_MATERIALS,
+                PermissionAction::ASSIGN_EQUIPMENT,
+                PermissionAction::COMPLETE,
+            ]],
+            ['role' => 'work_log_manager', 'resource' => PermissionResource::WORK_LOGS, 'actions' => [
+                PermissionAction::COMPLETE,
+                PermissionAction::APPROVE,
+                PermissionAction::REJECT,
+            ]],
+            ['role' => 'ticket_manager', 'resource' => PermissionResource::TICKETS, 'actions' => [
+                PermissionAction::CONVERT,
+                PermissionAction::REJECT,
             ]],
         ];
 
