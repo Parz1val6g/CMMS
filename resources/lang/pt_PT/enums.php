@@ -107,6 +107,23 @@ return [
         'pending' => 'Aprovação Pendente',
     ],
 
+    'role_name' => [
+        'admin'             => 'Administrador',
+        'manager'           => 'Gestor',
+        'equipment_manager'  => 'Gestor de Equipamentos',
+        'supervisor'        => 'Supervisor',
+        'worker'            => 'Trabalhador',
+        'client'            => 'Cliente',
+        'entidade'          => 'Entidade',
+        'task_manager'      => 'Gestor de Tarefas',
+        'mini_task_manager'  => 'Gestor de Mini-Tarefas',
+        'work_log_manager'  => 'Gestor de Work Logs',
+        'sector_manager'    => 'Gestor de Setor',
+        'attendant'         => 'Atendente',
+        'ticket_manager'    => 'Gestor de Tickets',
+        'team_manager'      => 'Gestor de Equipa',
+    ],
+
     'workflow_type' => [
         'regular' => 'Padrão',
         'loan' => 'Empréstimo',

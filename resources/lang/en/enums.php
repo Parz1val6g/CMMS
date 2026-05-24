@@ -107,6 +107,23 @@ return [
         'pending' => 'Pending Approval',
     ],
 
+    'role_name' => [
+        'admin'             => 'Administrator',
+        'manager'           => 'Manager',
+        'equipment_manager'  => 'Equipment Manager',
+        'supervisor'        => 'Supervisor',
+        'worker'            => 'Worker',
+        'client'            => 'Client',
+        'entidade'          => 'Entity',
+        'task_manager'      => 'Task Manager',
+        'mini_task_manager'  => 'Mini-Task Manager',
+        'work_log_manager'  => 'Work Log Manager',
+        'sector_manager'    => 'Sector Manager',
+        'attendant'         => 'Attendant',
+        'ticket_manager'    => 'Ticket Manager',
+        'team_manager'      => 'Team Manager',
+    ],
+
     'workflow_type' => [
         'regular' => 'Standard',
         'loan' => 'Loan',
