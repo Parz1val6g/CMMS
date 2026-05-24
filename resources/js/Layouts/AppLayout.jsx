@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import Sidebar from '@/Components/SideBar';
+import TopBar from '@/Components/TopBar';
 import { t } from '@/utils/i18n';
 
 export default function AppLayout({ title, children }) {
@@ -8,6 +9,8 @@ export default function AppLayout({ title, children }) {
       <Head title={title} />
 
       <div className="h-screen w-screen flex flex-col overflow-hidden bg-brand-light">
+        <TopBar />
+
         {/* Top section: Sidebar + Main Canvas */}
         <div className="flex-1 flex flex-row overflow-hidden">
           <Sidebar />
