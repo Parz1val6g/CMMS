@@ -31,6 +31,7 @@ enum PermissionResource: string
     case EQUIPMENT_TYPES = 'equipment_types';
     case COUNTING_TYPES = 'counting_types';
     case TICKETS = 'tickets';
+    case NOTIFICATIONS = 'notifications';
 
     public function label(): string
     {
@@ -62,6 +63,7 @@ enum PermissionResource: string
             self::EQUIPMENT_TYPES   => __('enums.permission_resource.equipment_types'),
             self::COUNTING_TYPES    => __('enums.permission_resource.counting_types'),
             self::TICKETS           => __('enums.permission_resource.tickets'),
+            self::NOTIFICATIONS     => __('enums.permission_resource.notifications'),
         };
     }
 }

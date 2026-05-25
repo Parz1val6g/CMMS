@@ -51,6 +51,7 @@ class HandleInertiaRequests extends Middleware
         'createWorkers'          => 'workers:create',
         'viewServiceTypes'       => 'service_types:view',
         'createServiceTypes'     => 'service_types:create',
+        'createServiceTypes'     => 'service_types:create',
         'viewLoanOrders'         => 'loan_orders:view',
         'viewTickets'            => 'tickets:view',
         'viewNotifications'      => 'notifications:view',
