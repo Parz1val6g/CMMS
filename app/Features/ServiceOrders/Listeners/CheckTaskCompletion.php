@@ -11,6 +11,7 @@ use App\Features\Tasks\Events\TaskCompletedEvent;
 
 class CheckTaskCompletion
 {
+    // See docs/architecture/cascade-completion-chain.md for the full cascade documentation.
     public function __construct(
         private TransactionHandler $transactions,
         private NotificationService $notificationService
