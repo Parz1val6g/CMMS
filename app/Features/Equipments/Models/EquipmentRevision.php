@@ -2,11 +2,11 @@
 
 namespace App\Features\Equipments\Models;
 
+use App\Core\Enums\EquipmentRevisionStatus;
 use App\Core\Traits\Base;
+use App\Shared\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-use App\Shared\Models\User;
 
 class EquipmentRevision extends Model
 {
@@ -26,6 +26,7 @@ class EquipmentRevision extends Model
     protected $casts = [
         'approved_at' => 'datetime',
         'revision_date' => 'datetime',
+        'status' => EquipmentRevisionStatus::class,
     ];
 
     /**
@@ -44,27 +45,18 @@ class EquipmentRevision extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    /**
-     * Check if revision is approved
-     */
     public function isApproved(): bool
     {
-        return $this->status === 'approved';
+        return $this->status === EquipmentRevisionStatus::APPROVED;
     }
 
-    /**
-     * Check if revision is pending
-     */
     public function isPending(): bool
     {
-        return $this->status === 'pending';
+        return $this->status === EquipmentRevisionStatus::PENDING;
     }
 
-    /**
-     * Check if revision is rejected
-     */
     public function isRejected(): bool
     {
-        return $this->status === 'rejected';
+        return $this->status === EquipmentRevisionStatus::REJECTED;
     }
 }
