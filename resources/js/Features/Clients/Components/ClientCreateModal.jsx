@@ -4,8 +4,8 @@ import { t } from '@/utils/i18n';
 import { useToast } from '@/Components/Toast/ToastContext';
 import { useFocusTrap } from '@/Hooks/useFocusTrap';
 import { useBodyLock } from '@/Hooks/useBodyLock';
+import { useApiRequest } from '@/composables/useApiRequest';
 import CascadingParishSelect from '@/Components/Common/CascadingParishSelect';
-import { csrfHeader } from '@/utils/csrf';
 
 const inputClass =
     'w-full rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent placeholder-brand-mid';
@@ -129,10 +129,10 @@ function LocationRow({ loc, index, districts, municipalities, parishes, onChange
 
 export default function ClientCreateModal({ open, onClose, storeUrl, districts = [], municipalities = [], parishes = [], onCreated }) {
     const containerRef = useRef(null);
-    const [saving, setSaving]   = useState(false);
     const [errors, setErrors]   = useState({});
     const [client, setClient]   = useState({ nif: '', first_name: '', last_name: '', email: '', phone: '' });
     const [locations, setLocations] = useState([{ ...emptyLocation(), name: t('pages.client_create.hq_default_name'), is_primary: true }]);
+    const { submit, loading: saving } = useApiRequest();
     const toast = useToast();
 
     useFocusTrap(containerRef, open);
@@ -144,7 +144,6 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
             setClient({ nif: '', first_name: '', last_name: '', email: '', phone: '' });
             setLocations([{ ...emptyLocation(), name: 'Sede', is_primary: true }]);
             setErrors({});
-            setSaving(false);
         }
     }, [open]);
 
@@ -186,17 +185,15 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
 
     const hasSede = locations.some(l => l.is_primary);
 
-    const handleSubmit = async e => {
+    const handleSubmit = e => {
         e.preventDefault();
         if (saving) return;
 
-        // Client-side sede guard
         if (!hasSede) {
             setErrors(prev => ({ ...prev, locations: [t('pages.client_create.hq_required_error')] }));
             return;
         }
 
-        setSaving(true);
         setErrors({});
 
         const payload = {
@@ -204,35 +201,23 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
             locations: locations.map(({ _id, ...rest }) => rest),
         };
 
-        try {
-            const res = await fetch(storeUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    ...csrfHeader(),
-                },
-                body: JSON.stringify(payload),
-            });
-
-            const body = await res.json();
-
-            if (res.ok) {
+        submit(storeUrl, {
+            method: 'POST',
+            body: payload,
+            onSuccess: () => {
                 toast.success(t('pages.client_create.success'));
                 onClose();
                 onCreated?.();
                 setTimeout(() => window.location.reload(), 300);
-            } else if (body.errors) {
-                setErrors(body.errors);
-            } else {
-                toast.error(body.message ?? t('pages.client_create.error_generic'));
-            }
-        } catch {
-            toast.error(t('pages.client_create.error_generic'));
-        } finally {
-            setSaving(false);
-        }
+            },
+            onError: (msg, errs) => {
+                if (errs) {
+                    setErrors(errs);
+                } else {
+                    toast.error(msg || t('pages.client_create.error_generic'));
+                }
+            },
+        });
     };
 
     if (!open) return null;
