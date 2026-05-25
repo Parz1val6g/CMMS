@@ -8,6 +8,27 @@ class CacheManager
 {
     private const CACHE_TTL_LIST = 3600;
     private const CACHE_TTL_ITEM = 1800;
+    private const MANIFEST_KEY = 'cache_manager:key_registry';
+
+    private static function registerKey(string $cacheKey): void
+    {
+        $keys = Cache::get(self::MANIFEST_KEY, []);
+        if (!in_array($cacheKey, $keys, true)) {
+            $keys[] = $cacheKey;
+        }
+        Cache::forever(self::MANIFEST_KEY, $keys);
+    }
+
+    private static function unregisterKey(string $cacheKey): void
+    {
+        $keys = Cache::get(self::MANIFEST_KEY, []);
+        Cache::forever(self::MANIFEST_KEY, array_values(array_diff($keys, [$cacheKey])));
+    }
+
+    private static function getRegisteredKeys(): array
+    {
+        return Cache::get(self::MANIFEST_KEY, []);
+    }
 
     public static function make(string $key, string $context, ?string $id = null, string $operation = 'list', ?array $params = null): string
     {
@@ -28,11 +49,15 @@ class CacheManager
 
     public static function get(string $cacheKey, callable $callback)
     {
+        self::registerKey($cacheKey);
+
         return Cache::remember($cacheKey, self::CACHE_TTL_LIST, $callback);
     }
 
     public static function getItem(string $cacheKey, callable $callback)
     {
+        self::registerKey($cacheKey);
+
         return Cache::remember($cacheKey, self::CACHE_TTL_ITEM, $callback);
     }
 
@@ -40,29 +65,31 @@ class CacheManager
     {
         if (!$id) {
             Cache::flush();
+            Cache::forever(self::MANIFEST_KEY, []);
             return;
         }
 
-        Cache::forget(self::make($model, $context ?? 'all', $id, 'list'));
-        Cache::forget(self::make($model, $context ?? 'all', $id, 'item'));
-        Cache::forget(self::make($model, $context ?? 'all', $id));
+        $keys = [
+            self::make($model, $context ?? 'all', $id, 'list'),
+            self::make($model, $context ?? 'all', $id, 'item'),
+            self::make($model, $context ?? 'all', $id),
+        ];
+
+        foreach ($keys as $key) {
+            Cache::forget($key);
+            self::unregisterKey($key);
+        }
     }
 
     public static function invalidatePattern(string $pattern): void
     {
-        // For file-based cache
-        if (config('cache.default') === 'file') {
-            $cacheDir = storage_path('framework/cache');
-            if (is_dir($cacheDir)) {
-                foreach (glob("{$cacheDir}/*") as $file) {
-                    if (is_file($file) && strpos(file_get_contents($file), $pattern) !== false) {
-                        unlink($file);
-                    }
-                }
+        $keys = self::getRegisteredKeys();
+
+        foreach ($keys as $key) {
+            if (str_starts_with($key, $pattern)) {
+                Cache::forget($key);
+                self::unregisterKey($key);
             }
         }
-
-        // For array/memory cache
-        Cache::forget($pattern);
     }
 }
