@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import ClientLocationSelector from '../Components/ClientLocationSelector';
+import ClientLocationSelector from '@/Components/Shared/ClientLocationSelector';
 import { csrfHeader } from '@/utils/csrf';
-import { buildCreatePayload } from '../Utils/payload';
+import { buildCreatePayload } from '@/utils/serviceOrderPayload';
 import { labelFor, badgeStyle } from '@/utils/enums';
 import { formatDate } from '@/utils/format';
 import { usePage } from '@inertiajs/react';

@@ -1,14 +1,6 @@
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
+import BaseField from '@/Components/Shared/Drawer/BaseField';
 import { t } from '@/utils/i18n';
-
-function Field({ label, children }) {
-    return (
-        <div className="flex flex-col gap-1">
-            <span className="text-xs font-medium uppercase tracking-wide text-brand-mid">{label}</span>
-            <span className="text-sm text-brand-darkest">{children ?? <span className="text-brand-mid">—</span>}</span>
-        </div>
-    );
-}
 
 function StatusBadge({ status }) {
     const map = {
@@ -53,33 +45,33 @@ function GeneralTab({ item }) {
 
     return (
         <div className="grid grid-cols-2 gap-6">
-            <Field label={t('pages.mini_tasks.drawer.field_reference')}>
+            <BaseField label={t('pages.mini_tasks.drawer.field_reference')}>
                 <span className="font-mono text-indigo-400">{item.reference}</span>
-            </Field>
-            <Field label={t('pages.mini_tasks.drawer.field_status')}>
+            </BaseField>
+            <BaseField label={t('pages.mini_tasks.drawer.field_status')}>
                 <StatusBadge status={item.status} />
-            </Field>
-            <Field label={t('pages.mini_tasks.drawer.field_task')}>
+            </BaseField>
+            <BaseField label={t('pages.mini_tasks.drawer.field_task')}>
                 <span className="font-mono text-indigo-400">{item.task?.reference ?? null}</span>
-            </Field>
-            <Field label={t('pages.mini_tasks.drawer.field_supervisor')}>
+            </BaseField>
+            <BaseField label={t('pages.mini_tasks.drawer.field_supervisor')}>
                 {item.supervisor?.name ?? null}
-            </Field>
-            <Field label={t('pages.mini_tasks.drawer.field_start_date')}>
+            </BaseField>
+            <BaseField label={t('pages.mini_tasks.drawer.field_start_date')}>
                 {formatDate(item.start_date)}
-            </Field>
-            <Field label={t('pages.mini_tasks.drawer.field_end_date')}>
+            </BaseField>
+            <BaseField label={t('pages.mini_tasks.drawer.field_end_date')}>
                 {formatDate(item.end_date)}
-            </Field>
-            <Field label={t('pages.mini_tasks.drawer.field_created_at')}>
+            </BaseField>
+            <BaseField label={t('pages.mini_tasks.drawer.field_created_at')}>
                 {createdAt}
-            </Field>
+            </BaseField>
             <div className="col-span-2">
-                <Field label={t('pages.mini_tasks.drawer.field_description')}>
+                <BaseField label={t('pages.mini_tasks.drawer.field_description')}>
                     {item.description
                         ? <p className="whitespace-pre-wrap leading-relaxed">{item.description}</p>
                         : null}
-                </Field>
+                </BaseField>
             </div>
         </div>
     );

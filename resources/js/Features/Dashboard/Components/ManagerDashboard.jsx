@@ -6,8 +6,8 @@ import PeriodFilter from './PeriodFilter';
 import RefreshIndicator from './RefreshIndicator';
 import NeedsAttention from './NeedsAttention';
 import InterventionMap from './InterventionMap';
-import ServiceOrderDrawer from '@/Features/ServiceOrders/Components/ServiceOrderDrawer';
-import TaskDrawer from '@/Features/Tasks/Components/TaskDrawer';
+import ServiceOrderDrawer from '@/Components/Shared/ServiceOrderDrawer';
+import TaskDrawer from '@/Components/Shared/TaskDrawer';
 import { csrfHeader } from '@/utils/csrf';
 
 export default function ManagerDashboard({ kpis, attention, mapOrders, period, onPeriodChange, countdown, onRefresh }) {
