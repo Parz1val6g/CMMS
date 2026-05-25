@@ -6,7 +6,7 @@ import { labelFor } from '@/utils/enums';
 import { formatDate } from '@/utils/format';
 import { csrfHeader } from '@/utils/csrf';
 import { t } from '@/utils/i18n';
-import LoanOrderDrawerTabs from '@/Features/LoanOrders/Components/LoanOrderDrawer';
+import LoanOrderDrawerTabs from '@/Components/Shared/LoanOrderDrawer';
 import { Plus, FileText, ChevronRight } from 'lucide-react';
 
 /* ── Light-mode badge palette (WCAG AA compliant) ───────────────────── */

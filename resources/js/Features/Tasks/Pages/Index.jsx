@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import CrudPage from '@/Components/Common/CrudPage';
-import TaskDrawer from '../Components/TaskDrawer';
+import TaskDrawer from '@/Components/Shared/TaskDrawer';
 
 export default function TasksIndex({ tasks, columns, formSchema, createFormSchema, routes, filterSchema, advancedFilterFields }) {
     const [viewItem, setViewItem] = useState(null);
