@@ -59,7 +59,7 @@ function AvatarInitial({ value }) {
     const name = typeof value === 'object' ? (value?.name ?? '') : String(value ?? '');
     if (!name) return <span className="text-brand-mid">{'—'}</span>;
     const initials = name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
-    const label = 'Atribuído a: ' + name;
+    const label = t('pages.table.assigned_to_aria', { name });
     return (
         <span
             className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-brand-accent text-brand-white text-xs font-bold"
@@ -153,7 +153,7 @@ function Row({ item, columns, hasEdit, onEdit, onDelete, onRowClick, selected = 
                         className="h-4 w-4 rounded border-brand-mid/20 bg-brand-white text-brand-accent focus:ring-brand-accent focus:ring-offset-brand-light"
                         checked={selected}
                         onChange={() => onToggleSelect(item.id)}
-                        aria-label={'Selecionar ' + (item.process ?? item.name ?? item.id)}
+                        aria-label={t('pages.table.select_row_aria', { name: item.process ?? item.name ?? item.id })}
                     />
                 </td>
             )}

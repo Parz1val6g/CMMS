@@ -17,9 +17,11 @@ class WorkerPageController extends Controller
 
         $user = $request->user();
 
+        $activeRole = $request->session()->get('active_role');
+
         $workers = Worker::with(['user', 'team.sector'])
             ->when(
-                !$user->isAdmin() && $user->roles()->where('name', 'sector_manager')->exists(),
+                $activeRole === 'sector_manager',
                 fn($q) => $q->whereIn('team_id', function ($sub) use ($user) {
                     $sub->select('id')
                         ->from('teams')
@@ -27,14 +29,9 @@ class WorkerPageController extends Controller
                 })
             )
             ->when(
-                !$user->isAdmin() && $user->roles()->where('name', 'supervisor')->exists(),
+                $activeRole === 'team_manager',
                 fn($q) => $q->whereIn('team_id', function ($sub) use ($user) {
-                    $sub->select('team_id')
-                        ->from('mini_tasks_workers_teams')
-                        ->join('mini_tasks', 'mini_tasks.id', '=', 'mini_tasks_workers_teams.mini_task_id')
-                        ->where('mini_tasks.supervisor_id', $user->id)
-                        ->whereNotNull('mini_tasks_workers_teams.team_id')
-                        ->distinct();
+                    $sub->select('id')->from('teams')->where('responsible_id', $user->id);
                 })
             )
             ->latest()

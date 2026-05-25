@@ -12,7 +12,7 @@ function toIds(raw) {
   return arr.map(item => (item && typeof item === 'object' ? item.id : item)).filter(v => v !== undefined && v !== null);
 }
 
-export default function MultiSelect({ name, options = [], value = [], onChange, placeholder = 'Select...', showSearch = true, lockedValues = [] }) {
+export default function MultiSelect({ name, options = [], value = [], onChange, placeholder, showSearch = true, lockedValues = [] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [dropdownStyle, setDropdownStyle] = useState({});
@@ -134,7 +134,7 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (isOpen) close(); else open(); } }}
       >
         {selectedLabels.length === 0 ? (
-          <span className="text-brand-mid">{placeholder}</span>
+          <span className="text-brand-mid">{placeholder || t('common.multi_select.placeholder')}</span>
         ) : (
           selectedLabels.map(({ label, value }) => {
             const isLocked = lockedValues.includes(value);
@@ -153,7 +153,7 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
                     type="button"
                     onClick={(e) => removeItem(e, value)}
                     className="inline-flex rounded-sm p-0.5 text-brand-accent hover:bg-brand-accent/10 hover:text-brand-accent/80 transition-colors"
-                    aria-label={`Remove ${label}`}
+                    aria-label={t('common.multi_select.remove_aria', { label })}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -192,7 +192,7 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
           {filtered.length === 0 && options.length > 0 ? (
             <div className="px-3 py-2 text-sm text-brand-mid">{t('pages.common.no_matches')}</div>
           ) : filtered.length === 0 && options.length === 0 ? (
-            <div className="px-3 py-2 text-sm text-brand-mid">No options available</div>
+            <div className="px-3 py-2 text-sm text-brand-mid">{t('common.multi_select.no_options')}</div>
           ) : (
             filtered.map((opt) => {
               const isChecked = selected.includes(opt.value);

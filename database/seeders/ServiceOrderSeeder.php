@@ -84,7 +84,7 @@ class ServiceOrderSeeder extends Seeder
                 SOStatus::COMPLETED   => (clone $createdAt)->modify('+5 days'),
                 SOStatus::IN_PROGRESS => (clone $createdAt)->modify('+2 days'),
                 SOStatus::PENDING     => (clone $createdAt)->modify('+30 days'),
-                SOStatus::CANCELLED   => null,
+                SOStatus::CANCELLED   => (clone $createdAt)->modify('+10 days'),
             };
 
             // Resolve client: prefer the one whose client location is being used

@@ -18,14 +18,21 @@ class MiniTaskPageController extends Controller
 
         $user = $request->user();
 
+        $activeRole = $request->session()->get('active_role');
+
         $miniTasks = MiniTask::with(['task.serviceOrder', 'supervisor', 'workers.user', 'teams'])
             ->when(
-                !$user->isAdmin() && $user->roles()->where('name', 'supervisor')->exists(),
+                // task_manager is stored as supervisor_id on mini_tasks (they create and own them)
+                $activeRole === 'task_manager',
                 fn($q) => $q->where('supervisor_id', $user->id)
             )
             ->when(
-                !$user->isAdmin() && $user->roles()->where('name', 'sector_manager')->exists(),
+                $activeRole === 'sector_manager',
                 fn($q) => $q->whereHas('task.sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id')))
+            )
+            ->when(
+                $activeRole === 'worker',
+                fn($q) => $q->whereHas('workers', fn($wq) => $wq->where('workers.user_id', $user->id))
             )
             ->latest()
             ->paginate(15)

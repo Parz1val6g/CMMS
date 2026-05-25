@@ -11,20 +11,19 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $roles = [
+            // ── UC1 roles ──
             'admin',
             'manager',
-            'equipment_manager',
-            'supervisor',
+            'attendant',
+            'task_manager',
             'worker',
             'client',
-            'entidade',
-            'task_manager',
-            'mini_task_manager',
-            'work_log_manager',
             'sector_manager',
-            'ticket_manager',
             'team_manager',
-            'attendant',
+            // ── Non-UC1 feature roles ──
+            'equipment_manager',
+            'ticket_manager',
+            'entidade',
         ];
 
         $existing = DB::table('roles')->whereIn('name', $roles)->pluck('name');

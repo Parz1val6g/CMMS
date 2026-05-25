@@ -2,8 +2,6 @@
 
 namespace App\Core\Policies;
 
-use App\Core\Enums\PermissionAction;
-use App\Core\Enums\PermissionResource;
 use App\Shared\Models\User;
 
 class BasePolicy
@@ -22,14 +20,30 @@ class BasePolicy
         return null;
     }
 
+    /**
+     * Returns the active_role from session, or null for token-based (API) requests.
+     */
+    private function getActiveRole(): ?string
+    {
+        return request()->hasSession() ? request()->session()->get('active_role') : null;
+    }
+
+    /**
+     * Admin check respects active_role: a user who selected a non-admin role
+     * does not get admin powers for that session.
+     */
     protected function isAdmin(User $user): bool
     {
+        $activeRole = $this->getActiveRole();
+
+        if ($activeRole !== null && $activeRole !== 'admin') {
+            return false;
+        }
+
         $key = 'admin:' . $user->id;
 
         if (!isset($this->permCache[$key])) {
-            $this->permCache[$key] = $user->roles()
-                ->where('name', 'admin')
-                ->exists();
+            $this->permCache[$key] = $user->roles()->where('name', 'admin')->exists();
         }
 
         return $this->permCache[$key];
@@ -37,27 +51,32 @@ class BasePolicy
 
     protected function isOwner(User $user, ?User $owner): bool
     {
-        if ($owner === null) {
-            return false;
-        }
-
-        return $user->id === $owner->id;
+        return $owner !== null && $user->id === $owner->id;
     }
 
+    /**
+     * Permission check scoped to active_role.
+     * If no active_role is set (e.g. token-based API), checks all roles.
+     */
     protected function hasPermission(User $user, string $action, string $resource): bool
     {
         if ($this->isAdmin($user)) {
             return true;
         }
 
-        $key = $user->id . ':' . $action . '@' . $resource;
+        $activeRole = $this->getActiveRole();
+        $key = $user->id . ':' . ($activeRole ?? 'all') . ':' . $action . '@' . $resource;
 
         if (!isset($this->permCache[$key])) {
-            $this->permCache[$key] = $user->roles()
-                ->whereHas('permissions', function ($query) use ($action, $resource) {
-                    $query->where('resource', $resource)
-                          ->where('action', $action);
-                })->exists();
+            $query = $user->roles();
+
+            if ($activeRole) {
+                $query = $query->where('name', $activeRole);
+            }
+
+            $this->permCache[$key] = $query->whereHas('permissions', function ($q) use ($action, $resource) {
+                $q->where('resource', $resource)->where('action', $action);
+            })->exists();
         }
 
         return $this->permCache[$key];
@@ -65,21 +84,27 @@ class BasePolicy
 
     protected function isManagerScoped(User $user, ?User $manager): bool
     {
-        if ($manager === null) {
+        return $manager !== null
+            && $user->id === $manager->id
+            && $this->hasRole($user, 'manager');
+    }
+
+    /**
+     * Role check respects active_role: a user with [manager, sector_manager] who
+     * selected 'manager' does not pass hasRole($user, 'sector_manager').
+     */
+    protected function hasRole(User $user, string $role): bool
+    {
+        $activeRole = $this->getActiveRole();
+
+        if ($activeRole !== null && $activeRole !== $role) {
             return false;
         }
 
-        return $user->id === $manager->id && $this->hasRole($user, 'manager');
-    }
-
-    protected function hasRole(User $user, string $role): bool
-    {
         $key = 'role:' . $user->id . ':' . $role;
 
         if (!isset($this->permCache[$key])) {
-            $this->permCache[$key] = $user->roles()
-                ->where('name', $role)
-                ->exists();
+            $this->permCache[$key] = $user->roles()->where('name', $role)->exists();
         }
 
         return $this->permCache[$key];
@@ -88,11 +113,6 @@ class BasePolicy
     protected function isSectorManager(User $user): bool
     {
         return $this->hasRole($user, 'sector_manager');
-    }
-
-    protected function isSupervisor(User $user): bool
-    {
-        return $this->hasRole($user, 'supervisor');
     }
 
     protected function isTeamManager(User $user): bool

@@ -17,21 +17,16 @@ class TeamPageController extends Controller
 
         $user = $request->user();
 
+        $activeRole = $request->session()->get('active_role');
+
         $teams = Team::with(['sector', 'responsible'])
             ->when(
-                !$user->isAdmin() && $user->roles()->where('name', 'sector_manager')->exists(),
+                $activeRole === 'sector_manager',
                 fn($q) => $q->whereIn('sector_id', $user->headedSectors()->pluck('id'))
             )
             ->when(
-                !$user->isAdmin() && $user->roles()->where('name', 'supervisor')->exists(),
-                fn($q) => $q->whereIn('id', function ($sub) use ($user) {
-                    $sub->select('team_id')
-                        ->from('mini_tasks_workers_teams')
-                        ->join('mini_tasks', 'mini_tasks.id', '=', 'mini_tasks_workers_teams.mini_task_id')
-                        ->where('mini_tasks.supervisor_id', $user->id)
-                        ->whereNotNull('mini_tasks_workers_teams.team_id')
-                        ->distinct();
-                })
+                $activeRole === 'team_manager',
+                fn($q) => $q->where('responsible_id', $user->id)
             )
             ->latest()
             ->paginate(15)

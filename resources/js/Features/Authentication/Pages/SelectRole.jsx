@@ -1,13 +1,8 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 
 export default function SelectRole({ availableRoles }) {
-  const { data, setData, post } = useForm({ role: '' });
-
   const handleSelect = (roleName) => {
-    setData('role', roleName);
-    post('/api/auth/switch-role', {
-      onSuccess: () => router.visit('/dashboard'),
-    });
+    router.post('/select-role', { role: roleName });
   };
 
   return (

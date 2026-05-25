@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { t } from '@/utils/i18n';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 
@@ -34,15 +35,15 @@ export default class ErrorBoundary extends Component {
             return (
                 <div className="flex h-screen w-screen items-center justify-center bg-brand-light">
                     <div className="text-center max-w-md px-6">
-                        <h1 className="text-2xl font-bold text-brand-darkest mb-2">Algo correu mal</h1>
+                        <h1 className="text-2xl font-bold text-brand-darkest mb-2">{t('common.error_boundary.heading')}</h1>
                         <p className="text-brand-mid mb-6 text-sm">
-                            Ocorreu um erro inesperado. Por favor, recarregue a página.
+                            {t('common.error_boundary.description')}
                         </p>
                         <button
                             onClick={() => window.location.reload()}
                             className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-white hover:bg-brand-accent/90 transition-colors"
                         >
-                            Recarregar Página
+                            {t('common.error_boundary.reload_button')}
                         </button>
                     </div>
                 </div>

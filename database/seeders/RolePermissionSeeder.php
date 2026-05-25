@@ -14,237 +14,366 @@ class RolePermissionSeeder extends Seeder
     {
         $roles = DB::table('roles')->pluck('id', 'name');
 
-        $roleResourceActions = [
+        /**
+         * Each role maps to an array of groups.
+         * A group is ['resources' => [...], 'actions' => [...]].
+         * This allows different action sets per resource within the same role.
+         *
+         * UC1 handoff principle: each level has exclusive write authority over its resource,
+         * and read-only access to resources above and below it.
+         */
+        $rolePermissions = [
+
+            // ── Admin: unrestricted ──
             'admin' => [
-                'resources' => PermissionResource::cases(),
-                'actions'   => PermissionAction::cases(),
+                ['resources' => PermissionResource::cases(), 'actions' => PermissionAction::cases()],
             ],
+
+            // ── Manager (Gestor SO): owns SOs, reads task state ──
             'manager' => [
-                'resources' => [
-                    PermissionResource::USERS,
-                    PermissionResource::CLIENTS,
-                    PermissionResource::LOCATIONS,
-                    PermissionResource::SERVICE_ORDERS,
-                    PermissionResource::SERVICE_TYPES,
-                    PermissionResource::TASKS,
-                    PermissionResource::MINI_TASKS,
-                    PermissionResource::WORK_LOGS,
-                    PermissionResource::EQUIPMENTS,
-                    PermissionResource::EQUIPMENT_REVISIONS,
-                    PermissionResource::EQUIPMENT_TYPES,
-                    PermissionResource::COUNTING_TYPES,
-                    PermissionResource::SECTORS,
-                    PermissionResource::TEAMS,
-                    PermissionResource::WORKERS,
-                    PermissionResource::MATERIALS,
-                    PermissionResource::UNITS,
-                    PermissionResource::ATTACHMENTS,
-                    PermissionResource::LOAN_ORDERS,
-                    PermissionResource::ENTITIES,
-                    PermissionResource::PROFILE,
-                    PermissionResource::SESSIONS,
-                    PermissionResource::LOGIN_HISTORIES,
-                    PermissionResource::TICKETS,
+                [
+                    'resources' => [
+                        PermissionResource::SERVICE_ORDERS,
+                        PermissionResource::ATTACHMENTS,
+                    ],
+                    'actions' => [
+                        PermissionAction::VIEW,
+                        PermissionAction::CREATE,
+                        PermissionAction::UPDATE,
+                        PermissionAction::DELETE,
+                        PermissionAction::ACTIVATE,
+                        PermissionAction::COMPLETE,
+                        PermissionAction::CANCEL,
+                    ],
                 ],
-                // manager can view all operational, create+update on most
-                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
-            ],
-            'equipment_manager' => [
-                'resources' => [
-                    PermissionResource::EQUIPMENTS,
-                    PermissionResource::EQUIPMENT_REVISIONS,
-                    PermissionResource::EQUIPMENT_TYPES,
-                    PermissionResource::COUNTING_TYPES,
-                    PermissionResource::ATTACHMENTS,
-                    PermissionResource::LOCATIONS,
-                    PermissionResource::SECTORS,
-                    PermissionResource::PROFILE,
+                [
+                    // Read task state + state-transition actions; no write on task data
+                    'resources' => [PermissionResource::TASKS],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::CANCEL,
+                        PermissionAction::COMPLETE,
+                        PermissionAction::REJECT,
+                    ],
                 ],
-                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
-            ],
-            'supervisor' => [
-                'resources' => [
-                    PermissionResource::SERVICE_ORDERS,
-                    PermissionResource::TASKS,
-                    PermissionResource::MINI_TASKS,
-                    PermissionResource::WORK_LOGS,
-                    PermissionResource::EQUIPMENTS,
-                    PermissionResource::LOCATIONS,
-                    PermissionResource::SECTORS,
-                    PermissionResource::TEAMS,
-                    PermissionResource::WORKERS,
-                    PermissionResource::PROFILE,
+                [
+                    // Reference data needed to create/activate SOs
+                    'resources' => [
+                        PermissionResource::USERS,
+                        PermissionResource::CLIENTS,
+                        PermissionResource::LOCATIONS,
+                        PermissionResource::SERVICE_TYPES,
+                        PermissionResource::SECTORS,
+                    ],
+                    'actions' => [PermissionAction::VIEW],
                 ],
-                'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
-            ],
-            'worker' => [
-                'resources' => [
-                    PermissionResource::TASKS,
-                    PermissionResource::MINI_TASKS,
-                    PermissionResource::WORK_LOGS,
-                    PermissionResource::EQUIPMENTS,
-                    PermissionResource::LOCATIONS,
-                    PermissionResource::PROFILE,
+                [
+                    'resources' => [
+                        PermissionResource::PROFILE,
+                        PermissionResource::SESSIONS,
+                        PermissionResource::LOGIN_HISTORIES,
+                    ],
+                    'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
                 ],
-                'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
             ],
-            'client' => [
-                'resources' => [
-                    PermissionResource::SERVICE_ORDERS,
-                    PermissionResource::LOCATIONS,
-                    PermissionResource::PROFILE,
-                ],
-                'actions' => [PermissionAction::VIEW],
-            ],
-            'task_manager' => [
-                'resources' => [
-                    PermissionResource::SERVICE_ORDERS,
-                    PermissionResource::TASKS,
-                    PermissionResource::ATTACHMENTS,
-                    PermissionResource::PROFILE,
-                ],
-                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
-            ],
-            'mini_task_manager' => [
-                'resources' => [
-                    PermissionResource::TASKS,
-                    PermissionResource::MINI_TASKS,
-                    PermissionResource::ATTACHMENTS,
-                    PermissionResource::PROFILE,
-                ],
-                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
-            ],
-            'work_log_manager' => [
-                'resources' => [
-                    PermissionResource::MINI_TASKS,
-                    PermissionResource::WORK_LOGS,
-                    PermissionResource::PROFILE,
-                ],
-                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
-            ],
-            'sector_manager' => [
-                'resources' => [
-                    PermissionResource::SECTORS,
-                    PermissionResource::TEAMS,
-                    PermissionResource::WORKERS,
-                    PermissionResource::PROFILE,
-                ],
-                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE],
-            ],
-            'ticket_manager' => [
-                'resources' => [
-                    PermissionResource::TICKETS,
-                    PermissionResource::PROFILE,
-                ],
-                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE, PermissionAction::UPDATE, PermissionAction::DELETE],
-            ],
-            'entidade' => [
-                'resources' => [
-                    PermissionResource::LOAN_ORDERS,
-                    PermissionResource::ENTITIES,
-                    PermissionResource::PROFILE,
-                ],
-                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE],
-            ],
-            'team_manager' => [
-                'resources' => [
-                    PermissionResource::TEAMS,
-                    PermissionResource::WORKERS,
-                    PermissionResource::MINI_TASKS,
-                    PermissionResource::WORK_LOGS,
-                    PermissionResource::TASKS,
-                    PermissionResource::EQUIPMENTS,
-                    PermissionResource::LOCATIONS,
-                    PermissionResource::PROFILE,
-                ],
-                'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
-            ],
+
+            // ── Attendant (Atendente): creates SOs, sees only their own ──
             'attendant' => [
-                'resources' => [
-                    PermissionResource::SERVICE_ORDERS,
-                    PermissionResource::PROFILE,
+                [
+                    'resources' => [PermissionResource::SERVICE_ORDERS],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::CREATE,
+                        PermissionAction::UPDATE,
+                        PermissionAction::DELETE, // only Pending SOs; enforced by policy
+                    ],
                 ],
-                'actions' => [PermissionAction::VIEW, PermissionAction::CREATE],
+                [
+                    'resources' => [PermissionResource::ATTACHMENTS],
+                    'actions'   => [PermissionAction::VIEW, PermissionAction::CREATE],
+                ],
+                [
+                    // Reference data needed to fill the SO form
+                    'resources' => [
+                        PermissionResource::CLIENTS,
+                        PermissionResource::LOCATIONS,
+                        PermissionResource::SERVICE_TYPES,
+                        PermissionResource::USERS,
+                        PermissionResource::SECTORS,
+                    ],
+                    'actions' => [PermissionAction::VIEW],
+                ],
+                [
+                    'resources' => [
+                        PermissionResource::PROFILE,
+                        PermissionResource::SESSIONS,
+                        PermissionResource::LOGIN_HISTORIES,
+                    ],
+                    'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
             ],
-        ];
 
-        foreach ($roleResourceActions as $roleName => $config) {
-            $roleId = $roles[$roleName] ?? null;
-            if (!$roleId) continue;
-
-            foreach ($config['resources'] as $resource) {
-                foreach ($config['actions'] as $action) {
-                    $exists = DB::table('role_permissions')
-                        ->where('role_id', $roleId)
-                        ->where('resource', $resource->value)
-                        ->where('action', $action->value)
-                        ->exists();
-
-                    if (!$exists) {
-                        DB::table('role_permissions')->insert([
-                            'id'          => Str::uuid(),
-                            'role_id'     => $roleId,
-                            'resource'    => $resource->value,
-                            'action'      => $action->value,
-                            'description' => null,
-                            'created_at'  => now(),
-                            'updated_at'  => now(),
-                        ]);
-                    }
-                }
-            }
-        }
-
-        // Custom abilities — per-resource action grants not covered by the matrix above
-        $customAbilities = [
-            'manager' => [
-                'service_orders' => ['activate', 'complete', 'cancel', 'delete'],
-                'tasks'          => ['cancel', 'complete', 'reject'],
-                'mini_tasks'     => ['assign_workers', 'assign_materials', 'assign_equipment', 'complete'],
-                'loan_orders'    => ['approve', 'checkout', 'cancel', 'complete', 'initiate_return', 'delete'],
-                'work_logs'      => ['complete', 'approve', 'reject'],
-            ],
-            'supervisor' => [
-                'service_orders' => ['complete'],
-                'tasks'          => ['complete', 'cancel', 'reject'],
-            ],
+            // ── Task Manager (Gestor de Tarefa): owns Tasks + Mini-Tasks ──
             'task_manager' => [
-                'tasks'      => ['complete', 'cancel', 'reject'],
-                'mini_tasks' => ['assign_workers', 'assign_materials', 'assign_equipment', 'complete'],
+                [
+                    'resources' => [PermissionResource::TASKS],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::UPDATE,
+                        PermissionAction::CANCEL,
+                        PermissionAction::COMPLETE,
+                        PermissionAction::REJECT,
+                    ],
+                ],
+                [
+                    'resources' => [PermissionResource::MINI_TASKS],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::CREATE,
+                        PermissionAction::UPDATE,
+                        PermissionAction::ASSIGN_WORKERS,
+                        PermissionAction::ASSIGN_MATERIALS,
+                        PermissionAction::ASSIGN_EQUIPMENT,
+                        PermissionAction::COMPLETE,
+                    ],
+                ],
+                [
+                    'resources' => [PermissionResource::ATTACHMENTS],
+                    'actions'   => [PermissionAction::VIEW, PermissionAction::CREATE],
+                ],
+                [
+                    // Reference data needed to plan mini-tasks
+                    'resources' => [
+                        PermissionResource::SERVICE_ORDERS,
+                        PermissionResource::SECTORS,
+                        PermissionResource::WORKERS,
+                        PermissionResource::TEAMS,
+                        PermissionResource::MATERIALS,
+                        PermissionResource::EQUIPMENTS,
+                        PermissionResource::UNITS,
+                    ],
+                    'actions' => [PermissionAction::VIEW],
+                ],
+                [
+                    'resources' => [
+                        PermissionResource::PROFILE,
+                        PermissionResource::SESSIONS,
+                        PermissionResource::LOGIN_HISTORIES,
+                    ],
+                    'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
             ],
-            'mini_task_manager' => [
-                'mini_tasks' => ['assign_workers', 'assign_materials', 'assign_equipment', 'complete'],
+
+            // ── Worker (Trabalhador): executes mini-tasks, logs work ──
+            'worker' => [
+                [
+                    'resources' => [PermissionResource::WORK_LOGS],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::CREATE,
+                        PermissionAction::UPDATE,
+                    ],
+                ],
+                [
+                    // Updates own assigned mini-tasks (mark complete); cannot create them
+                    'resources' => [PermissionResource::MINI_TASKS],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::UPDATE,
+                        PermissionAction::COMPLETE,
+                    ],
+                ],
+                [
+                    // Read-only access to tasks where assigned
+                    'resources' => [
+                        PermissionResource::TASKS,
+                        PermissionResource::MATERIALS,
+                        PermissionResource::EQUIPMENTS,
+                        PermissionResource::LOCATIONS,
+                        PermissionResource::UNITS,
+                    ],
+                    'actions' => [PermissionAction::VIEW],
+                ],
+                [
+                    'resources' => [
+                        PermissionResource::PROFILE,
+                        PermissionResource::SESSIONS,
+                        PermissionResource::LOGIN_HISTORIES,
+                    ],
+                    'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
             ],
-            'work_log_manager' => [
-                'work_logs' => ['complete', 'approve', 'reject'],
+
+            // ── Sector Manager (Gestor de Setor): manages teams and workers ──
+            'sector_manager' => [
+                [
+                    'resources' => [
+                        PermissionResource::SECTORS,
+                        PermissionResource::TEAMS,
+                        PermissionResource::WORKERS,
+                    ],
+                    'actions' => [
+                        PermissionAction::VIEW,
+                        PermissionAction::CREATE,
+                        PermissionAction::UPDATE,
+                    ],
+                ],
+                [
+                    'resources' => [
+                        PermissionResource::PROFILE,
+                        PermissionResource::SESSIONS,
+                        PermissionResource::LOGIN_HISTORIES,
+                    ],
+                    'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
             ],
+
+            // ── Team Manager (Gestor de Equipa): manages team composition ──
+            'team_manager' => [
+                [
+                    'resources' => [PermissionResource::TEAMS],
+                    'actions'   => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
+                [
+                    'resources' => [PermissionResource::WORKERS],
+                    'actions'   => [PermissionAction::VIEW],
+                ],
+                [
+                    'resources' => [
+                        PermissionResource::PROFILE,
+                        PermissionResource::SESSIONS,
+                        PermissionResource::LOGIN_HISTORIES,
+                    ],
+                    'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
+            ],
+
+            // ── Client: no system access currently (UC1 §1) ──
+            'client' => [
+                [
+                    'resources' => [PermissionResource::PROFILE],
+                    'actions'   => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
+            ],
+
+            // ── Equipment Manager (non-UC1 feature role) ──
+            'equipment_manager' => [
+                [
+                    'resources' => [
+                        PermissionResource::EQUIPMENTS,
+                        PermissionResource::EQUIPMENT_REVISIONS,
+                        PermissionResource::EQUIPMENT_TYPES,
+                        PermissionResource::COUNTING_TYPES,
+                        PermissionResource::ATTACHMENTS,
+                    ],
+                    'actions' => [
+                        PermissionAction::VIEW,
+                        PermissionAction::CREATE,
+                        PermissionAction::UPDATE,
+                    ],
+                ],
+                [
+                    'resources' => [
+                        PermissionResource::LOCATIONS,
+                        PermissionResource::SECTORS,
+                    ],
+                    'actions' => [PermissionAction::VIEW],
+                ],
+                [
+                    'resources' => [
+                        PermissionResource::PROFILE,
+                        PermissionResource::SESSIONS,
+                        PermissionResource::LOGIN_HISTORIES,
+                    ],
+                    'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
+            ],
+
+            // ── Ticket Manager (non-UC1 feature role) ──
             'ticket_manager' => [
-                'tickets' => ['convert', 'reject'],
+                [
+                    'resources' => [PermissionResource::TICKETS],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::CREATE,
+                        PermissionAction::UPDATE,
+                        PermissionAction::DELETE,
+                        PermissionAction::CONVERT,
+                        PermissionAction::REJECT,
+                    ],
+                ],
+                [
+                    // Reference data needed to process tickets
+                    'resources' => [
+                        PermissionResource::CLIENTS,
+                        PermissionResource::LOCATIONS,
+                        PermissionResource::SERVICE_TYPES,
+                        PermissionResource::USERS,
+                    ],
+                    'actions' => [PermissionAction::VIEW],
+                ],
+                [
+                    'resources' => [
+                        PermissionResource::PROFILE,
+                        PermissionResource::SESSIONS,
+                        PermissionResource::LOGIN_HISTORIES,
+                    ],
+                    'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
+            ],
+
+            // ── Entidade (non-UC1 feature role) ──
+            'entidade' => [
+                [
+                    'resources' => [PermissionResource::LOAN_ORDERS],
+                    'actions'   => [PermissionAction::VIEW, PermissionAction::CREATE],
+                ],
+                [
+                    'resources' => [PermissionResource::ENTITIES],
+                    'actions'   => [PermissionAction::VIEW],
+                ],
+                [
+                    'resources' => [
+                        PermissionResource::PROFILE,
+                        PermissionResource::SESSIONS,
+                        PermissionResource::LOGIN_HISTORIES,
+                    ],
+                    'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
             ],
         ];
 
-        foreach ($customAbilities as $roleName => $resourceActions) {
+        foreach ($rolePermissions as $roleName => $groups) {
             $roleId = $roles[$roleName] ?? null;
             if (!$roleId) continue;
 
-            foreach ($resourceActions as $resource => $actions) {
-                foreach ($actions as $action) {
-                    $exists = DB::table('role_permissions')
-                        ->where('role_id', $roleId)
-                        ->where('resource', $resource)
-                        ->where('action', $action)
-                        ->exists();
+            foreach ($groups as $group) {
+                foreach ($group['resources'] as $resource) {
+                    foreach ($group['actions'] as $action) {
+                        $resourceValue = $resource instanceof PermissionResource
+                            ? $resource->value
+                            : $resource;
+                        $actionValue = $action instanceof PermissionAction
+                            ? $action->value
+                            : $action;
 
-                    if (!$exists) {
-                        DB::table('role_permissions')->insert([
-                            'id'          => Str::uuid(),
-                            'role_id'     => $roleId,
-                            'resource'    => $resource,
-                            'action'      => $action,
-                            'description' => null,
-                            'created_at'  => now(),
-                            'updated_at'  => now(),
-                        ]);
+                        $exists = DB::table('role_permissions')
+                            ->where('role_id', $roleId)
+                            ->where('resource', $resourceValue)
+                            ->where('action', $actionValue)
+                            ->exists();
+
+                        if (!$exists) {
+                            DB::table('role_permissions')->insert([
+                                'id'          => Str::uuid(),
+                                'role_id'     => $roleId,
+                                'resource'    => $resourceValue,
+                                'action'      => $actionValue,
+                                'description' => null,
+                                'created_at'  => now(),
+                                'updated_at'  => now(),
+                            ]);
+                        }
                     }
                 }
             }

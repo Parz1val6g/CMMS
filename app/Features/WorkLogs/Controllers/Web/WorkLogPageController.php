@@ -18,10 +18,12 @@ class WorkLogPageController extends Controller
 
         $user = $request->user();
 
+        $activeRole = $request->session()->get('active_role');
+
         $workLogs = WorkLog::with(['miniTask.task', 'workers.user', 'materials'])
             ->when(
-                !$user->isAdmin() && $user->roles()->where('name', 'supervisor')->exists(),
-                fn($q) => $q->whereHas('miniTask', fn($mq) => $mq->where('supervisor_id', $user->id))
+                $activeRole === 'worker',
+                fn($q) => $q->whereHas('workers', fn($wq) => $wq->where('workers.user_id', $user->id))
             )
             ->latest()
             ->paginate(15)

@@ -87,6 +87,9 @@ return new class extends Migration {
 
             DB::statement('PRAGMA foreign_keys = ON');
         } else {
+            // Remove tasks not linked to a service_order (e.g. loan-order tasks) before reverting NOT NULL
+            DB::table('tasks')->whereNull('service_order_id')->delete();
+
             Schema::table('tasks', function (Blueprint $table) {
                 $table->uuid('service_order_id')->nullable(false)->change();
             });

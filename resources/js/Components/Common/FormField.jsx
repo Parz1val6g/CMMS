@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { usePage } from '@inertiajs/react';
+import { t } from '@/utils/i18n';
 import MultiSelect from '@/Components/Common/MultiSelect';
 import SearchableSelect from '@/Components/Common/SearchableSelect';
 import ToggleSwitch from '@/Components/Common/ToggleSwitch';
@@ -126,7 +127,7 @@ function MapPicker({ field, value }) {
   if (!gmapsKey) {
     return (
       <div className="mb-3 rounded-lg bg-yellow-50 p-3 text-sm text-yellow-700">
-        Loading Map Configuration...
+        {t('common.map_picker.missing_key')}
       </div>
     );
   }
@@ -138,7 +139,7 @@ function MapPicker({ field, value }) {
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" className="mr-1 inline text-brand-accent" viewBox="0 0 16 16">
             <path fillRule="evenodd" d="M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999z" />
           </svg>
-          Selecionar no Mapa
+          {t('common.map_picker.select_label')}
         </label>
         {(lat && lng) && (
           <span className="inline-flex items-center rounded bg-brand-accent/10 px-2 py-0.5 text-xs font-medium text-brand-accent">
@@ -155,7 +156,7 @@ function MapPicker({ field, value }) {
       >
         {!loaded && (
           <div className="flex h-full items-center justify-center text-sm text-brand-mid">
-            A carregar mapa...
+            {t('common.map_picker.loading')}
           </div>
         )}
       </div>
@@ -165,7 +166,7 @@ function MapPicker({ field, value }) {
       <input type="hidden" name={lngField} value={lng} readOnly />
 
       <p className="text-xs text-brand-mid">
-        Clique no mapa ou arraste o marcador para definir as coordenadas
+        {t('common.map_picker.hint')}
       </p>
     </div>
   );
@@ -186,7 +187,7 @@ function StandardField({ field, value = '', error, onChange, lockedValues = [] }
 
   /* Normalize select/multiselect options */
   const opts = options ?? [];
-  const ph = field.placeholder ?? 'Selecione...';
+  const ph = field.placeholder ?? t('common.select_placeholder');
 
   // Track changes on native DOM element for form serialization
   const handleInputChange = (val) => {
@@ -370,8 +371,8 @@ function FileDropzone({ name, required, error, onChange }) {
           <p className={`text-sm font-medium ${error ? 'text-red-600' : 'text-brand-darkest'}`}>{file.name}</p>
         ) : (
           <>
-            <p className={`text-sm font-medium ${error ? 'text-red-600' : 'text-brand-darkest'}`}>Click to upload or drag and drop</p>
-            <p className={`mt-1 text-xs ${error ? 'text-red-500' : 'text-brand-mid'}`}>Any file type supported</p>
+            <p className={`text-sm font-medium ${error ? 'text-red-600' : 'text-brand-darkest'}`}>{t('common.file_dropzone.upload_text')}</p>
+            <p className={`mt-1 text-xs ${error ? 'text-red-500' : 'text-brand-mid'}`}>{t('common.file_dropzone.supported_hint')}</p>
           </>
         )}
       </div>
