@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Plus, Pencil, Trash2, Star, MapPin, Loader2, Check } from 'lucide-react';
 import { useClientLocations } from '@/Hooks/useClientLocations';
+import { useApiRequest } from '@/composables/useApiRequest';
 import { useToast } from '@/Components/Toast/ToastContext';
 import { t } from '@/utils/i18n';
 import CascadingParishSelect from '@/Components/Common/CascadingParishSelect';
-import { csrfHeader } from '@/utils/csrf';
 
 function emptyForm() {
     return {
@@ -34,15 +34,14 @@ function LocationForm({ client, editTarget, onSaved, onCancel, districts, munici
             }
             : emptyForm()
     );
-    const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
+    const { submit, loading: submitting } = useApiRequest();
     const toast = useToast();
 
     const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        setSubmitting(true);
         setErrors({});
 
         const isEdit = editTarget !== null;
@@ -50,33 +49,21 @@ function LocationForm({ client, editTarget, onSaved, onCancel, districts, munici
             ? `/api/clients/${client.id}/locations/${editTarget.id}`
             : `/api/clients/${client.id}/locations`;
 
-        try {
-            const res = await fetch(url, {
-                method: isEdit ? 'PUT' : 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    ...csrfHeader(),
-                },
-                body: JSON.stringify(form),
-            });
-
-            const body = await res.json();
-
-            if (res.ok) {
+        submit(url, {
+            method: isEdit ? 'PUT' : 'POST',
+            body: form,
+            onSuccess: () => {
                 toast.success(isEdit ? t('pages.client_locations.updated') : t('pages.client_locations.created'));
                 onSaved();
-            } else if (body.errors) {
-                setErrors(body.errors);
-            } else {
-                toast.error(body.message ?? t('pages.client_locations.save_failed'));
-            }
-        } catch {
-            toast.error(t('pages.client_locations.unexpected_error'));
-        } finally {
-            setSubmitting(false);
-        }
+            },
+            onError: (msg, errs) => {
+                if (errs) {
+                    setErrors(errs);
+                } else {
+                    toast.error(msg || t('pages.client_locations.save_failed'));
+                }
+            },
+        });
     };
 
     const inputClass = 'w-full rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent';
@@ -222,6 +209,7 @@ export default function ClientLocationManager({ client, districts = [], municipa
     const { locations, loading, error, refetch } = useClientLocations(client?.id);
     const [showForm, setShowForm] = useState(false);
     const [editTarget, setEditTarget] = useState(null);
+    const { submit } = useApiRequest();
     const toast = useToast();
 
     const openCreate = () => { setEditTarget(null); setShowForm(true); };
@@ -230,28 +218,19 @@ export default function ClientLocationManager({ client, districts = [], municipa
 
     const handleSaved = () => { closeForm(); refetch(); };
 
-    const handleDelete = async (loc) => {
+    const handleDelete = (loc) => {
         if (!window.confirm(`${t('pages.client_locations.confirm_delete')} "${loc.name}"?`)) return;
 
-        try {
-            const res = await fetch(`/api/clients/${client.id}/locations/${loc.id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        ...csrfHeader(),
-                    },
-            });
-
-            if (res.ok) {
+        submit(`/api/clients/${client.id}/locations/${loc.id}`, {
+            method: 'DELETE',
+            onSuccess: () => {
                 toast.success(t('pages.client_locations.deleted'));
                 refetch();
-            } else {
+            },
+            onError: () => {
                 toast.error(t('pages.client_locations.delete_failed'));
-            }
-        } catch {
-            toast.error(t('pages.client_locations.unexpected_error'));
-        }
+            },
+        });
     };
 
     if (!client) return null;
