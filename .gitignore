@@ -29,4 +29,31 @@ Thumbs.db
 .claude/
 .opencode/
 .playwright-mcp/
+.clone/
+.graphify_chunks.json
+.graphify_python
+.graphifyignore
+.roo/
+.rooignore
+.clinerules
+.clineignore
+AGENTS.md
+CLAUDE.md
+opencode.json
 /temp/
+
+# Dev-only scripts and dumps
+_check_fks.php
+_write_issues.js
+db_tables.sql
+/plans/
+/documentation/
+
+# OS / editor
+desktop.ini
+project.zip
+PROJECT_STRUCTURE.md
+ESPECIFICACAO_PROJETO.md
+FIRST_TIME_SETUP.txt
+SETUP_COMMANDS.md
+I18N_ROADMAP.md
