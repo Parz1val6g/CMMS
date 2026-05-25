@@ -8,6 +8,7 @@ use App\Features\MiniTasks\Services\MiniTaskService;
 
 class CheckWorkLogsCompletion
 {
+    // See docs/architecture/cascade-completion-chain.md for the full cascade documentation.
     public function __construct(
         private MiniTaskService $miniTaskService
     ) {}
