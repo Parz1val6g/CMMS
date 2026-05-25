@@ -6,6 +6,7 @@ use App\Features\MiniTasks\Events\MiniTaskCompletedEvent;
 use App\Features\Notifications\Services\NotificationService;
 class CheckMiniTasksCompletion
 {
+    // See docs/architecture/cascade-completion-chain.md for the full cascade documentation.
     public function __construct(
         private NotificationService $notificationService
     ) {
