@@ -7,13 +7,9 @@ use App\Shared\Models\User;
 
 class NotificationPolicy extends BasePolicy
 {
-    /**
-     * viewAny returns true because the controller always scopes to auth()->id().
-     * Extending BasePolicy ensures the admin before() override still runs.
-     */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $this->hasPermission($user, 'view', 'notifications');
     }
 
     public function view(User $user, Notification $notification): bool

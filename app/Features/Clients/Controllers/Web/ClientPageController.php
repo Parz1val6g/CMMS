@@ -2,6 +2,7 @@
 
 namespace App\Features\Clients\Controllers\Web;
 
+use App\Core\Traits\GatesRoutes;
 use App\Features\Clients\ClientFormSchema;
 use App\Features\Clients\Models\Client;
 use App\Shared\Models\District;
@@ -14,6 +15,8 @@ use Inertia\Inertia;
 
 class ClientPageController extends Controller
 {
+    use GatesRoutes;
+
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Client::class);
@@ -46,13 +49,13 @@ class ClientPageController extends Controller
             ],
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
-            'routes' => [
-                'index' => url('/api/clients'),
-                'store' => url('/api/clients'),
-                'update' => url('/api/clients/__ID__'),
+            'routes' => $this->gatedRoutes([
+                'index'   => url('/api/clients'),
+                'store'   => url('/api/clients'),
+                'update'  => url('/api/clients/__ID__'),
                 'destroy' => url('/api/clients/__ID__'),
-                'show' => url('/api/clients/__ID__'),
-            ],
+                'show'    => url('/api/clients/__ID__'),
+            ], 'clients'),
             'districts' => District::orderBy('name')->get(['id', 'name'])
                 ->map(fn($d) => ['value' => $d->id, 'label' => $d->name])
                 ->toArray(),

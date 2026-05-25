@@ -29,6 +29,130 @@ class RolePermissionSeeder extends Seeder
                 ['resources' => PermissionResource::cases(), 'actions' => PermissionAction::cases()],
             ],
 
+            // ── Supervisor: read-only + state-transition oversight across the operational chain ──
+            'supervisor' => [
+                [
+                    'resources' => [
+                        PermissionResource::MINI_TASKS,
+                        PermissionResource::WORK_LOGS,
+                        PermissionResource::WORKERS,
+                        PermissionResource::TEAMS,
+                        PermissionResource::SECTORS,
+                    ],
+                    'actions' => [PermissionAction::VIEW],
+                ],
+                [
+                    // Can complete SOs but not activate/create (activation belongs to manager)
+                    'resources' => [PermissionResource::SERVICE_ORDERS],
+                    'actions'   => [PermissionAction::VIEW, PermissionAction::COMPLETE],
+                ],
+                [
+                    // Can drive task lifecycle (complete, cancel, reject) but cannot create/update
+                    'resources' => [PermissionResource::TASKS],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::COMPLETE,
+                        PermissionAction::CANCEL,
+                        PermissionAction::REJECT,
+                    ],
+                ],
+                [
+                    'resources' => [
+                        PermissionResource::PROFILE,
+                        PermissionResource::SESSIONS,
+                        PermissionResource::LOGIN_HISTORIES,
+                        PermissionResource::NOTIFICATIONS,
+                    ],
+                    'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
+            ],
+
+            // ── Mini-Task Manager: manages mini-tasks and monitors work logs ──
+            'mini_task_manager' => [
+                [
+                    'resources' => [PermissionResource::MINI_TASKS],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::CREATE,
+                        PermissionAction::UPDATE,
+                        PermissionAction::ASSIGN_WORKERS,
+                        PermissionAction::ASSIGN_MATERIALS,
+                        PermissionAction::ASSIGN_EQUIPMENT,
+                        PermissionAction::COMPLETE,
+                    ],
+                ],
+                [
+                    'resources' => [PermissionResource::WORK_LOGS],
+                    'actions'   => [PermissionAction::VIEW],
+                ],
+                [
+                    'resources' => [PermissionResource::ATTACHMENTS],
+                    'actions'   => [PermissionAction::VIEW, PermissionAction::CREATE],
+                ],
+                [
+                    // Reference data needed to plan mini-tasks
+                    'resources' => [
+                        PermissionResource::TASKS,
+                        PermissionResource::SECTORS,
+                        PermissionResource::WORKERS,
+                        PermissionResource::TEAMS,
+                        PermissionResource::MATERIALS,
+                        PermissionResource::EQUIPMENTS,
+                        PermissionResource::UNITS,
+                    ],
+                    'actions' => [PermissionAction::VIEW],
+                ],
+                [
+                    'resources' => [
+                        PermissionResource::PROFILE,
+                        PermissionResource::SESSIONS,
+                        PermissionResource::LOGIN_HISTORIES,
+                        PermissionResource::NOTIFICATIONS,
+                    ],
+                    'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
+            ],
+
+            // ── Work Log Manager: reviews and manages work logs ──
+            'work_log_manager' => [
+                [
+                    'resources' => [PermissionResource::WORK_LOGS],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::CREATE,
+                        PermissionAction::UPDATE,
+                        PermissionAction::COMPLETE,
+                        PermissionAction::APPROVE,
+                        PermissionAction::REJECT,
+                    ],
+                ],
+                [
+                    // Context needed to review work
+                    'resources' => [
+                        PermissionResource::MINI_TASKS,
+                        PermissionResource::TASKS,
+                        PermissionResource::WORKERS,
+                        PermissionResource::MATERIALS,
+                        PermissionResource::EQUIPMENTS,
+                        PermissionResource::UNITS,
+                    ],
+                    'actions' => [PermissionAction::VIEW],
+                ],
+                [
+                    'resources' => [PermissionResource::ATTACHMENTS],
+                    'actions'   => [PermissionAction::VIEW, PermissionAction::CREATE],
+                ],
+                [
+                    'resources' => [
+                        PermissionResource::PROFILE,
+                        PermissionResource::SESSIONS,
+                        PermissionResource::LOGIN_HISTORIES,
+                        PermissionResource::NOTIFICATIONS,
+                    ],
+                    'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
+                ],
+            ],
+
             // ── Manager (Gestor SO): owns SOs, reads task state ──
             'manager' => [
                 [
@@ -57,6 +181,19 @@ class RolePermissionSeeder extends Seeder
                     ],
                 ],
                 [
+                    'resources' => [PermissionResource::MINI_TASKS],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::CREATE,
+                        PermissionAction::ASSIGN_WORKERS,
+                    ],
+                ],
+                [
+                    // Approve loan orders requested for their service orders
+                    'resources' => [PermissionResource::LOAN_ORDERS],
+                    'actions'   => [PermissionAction::VIEW, PermissionAction::APPROVE],
+                ],
+                [
                     // Reference data needed to create/activate SOs
                     'resources' => [
                         PermissionResource::USERS,
@@ -72,6 +209,7 @@ class RolePermissionSeeder extends Seeder
                         PermissionResource::PROFILE,
                         PermissionResource::SESSIONS,
                         PermissionResource::LOGIN_HISTORIES,
+                        PermissionResource::NOTIFICATIONS,
                     ],
                     'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
                 ],
@@ -108,6 +246,7 @@ class RolePermissionSeeder extends Seeder
                         PermissionResource::PROFILE,
                         PermissionResource::SESSIONS,
                         PermissionResource::LOGIN_HISTORIES,
+                        PermissionResource::NOTIFICATIONS,
                     ],
                     'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
                 ],
@@ -138,6 +277,10 @@ class RolePermissionSeeder extends Seeder
                     ],
                 ],
                 [
+                    'resources' => [PermissionResource::WORK_LOGS],
+                    'actions'   => [PermissionAction::VIEW],
+                ],
+                [
                     'resources' => [PermissionResource::ATTACHMENTS],
                     'actions'   => [PermissionAction::VIEW, PermissionAction::CREATE],
                 ],
@@ -159,6 +302,7 @@ class RolePermissionSeeder extends Seeder
                         PermissionResource::PROFILE,
                         PermissionResource::SESSIONS,
                         PermissionResource::LOGIN_HISTORIES,
+                        PermissionResource::NOTIFICATIONS,
                     ],
                     'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
                 ],
@@ -199,6 +343,7 @@ class RolePermissionSeeder extends Seeder
                         PermissionResource::PROFILE,
                         PermissionResource::SESSIONS,
                         PermissionResource::LOGIN_HISTORIES,
+                        PermissionResource::NOTIFICATIONS,
                     ],
                     'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
                 ],
@@ -223,6 +368,7 @@ class RolePermissionSeeder extends Seeder
                         PermissionResource::PROFILE,
                         PermissionResource::SESSIONS,
                         PermissionResource::LOGIN_HISTORIES,
+                        PermissionResource::NOTIFICATIONS,
                     ],
                     'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
                 ],
@@ -243,6 +389,7 @@ class RolePermissionSeeder extends Seeder
                         PermissionResource::PROFILE,
                         PermissionResource::SESSIONS,
                         PermissionResource::LOGIN_HISTORIES,
+                        PermissionResource::NOTIFICATIONS,
                     ],
                     'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
                 ],
@@ -273,6 +420,16 @@ class RolePermissionSeeder extends Seeder
                     ],
                 ],
                 [
+                    // Loan order lifecycle management (approve, checkout, return)
+                    'resources' => [PermissionResource::LOAN_ORDERS],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::APPROVE,
+                        PermissionAction::CHECKOUT,
+                        PermissionAction::INITIATE_RETURN,
+                    ],
+                ],
+                [
                     'resources' => [
                         PermissionResource::LOCATIONS,
                         PermissionResource::SECTORS,
@@ -284,6 +441,7 @@ class RolePermissionSeeder extends Seeder
                         PermissionResource::PROFILE,
                         PermissionResource::SESSIONS,
                         PermissionResource::LOGIN_HISTORIES,
+                        PermissionResource::NOTIFICATIONS,
                     ],
                     'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
                 ],
@@ -317,6 +475,7 @@ class RolePermissionSeeder extends Seeder
                         PermissionResource::PROFILE,
                         PermissionResource::SESSIONS,
                         PermissionResource::LOGIN_HISTORIES,
+                        PermissionResource::NOTIFICATIONS,
                     ],
                     'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
                 ],
@@ -337,6 +496,7 @@ class RolePermissionSeeder extends Seeder
                         PermissionResource::PROFILE,
                         PermissionResource::SESSIONS,
                         PermissionResource::LOGIN_HISTORIES,
+                        PermissionResource::NOTIFICATIONS,
                     ],
                     'actions' => [PermissionAction::VIEW, PermissionAction::UPDATE],
                 ],

@@ -70,6 +70,9 @@ return [
         'tickets' => 'Tickets',
         'loan_orders' => 'Loan Orders',
         'entities' => 'Entities',
+        'notifications' => 'Notifications',
+        'equipment_types' => 'Equipment Types',
+        'counting_types' => 'Counting Types',
     ],
 
     'priority' => [

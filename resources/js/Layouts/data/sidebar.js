@@ -74,7 +74,7 @@ export function getSections() {
     {
       label: t('pages.sidebar.section_hr'),
       items: [
-        { label: t('pages.sidebar.sectors'), icon: Building2, href: '/sectors', dev: false, can: 'viewSectors' },
+        { label: t('pages.sidebar.sectors'), icon: Building2, href: '/sectors', dev: false, can: 'createSectors' },
         { label: t('pages.sidebar.teams'),   icon: Group,     href: '/teams',   dev: false, can: 'viewTeams' },
         { label: t('pages.sidebar.workers'), icon: UserCog,   href: '/workers', dev: false, can: 'viewWorkers' },
       ],
@@ -93,7 +93,7 @@ export function getSections() {
     {
       label: t('pages.sidebar.section_settings'),
       items: [
-        { label: t('pages.sidebar.service_types'),   icon: Package, href: '/service-types',   dev: false, can: 'viewServiceTypes' },
+        { label: t('pages.sidebar.service_types'),   icon: Package, href: '/service-types',   dev: false, can: 'createServiceTypes' },
         { label: t('pages.sidebar.equipment_types'), icon: Wrench,  href: '/equipment-types', dev: false, can: 'viewEquipmentTypes' },
         { label: t('pages.sidebar.counting_types'),  icon: Wrench,  href: '/counting-types',  dev: false, can: 'viewCountingTypes' },
         { label: t('pages.sidebar.materials'),       icon: Package, href: '/materials',        dev: false, can: 'viewMaterials' },
@@ -106,7 +106,7 @@ export function getSections() {
 export function getBottomItems() {
   return [
     { label: t('pages.sidebar.notifications'), icon: Bell,     href: '/notifications', dev: true,  can: 'viewNotifications' },
-    { label: t('pages.sidebar.settings'),      icon: Settings, href: '/settings',      dev: false, can: 'viewSettings' },
+    { label: t('pages.sidebar.settings'),      icon: Settings, href: '/settings',      dev: false },
     { label: t('pages.sidebar.admin'),         icon: Shield,   href: '/admin',         dev: false, can: 'manageUsers' },
   ];
 }
