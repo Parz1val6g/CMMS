@@ -13,7 +13,12 @@ const PRIORITY_BADGE = {
   low:    'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-300/60',
 };
 
-const PRIORITY_LABEL = { urgent: 'Urgente', high: 'Alta', normal: 'Normal', low: 'Baixa' };
+const PRIORITY_LABEL = {
+  urgent: t('pages.service_orders.drawer.priority_urgent'),
+  high: t('pages.service_orders.drawer.priority_high'),
+  normal: t('pages.service_orders.drawer.priority_normal'),
+  low: t('pages.service_orders.drawer.priority_low'),
+};
 
 const STATUS_BADGE = {
   pending:           'bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-300/60',
@@ -24,8 +29,11 @@ const STATUS_BADGE = {
 };
 
 const STATUS_LABEL = {
-  pending: 'Pendente', awaiting_approval: 'A Aguardar Aprovação',
-  in_progress: 'Em Progresso', completed: 'Concluído', cancelled: 'Cancelado',
+  pending: t('pages.service_orders.drawer.status_pending'),
+  awaiting_approval: t('pages.service_orders.drawer.status_awaiting_approval'),
+  in_progress: t('pages.service_orders.drawer.status_in_progress'),
+  completed: t('pages.service_orders.drawer.status_completed'),
+  cancelled: t('pages.service_orders.drawer.status_cancelled'),
 };
 
 function Field({ label, children }) {
@@ -98,22 +106,22 @@ function DetailTab({ order }) {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-        <Field label="Estado">
+        <Field label={t('pages.service_orders.drawer.field_status')}>
           <Badge map={STATUS_BADGE} labelMap={STATUS_LABEL} value={order?.status?.value ?? order?.status} />
         </Field>
-        <Field label="Prioridade">
+        <Field label={t('pages.service_orders.drawer.field_priority')}>
           <Badge map={PRIORITY_BADGE} labelMap={PRIORITY_LABEL} value={order?.priority?.value ?? order?.priority} />
         </Field>
-        <Field label="Gestor">{order?.manager?.name}</Field>
-        <Field label="Criado em">{createdAt}</Field>
-        <Field label="Data de Execução">{executionDate}</Field>
-        <Field label="Tipo de Serviço">{order?.service_type?.name}</Field>
-        <Field label="Localização">{order?.location?.parish?.name}</Field>
+        <Field label={t('pages.service_orders.drawer.field_manager')}>{order?.manager?.name}</Field>
+        <Field label={t('pages.service_orders.drawer.field_created_at')}>{createdAt}</Field>
+        <Field label={t('pages.service_orders.drawer.field_execution_date')}>{executionDate}</Field>
+        <Field label={t('pages.service_orders.drawer.field_service_type')}>{order?.service_type?.name}</Field>
+        <Field label={t('pages.service_orders.drawer.field_location')}>{order?.location?.parish?.name}</Field>
       </div>
 
       {order?.description && (
         <div>
-          <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Descrição</span>
+          <span className="text-xs font-medium uppercase tracking-wider text-gray-400">{t('pages.service_orders.drawer.field_description')}</span>
           <p className="mt-1 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{order.description}</p>
         </div>
       )}
@@ -124,7 +132,7 @@ function DetailTab({ order }) {
           className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-accent hover:underline"
         >
           <ExternalLink size={14} />
-          Ver em Ordens de Serviço
+          {t('pages.service_orders.drawer.view_link')}
         </Link>
       </div>
     </div>
@@ -207,8 +215,8 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
   ) : null;
 
   const tabs = loading || !order
-    ? [{ id: 'loading', label: '...', component: <div className="py-12 text-center text-sm text-gray-400">A carregar...</div> }]
-    : [{ id: 'details', label: 'Detalhes', component: <DetailTab order={order} /> }];
+    ? [{ id: 'loading', label: '...', component: <div className="py-12 text-center text-sm text-gray-400">{t('common.loading')}</div> }]
+    : [{ id: 'details', label: t('pages.service_orders.drawer.tab_details'), component: <DetailTab order={order} /> }];
 
   return (
     <>

@@ -24,7 +24,7 @@ export default function LoanOrdersIndex({ loan_orders, columns, formSchema, crea
       const res = await fetch(`/api/loan-orders/${item.id}`, {
         headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
       });
-      if (!res.ok) throw new Error('Failed to load');
+      if (!res.ok) throw new Error(t('pages.loan_orders.load_failed'));
       const data = await res.json();
       setDrawer({ open: true, loanOrder: data.data ?? data, loading: false, error: null });
     } catch (e) {
@@ -45,8 +45,8 @@ export default function LoanOrdersIndex({ loan_orders, columns, formSchema, crea
     })), [columns]);
 
   const drawerTabs = useMemo(() => {
-    if (drawer.loading) return [{ id: 'loading', label: '...', component: () => <div className="p-4 text-brand-mid">Loading...</div> }];
-    if (drawer.error) return [{ id: 'error', label: 'Error', component: () => <div className="p-4 text-red-500">{drawer.error}</div> }];
+    if (drawer.loading) return [{ id: 'loading', label: '...', component: () => <div className="p-4 text-brand-mid">{t('common.loading')}</div> }];
+    if (drawer.error) return [{ id: 'error', label: t('pages.loan_orders.tab_error'), component: () => <div className="p-4 text-red-500">{drawer.error}</div> }];
     if (!drawer.loanOrder) return [];
     return LoanOrderDrawerTabs(drawer.loanOrder, { onAction: closeDrawer });
   }, [drawer.loading, drawer.error, drawer.loanOrder, closeDrawer]);
@@ -62,7 +62,7 @@ export default function LoanOrdersIndex({ loan_orders, columns, formSchema, crea
       body: JSON.stringify(formData),
     });
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ message: 'Failed to create' }));
+      const err = await res.json().catch(() => ({ message: t('pages.loan_orders.create_failed') }));
       throw err;
     }
     setCreateOpen(false);

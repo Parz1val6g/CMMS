@@ -4,6 +4,7 @@ import { Loader2, AlertCircle } from 'lucide-react';
 import TaskTreeNode from './TaskTreeNode';
 import buildTaskTree from '../../Utils/buildTaskTree';
 import { csrfHeader } from '@/utils/csrf';
+import { t } from '@/utils/i18n';
 
 /**
  * SOTasksTree — Hierarchical tasks tree for a Service Order.
@@ -123,7 +124,7 @@ export default function SOTasksTree({
     return (
       <div className="flex items-center justify-center h-40 text-brand-mid gap-2">
         <Loader2 className="h-5 w-5 animate-spin" />
-        <span className="text-sm">Loading tasks…</span>
+        <span className="text-sm">{t('pages.service_orders.tasks_tree.loading')}</span>
       </div>
     );
   }
@@ -133,7 +134,7 @@ export default function SOTasksTree({
     return (
       <div className="flex items-center justify-center h-40 text-red-400 gap-2">
         <AlertCircle className="h-5 w-5" />
-        <span className="text-sm">Failed to load tasks: {error}</span>
+        <span className="text-sm">{t('pages.service_orders.tasks_tree.load_failed')}{error}</span>
       </div>
     );
   }
@@ -142,7 +143,7 @@ export default function SOTasksTree({
   if (tree.length === 0) {
     return (
       <div className="flex items-center justify-center h-40 text-brand-mid">
-        <p className="text-sm">No tasks assigned to this service order.</p>
+        <p className="text-sm">{t('pages.service_orders.tasks_tree.no_tasks')}</p>
       </div>
     );
   }
@@ -157,18 +158,18 @@ export default function SOTasksTree({
       {/* Summary */}
       <div className="flex items-center justify-between mb-4 px-4 py-2 rounded-lg bg-brand-white border border-brand-mid/20">
         <span className="text-xs text-brand-mid">
-          <span className="font-semibold text-brand-darkest">{totalTasks}</span> tasks
+          <span className="font-semibold text-brand-darkest">{totalTasks}</span> {t('pages.service_orders.tasks_tree.tasks_label')}
           {completedTasks > 0 && (
             <>
               {' · '}
-              <span className="font-semibold text-green-400">{completedTasks}</span> completed
+              <span className="font-semibold text-green-400">{completedTasks}</span> {t('pages.service_orders.tasks_tree.completed_label')}
             </>
           )}
         </span>
         <span className="text-xs text-brand-mid">
-          {totalTasks} task{totalTasks !== 1 ? 's' : ''}
+          {totalTasks} {totalTasks !== 1 ? t('pages.service_orders.tasks_tree.task_plural') : t('pages.service_orders.tasks_tree.task_singular')}
           {subTaskCount > 0 && (
-            <> · {subTaskCount} sub-task{subTaskCount !== 1 ? 's' : ''}</>
+            <> · {subTaskCount} {subTaskCount !== 1 ? t('pages.service_orders.tasks_tree.sub_task_plural') : t('pages.service_orders.tasks_tree.sub_task_singular')}</>
           )}
         </span>
       </div>

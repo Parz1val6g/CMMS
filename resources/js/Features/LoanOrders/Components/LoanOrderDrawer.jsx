@@ -102,7 +102,7 @@ function DetailsTab({ lo }) {
       {/* Estado e Datas */}
       <SectionTitle>{t('pages.loan_orders.section_status')}</SectionTitle>
       <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-        <Field label="Estado">
+        <Field label={t('pages.loan_orders.col_status')}>
           <StatusBadge value={lo.status} />
         </Field>
         <Field label={t('pages.loan_orders.section_created_at')} value={formatDate(lo.created_at)} />
@@ -154,7 +154,7 @@ function EquipmentCard({ eq }) {
         </span>
         {eq.start_date && (
           <span>
-            <span className="text-gray-400">Período:</span>{' '}
+            <span className="text-gray-400">{t('pages.loan_orders.period_label')}</span>{' '}
             {formatDate(eq.start_date)}
             {eq.end_date && ` — ${formatDate(eq.end_date)}`}
           </span>
@@ -318,11 +318,11 @@ function ActionButtons({ lo, onAction, entityMode = false }) {
     if (!isPending) return null;
     return (
       <div className="mt-6 pt-5 border-t border-gray-100">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Ações</p>
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">{t('pages.loan_orders.section_actions')}</p>
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => act('cancel', `/api/loan-orders/${lo.id}/cancel`,
-              t('pages.loan_orders.action_cancel_confirm'), 'Failed to cancel')}
+              t('pages.loan_orders.action_cancel_confirm'), t('pages.loan_orders.action_cancel_failed'))}
             disabled={loading.cancel}
             className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white hover:bg-red-50 hover:border-red-300 hover:text-red-700 disabled:opacity-60 text-gray-700 text-sm font-medium px-4 py-2 transition-colors"
           >
@@ -338,13 +338,13 @@ function ActionButtons({ lo, onAction, entityMode = false }) {
 
   return (
     <div className="mt-6 pt-5 border-t border-gray-100">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Ações</p>
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">{t('pages.loan_orders.section_actions')}</p>
       <div className="flex flex-wrap gap-3">
 
         {isPending && (
           <button
             onClick={() => act('approve', `/api/loan-orders/${lo.id}/approve`,
-              t('pages.loan_orders.action_approve_confirm'), 'Failed to approve')}
+              t('pages.loan_orders.action_approve_confirm'), t('pages.loan_orders.action_approve_failed'))}
             disabled={loading.approve}
             className="inline-flex items-center gap-2 rounded-lg bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition-colors"
           >
@@ -356,7 +356,7 @@ function ActionButtons({ lo, onAction, entityMode = false }) {
         {isApproved && (
           <button
             onClick={() => act('checkout', `/api/loan-orders/${lo.id}/checkout`,
-              t('pages.loan_orders.action_checkout_confirm'), 'Failed to checkout')}
+              t('pages.loan_orders.action_checkout_confirm'), t('pages.loan_orders.action_checkout_failed'))}
             disabled={loading.checkout}
             className="inline-flex items-center gap-2 rounded-lg bg-brand-accent hover:bg-brand-accent/90 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition-colors"
           >
@@ -368,7 +368,7 @@ function ActionButtons({ lo, onAction, entityMode = false }) {
         {isCheckedOut && (
           <button
             onClick={() => act('return', `/api/loan-orders/${lo.id}/return`,
-              t('pages.loan_orders.action_initiate_return_confirm'), 'Failed to initiate return')}
+              t('pages.loan_orders.action_initiate_return_confirm'), t('pages.loan_orders.action_initiate_return_failed'))}
             disabled={loading.return}
             className="inline-flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition-colors"
           >
@@ -380,7 +380,7 @@ function ActionButtons({ lo, onAction, entityMode = false }) {
         {isPending && (
           <button
             onClick={() => act('cancel', `/api/loan-orders/${lo.id}/cancel`,
-              t('pages.loan_orders.action_cancel_confirm'), 'Failed to cancel')}
+              t('pages.loan_orders.action_cancel_confirm'), t('pages.loan_orders.action_cancel_failed'))}
             disabled={loading.cancel}
             className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-60 text-gray-700 text-sm font-medium px-4 py-2 transition-colors"
           >
