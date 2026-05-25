@@ -15,10 +15,10 @@ use App\Features\Teams\Models\Team;
 use App\Features\Tickets\Models\Ticket;
 use App\Features\Workers\Models\Worker;
 use App\Features\WorkLogs\Models\WorkLog;
+use App\Shared\Models\Role;
 use App\Shared\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -50,7 +50,7 @@ class DashboardController extends Controller
     {
         $kpis = [
             'total_users'     => ['value' => User::count()],
-            'active_roles'    => ['value' => DB::table('user_roles')->count()],
+            'active_roles'    => ['value' => Role::whereHas('users')->count()],
             'new_users_week'  => ['value' => User::where('created_at', '>=', now()->startOfWeek())->count()],
         ];
 
