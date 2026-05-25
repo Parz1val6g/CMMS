@@ -1,15 +1,7 @@
 import { useState, useEffect } from 'react';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
+import BaseField from '@/Components/Shared/Drawer/BaseField';
 import { t } from '@/utils/i18n';
-
-function Field({ label, children }) {
-    return (
-        <div className="flex flex-col gap-1">
-            <span className="text-xs font-medium uppercase tracking-wide text-brand-mid">{label}</span>
-            <span className="text-sm text-brand-darkest">{children ?? <span className="text-brand-mid">—</span>}</span>
-        </div>
-    );
-}
 
 function StatusBadge({ status }) {
     const map = {
@@ -88,24 +80,24 @@ function GeneralTab({ item }) {
 
     return (
         <div className="grid grid-cols-2 gap-6">
-            <Field label={t('pages.work_logs.drawer.field_reference')}>
+            <BaseField label={t('pages.work_logs.drawer.field_reference')}>
                 <span className="font-mono text-brand-accent">{item.reference}</span>
-            </Field>
-            <Field label={t('pages.work_logs.drawer.field_status')}>
+            </BaseField>
+            <BaseField label={t('pages.work_logs.drawer.field_status')}>
                 <StatusBadge status={item.status} />
-            </Field>
-            <Field label={t('pages.work_logs.drawer.field_mini_task')}>
+            </BaseField>
+            <BaseField label={t('pages.work_logs.drawer.field_mini_task')}>
                 <span className="font-mono text-brand-accent">{item.mini_task?.reference ?? null}</span>
-            </Field>
-            <Field label={t('pages.work_logs.drawer.field_created_at')}>
+            </BaseField>
+            <BaseField label={t('pages.work_logs.drawer.field_created_at')}>
                 {createdAt}
-            </Field>
+            </BaseField>
             <div className="col-span-2">
-                <Field label={t('pages.work_logs.drawer.field_description')}>
+                <BaseField label={t('pages.work_logs.drawer.field_description')}>
                     {item.description
                         ? <p className="whitespace-pre-wrap leading-relaxed">{item.description}</p>
                         : null}
-                </Field>
+                </BaseField>
             </div>
         </div>
     );
@@ -180,12 +172,12 @@ function TimeTab({ startedAt, completedAt, durationMinutes }) {
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
-                <Field label={t('pages.work_logs.drawer.field_start')}>
+                <BaseField label={t('pages.work_logs.drawer.field_start')}>
                     {formatDateTime(startedAt)}
-                </Field>
-                <Field label={t('pages.work_logs.drawer.field_end')}>
+                </BaseField>
+                <BaseField label={t('pages.work_logs.drawer.field_end')}>
                     {isFinished ? formatDateTime(completedAt) : <span className="text-amber-400 text-sm">{t('pages.work_logs.drawer.in_progress_label')}</span>}
-                </Field>
+                </BaseField>
             </div>
 
             <div className="rounded-lg bg-brand-light border border-brand-mid/20 p-6 flex flex-col items-center gap-2">

@@ -7,7 +7,7 @@ import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
 import { t } from '@/utils/i18n';
 import { labelFor, badgeStyle } from '@/utils/enums';
 import { csrfHeader } from '@/utils/csrf';
-import LoanOrderDrawerTabs from '../Components/LoanOrderDrawer';
+import LoanOrderDrawerTabs from '@/Components/Shared/LoanOrderDrawer';
 
 export default function LoanOrdersIndex({ loan_orders, columns, formSchema, createFormSchema, routes, filterSchema = [], advancedFilterFields = [] }) {
   const breadcrumbs = [
