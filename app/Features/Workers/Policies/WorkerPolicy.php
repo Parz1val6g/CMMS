@@ -24,13 +24,6 @@ class WorkerPolicy extends BasePolicy
             return $worker->team?->sector->head_id === $user->id;
         }
 
-        // supervisor can only view workers in their teams
-        if ($this->isSupervisor($user)) {
-            return $worker->team?->miniTasks()
-                ->where('supervisor_id', $user->id)
-                ->exists();
-        }
-
         return true;
     }
 

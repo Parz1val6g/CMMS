@@ -51,7 +51,7 @@ export default function RepeaterInput({ field, value = [], onChange }) {
             className="inline-flex items-center gap-1 rounded-lg border border-brand-mid/20 bg-brand-white px-3 py-1.5 text-xs font-medium text-brand-accent hover:bg-brand-light transition-colors"
           >
             <Plus className="h-3.5 w-3.5" />
-            {subFields[0]?.placeholder || 'Adicionar'}
+            {subFields[0]?.placeholder || t('common.add')}
           </button>
         )}
       </div>

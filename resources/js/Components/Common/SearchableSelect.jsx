@@ -3,7 +3,7 @@ import { ChevronDown, Search } from 'lucide-react';
 import { toScalar } from '@/Utils/url';
 import { t } from '@/utils/i18n';
 
-export default function SearchableSelect({ name, options = [], value = '', onChange, placeholder = 'Select...' }) {
+export default function SearchableSelect({ name, options = [], value = '', onChange, placeholder }) {
   /* ── Normalize incoming value (may be object from Laravel relation) ── */
   const scalarValue = toScalar(value);
 
@@ -101,7 +101,7 @@ export default function SearchableSelect({ name, options = [], value = '', onCha
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (isOpen) close(); else open(); } }}
       >
         <span className={`flex-1 ${scalarValue !== '' ? '' : 'text-brand-mid'}`}>
-          {scalarValue !== '' ? displayLabel : placeholder}
+          {scalarValue !== '' ? displayLabel : (placeholder || t('common.searchable_select.placeholder'))}
         </span>
         <ChevronDown className={`h-4 w-4 text-brand-mid transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>

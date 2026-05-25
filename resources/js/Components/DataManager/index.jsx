@@ -67,7 +67,7 @@ export default function DataManager({
     const abortRef = useRef(null);
 
     const hasEdit = !!routes.update;
-    const name = entityName ?? title?.replace(/s$/, '') ?? 'Record';
+    const name = entityName ?? title?.replace(/s$/, '') ?? t('common.entity_name');
 
     /* ── Fetch helper — called after mutations to refresh without reload (#3) ── */
     const refetch = useCallback(() => {

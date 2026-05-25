@@ -308,7 +308,12 @@
         "map_title": "Mapa de Intervenções"
     },
     "layout": {
-        "footer_copyright": "© :year ERP Gestão — Todos os direitos reservados."
+        "footer_copyright": "© :year ERP Gestão — Todos os direitos reservados.",
+        "entity_portal": {
+            "brand": "Portal de Empréstimos",
+            "logout": "Sair",
+            "footer": "© :year CMMS — Portal de Entidades"
+        }
     },
     "sidebar": {
         "brand": "ERP Gestão",
@@ -343,7 +348,10 @@
         "admin": "Admin",
         "users": "Utilizadores",
         "series": "Séries",
-        "dev_badge": "Dev"
+        "dev_badge": "Dev",
+        "logout": "Sair",
+        "expand": "Expandir",
+        "collapse": "Colapsar"
     },
     "dev_pages": {
         "title_notifications": "Notificações",
@@ -471,6 +479,20 @@
         "use_toast_error": "useToast deve ser usado dentro de ToastProvider"
     },
     "common": {
+        "entity_name": "Registo",
+        "error_boundary": {
+            "heading": "Algo correu mal",
+            "description": "Ocorreu um erro inesperado. Por favor, recarregue a página.",
+            "reload_button": "Recarregar Página"
+        },
+        "multi_select": {
+            "placeholder": "Selecionar...",
+            "no_options": "Nenhuma opção disponível",
+            "remove_aria": "Remover :label"
+        },
+        "searchable_select": {
+            "placeholder": "Selecionar..."
+        },
         "cancel": "Cancelar",
         "save": "Guardar",
         "close": "Fechar",
@@ -483,11 +505,36 @@
         "search_placeholder": "Pesquisar...",
         "no_matches": "Sem resultados",
         "remove": "Remover",
+        "add": "Adicionar",
         "edit": "Editar",
         "delete": "Eliminar",
         "loading": "A carregar...",
         "yes": "Sim",
-        "no": "Não"
+        "no": "Não",
+        "select_placeholder": "Selecione...",
+        "map_picker": {
+            "missing_key": "A carregar configuração do mapa...",
+            "select_label": "Selecionar no Mapa",
+            "loading": "A carregar mapa...",
+            "hint": "Clique no mapa ou arraste o marcador para definir as coordenadas"
+        },
+        "file_dropzone": {
+            "upload_text": "Clique para carregar ou arraste e solte",
+            "supported_hint": "Qualquer tipo de ficheiro suportado"
+        },
+        "kanban": {
+            "item": "Item",
+            "no_items": "Sem itens"
+        },
+        "topbar": {
+            "select_role": "Selecionar Função"
+        },
+        "equipment_loan": {
+            "details_title": "Detalhes por Equipamento",
+            "start_date": "Data Inicial",
+            "end_date": "Data Final",
+            "needs_operator": "Requer Operador"
+        }
     },
     "work_logs": {
         "drawer": {
@@ -597,6 +644,8 @@
         "edit_aria": "Editar :name",
         "delete_aria": "Eliminar :name",
         "edit_title": "Editar",
-        "delete_title": "Eliminar"
+        "delete_title": "Eliminar",
+        "assigned_to_aria": "Atribuído a: :name",
+        "select_row_aria": "Selecionar :name"
     }
 }

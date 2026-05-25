@@ -3,6 +3,7 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { t } from '@/utils/i18n';
 import KanbanCard from './KanbanCard';
 
 export default function KanbanColumn({ column, items, renderCardContent, onCardClick }) {
@@ -42,7 +43,7 @@ export default function KanbanColumn({ column, items, renderCardContent, onCardC
                         ))
                     ) : (
                         <div className="flex items-center justify-center h-24 text-brand-mid">
-                            <p className="text-sm">No items</p>
+                            <p className="text-sm">{t('common.kanban.no_items')}</p>
                         </div>
                     )}
                 </SortableContext>

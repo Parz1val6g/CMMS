@@ -18,3 +18,5 @@ Route::middleware('auth')->post('/logout', [WebAuthController::class, 'logout'])
 
 // Select role — requires auth, shows role picker for multi-role users
 Route::middleware(['auth', 'web.access'])->get('/select-role', [WebAuthController::class, 'showSelectRole'])->name('select-role');
+Route::middleware(['auth', 'web.access'])->post('/select-role', [WebAuthController::class, 'selectRole'])->name('select-role.post');
+Route::middleware(['auth', 'web.access'])->post('/switch-role', [WebAuthController::class, 'switchRole'])->name('switch-role');

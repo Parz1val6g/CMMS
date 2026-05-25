@@ -37,11 +37,38 @@ return new class extends Migration {
 
     public function down(): void
     {
+        // Remove entity-linked loans — they have no client_id and cannot exist after rollback
+        DB::table('loan_orders')->whereNull('client_id')->delete();
+
+        // Drop FK constraints only if they exist (MySQL doesn't support DROP FOREIGN KEY IF EXISTS)
+        $dbName = DB::connection()->getDatabaseName();
+        $existingFks = DB::table('information_schema.TABLE_CONSTRAINTS')
+            ->where('TABLE_SCHEMA', $dbName)
+            ->where('TABLE_NAME', 'loan_orders')
+            ->where('CONSTRAINT_TYPE', 'FOREIGN KEY')
+            ->whereIn('CONSTRAINT_NAME', [
+                'loan_orders_entity_id_foreign',
+                'loan_orders_delivery_location_id_foreign',
+                'loan_orders_approved_by_foreign',
+            ])
+            ->pluck('CONSTRAINT_NAME');
+
+        foreach ($existingFks as $fk) {
+            DB::statement("ALTER TABLE loan_orders DROP FOREIGN KEY `{$fk}`");
+        }
+
         Schema::table('loan_orders', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('entity_id');
-            $table->dropConstrainedForeignId('delivery_location_id');
-            $table->dropConstrainedForeignId('approved_by');
-            $table->dropColumn(['approved_at', 'notes_cancel']);
+            $existing = Schema::getColumnListing('loan_orders');
+
+            $drops = array_filter(
+                ['entity_id', 'delivery_location_id', 'approved_by', 'approved_at', 'notes_cancel'],
+                fn($col) => in_array($col, $existing)
+            );
+
+            if ($drops) {
+                $table->dropColumn(array_values($drops));
+            }
+
             $table->foreignUuid('client_id')->nullable(false)->change();
         });
     }

@@ -72,7 +72,7 @@ function collectFormData(form, fields, formValues) {
   return data;
 }
 
-export default function Modal({ entityName = 'Record', title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit, children, injectAfterField }) {
+export default function Modal({ entityName = t('common.entity_name'), title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit, children, injectAfterField }) {
   const formRef = useRef(null);
   const containerRef = useRef(null);
   const [saving, setSaving] = useState(false);

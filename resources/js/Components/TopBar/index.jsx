@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { usePage, router } from '@inertiajs/react';
 import { ChevronDown, Check } from 'lucide-react';
+import { t } from '@/utils/i18n';
 
 function RoleSwitcher() {
   const { props: { availableRoles, activeRole } } = usePage();
@@ -23,15 +24,11 @@ function RoleSwitcher() {
 
   const activeLabel = availableRoles.find((r) => r.name === activeRole)?.label
     || availableRoles[0]?.label
-    || 'Select Role';
+    || t('common.topbar.select_role');
 
   const handleSwitch = (roleName) => {
-    router.post('/api/auth/switch-role', { role: roleName }, {
-      onSuccess: () => {
-        setOpen(false);
-        router.reload();
-      },
-    });
+    setOpen(false);
+    router.post('/switch-role', { role: roleName });
   };
 
   return (

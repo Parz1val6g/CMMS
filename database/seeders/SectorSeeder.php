@@ -13,10 +13,10 @@ class SectorSeeder extends Seeder
         $users = DB::table('users')->select('id', 'email')->get()->keyBy('email');
 
         $heads = [
-            'Departamento de Obras e Viação'       => 'rui.goncalves@cm-mangualde.pt',
-            'Departamento de Urbanismo'            => 'maria.pereira@cm-mangualde.pt',
-            'Departamento de Limpeza Urbana'       => 'nuno.costa@cm-mangualde.pt',
-            'Departamento de Água e Saneamento'    => 'sofia.marques@cm-mangualde.pt',
+            'Departamento de Obras e Viação'    => 'rui.goncalves@cm-mangualde.pt',
+            'Departamento de Urbanismo'         => 'maria.pereira@cm-mangualde.pt',
+            'Departamento de Limpeza Urbana'    => 'nuno.costa@cm-mangualde.pt',
+            'Departamento de Água e Saneamento' => 'sofia.marques@cm-mangualde.pt',
         ];
 
         foreach ($heads as $name => $email) {

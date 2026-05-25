@@ -183,7 +183,7 @@ function BottomUserRow({ auth, isCollapsed, onTooltipShow, onTooltipHide, onLogo
       <button
         type="button"
         onClick={onLogout}
-        onMouseEnter={isCollapsed ? (e) => onTooltipShow(e, 'Sair') : undefined}
+        onMouseEnter={isCollapsed ? (e) => onTooltipShow(e, t('pages.sidebar.logout')) : undefined}
         onMouseLeave={isCollapsed ? onTooltipHide : undefined}
         className={[
           'flex w-full items-center rounded-lg text-sm font-medium text-brand-mid transition-colors hover:bg-white/5 hover:text-brand-white',
@@ -191,7 +191,7 @@ function BottomUserRow({ auth, isCollapsed, onTooltipShow, onTooltipHide, onLogo
         ].join(' ')}
       >
         <LogOut className="h-[18px] w-[18px] shrink-0" />
-        {!isCollapsed && <span>Sair</span>}
+        {!isCollapsed && <span>{t('pages.sidebar.logout')}</span>}
       </button>
     </>
   );
@@ -321,7 +321,7 @@ export default function Sidebar() {
           <button
             type="button"
             onClick={toggleCollapse}
-            title={isCollapsed ? 'Expandir' : 'Colapsar'}
+            title={isCollapsed ? t('pages.sidebar.expand') : t('pages.sidebar.collapse')}
             className="flex h-7 w-7 items-center justify-center rounded-md text-brand-mid transition-colors hover:bg-white/5 hover:text-brand-white shrink-0"
           >
             {isCollapsed

@@ -26,7 +26,7 @@ export default function FilterBar({
     filterSchema = [],
     advancedFilterFields = [],
     onNew = () => {},
-    entityName = 'Record',
+    entityName = t('common.entity_name'),
     onFilterChange = () => {},
     onAdvancedFiltersChange = () => {},
 }) {

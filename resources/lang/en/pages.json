@@ -308,7 +308,12 @@
         "map_title": "Intervention Map"
     },
     "layout": {
-        "footer_copyright": "© :year ERP Gestão — All rights reserved."
+        "footer_copyright": "© :year ERP Gestão — All rights reserved.",
+        "entity_portal": {
+            "brand": "Loan Portal",
+            "logout": "Logout",
+            "footer": "© :year CMMS — Entities Portal"
+        }
     },
     "sidebar": {
         "brand": "ERP Gestão",
@@ -343,7 +348,10 @@
         "admin": "Admin",
         "users": "Users",
         "series": "Series",
-        "dev_badge": "Dev"
+        "dev_badge": "Dev",
+        "logout": "Logout",
+        "expand": "Expand",
+        "collapse": "Collapse"
     },
     "dev_pages": {
         "title_notifications": "Notifications",
@@ -471,6 +479,20 @@
         "use_toast_error": "useToast must be used within ToastProvider"
     },
     "common": {
+        "entity_name": "Record",
+        "error_boundary": {
+            "heading": "Something went wrong",
+            "description": "An unexpected error occurred. Please reload the page.",
+            "reload_button": "Reload Page"
+        },
+        "multi_select": {
+            "placeholder": "Select...",
+            "no_options": "No options available",
+            "remove_aria": "Remove :label"
+        },
+        "searchable_select": {
+            "placeholder": "Select..."
+        },
         "cancel": "Cancel",
         "save": "Save",
         "close": "Close",
@@ -483,11 +505,36 @@
         "search_placeholder": "Search...",
         "no_matches": "No matches",
         "remove": "Remove",
+        "add": "Add",
         "edit": "Edit",
         "delete": "Delete",
         "loading": "Loading...",
         "yes": "Yes",
-        "no": "No"
+        "no": "No",
+        "select_placeholder": "Select...",
+        "map_picker": {
+            "missing_key": "Loading Map Configuration...",
+            "select_label": "Select on Map",
+            "loading": "Loading map...",
+            "hint": "Click on the map or drag the marker to set coordinates"
+        },
+        "file_dropzone": {
+            "upload_text": "Click to upload or drag and drop",
+            "supported_hint": "Any file type supported"
+        },
+        "kanban": {
+            "item": "Item",
+            "no_items": "No items"
+        },
+        "topbar": {
+            "select_role": "Select Role"
+        },
+        "equipment_loan": {
+            "details_title": "Equipment Details",
+            "start_date": "Start Date",
+            "end_date": "End Date",
+            "needs_operator": "Requires Operator"
+        }
     },
     "work_logs": {
         "drawer": {
@@ -597,6 +644,8 @@
         "edit_aria": "Edit :name",
         "delete_aria": "Delete :name",
         "edit_title": "Edit",
-        "delete_title": "Delete"
+        "delete_title": "Delete",
+        "assigned_to_aria": "Assigned to: :name",
+        "select_row_aria": "Select :name"
     }
 }

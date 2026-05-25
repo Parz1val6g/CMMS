@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 class WebAccessMiddleware
 {
     /**
-     * Block worker/client roles from accessing the web interface.
-     * These roles are for the mobile app only.
+     * Block client role from the web interface.
+     * Workers are allowed — they need web access for mini-tasks and work logs (UC1).
      */
     public function handle(Request $request, Closure $next): mixed
     {
@@ -24,15 +24,23 @@ class WebAccessMiddleware
             return $next($request);
         }
 
-        // Roles blocked from web access
-        $blockedRoles = ['worker', 'client'];
+        // Only clients are blocked from the main web UI (UC1: client has no system access)
+        $blockedRoles = ['client'];
 
-        $hasWebAccess = $user->roles()
-            ->whereNotIn('name', $blockedRoles)
-            ->exists();
+        // When a specific role is active, check only against that role
+        $activeRole = $request->session()->get('active_role');
+        if ($activeRole) {
+            if (in_array($activeRole, $blockedRoles)) {
+                abort(403, 'Esta conta não tem acesso à interface web.');
+            }
+            return $next($request);
+        }
+
+        // Fallback: user has at least one non-blocked role
+        $hasWebAccess = $user->roles()->whereNotIn('name', $blockedRoles)->exists();
 
         if (!$hasWebAccess) {
-            abort(403, 'Esta conta é para a aplicação móvel e não tem acesso à interface web.');
+            abort(403, 'Esta conta não tem acesso à interface web.');
         }
 
         return $next($request);

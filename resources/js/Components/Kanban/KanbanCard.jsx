@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
+import { t } from '@/utils/i18n';
 
 function KanbanCard({ item, isDragging, renderCardContent, onCardClick }) {
     const {
@@ -38,7 +39,7 @@ function KanbanCard({ item, isDragging, renderCardContent, onCardClick }) {
 
             {/* Custom Content */}
             <div className="pl-2">
-                {renderCardContent ? renderCardContent(item) : <p className="text-sm text-brand-mid">Item</p>}
+                {renderCardContent ? renderCardContent(item) : <p className="text-sm text-brand-mid">{t('common.kanban.item')}</p>}
             </div>
         </div>
     );

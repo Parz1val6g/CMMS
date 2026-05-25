@@ -4,6 +4,7 @@ namespace App\Features\Authentication\Controllers\Web;
 
 use App\Core\Enums\SystemStatus;
 use App\Core\Helpers\InputSanitizer;
+use App\Core\Services\PermissionManager;
 use App\Features\Authentication\Requests\LoginRequest;
 use App\Shared\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -82,6 +83,44 @@ class WebAuthController extends Controller
         return \Inertia\Inertia::render('Authentication/Pages/SelectRole', [
             'availableRoles' => $availableRoles,
         ]);
+    }
+
+    /**
+     * Handle in-session role switch from the TopBar dropdown.
+     * Stays in context: redirects back to the current page.
+     */
+    public function switchRole(Request $request, PermissionManager $permissionManager): RedirectResponse
+    {
+        $data = $request->validate(['role' => ['required', 'string']]);
+        $user = $request->user();
+
+        if (!$user->roles()->where('name', $data['role'])->exists()) {
+            abort(403);
+        }
+
+        $request->session()->put('active_role', $data['role']);
+        $permissionManager->invalidateUserPermissions($user);
+
+        return redirect()->route('dashboard');
+    }
+
+    /**
+     * Handle role selection POST — sets active_role in session, redirects to dashboard.
+     */
+    public function selectRole(Request $request, PermissionManager $permissionManager): RedirectResponse
+    {
+        $data = $request->validate(['role' => ['required', 'string']]);
+
+        $user = $request->user();
+
+        if (!$user->roles()->where('name', $data['role'])->exists()) {
+            abort(403);
+        }
+
+        $request->session()->put('active_role', $data['role']);
+        $permissionManager->invalidateUserPermissions($user);
+
+        return redirect()->route('dashboard');
     }
 
     /**

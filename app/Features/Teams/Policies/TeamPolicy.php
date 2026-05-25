@@ -24,13 +24,6 @@ class TeamPolicy extends BasePolicy
             return $team->sector->head_id === $user->id;
         }
 
-        // supervisor can only view teams assigned to their mini-tasks
-        if ($this->isSupervisor($user)) {
-            return $team->miniTasks()
-                ->where('supervisor_id', $user->id)
-                ->exists();
-        }
-
         // team_manager can only view their own team
         if ($this->isTeamManager($user)) {
             return $team->responsible_id === $user->id;
