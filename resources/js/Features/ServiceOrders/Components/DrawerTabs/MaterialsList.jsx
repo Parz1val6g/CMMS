@@ -11,10 +11,10 @@ const EQUIP_STATUS_STYLE = {
 };
 
 const EQUIP_STATUS_LABEL = {
-  active:      'Active',
-  maintenance: 'Maintenance',
-  retired:     'Retired',
-  in_use:      'In Use',
+  active:      t('pages.service_orders.materials.status_active'),
+  maintenance: t('pages.service_orders.materials.status_maintenance'),
+  retired:     t('pages.service_orders.materials.status_retired'),
+  in_use:      t('pages.service_orders.materials.status_in_use'),
 };
 
 /* ── Type badge ──────────────────────────────────────────────── */
@@ -27,7 +27,7 @@ function TypeBadge({ isLoanable }) {
           : 'bg-brand-mid/20  text-brand-mid border border-brand-mid/30'
       }`}
     >
-      {isLoanable ? 'Loanable' : 'Fixed'}
+      {isLoanable ? t('pages.service_orders.materials.type_loanable') : t('pages.service_orders.materials.type_fixed')}
     </span>
   );
 }
@@ -73,7 +73,7 @@ export default function SOMaterialsList({ serviceOrder }) {
   if (!serviceOrder) {
     return (
       <div className="flex items-center justify-center h-40 text-brand-mid">
-        <p className="text-sm">No service order selected.</p>
+        <p className="text-sm">{t('pages.service_orders.materials.no_so_selected')}</p>
       </div>
     );
   }
@@ -83,7 +83,7 @@ export default function SOMaterialsList({ serviceOrder }) {
     return (
       <div className="flex flex-col items-center justify-center h-40 text-brand-mid gap-2">
         <Package className="h-6 w-6 text-brand-mid" />
-        <p className="text-sm">No equipment linked to this service order.</p>
+        <p className="text-sm">{t('pages.service_orders.materials.no_equipment')}</p>
       </div>
     );
   }
@@ -132,11 +132,11 @@ export default function SOMaterialsList({ serviceOrder }) {
           {/* Header */}
           <thead className="bg-brand-light border-b border-brand-mid/20">
             <tr>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">Item Name</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">Serial Number</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">Type</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">Status</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">Next Revision</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">{t('pages.service_orders.materials.th_item_name')}</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">{t('pages.service_orders.materials.th_serial_number')}</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">{t('pages.service_orders.materials.th_type')}</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">{t('pages.service_orders.materials.th_status')}</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-brand-mid uppercase tracking-wider">{t('pages.service_orders.materials.th_next_revision')}</th>
             </tr>
           </thead>
 
@@ -178,7 +178,7 @@ export default function SOMaterialsList({ serviceOrder }) {
       {/* Footer summary */}
       <div className="mt-3 flex items-center justify-between px-1">
         <span className="text-xs text-brand-mid">
-          {query.trim() ? '1 equipment (filtered)' : '1 equipment'}
+          {query.trim() ? t('pages.service_orders.materials.one_equipment_filtered') : t('pages.service_orders.materials.one_equipment')}
         </span>
       </div>
     </div>

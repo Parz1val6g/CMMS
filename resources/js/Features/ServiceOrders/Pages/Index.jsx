@@ -275,7 +275,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     if (soError) {
       return [{
         id: 'error',
-        label: 'Error',
+        label: t('pages.service_orders.drawer.tab_error'),
         component: (
           <div className="flex items-center justify-center h-40 text-red-400 gap-2">
             <AlertCircle className="h-5 w-5" />
@@ -303,7 +303,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
 
     return (
       <div className="flex items-center gap-4">
-        <span>{so.process || `OS/${so.id}`}</span>
+        <span>{so.process || `${t('pages.service_orders.drawer.os_prefix')}${so.id}`}</span>
         <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${badgeStyle(so.status, { border: true })}`}>
           {labelFor(so.status)}
         </span>
@@ -370,8 +370,8 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
           </span>
           <div
             className="w-6 h-6 rounded-full bg-brand-accent text-brand-white flex items-center justify-center text-xs font-bold"
-            title={item.manager?.name ? `Atribuído a: ${item.manager.name}` : 'Sem responsável'}
-            aria-label={item.manager?.name ? `Atribuído a: ${item.manager.name}` : 'Sem responsável'}
+            title={item.manager?.name ? `${t('pages.service_orders.drawer.assigned_to')}${item.manager.name}` : t('pages.service_orders.drawer.unassigned')}
+            aria-label={item.manager?.name ? `${t('pages.service_orders.drawer.assigned_to')}${item.manager.name}` : t('pages.service_orders.drawer.unassigned')}
           >
             {managerInitial}
           </div>
@@ -475,7 +475,7 @@ function SODetailsTab({ serviceOrder }) {
       <div className="grid grid-cols-2 gap-4">
         <section>
           <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_process')}</h4>
-          <p className="text-sm font-mono text-brand-accent font-bold">{so.process || `OS/${so.id}`}</p>
+          <p className="text-sm font-mono text-brand-accent font-bold">{so.process || `${t('pages.service_orders.drawer.os_prefix')}${so.id}`}</p>
         </section>
         <section>
           <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_status')}</h4>
@@ -514,7 +514,7 @@ function SODetailsTab({ serviceOrder }) {
         <section>
           <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_client')}</h4>
           <p className="text-sm text-brand-darkest">{so.client.name}</p>
-          {so.client.nif && <p className="text-xs text-brand-mid mt-0.5">NIF: {so.client.nif}</p>}
+          {so.client.nif && <p className="text-xs text-brand-mid mt-0.5">{t('pages.service_orders.drawer.nif_prefix')}{so.client.nif}</p>}
         </section>
       )}
 

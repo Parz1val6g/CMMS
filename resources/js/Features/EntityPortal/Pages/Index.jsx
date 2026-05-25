@@ -5,6 +5,7 @@ import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
 import { labelFor } from '@/utils/enums';
 import { formatDate } from '@/utils/format';
 import { csrfHeader } from '@/utils/csrf';
+import { t } from '@/utils/i18n';
 import LoanOrderDrawerTabs from '@/Features/LoanOrders/Components/LoanOrderDrawer';
 import { Plus, FileText, ChevronRight } from 'lucide-react';
 
@@ -27,10 +28,10 @@ function PortalStatusBadge({ value }) {
 }
 
 const COLUMNS = [
-  { key: 'reference',  label: 'Referência' },
-  { key: 'status',     label: 'Estado' },
-  { key: 'created_at', label: 'Data do Pedido' },
-  { key: 'equipments', label: 'Equipamentos' },
+  { key: 'reference',  label: t('pages.entity_portal.col_reference') },
+  { key: 'status',     label: t('pages.entity_portal.col_status') },
+  { key: 'created_at', label: t('pages.entity_portal.col_created_at') },
+  { key: 'equipments', label: t('pages.entity_portal.col_equipments') },
   { key: 'arrow',      label: '' },
 ];
 
@@ -62,7 +63,7 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
       const res = await fetch(`/api/loan-orders/${item.id}`, {
         headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
       });
-      if (!res.ok) throw new Error('Falha ao carregar');
+      if (!res.ok) throw new Error(t('pages.entity_portal.load_failed'));
       const data = await res.json();
       setDrawer({ open: true, loanOrder: data.data ?? data, loading: false, error: null });
     } catch (e) {
@@ -75,8 +76,8 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
   }, []);
 
   const drawerTabs = useMemo(() => {
-    if (drawer.loading) return [{ id: 'loading', label: '...', component: <div className="p-4 text-gray-500">A carregar...</div> }];
-    if (drawer.error)   return [{ id: 'error',   label: 'Erro', component: <div className="p-4 text-red-500">{drawer.error}</div> }];
+    if (drawer.loading) return [{ id: 'loading', label: '...', component: <div className="p-4 text-gray-500">{t('common.loading')}</div> }];
+    if (drawer.error)   return [{ id: 'error',   label: t('pages.entity_portal.tab_error'), component: <div className="p-4 text-red-500">{drawer.error}</div> }];
     if (!drawer.loanOrder) return [];
     return LoanOrderDrawerTabs(drawer.loanOrder, { onAction: closeDrawer, entityMode: true });
   }, [drawer.loading, drawer.error, drawer.loanOrder, closeDrawer]);
@@ -88,7 +89,7 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
       body: JSON.stringify(formData),
     });
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ message: 'Erro ao submeter pedido' }));
+      const err = await res.json().catch(() => ({ message: t('pages.entity_portal.submit_failed') }));
       throw err;
     }
     setCreateOpen(false);
@@ -96,21 +97,21 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
   }, [routes.store]);
 
   return (
-    <EntityLayout title="Portal de Empréstimos">
+    <EntityLayout title={t('pages.entity_portal.page_title')}>
       <div className="max-w-5xl mx-auto">
 
         {/* Page header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Os meus pedidos de empréstimo</h1>
-            <p className="text-gray-500 text-sm mt-1">Consulta e submete pedidos de empréstimo de equipamentos.</p>
+            <h1 className="text-2xl font-bold text-gray-800 tracking-tight">{t('pages.entity_portal.heading')}</h1>
+            <p className="text-gray-500 text-sm mt-1">{t('pages.entity_portal.subtitle')}</p>
           </div>
           <button
             onClick={() => setCreateOpen(true)}
             className="flex items-center gap-2 bg-brand-accent hover:bg-brand-accent/90 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors whitespace-nowrap"
           >
             <Plus size={16} strokeWidth={2.5} />
-            Novo Pedido
+            {t('pages.entity_portal.btn_new')}
           </button>
         </div>
 
@@ -119,14 +120,14 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
           {orders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
               <FileText size={40} className="mb-3 opacity-30" />
-              <p className="text-sm font-medium text-gray-500">Ainda não tens pedidos de empréstimo.</p>
-              <p className="text-xs text-gray-400 mt-1 mb-4">Os teus pedidos aparecerão aqui depois de os submeteres.</p>
+              <p className="text-sm font-medium text-gray-500">{t('pages.entity_portal.empty_title')}</p>
+              <p className="text-xs text-gray-400 mt-1 mb-4">{t('pages.entity_portal.empty_desc')}</p>
               <button
                 onClick={() => setCreateOpen(true)}
                 className="flex items-center gap-1.5 text-brand-accent text-sm font-medium hover:underline"
               >
                 <Plus size={14} />
-                Criar o primeiro pedido
+                {t('pages.entity_portal.empty_btn')}
               </button>
             </div>
           ) : (
@@ -167,14 +168,14 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
         {/* Pagination info */}
         {loan_orders?.total > loan_orders?.per_page && (
           <p className="text-gray-400 text-xs mt-3 text-right">
-            {loan_orders.total} pedidos no total
+            {t('pages.entity_portal.pagination_total', { n: loan_orders.total })}
           </p>
         )}
       </div>
 
       {/* Create modal */}
       <Modal
-        entityName="Pedido de Empréstimo"
+        entityName={t('pages.entity_portal.modal_entity_name')}
         formSchema={createFormSchema}
         routes={routes}
         open={createOpen}

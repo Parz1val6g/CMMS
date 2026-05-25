@@ -8,6 +8,7 @@ import { buildCreatePayload } from '@/Features/ServiceOrders/Utils/payload';
 import { labelFor, badgeStyle } from '@/utils/enums';
 import { formatDate } from '@/utils/format';
 import { csrfHeader } from '@/utils/csrf';
+import { t } from '@/utils/i18n';
 import { Plus, FileText, ChevronRight, Zap, CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
 
 /* ── Status badge ─────────────────────────────────────────────────────── */
@@ -75,7 +76,7 @@ function DrawerDetails({ so, routes, onAction }) {
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.message ?? 'Erro ao executar ação');
+        throw new Error(body.message ?? t('pages.manager_portal.action_error'));
       }
       onAction();
     } catch (e) {
@@ -94,34 +95,34 @@ function DrawerDetails({ so, routes, onAction }) {
       {/* Meta */}
       <div className="grid grid-cols-2 gap-3 text-sm">
         <div>
-          <p className="text-xs text-gray-400 mb-0.5">Estado</p>
+          <p className="text-xs text-gray-400 mb-0.5">{t('pages.manager_portal.drawer_status')}</p>
           <StatusBadge value={so.status} />
         </div>
         <div>
-          <p className="text-xs text-gray-400 mb-0.5">Prioridade</p>
+          <p className="text-xs text-gray-400 mb-0.5">{t('pages.manager_portal.drawer_priority')}</p>
           <PriorityDot value={so.priority} />
         </div>
         {so.client?.name && (
           <div>
-            <p className="text-xs text-gray-400 mb-0.5">Cliente</p>
+            <p className="text-xs text-gray-400 mb-0.5">{t('pages.manager_portal.drawer_client')}</p>
             <p className="text-gray-700 font-medium">{so.client.name}</p>
           </div>
         )}
         {so.execution_date && (
           <div>
-            <p className="text-xs text-gray-400 mb-0.5">Data prevista</p>
+            <p className="text-xs text-gray-400 mb-0.5">{t('pages.manager_portal.drawer_execution_date')}</p>
             <p className="text-gray-700">{formatDate(so.execution_date)}</p>
           </div>
         )}
         {so.service_type?.name && (
           <div className="col-span-2">
-            <p className="text-xs text-gray-400 mb-0.5">Tipo de serviço</p>
+            <p className="text-xs text-gray-400 mb-0.5">{t('pages.manager_portal.drawer_service_type')}</p>
             <p className="text-gray-700">{so.service_type.name}</p>
           </div>
         )}
         {so.description && (
           <div className="col-span-2">
-            <p className="text-xs text-gray-400 mb-0.5">Descrição</p>
+            <p className="text-xs text-gray-400 mb-0.5">{t('pages.manager_portal.drawer_description')}</p>
             <p className="text-gray-600 text-xs leading-relaxed">{so.description}</p>
           </div>
         )}
@@ -136,7 +137,7 @@ function DrawerDetails({ so, routes, onAction }) {
             className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
             <Zap size={13} />
-            Ativar
+            {t('pages.manager_portal.btn_activate')}
           </button>
         )}
         {so.status === 'awaiting_approval' && (
@@ -146,7 +147,7 @@ function DrawerDetails({ so, routes, onAction }) {
             className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
           >
             <CheckCircle size={13} />
-            Concluir
+            {t('pages.manager_portal.btn_complete')}
           </button>
         )}
         {!['completed', 'cancelled'].includes(so.status) && (
@@ -156,7 +157,7 @@ function DrawerDetails({ so, routes, onAction }) {
             className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50 transition-colors ring-1 ring-inset ring-red-200"
           >
             <XCircle size={13} />
-            Cancelar
+            {t('pages.manager_portal.btn_cancel')}
           </button>
         )}
       </div>
@@ -169,7 +170,7 @@ function DrawerDetails({ so, routes, onAction }) {
 
       {/* Tasks tree */}
       <div>
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Tarefas</p>
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">{t('pages.manager_portal.section_tasks')}</p>
         <SOTasksTree serviceOrderId={so.id} />
       </div>
     </div>
@@ -178,11 +179,11 @@ function DrawerDetails({ so, routes, onAction }) {
 
 /* ── Table columns ────────────────────────────────────────────────────── */
 const COLUMNS = [
-  { key: 'process',       label: 'Processo' },
-  { key: 'status',        label: 'Estado' },
-  { key: 'priority',      label: 'Prioridade' },
-  { key: 'execution_date',label: 'Data Prevista' },
-  { key: 'created_at',    label: 'Criado' },
+  { key: 'process',       label: t('pages.manager_portal.col_process') },
+  { key: 'status',        label: t('pages.manager_portal.col_status') },
+  { key: 'priority',      label: t('pages.manager_portal.col_priority') },
+  { key: 'execution_date',label: t('pages.manager_portal.col_execution_date') },
+  { key: 'created_at',    label: t('pages.manager_portal.col_created_at') },
   { key: 'arrow',         label: '' },
 ];
 
@@ -257,28 +258,28 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
 
   /* ── Stat cards config ────────────────────────────────────── */
   const statCards = [
-    { key: 'pending',           label: 'Pendentes',          icon: Clock,        color: 'bg-yellow-400' },
-    { key: 'in_progress',       label: 'Em Progresso',       icon: Zap,          color: 'bg-blue-500' },
-    { key: 'awaiting_approval', label: 'Aguarda Aprovação',  icon: AlertTriangle,color: 'bg-orange-400' },
-    { key: 'completed',         label: 'Concluídas',         icon: CheckCircle,  color: 'bg-green-500' },
+    { key: 'pending',           label: t('pages.manager_portal.stat_pending'),          icon: Clock,        color: 'bg-yellow-400' },
+    { key: 'in_progress',       label: t('pages.manager_portal.stat_in_progress'),       icon: Zap,          color: 'bg-blue-500' },
+    { key: 'awaiting_approval', label: t('pages.manager_portal.stat_awaiting_approval'),  icon: AlertTriangle,color: 'bg-orange-400' },
+    { key: 'completed',         label: t('pages.manager_portal.stat_completed'),         icon: CheckCircle,  color: 'bg-green-500' },
   ];
 
   return (
-    <AppLayout title="Portal de Gestão">
+    <AppLayout title={t('pages.manager_portal.page_title')}>
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-6 flex flex-col gap-6">
 
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">As minhas Ordens de Serviço</h1>
-            <p className="text-gray-500 text-sm mt-1">Gere as tuas ordens de serviço e acompanha o progresso.</p>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{t('pages.manager_portal.heading')}</h1>
+            <p className="text-gray-500 text-sm mt-1">{t('pages.manager_portal.subtitle')}</p>
           </div>
           <button
             onClick={() => setCreateOpen(true)}
             className="flex items-center gap-2 bg-brand-accent hover:bg-brand-accent/90 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors whitespace-nowrap"
           >
             <Plus size={16} strokeWidth={2.5} />
-            Nova OS
+            {t('pages.manager_portal.btn_new')}
           </button>
         </div>
 
@@ -298,10 +299,10 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
         {/* Status filter pills */}
         {activeStatus && (
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-gray-500">A filtrar por:</span>
+            <span className="text-gray-500">{t('pages.manager_portal.filter_by')}</span>
             <StatusBadge value={activeStatus} />
             <button onClick={() => setActiveStatus(null)} className="text-gray-400 hover:text-gray-600 text-xs underline">
-              limpar
+              {t('pages.manager_portal.clear_filter')}
             </button>
           </div>
         )}
@@ -311,12 +312,12 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
               <FileText size={40} className="mb-3 opacity-30" />
-              <p className="text-sm font-medium text-gray-500">Nenhuma ordem de serviço encontrada.</p>
+              <p className="text-sm font-medium text-gray-500">{t('pages.manager_portal.empty_title')}</p>
               <button
                 onClick={() => setCreateOpen(true)}
                 className="flex items-center gap-1.5 text-brand-accent text-sm font-medium hover:underline mt-4"
               >
-                <Plus size={14} /> Criar nova OS
+                <Plus size={14} /> {t('pages.manager_portal.empty_btn')}
               </button>
             </div>
           ) : (
@@ -355,7 +356,7 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
         {/* Pagination info */}
         {service_orders?.total > service_orders?.per_page && (
           <p className="text-gray-400 text-xs text-right">
-            {service_orders.total} ordens no total
+            {t('pages.manager_portal.pagination_total', { n: service_orders.total })}
           </p>
         )}
       </div>
@@ -387,7 +388,7 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
         tabs={drawer.so ? [
           {
             id: 'details',
-            label: 'Detalhes',
+            label: t('pages.manager_portal.tab_details'),
             component: <DrawerDetails so={drawer.so} routes={routes} onAction={handleAction} />,
           },
         ] : []}

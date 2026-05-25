@@ -24,3 +24,9 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 .aider*
+
+# AI tooling (local only)
+.claude/
+.opencode/
+.playwright-mcp/
+/temp/

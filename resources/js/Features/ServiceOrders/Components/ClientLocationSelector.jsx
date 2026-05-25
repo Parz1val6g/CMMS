@@ -115,7 +115,7 @@ export default function ClientLocationSelector({ isOpen, clientId, onClientLocat
     <div className="rounded-lg border border-brand-mid/20 bg-brand-light p-3 space-y-2">
       <div className="flex items-center gap-2 text-sm font-medium text-brand-darkest">
         <MapPin className="h-4 w-4 text-brand-accent" />
-        Saved location
+        {t('pages.service_orders.location_selector.saved_location')}
       </div>
 
       <div className="flex items-center gap-2">
@@ -127,11 +127,11 @@ export default function ClientLocationSelector({ isOpen, clientId, onClientLocat
           data-testid="client-location-select"
         >
           <option value="">
-            {loading ? 'Loading…' : 'Select a saved location…'}
+            {loading ? t('pages.service_orders.location_selector.loading') : t('pages.service_orders.location_selector.select_placeholder')}
           </option>
           {locations.map(cl => (
             <option key={cl.id} value={cl.id}>
-              {cl.name}{cl.is_primary ? ' (Primary)' : ''}
+              {cl.name}{cl.is_primary ? t('pages.service_orders.location_selector.primary_badge') : ''}
             </option>
           ))}
         </select>

@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
+import { t } from '@/utils/i18n';
 
 /* ── Status badge mapping ───────────────────────────────────── */
 const STATUS_STYLE = {
@@ -102,7 +103,7 @@ function TaskTreeNode({ node, depth = 0, expandedIds, onToggle }) {
             STATUS_STYLE[item.status] || STATUS_STYLE.pending
           }`}
         >
-          {item.status?.replace(/_/g, ' ') || 'pending'}
+          {item.status?.replace(/_/g, ' ') || t('pages.service_orders.tasks_tree.status_pending')}
         </span>
       </div>
 
