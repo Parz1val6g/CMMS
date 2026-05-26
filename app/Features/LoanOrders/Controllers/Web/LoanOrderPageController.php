@@ -16,12 +16,19 @@ class LoanOrderPageController extends Controller
     {
         Gate::authorize('viewAny', LoanOrder::class);
 
+        $user = $request->user();
+        $activeRole = $request->session()->get('active_role');
+
         $loanOrders = LoanOrder::with([
             'entity',
             'manager',
             'location.parish',
             'equipments',
         ])
+        ->when($activeRole === 'entity', fn($q) =>
+            $q->whereHas('entity', fn($eq) => $eq->where('user_id', $user->id))
+        )
+        ->when($activeRole === 'manager', fn($q) => $q->where('manager_id', $user->id))
         ->orderBy('created_at', 'desc')
         ->paginate(15)
         ->through(fn($lo) => LoanOrderPresenter::forIndex($lo));

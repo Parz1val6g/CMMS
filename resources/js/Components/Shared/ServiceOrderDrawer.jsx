@@ -4,44 +4,14 @@ import { Link, usePage } from '@inertiajs/react';
 import { Check, ExternalLink, Play } from 'lucide-react';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
 import BaseField from '@/Components/Shared/Drawer/BaseField';
+import { badgeStyle, labelFor } from '@/utils/enums';
 import { t } from '@/utils/i18n';
 import { csrfHeader } from '@/utils/csrf';
 
-const PRIORITY_BADGE = {
-  urgent: 'bg-red-100 text-red-800 ring-1 ring-inset ring-red-300/60',
-  high:   'bg-orange-100 text-orange-800 ring-1 ring-inset ring-orange-300/60',
-  normal: 'bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-300/60',
-  low:    'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-300/60',
-};
-
-const PRIORITY_LABEL = {
-  urgent: t('pages.service_orders.drawer.priority_urgent'),
-  high: t('pages.service_orders.drawer.priority_high'),
-  normal: t('pages.service_orders.drawer.priority_normal'),
-  low: t('pages.service_orders.drawer.priority_low'),
-};
-
-const STATUS_BADGE = {
-  pending:           'bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-300/60',
-  awaiting_approval: 'bg-amber-50 text-amber-800 ring-1 ring-inset ring-amber-300/60',
-  in_progress:       'bg-blue-50 text-blue-800 ring-1 ring-inset ring-blue-300/60',
-  completed:         'bg-green-50 text-green-800 ring-1 ring-inset ring-green-300/60',
-  cancelled:         'bg-red-50 text-red-800 ring-1 ring-inset ring-red-300/60',
-};
-
-const STATUS_LABEL = {
-  pending: t('pages.service_orders.drawer.status_pending'),
-  awaiting_approval: t('pages.service_orders.drawer.status_awaiting_approval'),
-  in_progress: t('pages.service_orders.drawer.status_in_progress'),
-  completed: t('pages.service_orders.drawer.status_completed'),
-  cancelled: t('pages.service_orders.drawer.status_cancelled'),
-};
-
-function Badge({ map, labelMap, value }) {
-  const cls = map[value] ?? 'bg-gray-100 text-gray-600';
+function Badge({ value }) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cls}`}>
-      {labelMap[value] ?? value ?? '—'}
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${badgeStyle(value)}`}>
+      {labelFor(value)}
     </span>
   );
 }
@@ -98,12 +68,6 @@ function DetailTab({ order }) {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_status')}>
-          <Badge map={STATUS_BADGE} labelMap={STATUS_LABEL} value={order?.status?.value ?? order?.status} />
-        </BaseField>
-        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_priority')}>
-          <Badge map={PRIORITY_BADGE} labelMap={PRIORITY_LABEL} value={order?.priority?.value ?? order?.priority} />
-        </BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_manager')}>{order?.manager?.name}</BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_created_at')}>{createdAt}</BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_execution_date')}>{executionDate}</BaseField>
@@ -131,9 +95,9 @@ function DetailTab({ order }) {
   );
 }
 
-export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, onActivated, onCompleted }) {
-  const { props: pageProps } = usePage();
-  const authUser = pageProps?.auth?.user;
+export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, onActivated, onCompleted, stacked = false }) {
+  const { props: { auth, can } } = usePage();
+  const authUser = auth?.user;
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [activating, setActivating] = useState(false);
@@ -141,10 +105,9 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
   const [completing, setCompleting] = useState(false);
 
   const status = order?.status?.value ?? order?.status;
-  const isAdmin = authUser?.roles?.some(r => r.name === 'admin');
   const isManager = authUser?.id && order?.manager?.id && String(authUser.id) === String(order.manager.id);
-  const canActivate = status === 'pending' && (isAdmin || isManager);
-  const canComplete = status === 'awaiting_approval' && (isAdmin || isManager);
+  const canActivate = status === 'pending' && (can?.activateServiceOrder || isManager);
+  const canComplete = status === 'awaiting_approval' && (can?.completeServiceOrder || isManager);
 
   const handleActivate = async () => {
     setActivating(true);
@@ -216,9 +179,15 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
         isOpen={isOpen}
         onClose={onClose}
         title={order?.process ?? ''}
-        subtitle={order ? (STATUS_LABEL[order.status?.value ?? order.status] ?? '') : ''}
+        subtitle={order ? (
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge value={order.status?.value ?? order.status} />
+            <Badge value={order.priority?.value ?? order.priority} />
+          </div>
+        ) : ''}
         tabs={tabs}
         headerActions={<>{completeButton}{activateButton}</>}
+        stacked={stacked}
       />
       <ConfirmDialog
         open={showConfirm}

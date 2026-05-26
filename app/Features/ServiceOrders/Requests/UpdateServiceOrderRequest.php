@@ -22,6 +22,7 @@ class UpdateServiceOrderRequest extends FormRequest
             'client_location_id' => ['nullable', 'uuid', 'exists:client_locations,id'],
             'sector_ids'         => ['sometimes', 'array', 'min:1'],
             'sector_ids.*'       => ['uuid', 'exists:sectors,id'],
+            'execution_date'     => ['sometimes', 'date'],
             'priority'           => ['sometimes', Rule::in(['low', 'normal', 'high', 'urgent'])],
             'parish_id'          => ['sometimes', 'uuid', 'exists:parishes,id'],
             'street'             => ['sometimes', 'string', 'max:255'],

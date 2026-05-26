@@ -5,7 +5,8 @@ import MultiSelect from '@/Components/Common/MultiSelect';
 import SearchableSelect from '@/Components/Common/SearchableSelect';
 import ToggleSwitch from '@/Components/Common/ToggleSwitch';
 import RepeaterInput from '@/Components/Common/RepeaterInput';
-import { toScalar } from '@/Utils/url';
+import DatePicker from '@/Components/Common/DatePicker';
+import { toScalar } from '@/utils/url';
 
 const SEARCH_THRESHOLD = 8;
 
@@ -406,6 +407,24 @@ export default function FormField({ field, value = '', error, onChange, lockedVa
 
   if (type === 'repeater') {
     return <RepeaterInput field={field} value={value} onChange={onChange} />;
+  }
+
+  if (type === 'date-picker') {
+    const meta = field.metadata ?? {};
+    return (
+      <DatePicker
+        mode={meta.dateMode ?? field.dateMode ?? 'single'}
+        value={value}
+        onChange={onChange}
+        blockedDates={meta.blockedDates ?? field.blockedDates ?? []}
+        minDate={meta.minDate ?? field.min ?? undefined}
+        maxDate={meta.maxDate ?? field.max ?? undefined}
+        label={label}
+        name={field.name ?? field.key}
+        error={error}
+        required={field.required}
+      />
+    );
   }
 
   return (

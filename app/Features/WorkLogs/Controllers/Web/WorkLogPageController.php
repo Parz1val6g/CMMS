@@ -17,14 +17,10 @@ class WorkLogPageController extends Controller
         Gate::authorize('viewAny', WorkLog::class);
 
         $user = $request->user();
-
         $activeRole = $request->session()->get('active_role');
 
         $workLogs = WorkLog::with(['miniTask.task', 'workers.user', 'materials'])
-            ->when(
-                $activeRole === 'worker',
-                fn($q) => $q->whereHas('workers', fn($wq) => $wq->where('workers.user_id', $user->id))
-            )
+            ->when($activeRole === 'worker', fn($q) => $q->whereHas('workers', fn($wq) => $wq->where('workers.user_id', $user->id)))
             ->latest()
             ->paginate(15)
             ->through(fn ($wl) => [

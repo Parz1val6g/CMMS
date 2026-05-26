@@ -6,7 +6,7 @@ import { labelFor, badgeStyle } from '@/utils/enums';
 import { formatDate } from '@/utils/format';
 import { usePage } from '@inertiajs/react';
 import { useToast } from '@/Components/Toast/ToastContext';
-import { MapPin, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { MapPin, Clock, Loader2, AlertCircle, Play, Check } from 'lucide-react';
 import { t } from '@/utils/i18n';
 import AppLayout from '@/Layouts/AppLayout';
 import DataManager from '@/Components/DataManager';
@@ -32,8 +32,10 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
   const [soError, setSoError] = useState(null);
   const [toast, setToast] = useState(null);
   const savingRef = useRef(false);
-  const { flash } = usePage().props;
+  const { flash, can } = usePage().props;
   const globalToast = useToast();
+  const [activating, setActivating] = useState(false);
+  const [completing, setCompleting] = useState(false);
 
   const breadcrumbs = [
     { name: t('pages.sidebar.dashboard'), url: '/dashboard' },
@@ -251,6 +253,43 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     handleCardClick({ id });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /* ── Activate / Complete handlers ─────────────────────────── */
+  const handleActivate = useCallback(async () => {
+    if (!selectedServiceOrder) return;
+    setActivating(true);
+    try {
+      const res = await fetch(`/api/service-orders/${selectedServiceOrder.id}/activate`, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
+      });
+      if (!res.ok) throw new Error();
+      handleCloseDrawer();
+      window.location.reload();
+    } catch {
+      globalToast.error(t('pages.service_orders.activate_failed'));
+    } finally {
+      setActivating(false);
+    }
+  }, [selectedServiceOrder, handleCloseDrawer, globalToast]);
+
+  const handleComplete = useCallback(async () => {
+    if (!selectedServiceOrder) return;
+    setCompleting(true);
+    try {
+      const res = await fetch(`/api/service-orders/${selectedServiceOrder.id}/complete`, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
+      });
+      if (!res.ok) throw new Error();
+      handleCloseDrawer();
+      window.location.reload();
+    } catch {
+      globalToast.error(t('pages.service_orders.complete_failed'));
+    } finally {
+      setCompleting(false);
+    }
+  }, [selectedServiceOrder, handleCloseDrawer, globalToast]);
+
   /* ── Build tabs array for WorkspaceDrawer ─────────────────── */
   const soTabs = useMemo(() => {
     const so = selectedServiceOrder;
@@ -295,6 +334,41 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
 
     return tabs;
   }, [selectedServiceOrder, soDetail, soLoading, soError]);
+
+  /* ── Drawer header action buttons ─────────────────────────── */
+  const drawerActions = useMemo(() => {
+    const so = soDetail ?? selectedServiceOrder;
+    if (!so) return null;
+    const status = so.status?.value ?? so.status;
+    const showActivate = status === 'pending' && can?.activateServiceOrder;
+    const showComplete = status === 'awaiting_approval' && can?.completeServiceOrder;
+    return (
+      <>
+        {showActivate && (
+          <button
+            type="button"
+            disabled={activating}
+            onClick={handleActivate}
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-brand-accent hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            <Play size={12} />
+            {activating ? '…' : t('pages.service_orders.btn_activate')}
+          </button>
+        )}
+        {showComplete && (
+          <button
+            type="button"
+            disabled={completing}
+            onClick={handleComplete}
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors disabled:opacity-50"
+          >
+            <Check size={12} />
+            {completing ? '…' : t('pages.service_orders.btn_complete')}
+          </button>
+        )}
+      </>
+    );
+  }, [soDetail, selectedServiceOrder, can, activating, completing, handleActivate, handleComplete]);
 
   /* ── Drawer title with SO context ─────────────────────────── */
   const drawerTitle = useMemo(() => {
@@ -409,6 +483,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         onClose={() => setShowModal(false)}
         onSubmit={handleCreate}
         injectAfterField="client_id"
+        externalErrors={formErrors}
       >
         <ClientLocationSelector
           isOpen={showModal}
@@ -459,6 +534,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         title={drawerTitle}
         subtitle={selectedServiceOrder?.client?.name ? `${t('pages.service_orders.drawer_client_label')} ${selectedServiceOrder.client.name}` : null}
         tabs={soTabs}
+        headerActions={drawerActions}
       />
     </AppLayout>
   );
@@ -471,36 +547,6 @@ function SODetailsTab({ serviceOrder }) {
 
   return (
     <div className="space-y-6">
-      {/* Process & Status row */}
-      <div className="grid grid-cols-2 gap-4">
-        <section>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_process')}</h4>
-          <p className="text-sm font-mono text-brand-accent font-bold">{so.process || `${t('pages.service_orders.drawer.os_prefix')}${so.id}`}</p>
-        </section>
-        <section>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_status')}</h4>
-          <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${badgeStyle(so.status)}`}>
-            {labelFor(so.status)}
-          </span>
-        </section>
-      </div>
-
-      {/* Priority */}
-      <div className="grid grid-cols-2 gap-4">
-        <section>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_priority')}</h4>
-          <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${badgeStyle(so.priority)}`}>
-            {labelFor(so.priority)}
-          </span>
-        </section>
-        <section>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_status')}</h4>
-          <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${badgeStyle(so.status)}`}>
-            {labelFor(so.status)}
-          </span>
-        </section>
-      </div>
-
       {/* Description */}
       {so.description && (
         <section>

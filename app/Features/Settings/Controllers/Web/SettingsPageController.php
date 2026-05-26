@@ -6,9 +6,11 @@ use App\Core\Helpers\InputSanitizer;
 use App\Shared\Models\AppSetting;
 use App\Shared\Models\User;
 use App\Shared\Models\UserPreference;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
@@ -24,7 +26,7 @@ class SettingsPageController extends Controller
     public function index(Request $request): Response
     {
         $user = $request->user();
-        $isAdmin = $user->roles()->where('name', 'admin')->exists();
+        $isAdmin = Gate::allows('update', new AppSetting());
 
         $preferences = UserPreference::where('user_id', $user->id)
             ->pluck('value', 'key')
@@ -36,12 +38,18 @@ class SettingsPageController extends Controller
 
         $appSettings = AppSetting::pluck('value', 'key')->toArray();
 
+        $user->loadMissing('roles');
+
         return Inertia::render('Settings/Pages/Settings', [
             'user' => [
-                'id'         => $user->id,
-                'first_name' => $user->first_name,
-                'last_name'  => $user->last_name,
-                'email'      => $user->email,
+                'id'               => $user->id,
+                'first_name'       => $user->first_name,
+                'last_name'        => $user->last_name,
+                'full_name'        => $user->first_name . ' ' . $user->last_name,
+                'email'            => $user->email,
+                'roles'            => $user->roles->pluck('name')->toArray(),
+                'permissions_count'=> $user->rolePermissions()->count(),
+                'created_at'       => $user->created_at?->toIso8601String(),
             ],
             'preferences' => $preferences,
             'appSettings'  => $appSettings,
@@ -58,7 +66,7 @@ class SettingsPageController extends Controller
     /**
      * Update the authenticated user's profile fields.
      */
-    public function updateUser(Request $request): RedirectResponse
+    public function updateUser(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'first_name' => 'required|string|max:250',
@@ -75,8 +83,11 @@ class SettingsPageController extends Controller
                 'first_name' => InputSanitizer::sanitize($validated['first_name']),
                 'last_name'  => InputSanitizer::sanitize($validated['last_name']),
                 'email'      => InputSanitizer::sanitizeEmail($validated['email']),
-                'phone'      => $validated['phone'] ? InputSanitizer::sanitizePhone($validated['phone']) : null,
             ];
+
+            if (isset($validated['phone'])) {
+                $data['phone'] = InputSanitizer::sanitizePhone($validated['phone']);
+            }
 
             if (isset($validated['language'])) {
                 $data['locale'] = $validated['language'];
@@ -85,15 +96,23 @@ class SettingsPageController extends Controller
             $user->update($data);
         });
 
+        if (isset($validated['language'])) {
+            App::setLocale($validated['language'] === 'pt' ? 'pt_PT' : $validated['language']);
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => __('Profile updated successfully.')]);
+        }
+
         return redirect()->back()->with('success', __('Profile updated successfully.'));
     }
 
     /**
      * Update system-wide settings (admin only).
      */
-    public function updateAdmin(Request $request): RedirectResponse
+    public function updateAdmin(Request $request): RedirectResponse|JsonResponse
     {
-        Gate::authorize('update', AppSetting::class);
+        Gate::authorize('update', new AppSetting());
 
         $validated = $request->validate([
             'company_name'               => 'nullable|string|max:250',
@@ -129,13 +148,17 @@ class SettingsPageController extends Controller
             }
         });
 
+        if ($request->expectsJson()) {
+            return response()->json(['message' => __('System settings updated.')]);
+        }
+
         return redirect()->back()->with('success', __('System settings updated.'));
     }
 
     /**
      * Update the authenticated user's password with security validation.
      */
-    public function updatePassword(Request $request): RedirectResponse
+    public function updatePassword(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'current_password'      => 'required|string|current_password',
@@ -146,13 +169,17 @@ class SettingsPageController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
+        if ($request->expectsJson()) {
+            return response()->json(['message' => __('Password updated successfully.')]);
+        }
+
         return redirect()->back()->with('success', __('Password updated successfully.'));
     }
 
     /**
      * Delete the authenticated user's account (soft-delete).
      */
-    public function deleteAccount(Request $request): RedirectResponse
+    public function deleteAccount(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'password' => 'required|string|current_password',
@@ -171,6 +198,10 @@ class SettingsPageController extends Controller
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => __('Account deleted successfully.')]);
+        }
 
         return redirect()->route('login');
     }

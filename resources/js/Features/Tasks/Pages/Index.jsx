@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import CrudPage from '@/Components/Common/CrudPage';
 import TaskDrawer from '@/Components/Shared/TaskDrawer';
 
-export default function TasksIndex({ tasks, columns, formSchema, createFormSchema, routes, filterSchema, advancedFilterFields }) {
+export default function TasksIndex({ tasks, columns, formSchema, createFormSchema, miniTaskCreateSchema, routes, filterSchema, advancedFilterFields }) {
     const [viewItem, setViewItem] = useState(null);
     const [viewLoading, setViewLoading] = useState(false);
 
@@ -51,6 +51,8 @@ export default function TasksIndex({ tasks, columns, formSchema, createFormSchem
                 onClose={() => setViewItem(null)}
                 item={viewItem}
                 loading={viewLoading}
+                miniTaskCreateSchema={miniTaskCreateSchema}
+                onCompleted={() => viewItem && handleRowClick(viewItem)}
             />
         </>
     );

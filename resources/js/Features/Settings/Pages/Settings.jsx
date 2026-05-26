@@ -3,9 +3,58 @@ import AppLayout from '@/Layouts/AppLayout';
 import Tabs from '@/Components/Common/Tabs';
 import FormSection from '@/Components/Common/FormSection';
 import DialogModal from '@/Components/Common/DialogModal';
+import Badge from '@/Components/Common/Badge';
 import { t } from '@/utils/i18n';
 import { submitForm } from '@/utils/form';
 import { useToast } from '@/Components/Toast/ToastContext';
+
+const ROLE_VARIANT = {
+  admin:             'danger',
+  manager:           'primary',
+  equipment_manager: 'info',
+  supervisor:        'warning',
+  worker:            'secondary',
+  client:            'success',
+  entidade:          'info',
+  task_manager:      'primary',
+  mini_task_manager: 'secondary',
+  work_log_manager:  'secondary',
+  sector_manager:    'warning',
+  ticket_manager:    'info',
+  team_manager:      'primary',
+  attendant:         'success',
+};
+
+function UserAvatar({ name }) {
+  const initials = (name ?? '?')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('');
+  return (
+    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-accent text-white text-xl font-bold shadow-md ring-4 ring-white">
+      {initials}
+    </div>
+  );
+}
+
+function StatCard({ label, value, icon }) {
+  return (
+    <div className="flex flex-col gap-1 rounded-xl border border-gray-100 bg-gray-50 p-4">
+      <div className="flex items-center gap-2 text-gray-400">
+        <span className="text-base">{icon}</span>
+        <span className="text-[10px] font-semibold uppercase tracking-wide">{label}</span>
+      </div>
+      <span className="text-lg font-bold text-gray-800">{value ?? '—'}</span>
+    </div>
+  );
+}
+
+function formatDate(iso) {
+  if (!iso) return null;
+  return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+}
 
 
 /* ── Settings Page ──────────────────────────────────────────────── */
@@ -26,11 +75,12 @@ export default function Settings({ user, preferences, appSettings, isAdmin, rout
     const langAfter = e.target.language?.value;
     const r = await submitForm(e.target, apiRoutes.updateUser);
     if (r.ok) {
-      toast.success(r.message);
       if (langAfter && langAfter !== langBefore) {
-        // Language changed — update window.__LOCALE__ and reload fully
         window.__LOCALE__ = langAfter === 'en' ? 'en' : 'pt_PT';
+        toast.success(t('pages.settings.success_updated'));
         setTimeout(() => window.location.reload(), 500);
+      } else {
+        toast.success(t('pages.settings.success_updated'));
       }
     } else toast.error(r.message);
   };
@@ -342,18 +392,61 @@ export default function Settings({ user, preferences, appSettings, isAdmin, rout
     },
   ];
 
+  const fullName = user.full_name ?? `${user.first_name} ${user.last_name}`;
+
   return (
     <AppLayout title={t('pages.settings.page_title')}>
 
-      <div className="h-full overflow-y-auto w-full">
-        <div className="max-w-7xl mx-auto py-8 px-6">
+      <div className="h-full overflow-y-auto w-full bg-gray-50">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
+
           {/* Page Header */}
-          <div className="mb-4 shrink-0">
-            <h2 className="text-xl font-bold text-brand-darkest">{t('pages.settings.page_heading')}</h2>
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-brand-darkest">{t('pages.settings.page_heading')}</h1>
             <p className="text-xs text-brand-mid">{t('pages.settings.page_subtitle')}</p>
           </div>
 
-          <Tabs tabs={tabs} defaultTab="details" className="flex-1 overflow-y-auto pt-5" />
+          {/* ── 2-column grid ── */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+
+            {/* ── Left: Identity card ── */}
+            <div className="lg:col-span-1">
+              <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6 flex flex-col items-center text-center gap-4 sticky top-6">
+                <UserAvatar name={fullName} />
+
+                <div className="flex flex-col gap-0.5">
+                  <h2 className="text-lg font-bold text-gray-900">{fullName}</h2>
+                  <p className="text-sm text-gray-500">{user.email}</p>
+                </div>
+
+                {user.roles && user.roles.length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-1.5">
+                    {user.roles.map((role) => (
+                      <Badge key={role} variant={ROLE_VARIANT[role] ?? 'secondary'} pill>
+                        {role}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                <div className="w-full border-t border-gray-100 pt-4">
+                  <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+                    {t('pages.profile.section_stats')}
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <StatCard label={t('pages.profile.label_permissions')} value={user.permissions_count ?? 0} icon="🔑" />
+                    <StatCard label={t('pages.profile.label_member_since')} value={formatDate(user.created_at)} icon="📅" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Right: Forms ── */}
+            <div className="lg:col-span-2">
+              <Tabs tabs={tabs} defaultTab="details" />
+            </div>
+
+          </div>
         </div>
       </div>
 

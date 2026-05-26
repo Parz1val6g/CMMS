@@ -2,7 +2,7 @@ export default function BaseField({ label, value, children, variant = 'brand' })
     const isGray = variant === 'gray';
 
     return (
-        <div className={`flex flex-col ${isGray ? 'gap-0.5' : 'gap-1'}`}>
+        <div className={`flex flex-col items-start ${isGray ? 'gap-0.5' : 'gap-1'}`}>
             <span className={`text-xs font-medium uppercase ${isGray ? 'tracking-wide text-gray-400' : 'tracking-wide text-brand-mid'}`}>
                 {label}
             </span>

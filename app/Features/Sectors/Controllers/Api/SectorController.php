@@ -26,8 +26,12 @@ class SectorController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
+        $user = $request->user();
+        $activeRole = $request->input('active_role');
+
         $query = $this->filterService->apply(
-            Sector::with(['head']),
+            Sector::with(['head'])
+                ->when($activeRole === 'sector_manager', fn($q) => $q->where('head_id', $user->id)),
             $request->only(['search', 'sort']),
             ['name']
         );

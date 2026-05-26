@@ -95,7 +95,11 @@ export default function LoanOrdersIndex({ loan_orders, columns, formSchema, crea
           isOpen={drawer.open}
           onClose={closeDrawer}
           title={drawer.loanOrder?.reference ?? ''}
-          subtitle={drawer.loanOrder?.status ? labelFor(drawer.loanOrder.status) : ''}
+          subtitle={drawer.loanOrder?.status ? (
+            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeStyle(drawer.loanOrder.status)}`}>
+              {labelFor(drawer.loanOrder.status)}
+            </span>
+          ) : ''}
           tabs={drawerTabs}
         />
       </DataManager>

@@ -26,12 +26,13 @@ class LoanOrderController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $user = $request->user();
+        $activeRole = $request->input('active_role');
 
         $orders = LoanOrder::with(['entity', 'manager', 'location', 'equipments', 'tasks'])
-            ->when($user->isEntity(), fn($q) =>
+            ->when($activeRole === 'entity', fn($q) =>
                 $q->whereHas('entity', fn($eq) => $eq->where('user_id', $user->id))
             )
-            ->when(!$user->isAdmin() && !$user->isEntity(), fn($q) => $q->where('manager_id', $user->id))
+            ->when($activeRole === 'manager', fn($q) => $q->where('manager_id', $user->id))
             ->latest()
             ->paginate(15);
 

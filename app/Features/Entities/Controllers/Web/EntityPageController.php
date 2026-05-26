@@ -3,6 +3,7 @@
 namespace App\Features\Entities\Controllers\Web;
 
 use App\Core\Enums\EntityType;
+use App\Core\Traits\GatesRoutes;
 use App\Features\Entities\EntityFormSchema;
 use App\Features\Entities\Models\Entity;
 use App\Http\Controllers\Controller;
@@ -12,6 +13,7 @@ use Inertia\Inertia;
 
 class EntityPageController extends Controller
 {
+    use GatesRoutes;
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Entity::class);
@@ -44,13 +46,13 @@ class EntityPageController extends Controller
             'formSchema'       => EntityFormSchema::update()->toArray(),
             'createFormSchema' => EntityFormSchema::create()->toArray(),
             'entityTypeOptions' => EntityType::options(),
-            'routes'       => [
+            'routes'       => $this->gatedRoutes([
                 'index'   => '/api/entities',
                 'store'   => '/api/entities',
                 'update'  => '/api/entities/__ID__',
                 'destroy' => '/api/entities/__ID__',
                 'show'    => '/api/entities/__ID__',
-            ],
+            ], 'entities'),
             'filterSchema' => [
                 ['key' => 'search', 'label' => __('forms.entities.search'), 'type' => 'text', 'placeholder' => '...'],
             ],

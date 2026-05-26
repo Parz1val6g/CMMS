@@ -17,23 +17,13 @@ class MiniTaskPageController extends Controller
         Gate::authorize('viewAny', MiniTask::class);
 
         $user = $request->user();
-
         $activeRole = $request->session()->get('active_role');
 
         $miniTasks = MiniTask::with(['task.serviceOrder', 'supervisor', 'workers.user', 'teams'])
-            ->when(
-                // task_manager is stored as supervisor_id on mini_tasks (they create and own them)
-                $activeRole === 'task_manager',
-                fn($q) => $q->where('supervisor_id', $user->id)
-            )
-            ->when(
-                $activeRole === 'sector_manager',
-                fn($q) => $q->whereHas('task.sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id')))
-            )
-            ->when(
-                $activeRole === 'worker',
-                fn($q) => $q->whereHas('workers', fn($wq) => $wq->where('workers.user_id', $user->id))
-            )
+            ->when($activeRole === 'manager', fn($q) => $q->whereHas('task.serviceOrder', fn($sq) => $sq->where('manager_id', $user->id)))
+            ->when($activeRole === 'task_manager', fn($q) => $q->where('supervisor_id', $user->id))
+            ->when($activeRole === 'sector_manager', fn($q) => $q->whereHas('task.sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id'))))
+            ->when($activeRole === 'worker', fn($q) => $q->whereHas('workers', fn($wq) => $wq->where('workers.user_id', $user->id)))
             ->latest()
             ->paginate(15)
             ->through(fn ($mt) => [

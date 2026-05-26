@@ -24,13 +24,10 @@ class TicketController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $user = $request->user();
+        $activeRole = $request->input('active_role');
 
-        $query = Ticket::with(['client.user', 'serviceType', 'ticketManager']);
-
-        // ticket_manager role sees only own tickets
-        if (!$user->isAdmin() && !$user->roles()->whereIn('name', ['manager'])->exists()) {
-            $query->where('ticket_manager_id', $user->id);
-        }
+        $query = Ticket::with(['client.user', 'serviceType', 'ticketManager'])
+            ->when($activeRole === 'ticket_manager', fn($q) => $q->where('ticket_manager_id', $user->id));
 
         $tickets = $query->latest()->paginate(15);
 

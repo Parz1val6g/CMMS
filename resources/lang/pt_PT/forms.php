@@ -161,6 +161,7 @@ return [
         'task' => 'Tarefa',
         'workers' => 'Trabalhadores',
         'teams' => 'Equipas',
+        'date_range' => 'Período de Execução',
         'start_date' => 'Data de Início',
         'end_date' => 'Data de Fim',
         'material_ids' => 'Materiais',

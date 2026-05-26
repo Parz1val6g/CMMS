@@ -4,7 +4,7 @@ import { t } from '@/utils/i18n';
 
 function StatusBadge({ status }) {
     const map = {
-        pending:     'bg-brand-light text-brand-mid',
+        pending:     'bg-brand-mid/10 text-brand-mid ring-1 ring-inset ring-brand-mid/25',
         in_progress: 'bg-brand-accent/15 text-brand-accent',
         completed:   'bg-emerald-900/60 text-emerald-300',
         blocked:     'bg-red-900/60 text-red-300',
@@ -45,12 +45,6 @@ function GeneralTab({ item }) {
 
     return (
         <div className="grid grid-cols-2 gap-6">
-            <BaseField label={t('pages.mini_tasks.drawer.field_reference')}>
-                <span className="font-mono text-indigo-400">{item.reference}</span>
-            </BaseField>
-            <BaseField label={t('pages.mini_tasks.drawer.field_status')}>
-                <StatusBadge status={item.status} />
-            </BaseField>
             <BaseField label={t('pages.mini_tasks.drawer.field_task')}>
                 <span className="font-mono text-indigo-400">{item.task?.reference ?? null}</span>
             </BaseField>
@@ -178,7 +172,7 @@ export default function MiniTaskDrawer({ isOpen, onClose, item, loading }) {
             isOpen={isOpen}
             onClose={onClose}
             title={item?.reference ?? ''}
-            subtitle={loading ? t('pages.common.loading') : undefined}
+            subtitle={loading ? t('pages.common.loading') : item ? <StatusBadge status={item.status} /> : undefined}
             tabs={tabs}
         />
     );

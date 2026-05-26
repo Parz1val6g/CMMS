@@ -32,7 +32,7 @@ class ServiceOrderFormSchema
             ->field(
                 TextInput::make('execution_date')
                     ->setLabel(__('forms.service_orders.execution_date'))
-                    ->setType('date')
+                    ->setType('date-picker')
                     ->setRequired()
                     ->setRules('required|date')
             )
@@ -95,13 +95,15 @@ class ServiceOrderFormSchema
                     ->setLabel(__('forms.service_orders.parish'))
                     ->helperText(__('forms.service_orders.parish_helper'))
                     ->setOptions(self::parishOptions())
-                    ->setRules('nullable|exists:parishes,id')
+                    ->setRequired()
+                    ->setRules('required_without:client_location_id|uuid|exists:parishes,id')
             )
             ->field(
                 TextInput::make('street')
                     ->setLabel(__('forms.service_orders.street'))
                     ->helperText(__('forms.service_orders.street_helper'))
-                    ->setRules('nullable|string|max:255')
+                    ->setRequired()
+                    ->setRules('required_without:client_location_id|string|max:255')
             )
             ->field(
                 TextInput::make('reference_point')
@@ -184,7 +186,7 @@ class ServiceOrderFormSchema
             ->field(
                 TextInput::make('execution_date')
                     ->setLabel(__('forms.service_orders.execution_date'))
-                    ->setType('date')
+                    ->setType('date-picker')
                     ->setRules('nullable|date')
             )
             // ── Photo ──

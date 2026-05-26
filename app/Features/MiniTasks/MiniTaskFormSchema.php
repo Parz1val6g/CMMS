@@ -5,7 +5,7 @@ namespace App\Features\MiniTasks;
 use App\Core\Enums\EquipmentStatus;
 use App\Core\Enums\TaskStatus;
 use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextAreaInput, SelectInput, TextInput};
+use App\Core\Forms\Fields\{TextAreaInput, SelectInput, TextInput, DateRangeInput};
 use App\Features\Equipments\Models\Equipment;
 use App\Features\Materials\Models\Material;
 use App\Features\Tasks\Models\Task;
@@ -31,18 +31,8 @@ class MiniTaskFormSchema
                     ->setRules('required|exists:tasks,id')
             )
             ->field(
-                TextInput::make('start_date')
-                    ->setLabel(__('forms.mini_tasks.start_date'))
-                    ->setType('date')
-                    ->setRequired()
-                    ->setRules('required|date')
-            )
-            ->field(
-                TextInput::make('end_date')
-                    ->setLabel(__('forms.mini_tasks.end_date'))
-                    ->setType('date')
-                    ->setRequired()
-                    ->setRules('required|date|after_or_equal:start_date')
+                DateRangeInput::make('date_range')
+                    ->setLabel(__('forms.mini_tasks.date_range'))
             )
             ->field(
                 SelectInput::make('worker_ids')
@@ -90,16 +80,8 @@ class MiniTaskFormSchema
                     ->setRules('sometimes|exists:tasks,id')
             )
             ->field(
-                TextInput::make('start_date')
-                    ->setLabel(__('forms.mini_tasks.start_date'))
-                    ->setType('date')
-                    ->setRules('sometimes|nullable|date')
-            )
-            ->field(
-                TextInput::make('end_date')
-                    ->setLabel(__('forms.mini_tasks.end_date'))
-                    ->setType('date')
-                    ->setRules('sometimes|nullable|date|after_or_equal:start_date')
+                DateRangeInput::make('date_range')
+                    ->setLabel(__('forms.mini_tasks.date_range'))
             )
             ->field(
                 SelectInput::make('worker_ids')
@@ -169,9 +151,16 @@ class MiniTaskFormSchema
 
     public static function materialOptions(): array
     {
-        return Material::orderBy('name')
-            ->get(['id', 'name'])
-            ->map(fn($m) => ['value' => $m->id, 'label' => $m->name])
+        return Material::with('unit')
+            ->orderBy('name')
+            ->get(['id', 'name', 'unit_id', 'stock_quantity'])
+            ->map(fn($m) => [
+                'value' => $m->id,
+                'label' => $m->name,
+                'unit'  => $m->unit?->abbreviation ?? $m->unit?->name,
+                'step'  => (float) ($m->unit?->step ?? 1),
+                'stock' => (float) $m->stock_quantity,
+            ])
             ->toArray();
     }
 

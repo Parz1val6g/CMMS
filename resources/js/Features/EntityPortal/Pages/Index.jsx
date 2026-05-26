@@ -188,7 +188,7 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
         isOpen={drawer.open}
         onClose={closeDrawer}
         title={drawer.loanOrder?.reference ?? ''}
-        subtitle={drawer.loanOrder?.status ? labelFor(drawer.loanOrder.status) : ''}
+        subtitle={drawer.loanOrder?.status ? <PortalStatusBadge value={drawer.loanOrder.status} /> : ''}
         tabs={drawerTabs}
       />
     </EntityLayout>

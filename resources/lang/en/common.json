@@ -1,0 +1,58 @@
+{
+    "entity_name": "Record",
+    "error_boundary": {
+        "heading": "Something went wrong",
+        "description": "An unexpected error occurred. Please reload the page.",
+        "reload_button": "Reload Page"
+    },
+    "multi_select": {
+        "placeholder": "Select...",
+        "no_options": "No options available",
+        "remove_aria": "Remove :label"
+    },
+    "searchable_select": {
+        "placeholder": "Select..."
+    },
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "dismiss": "Dismiss",
+    "close_alert": "Close alert",
+    "close_drawer": "Close drawer",
+    "resize_drawer": "Resize panel",
+    "clear_location": "Clear location",
+    "breadcrumb": "Breadcrumb",
+    "search_placeholder": "Search...",
+    "no_matches": "No matches",
+    "remove": "Remove",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "yes": "Yes",
+    "no": "No",
+    "select_placeholder": "Select...",
+    "map_picker": {
+        "missing_key": "Loading Map Configuration...",
+        "select_label": "Select on Map",
+        "loading": "Loading map...",
+        "hint": "Click on the map or drag the marker to set coordinates"
+    },
+    "file_dropzone": {
+        "upload_text": "Click to upload or drag and drop",
+        "supported_hint": "Any file type supported"
+    },
+    "kanban": {
+        "item": "Item",
+        "no_items": "No items"
+    },
+    "topbar": {
+        "select_role": "Select Role"
+    },
+    "equipment_loan": {
+        "details_title": "Equipment Details",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "needs_operator": "Requires Operator"
+    }
+}
