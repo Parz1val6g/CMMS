@@ -86,12 +86,9 @@ function DetailsTab({ lo }) {
         </>
       )}
 
-      {/* Estado e Datas */}
+      {/* Datas */}
       <SectionTitle>{t('pages.loan_orders.section_status')}</SectionTitle>
       <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-        <BaseField variant="gray" label={t('pages.loan_orders.col_status')}>
-          <StatusBadge value={lo.status} />
-        </BaseField>
         <BaseField variant="gray" label={t('pages.loan_orders.section_created_at')} value={formatDate(lo.created_at)} />
         {lo.approved_at  && <BaseField variant="gray" label={t('pages.loan_orders.section_approved_at')}    value={formatDate(lo.approved_at)} />}
         {lo.checked_out_at && <BaseField variant="gray" label={t('pages.loan_orders.section_checked_out_at')} value={formatDate(lo.checked_out_at)} />}

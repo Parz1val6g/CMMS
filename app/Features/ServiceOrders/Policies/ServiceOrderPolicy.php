@@ -4,6 +4,8 @@ namespace App\Features\ServiceOrders\Policies;
 
 use App\Core\Enums\PermissionAction;
 use App\Core\Enums\PermissionResource;
+use App\Core\Enums\RoleName;
+use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Policies\BasePolicy;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Shared\Models\User;
@@ -18,6 +20,7 @@ class ServiceOrderPolicy extends BasePolicy
     public function view(User $user, ServiceOrder $serviceOrder): bool
     {
         if ($this->isAdmin($user)) return true;
+        if ($this->hasRole($user, RoleName::ATTENDANT)) return $serviceOrder->created_by === $user->id;
         if ($this->isManagerScoped($user, $serviceOrder->manager)) return true;
         return $this->hasPermission($user, PermissionAction::VIEW->value, PermissionResource::SERVICE_ORDERS->value);
     }
@@ -30,6 +33,10 @@ class ServiceOrderPolicy extends BasePolicy
     public function update(User $user, ServiceOrder $serviceOrder): bool
     {
         if ($this->isAdmin($user)) return true;
+        if ($this->hasRole($user, RoleName::ATTENDANT)) {
+            return $serviceOrder->created_by === $user->id
+                && $serviceOrder->status === ServiceOrderStatus::PENDING;
+        }
         return $this->isManagerScoped($user, $serviceOrder->manager);
     }
 
@@ -57,6 +64,10 @@ class ServiceOrderPolicy extends BasePolicy
     public function delete(User $user, ServiceOrder $serviceOrder): bool
     {
         if ($this->isAdmin($user)) return true;
+        if ($this->hasRole($user, RoleName::ATTENDANT)) {
+            return $serviceOrder->created_by === $user->id
+                && $serviceOrder->status === ServiceOrderStatus::PENDING;
+        }
         return $this->isManagerScoped($user, $serviceOrder->manager);
     }
 

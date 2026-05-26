@@ -98,12 +98,6 @@ function DetailTab({ order }) {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_status')}>
-          <Badge map={STATUS_BADGE} labelMap={STATUS_LABEL} value={order?.status?.value ?? order?.status} />
-        </BaseField>
-        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_priority')}>
-          <Badge map={PRIORITY_BADGE} labelMap={PRIORITY_LABEL} value={order?.priority?.value ?? order?.priority} />
-        </BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_manager')}>{order?.manager?.name}</BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_created_at')}>{createdAt}</BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_execution_date')}>{executionDate}</BaseField>
@@ -132,19 +126,17 @@ function DetailTab({ order }) {
 }
 
 export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, onActivated, onCompleted }) {
-  const { props: pageProps } = usePage();
-  const authUser = pageProps?.auth?.user;
+  const { props: { auth, can } } = usePage();
+  const authUser = auth?.user;
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [activating, setActivating] = useState(false);
   const [activateError, setActivateError] = useState(false);
   const [completing, setCompleting] = useState(false);
-
   const status = order?.status?.value ?? order?.status;
-  const isAdmin = authUser?.roles?.some(r => r.name === 'admin');
   const isManager = authUser?.id && order?.manager?.id && String(authUser.id) === String(order.manager.id);
-  const canActivate = status === 'pending' && (isAdmin || isManager);
-  const canComplete = status === 'awaiting_approval' && (isAdmin || isManager);
+  const canActivate = status === 'pending' && (can?.activateServiceOrder || isManager);
+  const canComplete = status === 'awaiting_approval' && (can?.completeServiceOrder || isManager);
 
   const handleActivate = async () => {
     setActivating(true);
@@ -216,7 +208,12 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
         isOpen={isOpen}
         onClose={onClose}
         title={order?.process ?? ''}
-        subtitle={order ? (STATUS_LABEL[order.status?.value ?? order.status] ?? '') : ''}
+        subtitle={order ? (
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge map={STATUS_BADGE} labelMap={STATUS_LABEL} value={order.status?.value ?? order.status} />
+            <Badge map={PRIORITY_BADGE} labelMap={PRIORITY_LABEL} value={order.priority?.value ?? order.priority} />
+          </div>
+        ) : ''}
         tabs={tabs}
         headerActions={<>{completeButton}{activateButton}</>}
       />

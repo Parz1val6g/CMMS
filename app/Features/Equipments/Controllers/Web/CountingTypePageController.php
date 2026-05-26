@@ -2,6 +2,7 @@
 
 namespace App\Features\Equipments\Controllers\Web;
 
+use App\Core\Traits\GatesRoutes;
 use App\Features\Equipments\Models\CountingType;
 use App\Features\Equipments\CountingTypeFormSchema;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Inertia\Inertia;
 
 class CountingTypePageController extends Controller
 {
+    use GatesRoutes;
     public function index(Request $request)
     {
         Gate::authorize('viewAny', CountingType::class);
@@ -38,13 +40,13 @@ class CountingTypePageController extends Controller
             ],
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
-            'routes' => [
+            'routes' => $this->gatedRoutes([
                 'index' => url('/api/counting-types'),
                 'store' => url('/api/counting-types'),
                 'update' => url('/api/counting-types/__ID__'),
                 'destroy' => url('/api/counting-types/__ID__'),
                 'show' => url('/api/counting-types/__ID__'),
-            ],
+            ], 'counting_types'),
             'advancedFilterFields' => [
                 ['value' => 'name',       'label' => 'Nome'],
                 ['value' => 'value',      'label' => 'Valor'],

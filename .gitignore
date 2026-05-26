@@ -47,7 +47,6 @@ _check_fks.php
 _write_issues.js
 db_tables.sql
 /plans/
-/documentation/
 
 # OS / editor
 desktop.ini

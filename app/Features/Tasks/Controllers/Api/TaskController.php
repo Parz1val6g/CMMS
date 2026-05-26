@@ -27,8 +27,13 @@ class TaskController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
+        $user = $request->user();
+        $activeRole = $request->input('active_role');
+
         $query = $this->filterService->apply(
-            Task::with(['sectors', 'manager', 'serviceOrder']),
+            Task::with(['sectors', 'manager', 'serviceOrder'])
+                ->when($activeRole === 'manager', fn($q) => $q->whereHas('serviceOrder', fn($sq) => $sq->where('manager_id', $user->id)))
+                ->when($activeRole === 'sector_manager', fn($q) => $q->whereHas('sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id')))),
             $request->only(['search', 'status', 'priority', 'from_date', 'to_date', 'sort']),
             ['description', 'status']
         );

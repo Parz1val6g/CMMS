@@ -2,6 +2,7 @@
 
 namespace App\Features\Equipments\Controllers\Web;
 
+use App\Core\Traits\GatesRoutes;
 use App\Features\Equipments\Models\EquipmentType;
 use App\Features\Equipments\EquipmentTypeFormSchema;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Inertia\Inertia;
 
 class EquipmentTypePageController extends Controller
 {
+    use GatesRoutes;
     public function index(Request $request)
     {
         Gate::authorize('viewAny', EquipmentType::class);
@@ -40,13 +42,13 @@ class EquipmentTypePageController extends Controller
             ],
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
-            'routes' => [
+            'routes' => $this->gatedRoutes([
                 'index' => url('/api/equipment-types'),
                 'store' => url('/api/equipment-types'),
                 'update' => url('/api/equipment-types/__ID__'),
                 'destroy' => url('/api/equipment-types/__ID__'),
                 'show' => url('/api/equipment-types/__ID__'),
-            ],
+            ], 'equipment_types'),
             'advancedFilterFields' => [
                 ['value' => 'name',        'label' => 'Nome'],
                 ['value' => 'category',    'label' => 'Categoria'],

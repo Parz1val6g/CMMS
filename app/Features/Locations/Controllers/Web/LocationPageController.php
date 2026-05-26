@@ -2,6 +2,7 @@
 
 namespace App\Features\Locations\Controllers\Web;
 
+use App\Core\Traits\GatesRoutes;
 use App\Features\Locations\Models\Location;
 use App\Features\Locations\LocationFormSchema;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Inertia\Inertia;
 
 class LocationPageController extends Controller
 {
+    use GatesRoutes;
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Location::class);
@@ -54,13 +56,13 @@ class LocationPageController extends Controller
             ],
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
-            'routes' => [
+            'routes' => $this->gatedRoutes([
                 'index' => url('/api/locations'),
                 'store' => url('/api/locations'),
                 'update' => url('/api/locations/__ID__'),
                 'destroy' => url('/api/locations/__ID__'),
                 'show' => url('/api/locations/__ID__'),
-            ],
+            ], 'locations'),
             'advancedFilterFields' => [
                 ['value' => 'street_address', 'label' => 'Morada'],
                 ['value' => 'postal_code',    'label' => 'Código Postal'],

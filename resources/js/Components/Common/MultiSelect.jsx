@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, X, Search } from 'lucide-react';
 import { t } from '@/utils/i18n';
 
@@ -51,13 +52,28 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
   const computeDropdownPosition = useCallback(() => {
     if (!triggerRef.current) return {};
     const rect = triggerRef.current.getBoundingClientRect();
-    return {
-      position: 'fixed',
-      top: rect.bottom + 4,
-      left: rect.left,
-      width: rect.width,
-      zIndex: 9999,
-    };
+    const DROPDOWN_MAX_H = 240; // matches max-h-60
+    const GAP = 4;
+    const spaceBelow = window.innerHeight - rect.bottom - GAP;
+    const spaceAbove = rect.top - GAP;
+    const openUpward = spaceBelow < DROPDOWN_MAX_H && spaceAbove > spaceBelow;
+    return openUpward
+      ? {
+          position: 'fixed',
+          bottom: window.innerHeight - rect.top + GAP,
+          left: rect.left,
+          width: rect.width,
+          maxHeight: Math.min(DROPDOWN_MAX_H, spaceAbove),
+          zIndex: 9999,
+        }
+      : {
+          position: 'fixed',
+          top: rect.bottom + GAP,
+          left: rect.left,
+          width: rect.width,
+          maxHeight: Math.min(DROPDOWN_MAX_H, spaceBelow),
+          zIndex: 9999,
+        };
   }, []);
 
   /* ── Open / close ────────────────────────────────────────── */
@@ -165,12 +181,12 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
         <ChevronDown className={`ml-auto h-4 w-4 text-brand-mid transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
 
-      {/* ── Dropdown (fixed positioning to avoid overflow clip) ── */}
-      {isOpen && (
+      {/* ── Dropdown — portal to document.body to escape CSS transform contexts ── */}
+      {isOpen && createPortal(
         <div
           id={`ms-dropdown-${name}`}
           style={dropdownStyle}
-          className="max-h-60 overflow-auto rounded-lg border border-brand-mid/20 bg-brand-white shadow-2xl"
+          className="overflow-auto rounded-lg border border-brand-mid/20 bg-brand-white shadow-2xl"
         >
           {/* ── Sticky search bar ──────────────────────────────── */}
           {showSearch && (
@@ -196,13 +212,16 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
           ) : (
             filtered.map((opt) => {
               const isChecked = selected.includes(opt.value);
+              const isUnavailable = !!opt.unavailable;
               return (
                 <div
                   key={opt.value}
                   className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors ${
                     isChecked
                       ? 'bg-brand-accent/10 text-brand-accent'
-                      : 'text-brand-darkest hover:bg-brand-light'
+                      : isUnavailable
+                        ? 'text-amber-600 hover:bg-amber-50'
+                        : 'text-brand-darkest hover:bg-brand-light'
                   }`}
                   onClick={() => toggleItem(opt.value)}
                   role="option"
@@ -215,6 +234,9 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
                     className="h-4 w-4 rounded border-brand-mid/20 bg-brand-white text-brand-accent focus:ring-brand-accent"
                   />
                   <span className="flex-1">{opt.label}</span>
+                  {isUnavailable && !isChecked && (
+                    <span className="text-xs text-amber-500" title="Indisponível neste período">⚠</span>
+                  )}
                   {isChecked && (
                     <span className="text-xs text-brand-accent">✓</span>
                   )}
@@ -222,7 +244,8 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
               );
             })
           )}
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Hidden ref for programmatic focus */}

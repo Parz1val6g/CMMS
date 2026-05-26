@@ -4,6 +4,7 @@ namespace App\Features\ServiceOrders\Controllers\Web;
 
 use App\Core\Enums\Priority;
 use App\Core\Enums\ServiceOrderStatus;
+use App\Core\Traits\GatesRoutes;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\ServiceOrders\Presenters\ServiceOrderPresenter;
 use App\Features\ServiceOrders\ServiceOrderFormSchema;
@@ -14,21 +15,18 @@ use Inertia\Inertia;
 
 class ServiceOrderPageController extends Controller
 {
+    use GatesRoutes;
     public function index(Request $request)
     {
         Gate::authorize('viewAny', ServiceOrder::class);
 
         $user = $request->user();
+        $activeRole = $request->session()->get('active_role');
 
         $orders = ServiceOrder::with(['client.user', 'manager', 'location.parish', 'serviceType', 'sectors'])
-            ->when(
-                !$user->isAdmin() && !$user->roles()->where('name', 'sector_manager')->exists(),
-                fn($q) => $q->where('manager_id', $user->id)
-            )
-            ->when(
-                !$user->isAdmin() && $user->roles()->where('name', 'sector_manager')->exists(),
-                fn($q) => $q->whereHas('sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id')))
-            )
+            ->when($activeRole === 'attendant', fn($q) => $q->where('created_by', $user->id))
+            ->when($activeRole === 'sector_manager', fn($q) => $q->whereHas('sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id'))))
+            ->when($activeRole === 'manager', fn($q) => $q->where('manager_id', $user->id))
             ->latest()
             ->paginate(15)
             ->through(fn ($o) => ServiceOrderPresenter::forIndex($o));
@@ -48,13 +46,13 @@ class ServiceOrderPageController extends Controller
             ],
             'formSchema'       => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
-            'routes'               => [
+            'routes'               => $this->gatedRoutes([
                 'index'   => url('/api/service-orders'),
                 'store'   => url('/api/service-orders'),
                 'update'  => url('/api/service-orders/:id'),
                 'destroy' => url('/api/service-orders/:id'),
                 'show'    => url('/api/service-orders/:id'),
-            ],
+            ], 'service_orders'),
             'advancedFilterFields' => [
                 ['value' => 'process',     'label' => __('messages.controllers.service_orders.col_process')],
                 ['value' => 'description', 'label' => __('messages.controllers.service_orders.col_description')],

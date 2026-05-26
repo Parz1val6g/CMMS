@@ -5,13 +5,25 @@ namespace App\Features\MiniTasks\Requests;
 use App\Core\Forms\FormValidator;
 use App\Features\MiniTasks\Models\MiniTask;
 use App\Features\MiniTasks\MiniTaskFormSchema;
+use App\Features\Tasks\Models\Task;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreMiniTaskRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('create', MiniTask::class);
+        if ($this->user()->can('create', MiniTask::class)) {
+            return true;
+        }
+
+        // Task manager can create mini-tasks for their own tasks
+        $taskId = $this->input('task_id');
+        if ($taskId) {
+            $task = Task::find($taskId);
+            return $task && $task->manager_id === $this->user()->id;
+        }
+
+        return false;
     }
 
     public function rules(): array

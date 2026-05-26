@@ -17,10 +17,13 @@ const DEFAULT_WIDTH = 672;
  * @param {Array<{id:string, label:string, component:ReactNode}>} tabs - Tab definitions
  * @param {ReactNode}        headerActions - Optional actions rendered left of the close button
  */
-export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs = [], headerActions = null }) {
+export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs = [], headerActions = null, stacked = false }) {
   const [activeTab, setActiveTab] = useState(tabs[0]?.id ?? null);
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const panelRef = useRef(null);
+  const isResizing = useRef(false);
+  const startX = useRef(0);
+  const startWidth = useRef(0);
 
   const onResizeStart = useCallback((e) => {
     e.preventDefault();
@@ -56,24 +59,28 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
     }
   }, [tabs, activeTab]);
 
-  /* Close on Escape key */
+  /* Close on Escape key — only when not stacked (parent drawer owns Esc) */
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || stacked) return;
     const handler = (e) => { if (e.key === 'Escape') onClose?.(); };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, stacked]);
 
-  useBodyLock(isOpen);
+  /* Body lock — only when not stacked (parent drawer already locked) */
+  useBodyLock(isOpen && !stacked);
   useFocusTrap(panelRef, isOpen);
 
   const activeComponent = tabs.find((t) => t.id === activeTab)?.component ?? null;
+
+  const overlayZ = stacked ? 'z-[60]' : 'z-40';
+  const panelZ = stacked ? 'z-[70]' : 'z-50';
 
   return (
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 z-40 bg-brand-darkest/80 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
+        className={`fixed inset-0 ${overlayZ} bg-brand-darkest/80 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
@@ -84,7 +91,7 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
       <div
         ref={panelRef}
         style={{ width: `${width}px` }}
-        className={`fixed inset-y-0 right-0 z-50 flex flex-col bg-brand-white shadow-2xl border-l border-brand-mid/20 overflow-hidden transform transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 right-0 ${panelZ} flex flex-col bg-brand-white shadow-2xl border-l border-brand-mid/20 overflow-hidden transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -122,7 +129,7 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
         {/* Subtitle */}
         {subtitle && (
           <div className="shrink-0 px-6 py-3 border-b border-brand-mid/20 bg-brand-light">
-            <p className="text-sm text-brand-mid">{subtitle}</p>
+            <div className="text-sm text-brand-mid">{subtitle}</div>
           </div>
         )}
 

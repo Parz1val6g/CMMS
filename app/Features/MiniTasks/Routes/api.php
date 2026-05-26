@@ -1,7 +1,9 @@
 <?php
+use App\Features\MiniTasks\Controllers\Api\MiniTaskAvailabilityController;
 use App\Features\MiniTasks\Controllers\Api\MiniTaskController;
 use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/availability', MiniTaskAvailabilityController::class);
     Route::get('/', [MiniTaskController::class, 'index'])
         ->middleware('permission:mini_tasks,view');
     Route::post('/', [MiniTaskController::class, 'store'])

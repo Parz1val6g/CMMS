@@ -2,6 +2,7 @@
 
 namespace App\Features\ServiceTypes\Controllers\Web;
 
+use App\Core\Traits\GatesRoutes;
 use App\Features\ServiceTypes\Models\ServiceType;
 use App\Features\ServiceTypes\ServiceTypeFormSchema;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Inertia\Inertia;
 
 class ServiceTypePageController extends Controller
 {
+    use GatesRoutes;
     public function index(Request $request)
     {
         Gate::authorize('viewAny', ServiceType::class);
@@ -36,13 +38,13 @@ class ServiceTypePageController extends Controller
             ],
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
-            'routes' => [
+            'routes' => $this->gatedRoutes([
                 'index' => url('/api/service-types'),
                 'store' => url('/api/service-types'),
                 'update' => url('/api/service-types/__ID__'),
                 'destroy' => url('/api/service-types/__ID__'),
                 'show' => url('/api/service-types/__ID__'),
-            ],
+            ], 'service_types'),
             'advancedFilterFields' => [
                 ['value' => 'name',        'label' => 'Nome'],
                 ['value' => 'description', 'label' => 'Descrição'],

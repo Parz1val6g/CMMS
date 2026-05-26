@@ -161,6 +161,7 @@ return [
         'task' => 'Task',
         'workers' => 'Workers',
         'teams' => 'Teams',
+        'date_range' => 'Execution Period',
         'start_date' => 'Start Date',
         'end_date' => 'End Date',
         'material_ids' => 'Materials',

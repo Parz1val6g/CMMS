@@ -1,6 +1,6 @@
-import { useState, useCallback, useMemo, useLayoutEffect, useRef, memo } from 'react';
+import { useState, useCallback, useMemo, useLayoutEffect, useRef, useEffect, memo } from 'react';
 import { usePage, Link, router } from '@inertiajs/react';
-import { LogOut, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LogOut, ChevronDown, ChevronLeft, ChevronRight, Check, User, Settings } from 'lucide-react';
 import { getSections, getBottomItems } from '@/Layouts/data/sidebar';
 import { t } from '@/utils/i18n';
 
@@ -156,43 +156,171 @@ function NavSection({ section, isCollapsed, isOpen, hasActiveChild, onToggle, on
 }
 
 /* ════════════════════════════════════════════════════════════════
-   BOTTOM NAV ITEM (profile + logout — same pattern as NavItem)
+   BOTTOM NAV ITEM — side flyout via fixed positioning so it
+   escapes sidebar overflow clipping in both expanded/collapsed
    ════════════════════════════════════════════════════════════════ */
-function BottomUserRow({ auth, isCollapsed, onTooltipShow, onTooltipHide, onLogout }) {
+function BottomUserRow({ auth, isCollapsed, onTooltipShow, onTooltipHide, onLogout, bottomItems, can }) {
+  const { props: { availableRoles, activeRole } } = usePage();
+
+  const visibleBottomItems = bottomItems.filter((item) => !item.can || can?.[item.can]);
+
+  // null = closed; { x, y } = open, viewport-relative anchor for fixed flyout
+  const [flyoutPos, setFlyoutPos] = useState(null);
+  const menuOpen = flyoutPos !== null;
+
+  const triggerRef = useRef(null);
+  const flyoutRef  = useRef(null);
+
+  // Close on outside click — must check both trigger and flyout
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e) => {
+      if (
+        flyoutRef.current  && !flyoutRef.current.contains(e.target) &&
+        triggerRef.current && !triggerRef.current.contains(e.target)
+      ) setFlyoutPos(null);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [menuOpen]);
+
   if (!auth?.user) return null;
   const userName = `${auth.user.first_name} ${auth.user.last_name}`;
 
-  return (
-    <>
+  const hasMultipleRoles = availableRoles && availableRoles.length > 1;
+  const activeRoleLabel = availableRoles?.find((r) => r.name === activeRole)?.label
+    ?? availableRoles?.[0]?.label;
+
+  const handleSwitch = (roleName) => {
+    setFlyoutPos(null);
+    router.post('/switch-role', { role: roleName });
+  };
+
+  const toggleMenu = () => {
+    if (menuOpen) { setFlyoutPos(null); return; }
+    const rect = triggerRef.current.getBoundingClientRect();
+    // Anchor to right edge + bottom of trigger; flyout grows upward from this point
+    setFlyoutPos({ x: rect.right, y: rect.bottom });
+    if (isCollapsed) onTooltipHide();
+  };
+
+  const flyout = menuOpen && (
+    <div
+      ref={flyoutRef}
+      style={{ position: 'fixed', left: flyoutPos.x + 8, top: flyoutPos.y, zIndex: 200, transform: 'translateY(-100%)' }}
+      className="w-52 rounded-lg border border-white/[0.07] bg-brand-darkest/95 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-sm py-1.5"
+    >
+      {/* Role-gated items (Admin, Notifications, etc.) */}
+      {visibleBottomItems.map((item) => {
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={() => setFlyoutPos(null)}
+            className="flex w-full items-center gap-3 px-4 py-2.5 text-xs text-brand-mid transition-colors hover:text-brand-white hover:bg-white/5"
+          >
+            <Icon className="h-3.5 w-3.5 shrink-0" />
+            <span>{item.label}</span>
+          </Link>
+        );
+      })}
+
+      {visibleBottomItems.length > 0 && <div className="my-1 border-t border-white/[0.06]" />}
+
       <Link
-        href="/profile"
-        onMouseEnter={isCollapsed ? (e) => onTooltipShow(e, userName) : undefined}
-        onMouseLeave={isCollapsed ? onTooltipHide : undefined}
-        className={[
-          'flex items-center rounded-lg text-sm font-medium text-brand-mid transition-colors hover:bg-white/5 hover:text-brand-white',
-          isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2',
-        ].join(' ')}
+        href="/settings"
+        onClick={() => setFlyoutPos(null)}
+        className="flex w-full items-center gap-3 px-4 py-2.5 text-xs text-brand-mid transition-colors hover:text-brand-white hover:bg-white/5"
       >
-        {/* User avatar icon */}
-        <svg className="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-        {!isCollapsed && <span className="truncate">{userName}</span>}
+        <Settings className="h-3.5 w-3.5 shrink-0" />
+        <span>{t('pages.sidebar.settings')}</span>
       </Link>
 
+      {hasMultipleRoles && (
+        <>
+          <div className="my-1 border-t border-white/[0.06]" />
+          {availableRoles.map((role) => (
+            <button
+              key={role.name}
+              type="button"
+              onClick={() => handleSwitch(role.name)}
+              className={[
+                'flex w-full items-center pr-4 pl-[42px] py-2.5 text-left text-xs transition-colors',
+                role.name === activeRole
+                  ? 'bg-white/5 text-brand-white'
+                  : 'text-brand-mid hover:text-brand-white hover:bg-white/5',
+              ].join(' ')}
+            >
+              <span className="flex-1 truncate">{role.label}</span>
+              {role.name === activeRole && (
+                <Check className="h-3.5 w-3.5 shrink-0 text-brand-accent" strokeWidth={2.5} />
+              )}
+            </button>
+          ))}
+        </>
+      )}
+
+      <div className="my-1 border-t border-white/[0.06]" />
       <button
         type="button"
-        onClick={onLogout}
-        onMouseEnter={isCollapsed ? (e) => onTooltipShow(e, t('pages.sidebar.logout')) : undefined}
-        onMouseLeave={isCollapsed ? onTooltipHide : undefined}
-        className={[
-          'flex w-full items-center rounded-lg text-sm font-medium text-brand-mid transition-colors hover:bg-white/5 hover:text-brand-white',
-          isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2',
-        ].join(' ')}
+        onClick={() => { setFlyoutPos(null); onLogout(); }}
+        className="flex w-full items-center gap-3 px-4 py-2.5 text-xs text-brand-mid transition-colors hover:text-red-400 hover:bg-white/5"
       >
-        <LogOut className="h-[18px] w-[18px] shrink-0" />
-        {!isCollapsed && <span>{t('pages.sidebar.logout')}</span>}
+        <LogOut className="h-3.5 w-3.5 shrink-0" />
+        <span>{t('pages.sidebar.logout')}</span>
       </button>
+    </div>
+  );
+
+  return (
+    <>
+      <div className="px-2 pb-1">
+        {isCollapsed ? (
+          /* ── Collapsed: user icon is the sole trigger ── */
+          <button
+            ref={triggerRef}
+            type="button"
+            onClick={toggleMenu}
+            onMouseEnter={(e) => onTooltipShow(e, userName)}
+            onMouseLeave={onTooltipHide}
+            className={[
+              'flex w-full justify-center items-center rounded-lg px-2 py-2.5 text-sm font-medium transition-colors',
+              menuOpen ? 'bg-white/10 text-brand-white' : 'text-brand-mid hover:bg-white/5 hover:text-brand-white',
+            ].join(' ')}
+          >
+            <User className="h-[18px] w-[18px] shrink-0" />
+          </button>
+        ) : (
+          /* ── Expanded: entire block is the trigger ── */
+          <button
+            ref={triggerRef}
+            type="button"
+            onClick={toggleMenu}
+            className={[
+              'group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+              menuOpen ? 'bg-white/10 text-brand-white' : 'text-brand-mid hover:bg-white/5 hover:text-brand-white',
+            ].join(' ')}
+          >
+            <User className="h-[18px] w-[18px] shrink-0" />
+            <span className="flex-1 min-w-0 text-left">
+              <span className="block truncate">{userName}</span>
+              {activeRoleLabel && (
+                <span className="block text-[11px] font-normal text-brand-accent/60 truncate">
+                  {activeRoleLabel}
+                </span>
+              )}
+            </span>
+            <ChevronRight className={[
+              'h-3.5 w-3.5 shrink-0 transition-opacity duration-200',
+              menuOpen ? 'opacity-100 text-brand-white' : 'opacity-0 group-hover:opacity-60',
+            ].join(' ')} />
+          </button>
+        )}
+      </div>
+
+      {/* Fixed flyout — rendered outside sidebar stacking context */}
+      {flyout}
     </>
   );
 }
@@ -211,10 +339,6 @@ export default function Sidebar() {
       items: section.items.filter((item) => !item.can || can?.[item.can]),
     })).filter((section) => section.items.length > 0);
   }, [sections, can]);
-
-  const visibleBottomItems = useMemo(() => {
-    return bottomItems.filter((item) => !item.can || can?.[item.can]);
-  }, [bottomItems, can]);
 
   /* ── Collapsed state — persisted across navigations ── */
   const [isCollapsed, setIsCollapsed] = useState(
@@ -348,27 +472,15 @@ export default function Sidebar() {
         </div>
 
         {/* ── Sticky footer ───────────────────────────────────── */}
-        <div
-          className={[
-            'shrink-0 mt-auto border-t border-brand-mid/20 space-y-0.5 py-3',
-            isCollapsed ? 'px-2' : 'px-2',
-          ].join(' ')}
-        >
-          {visibleBottomItems.map((item) => (
-            <NavItem
-              key={item.href}
-              item={item}
-              isCollapsed={isCollapsed}
-              onTooltipShow={showTooltip}
-              onTooltipHide={hideTooltip}
-            />
-          ))}
+        <div className="shrink-0 mt-auto border-t border-brand-mid/20 py-3 px-2">
           <BottomUserRow
             auth={auth}
             isCollapsed={isCollapsed}
             onTooltipShow={showTooltip}
             onTooltipHide={hideTooltip}
             onLogout={handleLogout}
+            bottomItems={bottomItems}
+            can={can}
           />
         </div>
       </aside>

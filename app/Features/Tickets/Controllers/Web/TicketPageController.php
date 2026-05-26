@@ -18,12 +18,10 @@ class TicketPageController extends Controller
         Gate::authorize('viewAny', Ticket::class);
 
         $user = $request->user();
+        $activeRole = $request->session()->get('active_role');
 
         $tickets = Ticket::with(['client.user', 'serviceType', 'ticketManager'])
-            ->when(
-                !$user->isAdmin() && !$user->roles()->whereIn('name', ['manager'])->exists(),
-                fn($q) => $q->where('ticket_manager_id', $user->id)
-            )
+            ->when($activeRole === 'ticket_manager', fn($q) => $q->where('ticket_manager_id', $user->id))
             ->latest()
             ->paginate(15)
             ->through(fn($t) => [

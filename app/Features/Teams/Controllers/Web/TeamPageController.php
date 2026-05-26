@@ -2,6 +2,7 @@
 
 namespace App\Features\Teams\Controllers\Web;
 
+use App\Core\Traits\GatesRoutes;
 use App\Features\Teams\Models\Team;
 use App\Features\Teams\TeamFormSchema;
 use Illuminate\Http\Request;
@@ -11,23 +12,17 @@ use Inertia\Inertia;
 
 class TeamPageController extends Controller
 {
+    use GatesRoutes;
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Team::class);
 
         $user = $request->user();
-
         $activeRole = $request->session()->get('active_role');
 
         $teams = Team::with(['sector', 'responsible'])
-            ->when(
-                $activeRole === 'sector_manager',
-                fn($q) => $q->whereIn('sector_id', $user->headedSectors()->pluck('id'))
-            )
-            ->when(
-                $activeRole === 'team_manager',
-                fn($q) => $q->where('responsible_id', $user->id)
-            )
+            ->when($activeRole === 'sector_manager', fn($q) => $q->whereIn('sector_id', $user->headedSectors()->pluck('id')))
+            ->when($activeRole === 'team_manager', fn($q) => $q->where('responsible_id', $user->id))
             ->latest()
             ->paginate(15)
             ->through(fn ($t) => [
@@ -51,13 +46,13 @@ class TeamPageController extends Controller
             ],
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
-            'routes' => [
+            'routes' => $this->gatedRoutes([
                 'index' => url('/api/teams'),
                 'store' => url('/api/teams'),
                 'update' => url('/api/teams/__ID__'),
                 'destroy' => url('/api/teams/__ID__'),
                 'show' => url('/api/teams/__ID__'),
-            ],
+            ], 'teams'),
             'advancedFilterFields' => [
                 ['value' => 'name',       'label' => 'Nome'],
                 ['value' => 'created_at', 'label' => 'Criado'],

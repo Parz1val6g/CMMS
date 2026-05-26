@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { X, GripVertical } from 'lucide-react';
+import { X } from 'lucide-react';
 import FormField from '@/Components/Common/FormField';
 import { replaceId } from '@/utils/url';
 import { t } from '@/utils/i18n';
@@ -198,13 +198,10 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
         startWidthRef.current = panelWidth;
         document.body.style.cursor = 'col-resize';
         document.body.style.userSelect = 'none';
-    }, [panelWidth]);
 
-    useEffect(() => {
-        if (!resizingRef.current) return;
-        const onMove = (e) => {
+        const onMove = (ev) => {
             if (!resizingRef.current) return;
-            const delta = startXRef.current - e.clientX;
+            const delta = startXRef.current - ev.clientX;
             const next = Math.max(280, Math.min(900, startWidthRef.current + delta));
             setPanelWidth(next);
         };
@@ -212,14 +209,12 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
             resizingRef.current = false;
             document.body.style.cursor = '';
             document.body.style.userSelect = '';
-        };
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onUp);
-        return () => {
             document.removeEventListener('mousemove', onMove);
             document.removeEventListener('mouseup', onUp);
         };
-    }, []);
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+    }, [panelWidth]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

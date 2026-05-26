@@ -95,24 +95,24 @@ class LoanOrderFormSchema
                 RepeaterInput::make('equipments')
                     ->setColSpan(2)
                     ->setMaxItems(5)
-                    ->meta('itemColumns', 4)
+                    ->meta('itemColumns', 2)
                     ->subFields([
                         SelectInput::make('equipment_id')
                             ->setLabel(__('forms.loan_orders.equipment'))
                             ->setOptions($equipmentOpts)
                             ->setRequired(true)
                             ->setRules('required|uuid|exists:equipments,id'),
-                        TextInput::make('start_date')
-                            ->setLabel(__('forms.loan_orders.start_date'))
-                            ->setType('date')
-                            ->setRules('nullable|date'),
-                        TextInput::make('end_date')
-                            ->setLabel(__('forms.loan_orders.end_date'))
-                            ->setType('date')
-                            ->setRules('nullable|date|after_or_equal:start_date'),
                         ToggleInput::make('needs_operator')
                             ->setLabel(__('forms.loan_orders.needs_operator'))
                             ->setRules('nullable|boolean'),
+                        TextInput::make('start_date')
+                            ->setLabel(__('forms.loan_orders.start_date'))
+                            ->setType('date-picker')
+                            ->setRules('nullable|date'),
+                        TextInput::make('end_date')
+                            ->setLabel(__('forms.loan_orders.end_date'))
+                            ->setType('date-picker')
+                            ->setRules('nullable|date|after_or_equal:start_date'),
                     ])
             )
             // ── Full-width: Map ──
@@ -182,24 +182,24 @@ class LoanOrderFormSchema
                 RepeaterInput::make('equipments')
                     ->setColSpan(2)
                     ->setMaxItems(5)
-                    ->meta('itemColumns', 4)
+                    ->meta('itemColumns', 2)
                     ->subFields([
                         SelectInput::make('equipment_id')
                             ->setLabel(__('forms.loan_orders.equipment'))
                             ->setOptions($equipmentOpts)
                             ->setRequired(true)
                             ->setRules('required|uuid|exists:equipments,id'),
-                        TextInput::make('start_date')
-                            ->setLabel(__('forms.loan_orders.start_date'))
-                            ->setType('date')
-                            ->setRules('nullable|date'),
-                        TextInput::make('end_date')
-                            ->setLabel(__('forms.loan_orders.end_date'))
-                            ->setType('date')
-                            ->setRules('nullable|date|after_or_equal:start_date'),
                         ToggleInput::make('needs_operator')
                             ->setLabel(__('forms.loan_orders.needs_operator'))
                             ->setRules('nullable|boolean'),
+                        TextInput::make('start_date')
+                            ->setLabel(__('forms.loan_orders.start_date'))
+                            ->setType('date-picker')
+                            ->setRules('nullable|date'),
+                        TextInput::make('end_date')
+                            ->setLabel(__('forms.loan_orders.end_date'))
+                            ->setType('date-picker')
+                            ->setRules('nullable|date|after_or_equal:start_date'),
                     ])
             )
             ->field(
@@ -236,24 +236,24 @@ class LoanOrderFormSchema
             ->field(
                 RepeaterInput::make('equipments')
                     ->setMaxItems(5)
-                    ->meta('itemColumns', 4)
+                    ->meta('itemColumns', 2)
                     ->subFields([
                         SelectInput::make('equipment_id')
                             ->setLabel(__('forms.loan_orders.equipment'))
                             ->setOptions(self::editEquipmentOptions())
                             ->setRequired(true)
                             ->setRules('required|uuid|exists:equipments,id'),
-                        TextInput::make('start_date')
-                            ->setLabel(__('forms.loan_orders.start_date'))
-                            ->setType('date')
-                            ->setRules('nullable|date'),
-                        TextInput::make('end_date')
-                            ->setLabel(__('forms.loan_orders.end_date'))
-                            ->setType('date')
-                            ->setRules('nullable|date|after_or_equal:start_date'),
                         ToggleInput::make('needs_operator')
                             ->setLabel(__('forms.loan_orders.needs_operator'))
                             ->setRules('nullable|boolean'),
+                        TextInput::make('start_date')
+                            ->setLabel(__('forms.loan_orders.start_date'))
+                            ->setType('date-picker')
+                            ->setRules('nullable|date'),
+                        TextInput::make('end_date')
+                            ->setLabel(__('forms.loan_orders.end_date'))
+                            ->setType('date-picker')
+                            ->setRules('nullable|date|after_or_equal:start_date'),
                     ])
             )
             ->field(

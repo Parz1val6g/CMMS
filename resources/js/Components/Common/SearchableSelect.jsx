@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Search } from 'lucide-react';
-import { toScalar } from '@/Utils/url';
+import { toScalar } from '@/utils/url';
 import { t } from '@/utils/i18n';
 
 export default function SearchableSelect({ name, options = [], value = '', onChange, placeholder }) {
@@ -24,13 +25,28 @@ export default function SearchableSelect({ name, options = [], value = '', onCha
   const computeDropdownPosition = useCallback(() => {
     if (!triggerRef.current) return {};
     const rect = triggerRef.current.getBoundingClientRect();
-    return {
-      position: 'fixed',
-      top: rect.bottom + 4,
-      left: rect.left,
-      width: rect.width,
-      zIndex: 9999,
-    };
+    const DROPDOWN_MAX_H = 240;
+    const GAP = 4;
+    const spaceBelow = window.innerHeight - rect.bottom - GAP;
+    const spaceAbove = rect.top - GAP;
+    const openUpward = spaceBelow < DROPDOWN_MAX_H && spaceAbove > spaceBelow;
+    return openUpward
+      ? {
+          position: 'fixed',
+          bottom: window.innerHeight - rect.top + GAP,
+          left: rect.left,
+          width: rect.width,
+          maxHeight: Math.min(DROPDOWN_MAX_H, spaceAbove),
+          zIndex: 9999,
+        }
+      : {
+          position: 'fixed',
+          top: rect.bottom + GAP,
+          left: rect.left,
+          width: rect.width,
+          maxHeight: Math.min(DROPDOWN_MAX_H, spaceBelow),
+          zIndex: 9999,
+        };
   }, []);
 
   const open = useCallback(() => {
@@ -106,8 +122,8 @@ export default function SearchableSelect({ name, options = [], value = '', onCha
         <ChevronDown className={`h-4 w-4 text-brand-mid transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
 
-      {/* ── Dropdown (fixed positioning to avoid overflow clip) ── */}
-      {isOpen && (
+      {/* ── Dropdown — portal to document.body to escape CSS transform contexts ── */}
+      {isOpen && createPortal(
         <div
           id={`ss-dropdown-${name}`}
           style={dropdownStyle}
@@ -129,7 +145,7 @@ export default function SearchableSelect({ name, options = [], value = '', onCha
           </div>
 
           {/* Options list */}
-          <div className="max-h-48 overflow-auto">
+          <div className="overflow-auto">
             {filtered.length === 0 ? (
               <div className="px-3 py-2 text-sm text-brand-mid">{t('pages.common.no_matches')}</div>
             ) : (
@@ -153,7 +169,8 @@ export default function SearchableSelect({ name, options = [], value = '', onCha
               ))
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ── Hidden input for form.elements compatibility ──────── */}

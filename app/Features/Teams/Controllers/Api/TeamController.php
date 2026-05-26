@@ -26,8 +26,13 @@ class TeamController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
+        $user = $request->user();
+        $activeRole = $request->input('active_role');
+
         $query = $this->filterService->apply(
-            Team::with(['sector', 'responsible']),
+            Team::with(['sector', 'responsible'])
+                ->when($activeRole === 'sector_manager', fn($q) => $q->whereIn('sector_id', $user->headedSectors()->pluck('id')))
+                ->when($activeRole === 'team_manager', fn($q) => $q->where('responsible_id', $user->id)),
             $request->only(['search', 'sort']),
             ['name']
         );

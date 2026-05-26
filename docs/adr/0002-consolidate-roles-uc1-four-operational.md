@@ -1,0 +1,5 @@
+# Consolidação de papéis — UC1 com 4 papéis operacionais
+
+Para o Caso de Uso 1 (Reporte de Problema pelo Cidadão), o sistema usa 4 papéis operacionais (Atendente, Gestor, Gestor de Tarefa, Trabalhador) em vez do modelo anterior de 14 papéis. Foram eliminados `mini_task_manager`, `work_log_manager` e `supervisor` por não terem justificação no fluxo de UC1 — o Gestor de Tarefa assume a divisão em mini-tarefas (antes do `mini_task_manager`) e o Trabalhador conclui as suas próprias mini-tarefas sem approval chain intermédio.
+
+**Alternativa rejeitada:** manter papéis separados para cada nível da cascata (mini_task_manager para gerir mini-tarefas, work_log_manager para aprovar work logs). Isto criava uma cadeia de aprovação de 5 níveis com fricção desnecessária entre passos que, no terreno, são executados pela mesma pessoa ou equipa. A consolidação reduz o número de handoffs e alinha o sistema com a realidade operacional onde o Gestor de Tarefa planeia e o Trabalhador executa — sem intermediários.

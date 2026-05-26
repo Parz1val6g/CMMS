@@ -3,6 +3,7 @@
 namespace App\Features\Tasks\Controllers\Web;
 
 use App\Core\Enums\TaskStatus;
+use App\Features\MiniTasks\MiniTaskFormSchema;
 use App\Features\Tasks\Models\Task;
 use App\Features\Tasks\TaskFormSchema;
 use Illuminate\Http\Request;
@@ -17,12 +18,11 @@ class TaskPageController extends Controller
         Gate::authorize('viewAny', Task::class);
 
         $user = $request->user();
+        $activeRole = $request->session()->get('active_role');
 
         $tasks = Task::with(['serviceOrder', 'manager', 'sectors'])
-            ->when(
-                !$user->isAdmin() && $user->roles()->where('name', 'sector_manager')->exists(),
-                fn($q) => $q->whereHas('sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id')))
-            )
+            ->when($activeRole === 'manager', fn($q) => $q->whereHas('serviceOrder', fn($sq) => $sq->where('manager_id', $user->id)))
+            ->when($activeRole === 'sector_manager', fn($q) => $q->whereHas('sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id'))))
             ->latest()
             ->paginate(15)
             ->through(fn($t) => [
@@ -56,6 +56,7 @@ class TaskPageController extends Controller
             ],
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
+            'miniTaskCreateSchema' => MiniTaskFormSchema::create()->toArray(),
             'routes' => [
                 'index' => url('/api/tasks'),
                 'store' => url('/api/tasks'),

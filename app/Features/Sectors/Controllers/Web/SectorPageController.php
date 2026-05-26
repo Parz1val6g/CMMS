@@ -2,6 +2,7 @@
 
 namespace App\Features\Sectors\Controllers\Web;
 
+use App\Core\Traits\GatesRoutes;
 use App\Features\Sectors\Models\Sector;
 use App\Features\Sectors\SectorFormSchema;
 use Illuminate\Http\Request;
@@ -11,17 +12,16 @@ use Inertia\Inertia;
 
 class SectorPageController extends Controller
 {
+    use GatesRoutes;
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Sector::class);
 
         $user = $request->user();
+        $activeRole = $request->session()->get('active_role');
 
         $sectors = Sector::with(['head'])
-            ->when(
-                !$user->isAdmin() && $user->roles()->where('name', 'sector_manager')->exists(),
-                fn($q) => $q->where('head_id', $user->id)
-            )
+            ->when($activeRole === 'sector_manager', fn($q) => $q->where('head_id', $user->id))
             ->latest()
             ->paginate(15)
             ->through(fn ($s) => [
@@ -46,13 +46,13 @@ class SectorPageController extends Controller
             ],
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
-            'routes' => [
+            'routes' => $this->gatedRoutes([
                 'index' => url('/api/sectors'),
                 'store' => url('/api/sectors'),
                 'update' => url('/api/sectors/__ID__'),
                 'destroy' => url('/api/sectors/__ID__'),
                 'show' => url('/api/sectors/__ID__'),
-            ],
+            ], 'sectors'),
             'advancedFilterFields' => [
                 ['value' => 'name',       'label' => 'Nome'],
                 ['value' => 'created_at', 'label' => 'Criado'],

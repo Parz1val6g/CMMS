@@ -22,7 +22,14 @@ class MiniTaskController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $base = MiniTask::with(['task.serviceOrder', 'supervisor', 'workers.user', 'teams', 'materials.unit', 'equipment']);
+        $user = $request->user();
+        $activeRole = $request->input('active_role');
+
+        $base = MiniTask::with(['task.serviceOrder', 'supervisor', 'workers.user', 'teams', 'materials.unit', 'equipment'])
+            ->when($activeRole === 'manager', fn($q) => $q->whereHas('task.serviceOrder', fn($sq) => $sq->where('manager_id', $user->id)))
+            ->when($activeRole === 'task_manager', fn($q) => $q->where('supervisor_id', $user->id))
+            ->when($activeRole === 'sector_manager', fn($q) => $q->whereHas('task.sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id'))))
+            ->when($activeRole === 'worker', fn($q) => $q->whereHas('workers', fn($wq) => $wq->where('workers.user_id', $user->id)));
 
         if ($request->filled('task_id')) {
             $request->validate(['task_id' => 'exists:tasks,id']);

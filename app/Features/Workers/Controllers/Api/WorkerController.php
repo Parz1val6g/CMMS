@@ -26,7 +26,16 @@ class WorkerController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Worker::with(['user', 'team']);
+        $user = $request->user();
+        $activeRole = $request->input('active_role');
+
+        $query = Worker::with(['user', 'team'])
+            ->when($activeRole === 'sector_manager', fn($q) => $q->whereIn('team_id', function ($sub) use ($user) {
+                $sub->select('id')->from('teams')->whereIn('sector_id', $user->headedSectors()->pluck('id'));
+            }))
+            ->when($activeRole === 'team_manager', fn($q) => $q->whereIn('team_id', function ($sub) use ($user) {
+                $sub->select('id')->from('teams')->where('responsible_id', $user->id);
+            }));
 
         if ($request->has('team_id')) {
             $query->where('team_id', $request->team_id);

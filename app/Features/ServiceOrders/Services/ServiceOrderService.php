@@ -21,9 +21,9 @@ class ServiceOrderService
         private TransactionHandler $transactions
     ) {}
     
-    public function create(array $data, string $managerId): ServiceOrder
+    public function create(array $data, string $managerId, ?string $createdById = null): ServiceOrder
     {
-        return $this->transactions->execute(function () use ($data, $managerId) {
+        return $this->transactions->execute(function () use ($data, $managerId, $createdById) {
             // 1. Create Location
             $locationId = null;
             if (!empty($data['parish_id'])) {
@@ -49,6 +49,7 @@ class ServiceOrderService
                 'client_id'          => $data['client_id'] ?? null,
                 'client_location_id' => $data['client_location_id'] ?? null,
                 'manager_id'         => $managerId,
+                'created_by'         => $createdById,
                 'location_id'        => $locationId,
                 'service_type_id'    => $data['service_type_id'] ?? null,
                 'priority'           => $data['priority'] ?? null,

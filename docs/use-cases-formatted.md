@@ -45,37 +45,7 @@ A conclusão propaga-se de baixo para cima: quando todos os Work Logs estão con
 
 ---
 
-## Caso 2 — Requisição Interna de Equipamento
-
-**Contexto:** A nossa instituição necessita de equipamento(s) para um evento ou uso interno.
-
-### Fluxo
-
-1. **Ticket Interno** — Um colaborador interno cria um ticket com:
-   - Lista de equipamentos necessários
-   - Para cada equipamento: data de início, data de fim, e se é necessário operador
-
-2. **Criação da Ordem de Serviço** — O gestor de tickets acede ao pedido e cria uma Ordem de Serviço com:
-   - Dados importados automaticamente do ticket
-   - Datas previstas de início e fim
-   - Pessoa responsável atribuída
-   - Estado: *Pendente*
-   - Tipo: *Ticket* (com referência ao ID do ticket original)
-   - Secções p/equipamento de acordo com o chefe de cada secção
-
-3. **Criação de Tarefas por Equipamento** — O gestor da Ordem de Serviço analisa os equipamentos necessários e cria uma **Tarefa por equipamento**, atribuindo cada uma a uma secção de acordo com o chefe da mesma.
-
-4. **Execução — Entrega ou Levantamento** — Para cada movimento de equipamento (entrega à entidade ou levantamento pela entidade), é criada uma Mini-Tarefa e, dentro dela, um Work Log. Os cenários possíveis são:
-
-   | Cenário | Registo |
-   |---|---|
-   | Nós entregamos na localização | Timestamp de saída da instituição + timestamp de entrega |
-   | Nós vamos levantar | Timestamp de saída da instituição até à entidade |
-   | Entidade levanta e entrega no nosso estabelecimento | Registo de receção e devolução com Work Logs |
-
----
-
-## Caso 3 — Aluguer de Equipamento por Entidade Externa
+## Caso 2 — Aluguer de Equipamento por Entidade Externa
 
 **Contexto:** Uma entidade externa pretende alugar equipamento(s) da instituição.
 
@@ -103,6 +73,36 @@ A conclusão propaga-se de baixo para cima: quando todos os Work Logs estão con
    | Nós entregamos na localização | Timestamp de saída da instituição + timestamp de entrega |
    | Entidade levanta no nosso estabelecimento | Registo de levantamento com Work Log |
    | Entidade devolve no nosso estabelecimento | Registo de devolução com Work Log |
+
+---
+
+## Caso 3 — Requisição Interna de Equipamento
+
+**Contexto:** A nossa instituição necessita de equipamento(s) para um evento ou uso interno.
+
+### Fluxo
+
+1. **Ticket Interno** — Um colaborador interno cria um ticket com:
+   - Lista de equipamentos necessários
+   - Para cada equipamento: data de início, data de fim, e se é necessário operador
+
+2. **Criação da Ordem de Serviço** — O gestor de tickets acede ao pedido e cria uma Ordem de Serviço com:
+   - Dados importados automaticamente do ticket
+   - Datas previstas de início e fim
+   - Pessoa responsável atribuída
+   - Estado: *Pendente*
+   - Tipo: *Ticket* (com referência ao ID do ticket original)
+   - Secções p/equipamento de acordo com o chefe de cada secção
+
+3. **Criação de Tarefas por Equipamento** — O gestor da Ordem de Serviço analisa os equipamentos necessários e cria uma **Tarefa por equipamento**, atribuindo cada uma a uma secção de acordo com o chefe da mesma.
+
+4. **Execução — Entrega ou Levantamento** — Para cada movimento de equipamento (entrega à entidade ou levantamento pela entidade), é criada uma Mini-Tarefa e, dentro dela, um Work Log. Os cenários possíveis são:
+
+   | Cenário | Registo |
+   |---|---|
+   | Nós entregamos na localização | Timestamp de saída da instituição + timestamp de entrega |
+   | Nós vamos levantar | Timestamp de saída da instituição até à entidade |
+   | Entidade levanta e entrega no nosso estabelecimento | Registo de receção e devolução com Work Logs |
 
 ---
 

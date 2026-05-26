@@ -35,6 +35,7 @@ class ServiceOrder extends Model
         'client_id',
         'client_location_id',
         'manager_id',
+        'created_by',
         'location_id',
         'service_type_id',
         'migrated_to_loan_id',
@@ -76,6 +77,10 @@ class ServiceOrder extends Model
     public function manager()
     {
         return $this->belongsTo(User::class, 'manager_id');
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
     public function location()
     {

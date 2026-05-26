@@ -15,7 +15,6 @@ import {
   Download,
   Bell,
   BarChart3,
-  Settings,
   Shield,
   Ticket,
 } from 'lucide-react';
@@ -105,8 +104,7 @@ export function getSections() {
 
 export function getBottomItems() {
   return [
-    { label: t('pages.sidebar.notifications'), icon: Bell,     href: '/notifications', dev: true,  can: 'viewNotifications' },
-    { label: t('pages.sidebar.settings'),      icon: Settings, href: '/settings',      dev: false },
-    { label: t('pages.sidebar.admin'),         icon: Shield,   href: '/admin',         dev: false, can: 'manageUsers' },
+    { label: t('pages.sidebar.notifications'), icon: Bell,   href: '/notifications', dev: true,  can: 'viewNotifications' },
+    { label: t('pages.sidebar.admin'),         icon: Shield, href: '/admin',         dev: false, can: 'manageUsers' },
   ];
 }

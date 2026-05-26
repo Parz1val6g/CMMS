@@ -2,6 +2,7 @@
 
 namespace App\Features\Materials\Controllers\Web;
 
+use App\Core\Traits\GatesRoutes;
 use App\Features\Materials\Models\Material;
 use App\Features\Materials\MaterialFormSchema;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Inertia\Inertia;
 
 class MaterialPageController extends Controller
 {
+    use GatesRoutes;
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Material::class);
@@ -43,13 +45,13 @@ class MaterialPageController extends Controller
             ],
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
-            'routes' => [
+            'routes' => $this->gatedRoutes([
                 'index' => url('/api/materials'),
                 'store' => url('/api/materials'),
                 'update' => url('/api/materials/__ID__'),
                 'destroy' => url('/api/materials/__ID__'),
                 'show' => url('/api/materials/__ID__'),
-            ],
+            ], 'materials'),
             'advancedFilterFields' => [
                 ['value' => 'name',          'label' => 'Nome'],
                 ['value' => 'stock_quantity', 'label' => 'Stock'],

@@ -72,7 +72,7 @@ function collectFormData(form, fields, formValues) {
   return data;
 }
 
-export default function Modal({ entityName = t('common.entity_name'), title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit, children, injectAfterField }) {
+export default function Modal({ entityName = t('common.entity_name'), title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit, children, injectAfterField, externalErrors = {} }) {
   const formRef = useRef(null);
   const containerRef = useRef(null);
   const [saving, setSaving] = useState(false);
@@ -266,7 +266,7 @@ export default function Modal({ entityName = t('common.entity_name'), title, for
 
   function renderFieldContent(field) {
     const name = field.name ?? field.key;
-    const fieldError = errors[name]?.join?.(' ') ?? errors[name];
+    const fieldError = externalErrors[name]?.join?.(' ') ?? externalErrors[name] ?? errors[name]?.join?.(' ') ?? errors[name];
     const currentVal = formValues[name] ?? '';
     const basicInputTypes = ['text', 'email', 'number', 'password', 'phone', 'url'];
 

@@ -1,5 +1,6 @@
 <?php
 namespace App\Features\ServiceOrders\Controllers\Api;
+
 use App\Core\Services\FilterService;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\ServiceOrders\Requests\StoreServiceOrderRequest;
@@ -45,8 +46,13 @@ class ServiceOrderController extends Controller
             ['process', 'description', 'priority', 'status', 'created_at']
         );
 
+        $user = $request->user();
+        $activeRole = $request->input('active_role');
+
         $orders = $query
-            ->when(!$user->isAdmin(), fn($q) => $q->where('manager_id', $user->id))
+            ->when($activeRole === 'attendant', fn($q) => $q->where('created_by', $user->id))
+            ->when($activeRole === 'sector_manager', fn($q) => $q->whereHas('sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id'))))
+            ->when($activeRole === 'manager', fn($q) => $q->where('manager_id', $user->id))
             ->when(!$request->filled('sort'), fn($q) => $q->latest())
             ->paginate(15);
 
@@ -56,7 +62,7 @@ class ServiceOrderController extends Controller
     public function store(StoreServiceOrderRequest $request): ServiceOrderResource
     {
         $managerId = $request->validated('manager_id');
-        $serviceOrder = $this->serviceOrderService->create($request->validated(), $managerId);
+        $serviceOrder = $this->serviceOrderService->create($request->validated(), $managerId, $request->user()->id);
 
         $serviceOrder->load(['client.user', 'manager', 'location', 'serviceType']);
 

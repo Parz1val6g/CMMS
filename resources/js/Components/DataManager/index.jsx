@@ -1,11 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { usePage } from '@inertiajs/react';
 import { Plus, LayoutList, Grid2X2, Trash2, X } from 'lucide-react';
 import { t } from '@/utils/i18n';
 import DialogModal from '@/Components/Common/DialogModal';
 import Table from '@/Components/Table/index.jsx';
 import Pagination from '@/Components/Table/Pagination.jsx';
 import EditPanel from './EditPanel.jsx';
-import FilterBar from './FilterBar.jsx';
+import FilterBar from './filterbar.jsx';
 import { replaceId, toQueryString } from '@/utils/url';
 import { csrfHeader } from '@/utils/csrf';
 
@@ -66,13 +67,15 @@ export default function DataManager({
 
     const abortRef = useRef(null);
 
+    const { props: { activeRole } } = usePage();
+
     const hasEdit = !!routes.update;
     const name = entityName ?? title?.replace(/s$/, '') ?? t('common.entity_name');
 
     /* ── Fetch helper — called after mutations to refresh without reload (#3) ── */
     const refetch = useCallback(() => {
         if (!routes.index) return;
-        const params = { ...filters };
+        const params = { ...filters, active_role: activeRole };
         if (advFilters.length > 0) {
             params.adv_filters = JSON.stringify(advFilters);
             params.adv_logic   = advLogic;
@@ -85,7 +88,7 @@ export default function DataManager({
             .then((data) => setItems(normalizeResponse(data)))
             .catch(() => setItems(initialItemsRef.current))
             .finally(() => setLoading(false));
-    }, [routes.index, filters, advFilters, advLogic]);
+    }, [routes.index, filters, advFilters, advLogic, activeRole]);
 
     /* ── Fetch data from API when filters change ──────────────────── */
     useEffect(() => {
@@ -106,7 +109,7 @@ export default function DataManager({
         abortRef.current = controller;
 
         // Merge flat filters + advanced filter payload
-        const params = { ...filters };
+        const params = { ...filters, active_role: activeRole };
         if (hasAdvFilters) {
             params.adv_filters = JSON.stringify(advFilters);
             params.adv_logic   = advLogic;
@@ -138,7 +141,7 @@ export default function DataManager({
             if (abortRef.current) controller.abort();
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filters, advFilters, advLogic, routes.index]);
+    }, [filters, advFilters, advLogic, routes.index, activeRole]);
 
     /* ── Filter change handler ────────────────────────────────────── */
     const handleFilterChange = useCallback((newFilters) => {

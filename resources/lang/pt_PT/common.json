@@ -1,0 +1,58 @@
+{
+    "entity_name": "Registo",
+    "error_boundary": {
+        "heading": "Algo correu mal",
+        "description": "Ocorreu um erro inesperado. Por favor, recarregue a página.",
+        "reload_button": "Recarregar Página"
+    },
+    "multi_select": {
+        "placeholder": "Selecionar...",
+        "no_options": "Nenhuma opção disponível",
+        "remove_aria": "Remover :label"
+    },
+    "searchable_select": {
+        "placeholder": "Selecionar..."
+    },
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "close": "Fechar",
+    "dismiss": "Dispensar",
+    "close_alert": "Fechar alerta",
+    "close_drawer": "Fechar painel",
+    "resize_drawer": "Redimensionar painel",
+    "clear_location": "Limpar localização",
+    "breadcrumb": "Navegação",
+    "search_placeholder": "Pesquisar...",
+    "no_matches": "Sem resultados",
+    "remove": "Remover",
+    "add": "Adicionar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "loading": "A carregar...",
+    "yes": "Sim",
+    "no": "Não",
+    "select_placeholder": "Selecione...",
+    "map_picker": {
+        "missing_key": "A carregar configuração do mapa...",
+        "select_label": "Selecionar no Mapa",
+        "loading": "A carregar mapa...",
+        "hint": "Clique no mapa ou arraste o marcador para definir as coordenadas"
+    },
+    "file_dropzone": {
+        "upload_text": "Clique para carregar ou arraste e solte",
+        "supported_hint": "Qualquer tipo de ficheiro suportado"
+    },
+    "kanban": {
+        "item": "Item",
+        "no_items": "Sem itens"
+    },
+    "topbar": {
+        "select_role": "Selecionar Função"
+    },
+    "equipment_loan": {
+        "details_title": "Detalhes por Equipamento",
+        "start_date": "Data Inicial",
+        "end_date": "Data Final",
+        "needs_operator": "Requer Operador"
+    }
+}

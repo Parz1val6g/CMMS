@@ -23,7 +23,11 @@ class WorkLogController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $base = WorkLog::with(['miniTask.task', 'workers.user', 'materials', 'reviewer']);
+        $user = $request->user();
+        $activeRole = $request->input('active_role');
+
+        $base = WorkLog::with(['miniTask.task', 'workers.user', 'materials', 'reviewer'])
+            ->when($activeRole === 'worker', fn($q) => $q->whereHas('workers', fn($wq) => $wq->where('workers.user_id', $user->id)));
 
         if ($request->filled('mini_task_id')) {
             $request->validate(['mini_task_id' => 'exists:mini_tasks,id']);
