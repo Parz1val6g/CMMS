@@ -101,7 +101,7 @@ export function getSections() {
 
   ];
 }
-
+ 
 export function getBottomItems() {
   return [
     { label: t('pages.sidebar.notifications'), icon: Bell,   href: '/notifications', dev: true,  can: 'viewNotifications' },
