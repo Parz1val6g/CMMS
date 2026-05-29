@@ -47,7 +47,7 @@ class CsvExportService
                 $so->status,
                 $totalTasks,
                 $completedTasks,
-                $so->execution_date?->format('Y-m-d') ?? 'N/A',
+                $so->end_date?->format('Y-m-d') ?? 'N/A',
                 $so->created_at->format('Y-m-d H:i'),
             ];
         });
