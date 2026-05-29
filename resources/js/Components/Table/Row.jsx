@@ -37,7 +37,7 @@ function resolveHref(template, item) {
 const TRUNCATE_KEYS = new Set(['description', 'process', 'notes', 'comments', 'remarks', 'observations']);
 
 // Columns that contain raw dates — formatted to PT-PT (Fix 2)
-const DATE_KEYS = new Set(['created_at', 'updated_at', 'execution_date', 'last_revision_date', 'next_revision_date', 'completed_at', 'next_revision']);
+const DATE_KEYS = new Set(['created_at', 'updated_at', 'start_date', 'end_date', 'last_revision_date', 'next_revision_date', 'completed_at', 'next_revision']);
 
 // Columns that represent an assigned user — rendered as an avatar (Fix 5)
 const AVATAR_KEYS = new Set(['manager', 'worker', 'assigned_to', 'responsible', 'supervisor', 'head']);

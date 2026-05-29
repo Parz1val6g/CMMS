@@ -168,7 +168,7 @@
         "col_process": "Processo",
         "col_status": "Estado",
         "col_priority": "Prioridade",
-        "col_execution_date": "Data Prevista",
+        "col_end_date": "Data Fim",
         "col_created_at": "Criado",
         "empty_title": "Nenhuma ordem de serviço encontrada.",
         "empty_btn": "Criar nova OS",
@@ -176,7 +176,8 @@
         "drawer_status": "Estado",
         "drawer_priority": "Prioridade",
         "drawer_client": "Cliente",
-        "drawer_execution_date": "Data prevista",
+        "drawer_start_date": "Data de Início",
+        "drawer_end_date": "Data de Fim",
         "drawer_service_type": "Tipo de serviço",
         "drawer_description": "Descrição",
         "section_tasks": "Tarefas",
@@ -245,7 +246,8 @@
         "drawer_client_label": "Cliente:",
         "section_description": "Descrição",
         "section_location": "Localização",
-        "section_execution_date": "Data de Execução",
+        "section_start_date": "Data de Início",
+        "section_end_date": "Data de Fim",
         "section_manager": "Gestor",
         "section_service_type": "Tipo de Serviço",
         "section_process": "Processo",
@@ -293,7 +295,8 @@
             "field_priority": "Prioridade",
             "field_manager": "Gestor",
             "field_created_at": "Criado em",
-            "field_execution_date": "Data de Execução",
+            "field_start_date": "Data de Início",
+            "field_end_date": "Data de Fim",
             "field_service_type": "Tipo de Serviço",
             "field_location": "Localização",
             "field_description": "Descrição",
@@ -442,7 +445,56 @@
         "high_priority": "Alta Prioridade",
         "created_at": "Criado:",
         "no_critical_orders": "Não existem ordens críticas pendentes. Excelente trabalho!",
-        "map_title": "Mapa de Intervenções"
+        "map_title": "Mapa de Intervenções",
+        "kpi": {
+            "active_orders": "Ordens Activas",
+            "open_tickets": "Tickets Abertos",
+            "overdue_tasks": "Tarefas em Atraso",
+            "awaiting_review": "Aguarda Revisão",
+            "total_users": "Total Utilizadores",
+            "active_roles": "Roles Atribuídos",
+            "new_users_week": "Novos Esta Semana",
+            "pending_mini_tasks": "Mini-Tarefas Abertas",
+            "open_work_logs": "Work Logs em Aberto",
+            "completed_today": "Concluídas Hoje",
+            "workers": "Trabalhadores",
+            "active_tasks": "Tarefas Ativas",
+            "teams": "Equipas",
+            "awaiting_approval": "Aguarda Aprovação",
+            "pending_orders": "SOs Pendentes",
+            "new_orders": "Novas SOs"
+        },
+        "heading": {
+            "intervention_map": "Mapa de Intervenções",
+            "recent_users": "Utilizadores Recentes",
+            "team_workers": "Trabalhadores da Equipa",
+            "needs_attention": "Requer Atenção",
+            "recent_orders": "Ordens de Serviço Recentes"
+        },
+        "empty": {
+            "no_users": "Nenhum utilizador",
+            "no_team_workers": "Nenhum trabalhador na equipa",
+            "no_critical_items": "Nenhum item crítico",
+            "no_orders": "Nenhuma ordem de serviço"
+        },
+        "period": {
+            "today": "Hoje",
+            "week": "Esta semana",
+            "month": "Este mês"
+        },
+        "map_loading": "A carregar mapa...",
+        "map_config_loading": "A carregar configuração do mapa..."
+    },
+    "select_role": {
+        "title": "Selecionar Função",
+        "heading": "Selecionar a Sua Função",
+        "description": "Tem múltiplas funções. Escolha qual utilizar nesta sessão."
+    },
+    "task_drawer": {
+        "materials_label": "Materiais",
+        "add_material": "Adicionar material...",
+        "no_stock_materials": "Sem materiais com stock disponível.",
+        "checking_availability": "A verificar disponibilidade..."
     },
     "layout": {
         "footer_copyright": "© :year ERP Gestão — Todos os direitos reservados.",

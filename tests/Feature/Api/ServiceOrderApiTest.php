@@ -62,7 +62,8 @@ class ServiceOrderApiTest extends TestCase
                 'postal_code'     => '6300-000',
                 'latitude'        => 40.3399,
                 'longitude'       => -7.2674,
-                'execution_date'  => '2026-06-01',
+                'start_date'     => '2026-06-01',
+                'end_date'       => '2026-06-03',
             ], ['Accept' => 'application/json']);
 
         $this->assertEquals(201, $response->status());
@@ -87,7 +88,7 @@ class ServiceOrderApiTest extends TestCase
         $this->assertArrayHasKey('sector_ids', $response->json('errors'));
     }
 
-    public function test_create_service_order_without_execution_date_returns_422(): void
+    public function test_create_service_order_with_start_date_and_end_date_persists_correctly(): void
     {
         $sector = \App\Features\Sectors\Models\Sector::factory()->create([
             'head_id' => $this->manager->id,
@@ -100,13 +101,21 @@ class ServiceOrderApiTest extends TestCase
                 'sector_ids' => [$sector->id],
                 'parish_id'  => $parish->id,
                 'street'     => 'Rua do Teste, 1',
+                'start_date' => '2026-06-10',
+                'end_date'   => '2026-06-15',
             ]);
 
-        $this->assertEquals(422, $response->status());
-        $this->assertArrayHasKey('execution_date', $response->json('errors'));
+        $this->assertEquals(201, $response->status());
+        $this->assertEquals('2026-06-10', $response->json('data.start_date'));
+        $this->assertEquals('2026-06-15', $response->json('data.end_date'));
+        $this->assertDatabaseHas('service_orders', [
+            'manager_id' => $this->manager->id,
+            'start_date' => '2026-06-10 00:00:00',
+            'end_date'   => '2026-06-15 00:00:00',
+        ]);
     }
 
-    public function test_create_service_order_with_execution_date_persists_correctly(): void
+    public function test_create_service_order_without_start_date_returns_422(): void
     {
         $sector = \App\Features\Sectors\Models\Sector::factory()->create([
             'head_id' => $this->manager->id,
@@ -115,19 +124,56 @@ class ServiceOrderApiTest extends TestCase
 
         $response = $this->actingAs($this->manager, 'sanctum')
             ->postJson('/api/service-orders', [
-                'manager_id'     => $this->manager->id,
-                'sector_ids'     => [$sector->id],
-                'parish_id'      => $parish->id,
-                'street'         => 'Rua do Teste, 1',
-                'execution_date' => '2026-06-15',
+                'manager_id' => $this->manager->id,
+                'sector_ids' => [$sector->id],
+                'parish_id'  => $parish->id,
+                'street'     => 'Rua do Teste, 1',
+                'end_date'   => '2026-06-15',
             ]);
 
-        $this->assertEquals(201, $response->status());
-        $this->assertEquals('2026-06-15', $response->json('data.end_date'));
-        $this->assertDatabaseHas('service_orders', [
-            'manager_id'     => $this->manager->id,
-            'end_date' => '2026-06-15 00:00:00',
+        $this->assertEquals(422, $response->status());
+        $this->assertArrayHasKey('start_date', $response->json('errors'));
+    }
+
+    public function test_create_service_order_without_end_date_returns_422(): void
+    {
+        $sector = \App\Features\Sectors\Models\Sector::factory()->create([
+            'head_id' => $this->manager->id,
         ]);
+        $parish = Parish::inRandomOrder()->first() ?? Parish::factory()->create();
+
+        $response = $this->actingAs($this->manager, 'sanctum')
+            ->postJson('/api/service-orders', [
+                'manager_id' => $this->manager->id,
+                'sector_ids' => [$sector->id],
+                'parish_id'  => $parish->id,
+                'street'     => 'Rua do Teste, 1',
+                'start_date' => '2026-06-10',
+            ]);
+
+        $this->assertEquals(422, $response->status());
+        $this->assertArrayHasKey('end_date', $response->json('errors'));
+    }
+
+    public function test_create_service_order_with_end_date_before_start_date_returns_422(): void
+    {
+        $sector = \App\Features\Sectors\Models\Sector::factory()->create([
+            'head_id' => $this->manager->id,
+        ]);
+        $parish = Parish::inRandomOrder()->first() ?? Parish::factory()->create();
+
+        $response = $this->actingAs($this->manager, 'sanctum')
+            ->postJson('/api/service-orders', [
+                'manager_id' => $this->manager->id,
+                'sector_ids' => [$sector->id],
+                'parish_id'  => $parish->id,
+                'street'     => 'Rua do Teste, 1',
+                'start_date' => '2026-06-15',
+                'end_date'   => '2026-06-10',
+            ]);
+
+        $this->assertEquals(422, $response->status());
+        $this->assertArrayHasKey('end_date', $response->json('errors'));
     }
 
     public function test_get_service_order(): void
@@ -164,6 +210,46 @@ class ServiceOrderApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
         $this->assertEquals('Updated: Fix potholes', $response->json('data.process'));
+    }
+
+    public function test_update_service_order_dates(): void
+    {
+        $order = ServiceOrder::factory()->create([
+            'manager_id' => $this->manager->id,
+            'status' => ServiceOrderStatus::PENDING->value,
+        ]);
+
+        $response = $this->actingAs($this->manager, 'sanctum')
+            ->putJson("/api/service-orders/{$order->id}", [
+                'start_date' => '2026-07-01',
+                'end_date'   => '2026-07-15',
+            ]);
+
+        $this->assertEquals(200, $response->status());
+        $this->assertEquals('2026-07-01', $response->json('data.start_date'));
+        $this->assertEquals('2026-07-15', $response->json('data.end_date'));
+        $this->assertDatabaseHas('service_orders', [
+            'id'         => $order->id,
+            'start_date' => '2026-07-01 00:00:00',
+            'end_date'   => '2026-07-15 00:00:00',
+        ]);
+    }
+
+    public function test_update_service_order_end_date_before_start_date_returns_422(): void
+    {
+        $order = ServiceOrder::factory()->create([
+            'manager_id' => $this->manager->id,
+            'status' => ServiceOrderStatus::PENDING->value,
+        ]);
+
+        $response = $this->actingAs($this->manager, 'sanctum')
+            ->putJson("/api/service-orders/{$order->id}", [
+                'start_date' => '2026-07-15',
+                'end_date'   => '2026-07-01',
+            ]);
+
+        $this->assertEquals(422, $response->status());
+        $this->assertArrayHasKey('end_date', $response->json('errors'));
     }
 
     public function test_cannot_update_completed_service_order(): void
