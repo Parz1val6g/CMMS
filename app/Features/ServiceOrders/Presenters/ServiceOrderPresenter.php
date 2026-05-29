@@ -26,7 +26,8 @@ class ServiceOrderPresenter
             'manager_id'    => $o->manager_id,
             'priority'      => $o->priority,
             'status'        => $o->status,
-            'execution_date' => $o->execution_date?->format('Y-m-d'),
+            'start_date'    => $o->start_date?->format('Y-m-d'),
+            'end_date'      => $o->end_date?->format('Y-m-d'),
             'created_at'    => $o->created_at->format('Y-m-d'),
             'photo_url'     => $o->photo_url,
             'sectors'       => $o->sectors->map(fn($s) => [
@@ -65,7 +66,8 @@ class ServiceOrderPresenter
             'manager_id'    => $so->manager_id,
             'priority'      => $so->priority,
             'status'        => $so->status,
-            'execution_date' => $so->execution_date?->format('Y-m-d'),
+            'start_date'    => $so->start_date?->format('Y-m-d'),
+            'end_date'      => $so->end_date?->format('Y-m-d'),
             'created_at'    => $so->created_at->format('Y-m-d'),
             'photo_url'     => $so->photo_url,
             'sectors'       => $so->sectors->map(fn($s) => [

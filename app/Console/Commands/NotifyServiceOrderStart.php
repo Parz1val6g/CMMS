@@ -24,7 +24,7 @@ class NotifyServiceOrderStart extends Command
     public function handle(): int
     {
         $orders = ServiceOrder::query()
-            ->whereDate('execution_date', today())
+            ->whereDate('end_date', today())
             ->where('status', ServiceOrderStatus::PENDING->value)
             ->whereNull('start_notified_at')
             ->get();

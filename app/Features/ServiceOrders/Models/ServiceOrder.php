@@ -40,14 +40,16 @@ class ServiceOrder extends Model
         'service_type_id',
         'migrated_to_loan_id',
         'priority',
-        'execution_date',
+        'start_date',
+        'end_date',
         'status',
         'photo_path',
         'description',
         'start_notified_at',
     ];
     protected $casts = [
-        'execution_date' => 'date',
+        'start_date' => 'date',
+        'end_date' => 'date',
         'priority' => Priority::class,
         'status' => ServiceOrderStatus::class,
         'start_notified_at' => 'datetime',

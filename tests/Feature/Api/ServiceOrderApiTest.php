@@ -123,10 +123,10 @@ class ServiceOrderApiTest extends TestCase
             ]);
 
         $this->assertEquals(201, $response->status());
-        $this->assertEquals('2026-06-15', $response->json('data.execution_date'));
+        $this->assertEquals('2026-06-15', $response->json('data.end_date'));
         $this->assertDatabaseHas('service_orders', [
             'manager_id'     => $this->manager->id,
-            'execution_date' => '2026-06-15 00:00:00',
+            'end_date' => '2026-06-15 00:00:00',
         ]);
     }
 
