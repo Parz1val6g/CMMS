@@ -27,9 +27,13 @@ class Task extends Model
         'manager_id',
         'description',
         'status',
+        'start_date',
+        'end_date',
     ];
     protected $casts = [
         'status' => TaskStatus::class,
+        'start_date' => 'date',
+        'end_date' => 'date',
     ];
 
     /**

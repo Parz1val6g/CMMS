@@ -41,6 +41,12 @@ function GeneralTab({ item, canViewServiceOrders, onOpenServiceOrder }) {
     const createdAt = item.created_at
         ? new Date(item.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
         : null;
+    const startDate = item.start_date
+        ? new Date(item.start_date + 'T00:00:00').toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        : null;
+    const endDate = item.end_date
+        ? new Date(item.end_date + 'T00:00:00').toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        : null;
 
     const soProcess = item.service_order?.process;
     const soId = item.service_order?.id;
@@ -70,6 +76,12 @@ function GeneralTab({ item, canViewServiceOrders, onOpenServiceOrder }) {
             </BaseField>
             <BaseField label={t('pages.tasks.drawer.field_created_at')}>
                 {createdAt}
+            </BaseField>
+            <BaseField label={t('forms.tasks.start_date')}>
+                {startDate}
+            </BaseField>
+            <BaseField label={t('forms.tasks.end_date')}>
+                {endDate}
             </BaseField>
             <div className="col-span-2">
                 <BaseField label={t('pages.tasks.drawer.field_description')}>
