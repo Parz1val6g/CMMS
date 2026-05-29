@@ -13,7 +13,7 @@ class NotifyServiceOrderStartTest extends TestCase
     {
         $order = ServiceOrder::factory()->create([
             'manager_id' => $this->manager->id,
-            'execution_date' => today(),
+            'end_date' => today(),
             'status' => ServiceOrderStatus::PENDING->value,
             'start_notified_at' => null,
         ]);
@@ -34,7 +34,7 @@ class NotifyServiceOrderStartTest extends TestCase
     {
         ServiceOrder::factory()->create([
             'manager_id' => $this->manager->id,
-            'execution_date' => today(),
+            'end_date' => today(),
             'status' => ServiceOrderStatus::PENDING->value,
             'start_notified_at' => now()->subDay(),
         ]);
@@ -51,7 +51,7 @@ class NotifyServiceOrderStartTest extends TestCase
     {
         ServiceOrder::factory()->create([
             'manager_id' => $this->manager->id,
-            'execution_date' => today(),
+            'end_date' => today(),
             'status' => ServiceOrderStatus::IN_PROGRESS->value,
             'start_notified_at' => null,
         ]);
@@ -68,7 +68,7 @@ class NotifyServiceOrderStartTest extends TestCase
     {
         ServiceOrder::factory()->create([
             'manager_id' => $this->manager->id,
-            'execution_date' => today()->addDay(),
+            'end_date' => today()->addDay(),
             'status' => ServiceOrderStatus::PENDING->value,
             'start_notified_at' => null,
         ]);

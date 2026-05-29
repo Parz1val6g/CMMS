@@ -80,7 +80,7 @@ class ServiceOrderSeeder extends Seeder
             $process = 'OS/' . $year . '/GALLERY-' . str_pad((string) $counter, 3, '0', STR_PAD_LEFT);
 
             $createdAt = (clone $twoMonthsAgo)->modify('+' . (($counter - 1) * 4) . ' days');
-            $executionDate = match ($def['status']) {
+            $endDate = match ($def['status']) {
                 SOStatus::COMPLETED   => (clone $createdAt)->modify('+5 days'),
                 SOStatus::IN_PROGRESS => (clone $createdAt)->modify('+2 days'),
                 SOStatus::PENDING     => (clone $createdAt)->modify('+30 days'),
@@ -119,7 +119,8 @@ class ServiceOrderSeeder extends Seeder
                 'location_id'        => $locationId,
                 'service_type_id'    => $serviceType?->id,
                 'priority'           => $def['priority']->value,
-                'execution_date'     => $executionDate,
+                'start_date'         => $createdAt,
+                'end_date'           => $endDate,
                 'status'             => $def['status']->value,
                 'description'        => $def['desc'],
                 'created_at'         => $createdAt,

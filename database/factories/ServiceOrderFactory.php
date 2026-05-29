@@ -16,18 +16,20 @@ class ServiceOrderFactory extends Factory
 
     public function definition(): array
     {
-        $executionDate = fake()->dateTimeBetween('-3 months', '+1 month');
+        $endDate = fake()->dateTimeBetween('-3 months', '+1 month');
+        $startDate = (clone $endDate)->modify('-' . fake()->numberBetween(1, 30) . ' days');
         // Avoid DST spring-forward gap (Europe/Lisbon: Mar last Sun 01:00-02:00)
-        if ($executionDate->format('Y-m-d') === '2026-03-29' && $executionDate->format('H') === '01') {
-            $executionDate->modify('+1 hour');
+        if ($endDate->format('Y-m-d') === '2026-03-29' && $endDate->format('H') === '01') {
+            $endDate->modify('+1 hour');
         }
 
         return [
             // client_id, manager_id, location_id, service_type_id must be provided via state()
-            'process'        => 'OS/' . fake()->year() . '/' . fake()->unique()->numberBetween(1000, 9999),
-            'priority'       => fake()->randomElement(Priority::cases())->value,
-            'execution_date' => $executionDate,
-            'status'         => fake()->randomElement(ServiceOrderStatus::cases())->value,
+            'process'    => 'OS/' . fake()->year() . '/' . fake()->unique()->numberBetween(1000, 9999),
+            'priority'   => fake()->randomElement(Priority::cases())->value,
+            'start_date' => $startDate,
+            'end_date'   => $endDate,
+            'status'     => fake()->randomElement(ServiceOrderStatus::cases())->value,
         ];
     }
 

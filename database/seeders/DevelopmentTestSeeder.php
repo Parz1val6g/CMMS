@@ -90,7 +90,8 @@ class DevelopmentTestSeeder extends Seeder
             'location_id'     => $location->id,
             'service_type_id' => null,
             'priority'        => Priority::NORMAL->value,
-            'execution_date'  => $now->copy()->addDays(3),
+            'start_date'      => $now->copy(),
+            'end_date'        => $now->copy()->addDays(3),
             'status'          => SOStatus::IN_PROGRESS->value,
             'description'     => 'Reparação de piso danificado na via pública com aplicação de nova camada de asfalto',
         ]);
@@ -103,7 +104,8 @@ class DevelopmentTestSeeder extends Seeder
             'location_id'     => $location->id,
             'service_type_id' => null,
             'priority'        => Priority::HIGH->value,
-            'execution_date'  => $now->copy()->addDays(1),
+            'start_date'      => $now->copy(),
+            'end_date'        => $now->copy()->addDays(1),
             'status'          => SOStatus::IN_PROGRESS->value,
             'description'     => 'Instalação de equipamento em regime de comodato na zona industrial',
         ]);
