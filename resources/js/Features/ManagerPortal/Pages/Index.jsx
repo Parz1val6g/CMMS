@@ -108,10 +108,16 @@ function DrawerDetails({ so, routes, onAction }) {
             <p className="text-gray-700 font-medium">{so.client.name}</p>
           </div>
         )}
-        {so.execution_date && (
+        {so.start_date && (
           <div>
-            <p className="text-xs text-gray-400 mb-0.5">{t('pages.manager_portal.drawer_execution_date')}</p>
-            <p className="text-gray-700">{formatDate(so.execution_date)}</p>
+            <p className="text-xs text-gray-400 mb-0.5">{t('pages.manager_portal.drawer_start_date')}</p>
+            <p className="text-gray-700">{formatDate(so.start_date)}</p>
+          </div>
+        )}
+        {so.end_date && (
+          <div>
+            <p className="text-xs text-gray-400 mb-0.5">{t('pages.manager_portal.drawer_end_date')}</p>
+            <p className="text-gray-700">{formatDate(so.end_date)}</p>
           </div>
         )}
         {so.service_type?.name && (
@@ -182,7 +188,7 @@ const COLUMNS = [
   { key: 'process',       label: t('pages.manager_portal.col_process') },
   { key: 'status',        label: t('pages.manager_portal.col_status') },
   { key: 'priority',      label: t('pages.manager_portal.col_priority') },
-  { key: 'execution_date',label: t('pages.manager_portal.col_execution_date') },
+  { key: 'end_date',   label: t('pages.manager_portal.col_end_date') },
   { key: 'created_at',    label: t('pages.manager_portal.col_created_at') },
   { key: 'arrow',         label: '' },
 ];
@@ -341,7 +347,7 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
                     <td className="px-5 py-4 font-semibold text-gray-900">{so.process}</td>
                     <td className="px-5 py-4"><StatusBadge value={so.status} /></td>
                     <td className="px-5 py-4"><PriorityDot value={so.priority} /></td>
-                    <td className="px-5 py-4 text-gray-500 tabular-nums">{so.execution_date ? formatDate(so.execution_date) : '—'}</td>
+                    <td className="px-5 py-4 text-gray-500 tabular-nums">{so.end_date ? formatDate(so.end_date) : '—'}</td>
                     <td className="px-5 py-4 text-gray-400 tabular-nums">{formatDate(so.created_at)}</td>
                     <td className="px-5 py-4 text-gray-300 group-hover:text-gray-400 transition-colors">
                       <ChevronRight size={16} />
