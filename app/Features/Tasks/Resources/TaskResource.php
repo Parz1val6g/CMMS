@@ -15,6 +15,8 @@ class TaskResource extends JsonResource
             'service_order_id' => $this->service_order_id,
             'description' => $this->description,
             'status' => $this->status,
+            'start_date' => $this->start_date?->toDateString(),
+            'end_date' => $this->end_date?->toDateString(),
             'created_at' => $this->created_at->toIso8601String(),
             'service_order' => $this->whenLoaded('serviceOrder', function () {
                 return [

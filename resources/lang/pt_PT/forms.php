@@ -207,6 +207,8 @@ return [
         'sectors_helper' => 'Atribuir esta tarefa a um ou mais setores',
         'status' => 'Estado',
         'status_helper' => 'Estado atual da tarefa',
+        'start_date' => 'Data de Início',
+        'end_date' => 'Data de Fim',
     ],
 
     'entities' => [

@@ -207,6 +207,8 @@ return [
         'sectors_helper' => 'Assign this task to one or more sectors',
         'status' => 'Status',
         'status_helper' => 'Current status of the task',
+        'start_date' => 'Start Date',
+        'end_date' => 'End Date',
     ],
 
     'entities' => [

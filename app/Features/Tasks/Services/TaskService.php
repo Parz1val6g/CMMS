@@ -24,6 +24,8 @@ class TaskService
                 'manager_id' => $managerId,
                 'description' => InputSanitizer::sanitize($data['description']),
                 'status' => TaskStatus::PENDING->value,
+                'start_date' => $data['start_date'] ?? null,
+                'end_date' => $data['end_date'] ?? null,
             ]);
 
             if (isset($data['sector_id'])) {
@@ -40,8 +42,18 @@ class TaskService
             throw new InvalidArgumentException('Cannot update a completed or cancelled task.');
         }
         return $this->transactions->execute(function () use ($task, $data) {
+            $updateData = [];
             if (isset($data['description'])) {
-                $task->update(['description' => InputSanitizer::sanitize($data['description'])]);
+                $updateData['description'] = InputSanitizer::sanitize($data['description']);
+            }
+            if (isset($data['start_date'])) {
+                $updateData['start_date'] = $data['start_date'];
+            }
+            if (isset($data['end_date'])) {
+                $updateData['end_date'] = $data['end_date'];
+            }
+            if (!empty($updateData)) {
+                $task->update($updateData);
             }
             if (isset($data['sector_id'])) {
                 $task->sectors()->sync([$data['sector_id']]);

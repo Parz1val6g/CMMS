@@ -5,7 +5,7 @@ namespace App\Features\Tasks;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Enums\TaskStatus;
 use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextAreaInput, SelectInput};
+use App\Core\Forms\Fields\{TextAreaInput, SelectInput, DateRangeInput};
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\Sectors\Models\Sector;
 
@@ -35,6 +35,20 @@ class TaskFormSchema
                     ->helperText(__('forms.tasks.sectors_helper'))
                     ->setOptions(self::sectorOptions())
                     ->setRules('required|exists:sectors,id')
+            )
+            ->field(
+                DateRangeInput::make('start_date')
+                    ->setLabel(__('forms.tasks.start_date'))
+                    ->setRequired()
+                    ->setDateMode('single')
+                    ->setRules('required|date')
+            )
+            ->field(
+                DateRangeInput::make('end_date')
+                    ->setLabel(__('forms.tasks.end_date'))
+                    ->setRequired()
+                    ->setDateMode('single')
+                    ->setRules('required|date|after_or_equal:start_date')
             );
     }
 
@@ -68,6 +82,18 @@ class TaskFormSchema
                     ->helperText(__('forms.tasks.status_helper'))
                     ->setOptions(TaskStatus::options())
                     ->setRules('sometimes|string')
+            )
+            ->field(
+                DateRangeInput::make('start_date')
+                    ->setLabel(__('forms.tasks.start_date'))
+                    ->setDateMode('single')
+                    ->setRules('sometimes|date')
+            )
+            ->field(
+                DateRangeInput::make('end_date')
+                    ->setLabel(__('forms.tasks.end_date'))
+                    ->setDateMode('single')
+                    ->setRules('sometimes|date|after_or_equal:start_date')
             );
     }
 
