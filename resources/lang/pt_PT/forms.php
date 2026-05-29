@@ -73,6 +73,8 @@ return [
         'sectors_helper' => 'Atribuir esta ordem de serviço a um ou mais setores',
         'status' => 'Estado',
         'execution_date' => 'Data de Execução',
+        'start_date' => 'Data de Início',
+        'end_date' => 'Data de Fim',
         'manager' => 'Gestor da Ordem de Serviço',
     ],
 

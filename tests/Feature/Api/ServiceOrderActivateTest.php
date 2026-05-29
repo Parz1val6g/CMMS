@@ -134,7 +134,8 @@ class ServiceOrderActivateTest extends TestCase
             ->postJson('/api/service-orders', [
                 'manager_id'     => $this->manager->id,
                 'sector_ids'     => [$sector->id],
-                'execution_date' => '2026-06-15',
+                'start_date' => '2026-06-10',
+                'end_date'   => '2026-06-15',
             ]);
 
         $this->assertEquals(0, Task::count());
