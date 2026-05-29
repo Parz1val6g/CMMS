@@ -4,6 +4,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { Check, ExternalLink, Play } from 'lucide-react';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
 import BaseField from '@/Components/Shared/Drawer/BaseField';
+import LocationMap from '@/Components/Shared/LocationMap';
 import { badgeStyle, labelFor } from '@/utils/enums';
 import { t } from '@/utils/i18n';
 import { csrfHeader } from '@/utils/csrf';
@@ -61,8 +62,12 @@ function DetailTab({ order }) {
     ? new Date(order.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
     : null;
 
-  const executionDate = order?.execution_date
-    ? new Date(order.execution_date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  const startDate = order?.start_date
+    ? new Date(order.start_date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    : null;
+
+  const endDate = order?.end_date
+    ? new Date(order.end_date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
     : null;
 
   return (
@@ -70,10 +75,19 @@ function DetailTab({ order }) {
       <div className="grid grid-cols-2 gap-x-6 gap-y-5">
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_manager')}>{order?.manager?.name}</BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_created_at')}>{createdAt}</BaseField>
-        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_execution_date')}>{executionDate}</BaseField>
+        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_start_date')}>{startDate}</BaseField>
+        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_end_date')}>{endDate}</BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_service_type')}>{order?.service_type?.name}</BaseField>
-        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_location')}>{order?.location?.parish?.name}</BaseField>
       </div>
+
+      {order?.location && (
+        <div>
+          <span className="text-xs font-medium uppercase tracking-wider text-gray-400">{t('pages.service_orders.drawer.field_location')}</span>
+          <div className="mt-1">
+            <LocationMap location={order.location} />
+          </div>
+        </div>
+      )}
 
       {order?.description && (
         <div>

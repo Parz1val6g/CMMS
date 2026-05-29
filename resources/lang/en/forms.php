@@ -73,6 +73,8 @@ return [
         'sectors_helper' => 'Assign this service order to one or more sectors',
         'status' => 'Status',
         'execution_date' => 'Execution Date',
+        'start_date' => 'Start Date',
+        'end_date' => 'End Date',
         'manager' => 'Service Order Manager',
     ],
 

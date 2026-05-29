@@ -6,6 +6,7 @@ use App\Core\Enums\Priority;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, FileInput, SectionHeader, MapInput};
+use App\Core\LocationCascadeOptions;
 use App\Features\Clients\Models\Client;
 use App\Features\Sectors\Models\Sector;
 use App\Features\ServiceTypes\Models\ServiceType;
@@ -30,11 +31,18 @@ class ServiceOrderFormSchema
                     ->setRules('nullable|string|max:2000')
             )
             ->field(
-                TextInput::make('execution_date')
-                    ->setLabel(__('forms.service_orders.execution_date'))
+                TextInput::make('start_date')
+                    ->setLabel(__('forms.service_orders.start_date'))
                     ->setType('date-picker')
                     ->setRequired()
                     ->setRules('required|date')
+            )
+            ->field(
+                TextInput::make('end_date')
+                    ->setLabel(__('forms.service_orders.end_date'))
+                    ->setType('date-picker')
+                    ->setRequired()
+                    ->setRules('required|date|after_or_equal:start_date')
             )
             ->field(
                 SelectInput::make('sector_ids')
@@ -97,6 +105,10 @@ class ServiceOrderFormSchema
                     ->setOptions(self::parishOptions())
                     ->setRequired()
                     ->setRules('required_without:client_location_id|uuid|exists:parishes,id')
+                    ->meta('useCascade', true)
+                    ->meta('districts', LocationCascadeOptions::all()['districts'])
+                    ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
+                    ->meta('parishes', LocationCascadeOptions::all()['parishes'])
             )
             ->field(
                 TextInput::make('street')
@@ -184,10 +196,16 @@ class ServiceOrderFormSchema
                     ->setRules('sometimes|string')
             )
             ->field(
-                TextInput::make('execution_date')
-                    ->setLabel(__('forms.service_orders.execution_date'))
+                TextInput::make('start_date')
+                    ->setLabel(__('forms.service_orders.start_date'))
                     ->setType('date-picker')
                     ->setRules('nullable|date')
+            )
+            ->field(
+                TextInput::make('end_date')
+                    ->setLabel(__('forms.service_orders.end_date'))
+                    ->setType('date-picker')
+                    ->setRules('nullable|date|after_or_equal:start_date')
             )
             // ── Photo ──
             ->field(
@@ -210,6 +228,10 @@ class ServiceOrderFormSchema
                     ->setLabel(__('forms.service_orders.parish'))
                     ->setOptions(self::parishOptions())
                     ->setRules('nullable|exists:parishes,id')
+                    ->meta('useCascade', true)
+                    ->meta('districts', LocationCascadeOptions::all()['districts'])
+                    ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
+                    ->meta('parishes', LocationCascadeOptions::all()['parishes'])
             )
             ->field(
                 TextInput::make('street')

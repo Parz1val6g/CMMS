@@ -55,8 +55,8 @@ class ServiceOrderService
                 'priority'           => $data['priority'] ?? null,
                 'description'        => $data['description'] ?? null,
                 'photo_path'         => $photoPath,
-                'start_date'         => $data['start_date'] ?? $data['execution_date'] ?? now(),
-                'end_date'           => $data['execution_date'],
+                'start_date'         => $data['start_date'],
+                'end_date'           => $data['end_date'],
                 'status'             => ServiceOrderStatus::PENDING->value,
             ]);
 
@@ -123,11 +123,6 @@ class ServiceOrderService
             ])->toArray();
 
             $serviceOrder->update($soFields);
-
-            // Map legacy execution_date input to end_date model attribute
-            if (array_key_exists('execution_date', $data)) {
-                $serviceOrder->update(['end_date' => $data['execution_date']]);
-            }
 
             if (array_key_exists('sector_ids', $data)) {
                 $this->syncSectors($serviceOrder, $data['sector_ids']);

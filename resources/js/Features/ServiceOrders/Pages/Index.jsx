@@ -15,6 +15,7 @@ import PhotoListener from '@/Hooks/usePhotoListener';
 import KanbanBoard from '@/Components/Kanban/KanbanBoard';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
 import SOTasksTree from '../Components/DrawerTabs/TasksTree';
+import LocationMap from '@/Components/Shared/LocationMap';
 
 export default function ServiceOrdersIndex({ service_orders, columns, formSchema, createFormSchema, routes, filterSchema, advancedFilterFields}) {
   const [showModal, setShowModal] = useState(false);
@@ -423,10 +424,10 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
               </span>
             </div>
           )}
-          {item.execution_date && (
+          {(item.start_date || item.end_date) && (
             <div className="flex items-center gap-2 text-xs text-brand-mid">
               <Clock className="h-3 w-3 flex-shrink-0 text-brand-accent" />
-              <span>{formatDate(item.execution_date)}</span>
+              <span>{[item.start_date, item.end_date].filter(Boolean).map(d => formatDate(d)).join(' – ')}</span>
             </div>
           )}
         </div>
@@ -576,16 +577,7 @@ function SODetailsTab({ serviceOrder }) {
       {so.location && (
         <section>
           <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_location')}</h4>
-          <p className="text-sm text-brand-darkest">
-            {so.location.street || so.location.landmark || t('pages.service_orders.value_missing')}
-          </p>
-          {so.location.parish && (
-            <p className="text-xs text-brand-mid mt-0.5">
-              {so.location.parish.name}
-              {so.location.parish.municipality && <> · {so.location.parish.municipality.name}</>}
-              {so.location.parish.municipality?.district && <> · {so.location.parish.municipality.district.name}</>}
-            </p>
-          )}
+          <LocationMap location={so.location} />
         </section>
       )}
 
@@ -597,11 +589,19 @@ function SODetailsTab({ serviceOrder }) {
         </section>
       )}
 
-      {/* Execution Date */}
-      {so.execution_date && (
+      {/* Start Date */}
+      {so.start_date && (
         <section>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_execution_date')}</h4>
-          <p className="text-sm text-brand-darkest">{formatDate(so.execution_date)}</p>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_start_date')}</h4>
+          <p className="text-sm text-brand-darkest">{formatDate(so.start_date)}</p>
+        </section>
+      )}
+
+      {/* End Date */}
+      {so.end_date && (
+        <section>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_end_date')}</h4>
+          <p className="text-sm text-brand-darkest">{formatDate(so.end_date)}</p>
         </section>
       )}
 
