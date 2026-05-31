@@ -16,7 +16,7 @@ class TeamApiTest extends TestCase
     {
         parent::setUp();
 
-        $this->head = $this->createUser();
+        $this->head = $this->createUser('sector_manager');
         $this->sector = Sector::factory()->create(['head_id' => $this->head->id]);
     }
 
@@ -29,7 +29,7 @@ class TeamApiTest extends TestCase
 
     public function test_list_teams_returns_paginated(): void
     {
-        $manager = $this->createUser('manager');
+        $manager = $this->createUser('sector_manager');
         Team::factory(3)->create([
             'sector_id' => $this->sector->id,
             'responsible_id' => $this->head->id,
@@ -44,7 +44,7 @@ class TeamApiTest extends TestCase
 
     public function test_create_team_with_valid_data(): void
     {
-        $manager = $this->createUser('manager');
+        $manager = $this->createUser('sector_manager');
         $user = $this->createUser('worker');
         $workerRole = \App\Shared\Models\Role::where('name', 'worker')->first();
         $user->roles()->syncWithoutDetaching([$workerRole->id]);
@@ -68,7 +68,7 @@ class TeamApiTest extends TestCase
 
     public function test_create_team_validation_fails(): void
     {
-        $manager = $this->createUser('manager');
+        $manager = $this->createUser('sector_manager');
 
         $response = $this->actingAs($manager, 'sanctum')
             ->postJson('/api/teams', [
@@ -80,13 +80,12 @@ class TeamApiTest extends TestCase
 
     public function test_get_team(): void
     {
-        $manager = $this->createUser('manager');
         $team = Team::factory()->create([
             'sector_id' => $this->sector->id,
             'responsible_id' => $this->head->id,
         ]);
 
-        $response = $this->actingAs($manager, 'sanctum')
+        $response = $this->actingAs($this->head, 'sanctum')
             ->getJson("/api/teams/{$team->id}");
 
         $this->assertEquals(200, $response->status());
@@ -96,7 +95,7 @@ class TeamApiTest extends TestCase
 
     public function test_get_team_not_found(): void
     {
-        $manager = $this->createUser('manager');
+        $manager = $this->createUser('sector_manager');
 
         $response = $this->actingAs($manager, 'sanctum')
             ->getJson('/api/teams/nonexistent-id');
@@ -106,13 +105,12 @@ class TeamApiTest extends TestCase
 
     public function test_update_team(): void
     {
-        $manager = $this->createUser('manager');
         $team = Team::factory()->create([
             'sector_id' => $this->sector->id,
             'responsible_id' => $this->head->id,
         ]);
 
-        $response = $this->actingAs($manager, 'sanctum')
+        $response = $this->actingAs($this->head, 'sanctum')
             ->putJson("/api/teams/{$team->id}", [
                 'name' => 'Updated Team Name',
             ]);

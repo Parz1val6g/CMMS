@@ -191,7 +191,12 @@ class RolePermissionSeeder extends Seeder
                 [
                     // Approve loan orders requested for their service orders
                     'resources' => [PermissionResource::LOAN_ORDERS],
-                    'actions'   => [PermissionAction::VIEW, PermissionAction::APPROVE],
+                    'actions'   => [
+                        PermissionAction::VIEW,
+                        PermissionAction::APPROVE,
+                        PermissionAction::CANCEL,
+                        PermissionAction::INITIATE_RETURN,
+                    ],
                 ],
                 [
                     // Reference data needed to create/activate SOs

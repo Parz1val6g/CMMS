@@ -20,7 +20,7 @@ class LoanOrderLifecycleApiTest extends TestCase
         $entityId = $this->createEntityId();
 
         // Create loan → PENDING
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
@@ -28,7 +28,7 @@ class LoanOrderLifecycleApiTest extends TestCase
         $id = $response->json('data.id');
 
         // Attempt return on PENDING → 422
-        $response = $this->actingAsUser()->postJson("/api/loan-orders/{$id}/return");
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id}/return");
         $response->assertStatus(422);
     }
 
@@ -37,14 +37,14 @@ class LoanOrderLifecycleApiTest extends TestCase
         $equipment = Equipment::factory()->loanable()->active()->create();
         $entityId = $this->createEntityId();
 
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
         ]);
         $id = $response->json('data.id');
 
-        $response = $this->actingAsUser()->postJson("/api/loan-orders/{$id}/cancel");
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id}/cancel");
 
         $response->assertOk();
         $this->assertEquals(LoanOrderStatus::CANCELLED->value, $response->json('data.status'));
@@ -61,7 +61,7 @@ class LoanOrderLifecycleApiTest extends TestCase
         $entityId = $this->createEntityId();
 
         // Create loan
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
@@ -78,7 +78,7 @@ class LoanOrderLifecycleApiTest extends TestCase
         $task->update(['status' => TaskStatus::COMPLETED->value]);
 
         // Initiate return
-        $response = $this->actingAsUser()->postJson("/api/loan-orders/{$id}/return");
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id}/return");
 
         $response->assertSuccessful();
         $this->assertEquals(__('messages.task_names.equipment_return'), $response->json('data.description'));
@@ -90,7 +90,7 @@ class LoanOrderLifecycleApiTest extends TestCase
         $equipment = Equipment::factory()->loanable()->active()->create();
         $entityId = $this->createEntityId();
 
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
@@ -107,10 +107,10 @@ class LoanOrderLifecycleApiTest extends TestCase
         $task->update(['status' => TaskStatus::COMPLETED->value]);
 
         // First return — OK
-        $this->actingAsUser()->postJson("/api/loan-orders/{$id}/return")->assertSuccessful();
+        $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id}/return")->assertSuccessful();
 
         // Duplicate return — 422
-        $response = $this->actingAsUser()->postJson("/api/loan-orders/{$id}/return");
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id}/return");
         $response->assertStatus(422);
     }
 
@@ -119,7 +119,7 @@ class LoanOrderLifecycleApiTest extends TestCase
         $equipment = Equipment::factory()->loanable()->active()->create();
         $entityId = $this->createEntityId();
 
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
@@ -130,10 +130,10 @@ class LoanOrderLifecycleApiTest extends TestCase
         $loanOrder = LoanOrder::findOrFail($id);
         $loanOrder->update(['status' => LoanOrderStatus::CHECKED_OUT->value]);
 
-        // Cancel CHECKED_OUT → 403 (policy denies non-PENDING cancel)
-        $response = $this->actingAsUser()->postJson("/api/loan-orders/{$id}/cancel");
+        // Cancel CHECKED_OUT → 422 (service rejects non-PENDING cancel, admin bypasses policy)
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id}/cancel");
 
-        $response->assertStatus(403);
+        $response->assertStatus(422);
         $equipment->refresh();
         $this->assertEquals(EquipmentStatus::IN_USE, $equipment->status);
     }
@@ -143,7 +143,7 @@ class LoanOrderLifecycleApiTest extends TestCase
         $equipment = Equipment::factory()->loanable()->active()->create();
         $entityId = $this->createEntityId();
 
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
@@ -151,10 +151,10 @@ class LoanOrderLifecycleApiTest extends TestCase
         $id = $response->json('data.id');
 
         // First cancel
-        $this->actingAsUser()->postJson("/api/loan-orders/{$id}/cancel")->assertOk();
+        $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id}/cancel")->assertOk();
 
         // Second cancel — idempotent
-        $response = $this->actingAsUser()->postJson("/api/loan-orders/{$id}/cancel");
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id}/cancel");
         $response->assertOk();
         $this->assertEquals(LoanOrderStatus::CANCELLED->value, $response->json('data.status'));
     }
@@ -164,14 +164,14 @@ class LoanOrderLifecycleApiTest extends TestCase
         $equipment = Equipment::factory()->loanable()->active()->create();
         $entityId = $this->createEntityId();
 
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
         ]);
         $id = $response->json('data.id');
 
-        $response = $this->actingAsUser()->deleteJson("/api/loan-orders/{$id}");
+        $response = $this->actingAs($this->admin, 'sanctum')->deleteJson("/api/loan-orders/{$id}");
 
         $response->assertOk();
         $this->assertSoftDeleted('loan_orders', ['id' => $id]);
@@ -182,7 +182,7 @@ class LoanOrderLifecycleApiTest extends TestCase
         $equipment = Equipment::factory()->loanable()->active()->create();
         $entityId = $this->createEntityId();
 
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
@@ -194,7 +194,7 @@ class LoanOrderLifecycleApiTest extends TestCase
         $loanOrder->update(['status' => LoanOrderStatus::CHECKED_OUT->value]);
 
         // Cannot delete non-terminal
-        $response = $this->actingAsUser()->deleteJson("/api/loan-orders/{$id}");
+        $response = $this->actingAs($this->admin, 'sanctum')->deleteJson("/api/loan-orders/{$id}");
         $response->assertStatus(422);
     }
 
@@ -206,7 +206,7 @@ class LoanOrderLifecycleApiTest extends TestCase
         $entityId = $this->createEntityId();
 
         // 1. Create → PENDING
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
@@ -215,13 +215,13 @@ class LoanOrderLifecycleApiTest extends TestCase
         $this->assertEquals(LoanOrderStatus::PENDING->value, $response->json('data.status'));
 
         // 2. Return on PENDING → 422
-        $this->actingAsUser()->postJson("/api/loan-orders/{$id}/return")->assertStatus(422);
+        $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id}/return")->assertStatus(422);
 
         // 3. Cancel PENDING → CANCELLED
-        $this->actingAsUser()->postJson("/api/loan-orders/{$id}/cancel")->assertOk();
+        $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id}/cancel")->assertOk();
 
         // 4. Create another
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
@@ -237,23 +237,23 @@ class LoanOrderLifecycleApiTest extends TestCase
             ->update(['status' => TaskStatus::COMPLETED->value]);
 
         // 6. Initiate return → return task created
-        $response = $this->actingAsUser()->postJson("/api/loan-orders/{$id2}/return");
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id2}/return");
         $response->assertSuccessful();
         $this->assertEquals(__('messages.task_names.equipment_return'), $response->json('data.description'));
 
         // 7. Duplicate return → 422
-        $this->actingAsUser()->postJson("/api/loan-orders/{$id2}/return")->assertStatus(422);
+        $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id2}/return")->assertStatus(422);
 
-        // 8. Cancel CHECKED_OUT → 403 (policy denies non-PENDING cancel)
-        $response = $this->actingAsUser()->postJson("/api/loan-orders/{$id2}/cancel");
-        $response->assertStatus(403);
+        // 8. Cancel CHECKED_OUT → 422 (service rejects non-PENDING cancel, admin bypasses policy)
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id2}/cancel");
+        $response->assertStatus(422);
 
         // Equipment still IN_USE
         $equipment->refresh();
         $this->assertEquals(EquipmentStatus::IN_USE, $equipment->status);
 
         // 9. Complete the return → RETURNED
-        $response = $this->actingAsUser()->postJson("/api/loan-orders/{$id2}/complete");
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson("/api/loan-orders/{$id2}/complete");
         $response->assertSuccessful();
         $this->assertEquals(LoanOrderStatus::RETURNED->value, $response->json('data.status'));
 
@@ -262,7 +262,7 @@ class LoanOrderLifecycleApiTest extends TestCase
         $this->assertEquals(EquipmentStatus::ACTIVE, $equipment->status);
 
         // 10. Soft delete RETURNED
-        $this->actingAsUser()->deleteJson("/api/loan-orders/{$id2}")->assertOk();
+        $this->actingAs($this->admin, 'sanctum')->deleteJson("/api/loan-orders/{$id2}")->assertOk();
         $this->assertSoftDeleted('loan_orders', ['id' => $id2]);
     }
 

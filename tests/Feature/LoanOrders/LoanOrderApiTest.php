@@ -26,7 +26,7 @@ class LoanOrderApiTest extends TestCase
         $equipment = Equipment::factory()->loanable()->active()->create();
         $entityId = $this->createEntityId();
 
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
@@ -56,7 +56,7 @@ class LoanOrderApiTest extends TestCase
         $entityId = $this->createEntityId();
         $parish = \App\Shared\Models\Parish::first();
 
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
@@ -74,7 +74,7 @@ class LoanOrderApiTest extends TestCase
 
     public function test_create_loan_order_validation_fails(): void
     {
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'     => 'invalid-uuid',
             'equipment_ids' => 'not-an-array',
         ]);
@@ -87,7 +87,7 @@ class LoanOrderApiTest extends TestCase
         $equipment = Equipment::factory()->loanable()->active()->create();
         $entityId = $this->createEntityId();
 
-        $createResponse = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $createResponse = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
@@ -95,7 +95,7 @@ class LoanOrderApiTest extends TestCase
 
         $id = $createResponse->json('data.id');
 
-        $response = $this->actingAsUser()->getJson("/api/loan-orders/{$id}");
+        $response = $this->actingAs($this->admin, 'sanctum')->getJson("/api/loan-orders/{$id}");
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -109,7 +109,7 @@ class LoanOrderApiTest extends TestCase
 
     public function test_get_loan_order_not_found(): void
     {
-        $response = $this->actingAsUser()->getJson('/api/loan-orders/00000000-0000-0000-0000-000000000000');
+        $response = $this->actingAs($this->admin, 'sanctum')->getJson('/api/loan-orders/00000000-0000-0000-0000-000000000000');
 
         $response->assertNotFound();
     }
@@ -123,7 +123,7 @@ class LoanOrderApiTest extends TestCase
             'manager_id' => $this->user->id,
         ]);
 
-        $response = $this->actingAsUser()->getJson('/api/loan-orders');
+        $response = $this->actingAs($this->admin, 'sanctum')->getJson('/api/loan-orders');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -138,14 +138,14 @@ class LoanOrderApiTest extends TestCase
         $entityId = $this->createEntityId();
 
         // First creation consumes it
-        $this->actingAsUser()->postJson('/api/loan-orders', [
+        $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],
         ]);
 
         // Second attempt should fail — equipment is now IN_USE
-        $response = $this->actingAsUser()->postJson('/api/loan-orders', [
+        $response = $this->actingAs($this->admin, 'sanctum')->postJson('/api/loan-orders', [
             'entity_id'      => $entityId,
             'manager_id'     => $this->user->id,
             'equipment_ids'  => [$equipment->id],

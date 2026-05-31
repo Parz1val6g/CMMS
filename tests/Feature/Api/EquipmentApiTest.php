@@ -15,7 +15,7 @@ class EquipmentApiTest extends TestCase
             'category' => 'vehicle',
         ]);
 
-        $response = $this->actingAs($this->manager, 'sanctum')
+        $response = $this->actingAs($this->admin, 'sanctum')
             ->postJson('/api/equipments', [
                 'name' => 'Test Vehicle',
                 'equipment_type_id' => $equipmentType->id,
@@ -38,7 +38,7 @@ class EquipmentApiTest extends TestCase
             'name' => 'Berbequim',
         ]);
 
-        $response = $this->actingAs($this->manager, 'sanctum')
+        $response = $this->actingAs($this->admin, 'sanctum')
             ->postJson('/api/equipments', [
                 'name' => 'Test Drill',
                 'equipment_type_id' => $equipmentType->id,
@@ -66,7 +66,7 @@ class EquipmentApiTest extends TestCase
 
     public function test_create_equipment_validation_fails(): void
     {
-        $response = $this->actingAs($this->manager, 'sanctum')
+        $response = $this->actingAs($this->admin, 'sanctum')
             ->postJson('/api/equipments', []);
 
         $response->assertStatus(422);
@@ -80,7 +80,7 @@ class EquipmentApiTest extends TestCase
             'equipment_type_id' => $equipmentType->id,
         ]);
 
-        $response = $this->actingAs($this->manager, 'sanctum')
+        $response = $this->actingAs($this->admin, 'sanctum')
             ->getJson("/api/equipments/{$equipment->id}");
 
         $response->assertStatus(200);
@@ -89,7 +89,7 @@ class EquipmentApiTest extends TestCase
 
     public function test_get_equipment_not_found(): void
     {
-        $response = $this->actingAs($this->manager, 'sanctum')
+        $response = $this->actingAs($this->admin, 'sanctum')
             ->getJson('/api/equipments/00000000-0000-0000-0000-000000000000');
 
         $response->assertStatus(404);
@@ -102,7 +102,7 @@ class EquipmentApiTest extends TestCase
             'equipment_type_id' => $equipmentType->id,
         ]);
 
-        $response = $this->actingAs($this->manager, 'sanctum')
+        $response = $this->actingAs($this->admin, 'sanctum')
             ->putJson("/api/equipments/{$equipment->id}", [
                 'name' => 'Updated Name',
             ]);
