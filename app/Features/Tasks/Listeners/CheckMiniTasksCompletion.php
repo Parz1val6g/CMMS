@@ -14,6 +14,11 @@ class CheckMiniTasksCompletion
     public function handle(MiniTaskCompletedEvent $event): void
     {
         $task = $event->miniTask->task;
+
+        if (!$task->start_date || !$task->end_date) {
+            return;
+        }
+
         $hasIncompleteMiniTasks = $task->miniTasks()
             ->where('status', '!=', MiniTaskStatus::COMPLETED->value)
             ->exists();

@@ -189,7 +189,7 @@ function MaterialQuantityInput({ options = [], value = [], onChange, stockMap = 
     );
 }
 
-function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated }) {
+function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPeriod = true }) {
     const [showForm, setShowForm] = useState(false);
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState({});
@@ -328,7 +328,9 @@ function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated }) {
                     <button
                         type="button"
                         onClick={showForm ? handleClose : handleOpen}
-                        className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold text-brand-accent border border-brand-accent/30 hover:bg-brand-accent/10 transition-colors"
+                        disabled={!hasPeriod}
+                        title={!hasPeriod ? t('pages.tasks.drawer.no_period_tooltip') : undefined}
+                        className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold text-brand-accent border border-brand-accent/30 hover:bg-brand-accent/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {showForm ? <XIcon size={12} /> : <Plus size={12} />}
                         {showForm ? t('pages.tasks.drawer.cancel') : t('pages.tasks.drawer.new_mini_task')}
@@ -594,7 +596,7 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
 
     const tabs = item ? [
         { id: 'general',     label: t('pages.tasks.drawer.tab_general'),    component: <GeneralTab item={item} canViewServiceOrders={can?.viewServiceOrders} onOpenServiceOrder={handleOpenServiceOrder} /> },
-        { id: 'mini_tasks',  label: t('pages.tasks.drawer.tab_mini_tasks'),  component: <MiniTasksTab miniTasks={item.mini_tasks} taskId={item.id} schema={miniTaskCreateSchema} onCreated={onCompleted} /> },
+        { id: 'mini_tasks',  label: t('pages.tasks.drawer.tab_mini_tasks'),  component: <MiniTasksTab miniTasks={item.mini_tasks} taskId={item.id} schema={miniTaskCreateSchema} onCreated={onCompleted} hasPeriod={!!(item.start_date && item.end_date)} /> },
         { id: 'rejections',  label: t('pages.tasks.drawer.tab_rejections'),  component: <RejectionsTab taskId={item.id} /> },
     ] : [];
 
