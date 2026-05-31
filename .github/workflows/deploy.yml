@@ -31,7 +31,7 @@ jobs:
               --no-dev --optimize-autoloader --no-interaction
 
             echo "--- frontend ---"
-            npm ci --prefer-offline
+            npm ci --prefer-offline --legacy-peer-deps
             npm run build
 
             echo "--- artisan ---"
