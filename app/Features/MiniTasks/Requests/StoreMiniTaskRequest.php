@@ -56,6 +56,24 @@ class StoreMiniTaskRequest extends FormRequest
         return $rules;
     }
 
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $taskId = $this->input('task_id');
+            if (!$taskId) return;
+
+            $task = Task::find($taskId);
+            if (!$task) return;
+
+            if (!$task->start_date || !$task->end_date) {
+                $validator->errors()->add(
+                    'task_id',
+                    __('validation.task.no_period_for_mini_task')
+                );
+            }
+        });
+    }
+
     public function messages(): array
     {
         return [];
