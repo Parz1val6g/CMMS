@@ -775,6 +775,7 @@
             "no_mini_tasks": "Nenhuma mini-tarefa associada.",
             "new_mini_task": "Nova Mini-Tarefa",
             "no_period_tooltip": "Defina o período de execução da tarefa (data de início/fim) antes de adicionar mini-tarefas.",
+            "task_period_label": "Período da Tarefa",
             "save_mini_task": "Criar Mini-Tarefa",
             "mini_task_create_error": "Erro ao criar mini-tarefa.",
             "cancel": "Cancelar",

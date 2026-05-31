@@ -189,7 +189,7 @@ function MaterialQuantityInput({ options = [], value = [], onChange, stockMap = 
     );
 }
 
-function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPeriod = true }) {
+export function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPeriod = true, taskStartDate, taskEndDate }) {
     const [showForm, setShowForm] = useState(false);
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState({});
@@ -341,6 +341,11 @@ function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPeriod = t
             {/* Inline create form */}
             {showForm && (
                 <form onSubmit={handleSubmit} className="rounded-lg border border-brand-mid/20 bg-brand-light/40 p-4 space-y-3">
+                    {taskStartDate && taskEndDate && (
+                        <p className="text-xs text-brand-mid">
+                            {t('pages.tasks.drawer.task_period_label')}: {taskStartDate} – {taskEndDate}
+                        </p>
+                    )}
                     {Object.keys(errors).length > 0 && (
                         <div className="rounded-lg bg-red-50 p-3 text-xs text-red-600">
                             {Object.entries(errors).map(([k, msgs]) => (
@@ -523,6 +528,11 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
         setSoDrawerOpen(false);
     }, []);
 
+    const formatDate = (dateStr) => {
+        if (!dateStr) return null;
+        return new Date(dateStr + 'T00:00:00').toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+
     const status = item?.status?.value ?? item?.status;
     const isManager = authUser?.id && item?.manager?.id && String(authUser.id) === String(item.manager.id);
     const canComplete = status === 'awaiting_approval' && (can?.completeTask || isManager);
@@ -596,7 +606,7 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
 
     const tabs = item ? [
         { id: 'general',     label: t('pages.tasks.drawer.tab_general'),    component: <GeneralTab item={item} canViewServiceOrders={can?.viewServiceOrders} onOpenServiceOrder={handleOpenServiceOrder} /> },
-        { id: 'mini_tasks',  label: t('pages.tasks.drawer.tab_mini_tasks'),  component: <MiniTasksTab miniTasks={item.mini_tasks} taskId={item.id} schema={miniTaskCreateSchema} onCreated={onCompleted} hasPeriod={!!(item.start_date && item.end_date)} /> },
+        { id: 'mini_tasks',  label: t('pages.tasks.drawer.tab_mini_tasks'),  component: <MiniTasksTab miniTasks={item.mini_tasks} taskId={item.id} schema={miniTaskCreateSchema} onCreated={onCompleted} hasPeriod={!!(item.start_date && item.end_date)} taskStartDate={formatDate(item.start_date)} taskEndDate={formatDate(item.end_date)} /> },
         { id: 'rejections',  label: t('pages.tasks.drawer.tab_rejections'),  component: <RejectionsTab taskId={item.id} /> },
     ] : [];
 

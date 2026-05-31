@@ -3,6 +3,7 @@
 namespace App\Features\Tasks\Requests;
 
 use App\Core\Enums\TaskStatus;
+use App\Core\Enums\MiniTaskStatus;
 use App\Core\Forms\FormValidator;
 use App\Features\Tasks\Models\Task;
 use App\Features\Tasks\TaskFormSchema;
@@ -78,6 +79,41 @@ class UpdateTaskRequest extends FormRequest
                         'end' => $soEnd,
                     ])
                 );
+            }
+        });
+
+        $validator->after(function ($validator) {
+            $task = $this->route('task');
+            if (!$task instanceof Task) return;
+
+            $startDate = $this->input('start_date');
+            $endDate = $this->input('end_date');
+
+            // Only validate if at least one date is being changed
+            if (!$startDate && !$endDate) return;
+
+            $newStart = $startDate ?? $task->start_date?->format('Y-m-d');
+            $newEnd = $endDate ?? $task->end_date?->format('Y-m-d');
+
+            if (!$newStart || !$newEnd) return;
+
+            $conflicting = $task->miniTasks()
+                ->whereNotIn('status', [
+                    MiniTaskStatus::COMPLETED->value,
+                    MiniTaskStatus::CANCELLED->value,
+                ])
+                ->where(function ($query) use ($newStart, $newEnd) {
+                    $query->where('start_date', '<', $newStart)
+                        ->orWhere('end_date', '>', $newEnd);
+                })
+                ->count();
+
+            if ($conflicting > 0) {
+                $message = __('validation.task.dates_conflict_mini_tasks', [
+                    'count' => $conflicting,
+                ]);
+                $validator->errors()->add('start_date', $message);
+                $validator->errors()->add('end_date', $message);
             }
         });
     }
