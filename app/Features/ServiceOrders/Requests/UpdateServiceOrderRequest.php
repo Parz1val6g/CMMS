@@ -2,6 +2,7 @@
 
 namespace App\Features\ServiceOrders\Requests;
 
+use App\Core\Enums\TaskStatus;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -34,5 +35,41 @@ class UpdateServiceOrderRequest extends FormRequest
             'latitude'           => ['nullable', 'numeric', 'between:-90,90'],
             'longitude'          => ['nullable', 'numeric', 'between:-180,180'],
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if (!$this->has('start_date') && !$this->has('end_date')) {
+                return;
+            }
+
+            $so = $this->route('serviceOrder');
+            if (!$so instanceof ServiceOrder) return;
+
+            $newStart = $this->input('start_date', $so->start_date?->format('Y-m-d'));
+            $newEnd = $this->input('end_date', $so->end_date?->format('Y-m-d'));
+
+            $excludedStatuses = [TaskStatus::COMPLETED->value, TaskStatus::CANCELLED->value];
+
+            $conflictingTasks = $so->tasks()
+                ->whereNotIn('status', $excludedStatuses)
+                ->whereNotNull('start_date')
+                ->whereNotNull('end_date')
+                ->where(function ($q) use ($newStart, $newEnd) {
+                    $q->where('start_date', '<', $newStart)
+                      ->orWhere('end_date', '>', $newEnd);
+                })
+                ->get();
+
+            if ($conflictingTasks->isNotEmpty()) {
+                $validator->errors()->add(
+                    'start_date',
+                    __('validation.service_order.dates_conflict_tasks', [
+                        'count' => $conflictingTasks->count(),
+                    ])
+                );
+            }
+        });
     }
 }
