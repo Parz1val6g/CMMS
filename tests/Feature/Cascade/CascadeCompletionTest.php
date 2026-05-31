@@ -56,6 +56,8 @@ class CascadeCompletionTest extends TestCase
             'service_order_id' => $this->serviceOrder->id,
             'manager_id' => $this->manager->id,
             'status' => TaskStatus::PENDING->value,
+            'start_date' => '2026-06-01',
+            'end_date' => '2026-06-10',
         ]);
 
         $this->miniTask = MiniTask::factory()->create([

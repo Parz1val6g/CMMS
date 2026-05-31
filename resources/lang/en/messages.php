@@ -39,6 +39,9 @@ return [
             'cannot_update_terminal' => 'Cannot update a converted or cancelled ticket.',
             'already_terminal' => 'This ticket is already in a terminal state (converted or cancelled).',
         ],
+        'task' => [
+            'cannot_cancel_without_period' => 'Cannot cancel task: execution period (start_date/end_date) must be defined first.',
+        ],
         'loan_orders' => [
             'must_be_pending_to_approve' => 'Loan order must be in PENDING status to approve.',
             'must_be_approved_to_checkout' => 'Loan order must be APPROVED to checkout.',

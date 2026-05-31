@@ -66,6 +66,9 @@ class TaskService
         if ($task->status === TaskStatus::COMPLETED->value) {
             throw new InvalidArgumentException('Cannot cancel an already completed task.');
         }
+        if ($task->status === TaskStatus::PENDING && (!$task->start_date || !$task->end_date)) {
+            throw new InvalidArgumentException(__('messages.services.task.cannot_cancel_without_period'));
+        }
         return $this->transactions->execute(function () use ($task) {
             $task->update(['status' => TaskStatus::CANCELLED->value]);
             return $task;
