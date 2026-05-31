@@ -70,6 +70,32 @@ class StoreMiniTaskRequest extends FormRequest
                     'task_id',
                     __('validation.task.no_period_for_mini_task')
                 );
+                return;
+            }
+
+            $taskStart = $task->start_date->format('Y-m-d');
+            $taskEnd = $task->end_date->format('Y-m-d');
+            $mtStart = $this->input('start_date');
+            $mtEnd = $this->input('end_date');
+
+            if ($mtStart && $mtStart < $taskStart) {
+                $validator->errors()->add(
+                    'start_date',
+                    __('validation.task.mini_task_start_date_before_task', [
+                        'start' => $taskStart,
+                        'end' => $taskEnd,
+                    ])
+                );
+            }
+
+            if ($mtEnd && $mtEnd > $taskEnd) {
+                $validator->errors()->add(
+                    'end_date',
+                    __('validation.task.mini_task_end_date_after_task', [
+                        'start' => $taskStart,
+                        'end' => $taskEnd,
+                    ])
+                );
             }
         });
     }

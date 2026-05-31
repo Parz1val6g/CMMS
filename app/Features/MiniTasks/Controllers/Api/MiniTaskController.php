@@ -4,6 +4,7 @@ use App\Core\Services\FilterService;
 use App\Core\Traits\FiltersAdvancedRules;
 use App\Features\MiniTasks\Models\MiniTask;
 use App\Features\MiniTasks\Requests\StoreMiniTaskRequest;
+use App\Features\MiniTasks\Requests\UpdateMiniTaskRequest;
 use App\Features\MiniTasks\Resources\MiniTaskResource;
 use App\Features\MiniTasks\Services\MiniTaskService;
 use Illuminate\Http\Request;
@@ -67,21 +68,9 @@ class MiniTaskController extends Controller
         return new MiniTaskResource($miniTask);
     }
 
-    public function update(Request $request, MiniTask $miniTask): MiniTaskResource
+    public function update(UpdateMiniTaskRequest $request, MiniTask $miniTask): MiniTaskResource
     {
-        Gate::authorize('update', $miniTask);
-
-        if ($miniTask->status === \App\Core\Enums\MiniTaskStatus::COMPLETED->value) {
-            throw new \InvalidArgumentException('Cannot update a completed mini-task.');
-        }
-
-        $data = $request->validate([
-            'description' => ['sometimes', 'string', 'max:250'],
-            'start_date'  => ['sometimes', 'nullable', 'date'],
-            'end_date'    => ['sometimes', 'nullable', 'date', 'after_or_equal:start_date'],
-        ]);
-
-        $miniTask->update($data);
+        $miniTask->update($request->validated());
         $miniTask->load(['supervisor', 'workers.user', 'teams', 'materials.unit', 'equipment']);
 
         return new MiniTaskResource($miniTask);
