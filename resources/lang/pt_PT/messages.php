@@ -39,6 +39,9 @@ return [
             'cannot_update_terminal' => 'Não é possível atualizar um ticket convertido ou cancelado.',
             'already_terminal' => 'Este ticket já está num estado terminal (convertido ou cancelado).',
         ],
+        'task' => [
+            'cannot_cancel_without_period' => 'Não é possível cancelar a tarefa: o período de execução (data de início/fim) deve ser definido primeiro.',
+        ],
         'loan_orders' => [
             'must_be_pending_to_approve' => 'O empréstimo deve estar com estado PENDENTE para ser aprovado.',
             'must_be_approved_to_checkout' => 'O empréstimo deve estar APROVADO para levantar.',
