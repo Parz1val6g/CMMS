@@ -6,6 +6,7 @@ use App\Core\Enums\TaskStatus;
 use App\Core\Forms\FormValidator;
 use App\Features\Tasks\Models\Task;
 use App\Features\Tasks\TaskFormSchema;
+use App\Features\ServiceOrders\Models\ServiceOrder;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTaskRequest extends FormRequest
@@ -40,6 +41,42 @@ class UpdateTaskRequest extends FormRequest
                 $validator->errors()->add(
                     'start_date',
                     __('validation.task.period_locked')
+                );
+            }
+        });
+
+        $validator->after(function ($validator) {
+            $task = $this->route('task');
+            if (!$task instanceof Task) return;
+
+            $startDate = $this->input('start_date', $task->start_date?->format('Y-m-d'));
+            $endDate = $this->input('end_date', $task->end_date?->format('Y-m-d'));
+
+            if (!$startDate || !$endDate) return;
+
+            $so = ServiceOrder::find($task->service_order_id);
+            if (!$so || !$so->start_date || !$so->end_date) return;
+
+            $soStart = $so->start_date->format('Y-m-d');
+            $soEnd = $so->end_date->format('Y-m-d');
+
+            if ($startDate < $soStart) {
+                $validator->errors()->add(
+                    'start_date',
+                    __('validation.task.start_date_before_service_order', [
+                        'start' => $soStart,
+                        'end' => $soEnd,
+                    ])
+                );
+            }
+
+            if ($endDate > $soEnd) {
+                $validator->errors()->add(
+                    'end_date',
+                    __('validation.task.end_date_after_service_order', [
+                        'start' => $soStart,
+                        'end' => $soEnd,
+                    ])
                 );
             }
         });
