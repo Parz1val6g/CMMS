@@ -36,6 +36,8 @@ class TaskPeriodTest extends TestCase
             'location_id' => $location->id,
             'service_type_id' => $serviceType->id,
             'status' => ServiceOrderStatus::PENDING->value,
+            'start_date' => '2026-01-01',
+            'end_date' => '2026-12-31',
         ]);
     }
 
