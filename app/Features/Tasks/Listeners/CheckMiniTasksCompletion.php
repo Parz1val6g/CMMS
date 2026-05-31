@@ -1,14 +1,15 @@
 <?php
 namespace App\Features\Tasks\Listeners;
 use App\Core\Enums\MiniTaskStatus;
-use App\Core\Enums\TaskStatus;
 use App\Features\MiniTasks\Events\MiniTaskCompletedEvent;
 use App\Features\Notifications\Services\NotificationService;
+use App\Features\Tasks\Services\TaskService;
 class CheckMiniTasksCompletion
 {
     // See docs/architecture/cascade-completion-chain.md for the full cascade documentation.
     public function __construct(
-        private NotificationService $notificationService
+        private NotificationService $notificationService,
+        private TaskService $taskService
     ) {
     }
     public function handle(MiniTaskCompletedEvent $event): void
@@ -23,7 +24,7 @@ class CheckMiniTasksCompletion
             ->where('status', '!=', MiniTaskStatus::COMPLETED->value)
             ->exists();
         if (!$hasIncompleteMiniTasks) {
-            $task->update(['status' => TaskStatus::AWAITING_APPROVAL->value]);
+            $this->taskService->markAwaitingApproval($task);
             $this->notificationService->create(
                 $task->manager_id,
                 __('messages.services.notifications.task_awaiting_approval_title', ['reference' => $task->reference]),

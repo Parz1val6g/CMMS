@@ -5,16 +5,16 @@ namespace App\Features\ServiceOrders\Listeners;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Enums\TaskStatus;
 use App\Core\Enums\WorkflowType;
-use App\Core\Services\TransactionHandler;
 use App\Features\Notifications\Services\NotificationService;
+use App\Features\ServiceOrders\Services\ServiceOrderService;
 use App\Features\Tasks\Events\TaskCompletedEvent;
 
 class CheckTaskCompletion
 {
     // See docs/architecture/cascade-completion-chain.md for the full cascade documentation.
     public function __construct(
-        private TransactionHandler $transactions,
-        private NotificationService $notificationService
+        private NotificationService $notificationService,
+        private ServiceOrderService $serviceOrderService
     ) {}
 
     public function handle(TaskCompletedEvent $event): void
@@ -35,9 +35,7 @@ class CheckTaskCompletion
             ->exists();
 
         if (!$hasIncompleteTasks) {
-            $this->transactions->execute(function () use ($serviceOrder) {
-                $serviceOrder->update(['status' => ServiceOrderStatus::AWAITING_APPROVAL->value]);
-            });
+            $this->serviceOrderService->markAwaitingApproval($serviceOrder);
 
             $this->notificationService->create(
                 $serviceOrder->manager_id,

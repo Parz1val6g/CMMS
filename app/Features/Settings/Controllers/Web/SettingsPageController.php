@@ -3,6 +3,7 @@
 namespace App\Features\Settings\Controllers\Web;
 
 use App\Core\Helpers\InputSanitizer;
+use App\Core\Services\TransactionHandler;
 use App\Shared\Models\AppSetting;
 use App\Shared\Models\User;
 use App\Shared\Models\UserPreference;
@@ -11,7 +12,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -20,6 +20,10 @@ use Inertia\Response;
 
 class SettingsPageController extends Controller
 {
+    public function __construct(
+        private TransactionHandler $transactions
+    ) {}
+
     /**
      * Show the settings page.
      */
@@ -78,7 +82,7 @@ class SettingsPageController extends Controller
 
         $user = $request->user();
 
-        DB::transaction(function () use ($user, $validated) {
+        $this->transactions->execute(function () use ($user, $validated) {
             $data = [
                 'first_name' => InputSanitizer::sanitize($validated['first_name']),
                 'last_name'  => InputSanitizer::sanitize($validated['last_name']),
@@ -125,7 +129,7 @@ class SettingsPageController extends Controller
             'company_website'            => 'nullable|url|max:250',
         ]);
 
-        DB::transaction(function () use ($validated, $request) {
+        $this->transactions->execute(function () use ($validated, $request) {
             foreach ($validated as $key => $value) {
                 if ($value !== null) {
                     AppSetting::updateOrCreate(
@@ -187,7 +191,7 @@ class SettingsPageController extends Controller
 
         $user = $request->user();
 
-        DB::transaction(function () use ($user) {
+        $this->transactions->execute(function () use ($user) {
             // Revoke all tokens if using Sanctum
             if (method_exists($user, 'tokens')) {
                 $user->tokens()->delete();

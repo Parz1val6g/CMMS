@@ -61,6 +61,14 @@ class TaskService
             return $task;
         });
     }
+    public function markAwaitingApproval(Task $task): Task
+    {
+        return $this->transactions->execute(function () use ($task) {
+            $task->update(['status' => TaskStatus::AWAITING_APPROVAL->value]);
+            return $task;
+        });
+    }
+
     public function cancel(Task $task): Task
     {
         if ($task->status === TaskStatus::COMPLETED->value) {

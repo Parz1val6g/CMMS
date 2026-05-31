@@ -181,27 +181,8 @@ class FormValidator
     }
 
     /**
-     * Avalia condição (FieldCondition).
-     * 
-     * ⚠️ DEPRECATED: Use FieldCondition::evaluate() diretamente
-     * 
-     * @deprecated
-     * @param mixed $val1
-     * @param string $operator
-     * @param mixed $val2
-     * @return bool
-     * 
-     * @throws \InvalidArgumentException se operator é inválido
-     */
-    public function when(mixed $val1, string $operator, mixed $val2): bool
-    {
-        $condition = new FieldCondition('dummy', $operator, $val2);
-        return $condition->evaluate($val1);
-    }
-
-    /**
      * Log de debug.
-     * 
+     *
      * @param string $message
      * @return void
      */

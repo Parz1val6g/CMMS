@@ -3,8 +3,7 @@
 namespace App\Features\LoanOrders\Services;
 
 use App\Core\Enums\LoanOrderStatus;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use App\Features\LoanOrders\Models\LoanOrder;
 
 class AvailabilityService
 {
@@ -23,28 +22,16 @@ class AvailabilityService
         string $endDate,
         ?string $excludeLoanOrderId = null
     ): bool {
-        // Only check if the pivot table has the date columns
-        if (!$this->pivotHasDateColumns()) {
-            return true;
-        }
-
         $activeStatuses = [LoanOrderStatus::APPROVED->value, LoanOrderStatus::CHECKED_OUT->value];
 
-        $query = DB::table('equipment_loan_order as elo')
-            ->join('loan_orders as lo', 'elo.loan_order_id', '=', 'lo.id')
-            ->where('elo.equipment_id', $equipmentId)
-            ->whereIn('lo.status', $activeStatuses)
-            ->whereNull('lo.deleted_at')
-            ->whereNotNull('elo.start_date')
-            ->whereNotNull('elo.end_date')
-            ->where('elo.start_date', '<=', $endDate)
-            ->where('elo.end_date', '>=', $startDate);
-
-        if ($excludeLoanOrderId !== null) {
-            $query->where('elo.loan_order_id', '!=', $excludeLoanOrderId);
-        }
-
-        return $query->doesntExist();
+        return LoanOrder::whereIn('status', $activeStatuses)
+            ->when($excludeLoanOrderId, fn($q, $id) => $q->where('id', '!=', $id))
+            ->whereHas('equipments', fn($q) => $q
+                ->where('equipments.id', $equipmentId)
+                ->wherePivot('start_date', '<=', $endDate)
+                ->wherePivot('end_date', '>=', $startDate)
+            )
+            ->doesntExist();
     }
 
     /**
@@ -57,35 +44,26 @@ class AvailabilityService
      */
     public function getOccupiedRanges(string $equipmentId, string $fromDate, string $toDate): array
     {
-        if (!$this->pivotHasDateColumns()) {
-            return [];
-        }
-
         $activeStatuses = [LoanOrderStatus::APPROVED->value, LoanOrderStatus::CHECKED_OUT->value];
 
-        $rows = DB::table('equipment_loan_order as elo')
-            ->join('loan_orders as lo', 'elo.loan_order_id', '=', 'lo.id')
-            ->where('elo.equipment_id', $equipmentId)
-            ->whereIn('lo.status', $activeStatuses)
-            ->whereNull('lo.deleted_at')
-            ->whereNotNull('elo.start_date')
-            ->whereNotNull('elo.end_date')
-            ->where('elo.start_date', '<=', $toDate)
-            ->where('elo.end_date', '>=', $fromDate)
-            ->select(
-                'elo.start_date',
-                'elo.end_date',
-                'lo.reference',
-                'lo.id as loan_order_id'
+        $loans = LoanOrder::whereIn('status', $activeStatuses)
+            ->whereHas('equipments', fn($q) => $q
+                ->where('equipments.id', $equipmentId)
+                ->wherePivot('start_date', '<=', $toDate)
+                ->wherePivot('end_date', '>=', $fromDate)
             )
+            ->with(['equipments' => fn($q) => $q
+                ->where('equipments.id', $equipmentId)
+                ->withPivot(['start_date', 'end_date'])
+            ])
             ->get();
 
-        return $rows->map(fn($row) => [
-            'start_date' => $row->start_date,
-            'end_date'   => $row->end_date,
+        return $loans->flatMap(fn($loan) => $loan->equipments->map(fn($eq) => [
+            'start_date' => $eq->pivot->start_date,
+            'end_date'   => $eq->pivot->end_date,
             'type'       => 'loan_order',
-            'reference'  => $row->reference,
-        ])->toArray();
+            'reference'  => $loan->reference,
+        ]))->toArray();
     }
 
     /**
@@ -109,12 +87,4 @@ class AvailabilityService
         return $results;
     }
 
-    /**
-     * Check whether the equipment_loan_order pivot table has date columns.
-     * This allows tests running against SQLite migrations to skip the check gracefully.
-     */
-    private function pivotHasDateColumns(): bool
-    {
-        return Schema::hasColumn('equipment_loan_order', 'start_date');
-    }
 }

@@ -2,11 +2,13 @@
 
 namespace App\Features\MiniTasks\Controllers\Api;
 
+use App\Features\Equipments\Models\Equipment;
 use App\Features\Materials\Models\Material;
 use App\Features\MiniTasks\Models\MiniTask;
+use App\Features\Teams\Models\Team;
+use App\Features\Workers\Models\Worker;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
 
 class MiniTaskAvailabilityController extends Controller
 {
@@ -25,23 +27,18 @@ class MiniTaskAvailabilityController extends Controller
             ->where('end_date', '>=', $start)
             ->pluck('id');
 
-        $busyWorkers = DB::table('mini_tasks_workers_teams')
-            ->whereIn('mini_task_id', $overlapping)
-            ->whereNotNull('worker_id')
-            ->pluck('worker_id')
+        $busyWorkers = Worker::whereHas('miniTasks', fn($q) => $q->whereIn('mini_tasks.id', $overlapping))
+            ->pluck('id')
             ->unique()
             ->values();
 
-        $busyTeams = DB::table('mini_tasks_workers_teams')
-            ->whereIn('mini_task_id', $overlapping)
-            ->whereNotNull('team_id')
-            ->pluck('team_id')
+        $busyTeams = Team::whereHas('miniTasks', fn($q) => $q->whereIn('mini_tasks.id', $overlapping))
+            ->pluck('id')
             ->unique()
             ->values();
 
-        $busyEquipment = DB::table('mini_task_equipment')
-            ->whereIn('mini_task_id', $overlapping)
-            ->pluck('equipment_id')
+        $busyEquipment = Equipment::whereHas('miniTasks', fn($q) => $q->whereIn('mini_tasks.id', $overlapping))
+            ->pluck('id')
             ->unique()
             ->values();
 

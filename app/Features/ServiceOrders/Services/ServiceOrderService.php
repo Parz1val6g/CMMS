@@ -216,6 +216,14 @@ class ServiceOrderService
         }
     }
 
+    public function markAwaitingApproval(ServiceOrder $serviceOrder): ServiceOrder
+    {
+        return $this->transactions->execute(function () use ($serviceOrder) {
+            $serviceOrder->update(['status' => ServiceOrderStatus::AWAITING_APPROVAL->value]);
+            return $serviceOrder;
+        });
+    }
+
     public function cancel(ServiceOrder $serviceOrder): ServiceOrder
     {
         if ($serviceOrder->status === ServiceOrderStatus::COMPLETED) {

@@ -2,6 +2,7 @@
 
 namespace App\Core\Helpers;
 
+use App\Shared\Models\User;
 use Illuminate\Support\Facades\Config;
 
 class FeatureFlags
@@ -16,13 +17,12 @@ class FeatureFlags
         return !self::isEnabled($feature);
     }
 
-    public static function enableFor(string $feature, string $user): bool
+    public static function enableFor(string $feature, User $user): bool
     {
-        // Implement your own logic to check if user has access to feature
-        return true;
+        return self::isEnabled($feature);
     }
 
-    public static function disableFor(string $feature, string $user): bool
+    public static function disableFor(string $feature, User $user): bool
     {
         return !self::enableFor($feature, $user);
     }
