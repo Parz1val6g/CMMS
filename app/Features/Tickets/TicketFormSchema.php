@@ -7,6 +7,7 @@ use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextAreaInput, SelectInput, TextInput, SectionHeader, MapInput};
 use App\Features\Clients\Models\Client;
 use App\Core\Cache\RefCache;
+use App\Core\LocationCascadeOptions;
 
 class TicketFormSchema
 {
@@ -52,6 +53,10 @@ class TicketFormSchema
                     ->setLabel(__('forms.tickets.parish'))
                     ->setOptions(self::parishOptions())
                     ->setRules('nullable|exists:parishes,id')
+                    ->meta('useCascade', true)
+                    ->meta('districts', LocationCascadeOptions::all()['districts'])
+                    ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
+                    ->meta('parishes', LocationCascadeOptions::all()['parishes'])
             )
             ->field(
                 TextInput::make('street')
@@ -106,6 +111,10 @@ class TicketFormSchema
                     ->setLabel(__('forms.tickets.parish'))
                     ->setOptions(self::parishOptions())
                     ->setRules('nullable|exists:parishes,id')
+                    ->meta('useCascade', true)
+                    ->meta('districts', LocationCascadeOptions::all()['districts'])
+                    ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
+                    ->meta('parishes', LocationCascadeOptions::all()['parishes'])
             )
             ->field(
                 TextInput::make('street')

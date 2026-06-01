@@ -3,6 +3,7 @@ import { usePage } from '@inertiajs/react';
 import { t } from '@/utils/i18n';
 import MultiSelect from '@/Components/Common/MultiSelect';
 import SearchableSelect from '@/Components/Common/SearchableSelect';
+import CascadingParishSelect from '@/Components/Common/CascadingParishSelect';
 import ToggleSwitch from '@/Components/Common/ToggleSwitch';
 import RepeaterInput from '@/Components/Common/RepeaterInput';
 import DatePicker from '@/Components/Common/DatePicker';
@@ -194,6 +195,24 @@ function StandardField({ field, value = '', error, onChange, lockedValues = [] }
   const handleInputChange = (val) => {
     onChange?.(val);
   };
+
+  if ((type === 'select') && field.metadata?.useCascade) {
+    const meta = field.metadata;
+    const companyLocation = usePage().props.companyLocation;
+    return (
+      <CascadingParishSelect
+        name={name}
+        districts={meta.districts ?? []}
+        municipalities={meta.municipalities ?? []}
+        parishes={meta.parishes ?? []}
+        value={toScalar(value)}
+        onChange={handleInputChange}
+        required={required}
+        lockedDistrictId={companyLocation?.district_id ?? null}
+        lockedMunicipalityId={companyLocation?.municipality_id ?? null}
+      />
+    );
+  }
 
   if (type === 'select' || type === 'multiselect') {
     const isMulti = isMultiple || type === 'multiselect';

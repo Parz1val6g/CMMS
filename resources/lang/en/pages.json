@@ -396,6 +396,8 @@
         "section_app_desc": "Configure global settings",
         "label_company_name": "Company Name",
         "placeholder_company_name": "Enter company name",
+        "label_company_location": "Company Location",
+        "hint_company_location": "When set, district and municipality are pre-filled and locked in all location fields.",
         "label_logo": "Website Logo",
         "logo_alt": "Logo",
         "hint_logo_size": "Recommended size: 200x200px",

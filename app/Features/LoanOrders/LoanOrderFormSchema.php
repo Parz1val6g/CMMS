@@ -7,6 +7,7 @@ use App\Core\Enums\LoanOrderStatus;
 use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, SectionHeader, MapInput, ToggleInput, RepeaterInput, DateRangeInput};
 use App\Core\Cache\RefCache;
+use App\Core\LocationCascadeOptions;
 use App\Features\Equipments\Models\Equipment;
 use App\Shared\Models\User;
 
@@ -61,6 +62,10 @@ class LoanOrderFormSchema
                     ->setOptions(self::parishOptions())
                     ->setColumn(2)
                     ->setRules('nullable|exists:parishes,id')
+                    ->meta('useCascade', true)
+                    ->meta('districts', LocationCascadeOptions::all()['districts'])
+                    ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
+                    ->meta('parishes', LocationCascadeOptions::all()['parishes'])
             )
             ->field(
                 TextInput::make('street')
@@ -156,6 +161,10 @@ class LoanOrderFormSchema
                     ->setOptions(self::parishOptions())
                     ->setColumn(1)
                     ->setRules('nullable|exists:parishes,id')
+                    ->meta('useCascade', true)
+                    ->meta('districts', LocationCascadeOptions::all()['districts'])
+                    ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
+                    ->meta('parishes', LocationCascadeOptions::all()['parishes'])
             )
             ->field(
                 TextInput::make('street')
@@ -271,6 +280,10 @@ class LoanOrderFormSchema
                     ->setLabel(__('forms.loan_orders.parish'))
                     ->setOptions(self::parishOptions())
                     ->setRules('nullable|exists:parishes,id')
+                    ->meta('useCascade', true)
+                    ->meta('districts', LocationCascadeOptions::all()['districts'])
+                    ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
+                    ->meta('parishes', LocationCascadeOptions::all()['parishes'])
             )
             ->field(
                 TextInput::make('street')

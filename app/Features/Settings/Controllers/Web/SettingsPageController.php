@@ -3,6 +3,7 @@
 namespace App\Features\Settings\Controllers\Web;
 
 use App\Core\Helpers\InputSanitizer;
+use App\Core\LocationCascadeOptions;
 use App\Core\Services\TransactionHandler;
 use App\Shared\Models\AppSetting;
 use App\Shared\Models\User;
@@ -58,6 +59,10 @@ class SettingsPageController extends Controller
             'preferences' => $preferences,
             'appSettings'  => $appSettings,
             'isAdmin'      => $isAdmin,
+            'locationOptions' => [
+                'districts'      => LocationCascadeOptions::all()['districts'],
+                'municipalities' => LocationCascadeOptions::all()['municipalities'],
+            ],
             'routes'       => [
                 'updateUser'     => route('settings.update-user'),
                 'updatePassword' => route('settings.update-password'),
@@ -127,10 +132,22 @@ class SettingsPageController extends Controller
             'user_registration_enabled'  => 'nullable|boolean',
             'support_email'              => 'nullable|email|max:250',
             'company_website'            => 'nullable|url|max:250',
+            'company_district_id'        => 'nullable|uuid|exists:districts,id',
+            'company_municipality_id'    => 'nullable|uuid|exists:municipalities,id',
         ]);
 
         $this->transactions->execute(function () use ($validated, $request) {
+            $locationKeys = ['company_district_id', 'company_municipality_id'];
             foreach ($validated as $key => $value) {
+                if (in_array($key, $locationKeys, true)) {
+                    // Explicitly clear when empty so users can remove the lock
+                    if ($value) {
+                        AppSetting::updateOrCreate(['key' => $key], ['value' => $value]);
+                    } else {
+                        AppSetting::where('key', $key)->delete();
+                    }
+                    continue;
+                }
                 if ($value !== null) {
                     AppSetting::updateOrCreate(
                         ['key' => $key],

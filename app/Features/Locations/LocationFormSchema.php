@@ -4,6 +4,8 @@ namespace App\Features\Locations;
 
 use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextInput, SelectInput, MapInput};
+use App\Core\Cache\RefCache;
+use App\Core\LocationCascadeOptions;
 
 class LocationFormSchema
 {
@@ -25,8 +27,13 @@ class LocationFormSchema
             ->field(
                 SelectInput::make('parish_id')
                     ->setLabel(__('forms.locations.parish'))
-                    ->setOptions([])
+                    ->setOptions(RefCache::parishes())
+                    ->setRequired()
                     ->setRules('required|exists:parishes,id')
+                    ->meta('useCascade', true)
+                    ->meta('districts', LocationCascadeOptions::all()['districts'])
+                    ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
+                    ->meta('parishes', LocationCascadeOptions::all()['parishes'])
             )
             ->field(
                 TextInput::make('landmark')
@@ -42,6 +49,7 @@ class LocationFormSchema
     }
 
     public static function update(): FormSchema
+
     {
         return FormSchema::make(__('forms.locations.edit_title'))
             ->field(
@@ -57,8 +65,12 @@ class LocationFormSchema
             ->field(
                 SelectInput::make('parish_id')
                     ->setLabel(__('forms.locations.parish'))
-                    ->setOptions([])
+                    ->setOptions(RefCache::parishes())
                     ->setRules('sometimes|exists:parishes,id')
+                    ->meta('useCascade', true)
+                    ->meta('districts', LocationCascadeOptions::all()['districts'])
+                    ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
+                    ->meta('parishes', LocationCascadeOptions::all()['parishes'])
             )
             ->field(
                 TextInput::make('landmark')

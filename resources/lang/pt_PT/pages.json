@@ -396,6 +396,8 @@
         "section_app_desc": "Configure as definições globais",
         "label_company_name": "Nome da Empresa",
         "placeholder_company_name": "Insira o nome da empresa",
+        "label_company_location": "Localização da Empresa",
+        "hint_company_location": "Quando definido, o distrito e o município são preenchidos e bloqueados em todos os campos de localização.",
         "label_logo": "Logótipo do Site",
         "logo_alt": "Logótipo",
         "hint_logo_size": "Tamanho recomendado: 200x200px",

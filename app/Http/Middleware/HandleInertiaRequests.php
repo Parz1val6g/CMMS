@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Core\Services\PermissionManager;
+use App\Shared\Models\AppSetting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -116,6 +117,13 @@ class HandleInertiaRequests extends Middleware
                     ? e($request->session()->get('error')) : null,
             ],
             'googleMapsApiKey' => $user ? config('services.google_maps.api_key') : null,
+            'companyLocation'  => (function () {
+                $s = AppSetting::whereIn('key', ['company_district_id', 'company_municipality_id'])
+                    ->pluck('value', 'key');
+                $d = $s->get('company_district_id');
+                $m = $s->get('company_municipality_id');
+                return ($d || $m) ? ['district_id' => $d ?: null, 'municipality_id' => $m ?: null] : null;
+            })(),
         ];
     }
 }

@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import Tabs from '@/Components/Common/Tabs';
 import FormSection from '@/Components/Common/FormSection';
 import DialogModal from '@/Components/Common/DialogModal';
 import Badge from '@/Components/Common/Badge';
+import SearchableSelect from '@/Components/Common/SearchableSelect';
 import { t } from '@/utils/i18n';
 import { submitForm } from '@/utils/form';
 import { useToast } from '@/Components/Toast/ToastContext';
@@ -58,9 +59,17 @@ function formatDate(iso) {
 
 
 /* ── Settings Page ──────────────────────────────────────────────── */
-export default function Settings({ user, preferences, appSettings, isAdmin, routes: apiRoutes }) {
+export default function Settings({ user, preferences, appSettings, isAdmin, locationOptions, routes: apiRoutes }) {
 
   const toast = useToast();
+
+  /* Company location state */
+  const [companyDistrictId, setCompanyDistrictId]       = useState(appSettings?.company_district_id ?? '');
+  const [companyMunicipalityId, setCompanyMunicipalityId] = useState(appSettings?.company_municipality_id ?? '');
+  const filteredMunicipalities = useMemo(
+    () => (locationOptions?.municipalities ?? []).filter(m => !companyDistrictId || m.district_id === companyDistrictId),
+    [locationOptions?.municipalities, companyDistrictId]
+  );
 
   /* Logo state */
   const [logoPreviewSrc, setLogoPreviewSrc] = useState(appSettings?.logo_path ? `/storage/${appSettings.logo_path}` : null);
@@ -262,6 +271,34 @@ export default function Settings({ user, preferences, appSettings, isAdmin, rout
               <div>
                 <label className="mb-1 block text-xs font-bold text-brand-mid">{t('pages.settings.label_company_name')}</label>
                 <input type="text" name="company_name" defaultValue={appSettings?.company_name ?? ''} className={inputClass} placeholder={t('pages.settings.placeholder_company_name')} />
+                <div className="form-feedback mt-1 hidden text-xs text-red-600" />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-bold text-brand-mid">{t('pages.settings.label_company_location')}</label>
+                <p className="mb-2 text-xs text-brand-mid">{t('pages.settings.hint_company_location')}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-brand-mid">{t('pages.cascading_parish.district')}</label>
+                    <SearchableSelect
+                      name="company_district_id"
+                      options={locationOptions?.districts ?? []}
+                      value={companyDistrictId}
+                      onChange={val => { setCompanyDistrictId(val); setCompanyMunicipalityId(''); }}
+                      placeholder="—"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-brand-mid">{t('pages.cascading_parish.municipality')}</label>
+                    <SearchableSelect
+                      name="company_municipality_id"
+                      options={filteredMunicipalities}
+                      value={companyMunicipalityId}
+                      onChange={setCompanyMunicipalityId}
+                      placeholder="—"
+                      disabled={!companyDistrictId}
+                    />
+                  </div>
+                </div>
                 <div className="form-feedback mt-1 hidden text-xs text-red-600" />
               </div>
               <div>

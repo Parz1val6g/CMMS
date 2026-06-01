@@ -186,11 +186,11 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
         <div
           id={`ms-dropdown-${name}`}
           style={dropdownStyle}
-          className="overflow-auto rounded-lg border border-brand-mid/20 bg-brand-white shadow-2xl"
+          className="flex flex-col overflow-hidden rounded-lg border border-brand-mid/20 bg-brand-white shadow-2xl"
         >
-          {/* ── Sticky search bar ──────────────────────────────── */}
+          {/* ── Search bar ──────────────────────────────────────── */}
           {showSearch && (
-            <div className="sticky top-0 z-10 border-b border-brand-mid/20 bg-brand-white p-2">
+            <div className="shrink-0 border-b border-brand-mid/20 bg-brand-white p-2">
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-mid" />
                 <input
@@ -205,6 +205,7 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
             </div>
           )}
 
+          <div className="overflow-auto flex-1">
           {filtered.length === 0 && options.length > 0 ? (
             <div className="px-3 py-2 text-sm text-brand-mid">{t('pages.common.no_matches')}</div>
           ) : filtered.length === 0 && options.length === 0 ? (
@@ -244,6 +245,7 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
               );
             })
           )}
+          </div>
         </div>,
         document.body
       )}

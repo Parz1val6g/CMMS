@@ -4,7 +4,7 @@ import { ChevronDown, Search } from 'lucide-react';
 import { toScalar } from '@/utils/url';
 import { t } from '@/utils/i18n';
 
-export default function SearchableSelect({ name, options = [], value = '', onChange, placeholder }) {
+export default function SearchableSelect({ name, options = [], value = '', onChange, placeholder, disabled = false, required }) {
   /* ── Normalize incoming value (may be object from Laravel relation) ── */
   const scalarValue = toScalar(value);
 
@@ -108,13 +108,13 @@ export default function SearchableSelect({ name, options = [], value = '', onCha
       {/* ── Trigger ──────────────────────────────────────────── */}
       <div
         ref={triggerRef}
-        className="flex min-h-[38px] cursor-pointer items-center gap-2 rounded-lg border border-brand-mid/20 bg-brand-white px-3 py-2 text-sm text-brand-darkest transition-colors hover:border-brand-mid"
-        onClick={() => { if (isOpen) close(); else open(); }}
+        className={`flex min-h-[38px] items-center gap-2 rounded-lg border border-brand-mid/20 bg-brand-white px-3 py-2 text-sm text-brand-darkest transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-brand-mid'}`}
+        onClick={() => { if (disabled) return; if (isOpen) close(); else open(); }}
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (isOpen) close(); else open(); } }}
+        tabIndex={disabled ? -1 : 0}
+        onKeyDown={(e) => { if (disabled) return; if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (isOpen) close(); else open(); } }}
       >
         <span className={`flex-1 ${scalarValue !== '' ? '' : 'text-brand-mid'}`}>
           {scalarValue !== '' ? displayLabel : (placeholder || t('common.searchable_select.placeholder'))}
@@ -127,10 +127,10 @@ export default function SearchableSelect({ name, options = [], value = '', onCha
         <div
           id={`ss-dropdown-${name}`}
           style={dropdownStyle}
-          className="rounded-lg border border-brand-mid/20 bg-brand-white shadow-2xl"
+          className="flex flex-col overflow-hidden rounded-lg border border-brand-mid/20 bg-brand-white shadow-2xl"
         >
-          {/* Sticky search */}
-          <div className="sticky top-0 border-b border-brand-mid/20 bg-brand-white p-2">
+          {/* Search bar */}
+          <div className="shrink-0 border-b border-brand-mid/20 bg-brand-white p-2">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-mid" />
               <input
@@ -145,7 +145,7 @@ export default function SearchableSelect({ name, options = [], value = '', onCha
           </div>
 
           {/* Options list */}
-          <div className="overflow-auto">
+          <div className="overflow-auto flex-1">
             {filtered.length === 0 ? (
               <div className="px-3 py-2 text-sm text-brand-mid">{t('pages.common.no_matches')}</div>
             ) : (
@@ -174,7 +174,7 @@ export default function SearchableSelect({ name, options = [], value = '', onCha
       )}
 
       {/* ── Hidden input for form.elements compatibility ──────── */}
-      <input type="hidden" name={name} value={scalarValue} />
+      <input type="hidden" name={name} value={scalarValue} required={required} />
     </div>
   );
 }
