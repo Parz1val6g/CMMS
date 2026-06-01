@@ -3,6 +3,7 @@
 namespace App\Features\WorkLogs\Controllers\Web;
 
 use App\Core\Enums\WorkLogStatus;
+use App\Core\Traits\GatesRoutes;
 use App\Features\WorkLogs\Models\WorkLog;
 use App\Features\WorkLogs\WorkLogFormSchema;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use Inertia\Inertia;
 
 class WorkLogPageController extends Controller
 {
+    use GatesRoutes;
     public function index(Request $request)
     {
         Gate::authorize('viewAny', WorkLog::class);
@@ -62,13 +64,13 @@ class WorkLogPageController extends Controller
             ],
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
-            'routes' => [
+            'routes' => $this->gatedRoutes([
                 'index'   => url('/api/work-logs'),
                 'store'   => url('/api/work-logs'),
                 'update'  => url('/api/work-logs/__ID__'),
                 'destroy' => url('/api/work-logs/__ID__'),
                 'show'    => url('/api/work-logs/__ID__'),
-            ],
+            ], 'work_logs'),
             'filterSchema' => [
                 ['key' => 'search', 'label' => 'Pesquisa', 'type' => 'text', 'placeholder' => 'Pesquisar work logs...'],
                 ['key' => 'status', 'label' => 'Estado',   'type' => 'select', 'options' => WorkLogStatus::options()],

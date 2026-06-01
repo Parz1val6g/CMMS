@@ -3,6 +3,7 @@
 namespace App\Features\Tasks\Controllers\Web;
 
 use App\Core\Enums\TaskStatus;
+use App\Core\Traits\GatesRoutes;
 use App\Features\MiniTasks\MiniTaskFormSchema;
 use App\Features\Tasks\Models\Task;
 use App\Features\Tasks\TaskFormSchema;
@@ -13,6 +14,7 @@ use Inertia\Inertia;
 
 class TaskPageController extends Controller
 {
+    use GatesRoutes;
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Task::class);
@@ -57,13 +59,13 @@ class TaskPageController extends Controller
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
             'miniTaskCreateSchema' => MiniTaskFormSchema::create()->toArray(),
-            'routes' => [
-                'index' => url('/api/tasks'),
-                'store' => url('/api/tasks'),
-                'update' => url('/api/tasks/__ID__'),
+            'routes' => $this->gatedRoutes([
+                'index'   => url('/api/tasks'),
+                'store'   => url('/api/tasks'),
+                'update'  => url('/api/tasks/__ID__'),
                 'destroy' => url('/api/tasks/__ID__'),
-                'show' => url('/api/tasks/__ID__'),
-            ],
+                'show'    => url('/api/tasks/__ID__'),
+            ], 'tasks'),
             'advancedFilterFields' => [
                 ['value' => 'description', 'label' => 'Descrição'],
                 ['value' => 'status',      'label' => 'Estado', 'type' => 'select', 'options' => TaskStatus::options()],

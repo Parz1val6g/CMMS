@@ -3,6 +3,7 @@
 namespace App\Features\MiniTasks\Controllers\Web;
 
 use App\Core\Enums\MiniTaskStatus;
+use App\Core\Traits\GatesRoutes;
 use App\Features\MiniTasks\Models\MiniTask;
 use App\Features\MiniTasks\MiniTaskFormSchema;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use Inertia\Inertia;
 
 class MiniTaskPageController extends Controller
 {
+    use GatesRoutes;
     public function index(Request $request)
     {
         Gate::authorize('viewAny', MiniTask::class);
@@ -66,12 +68,12 @@ class MiniTaskPageController extends Controller
             ],
             'formSchema'       => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
-            'routes' => [
+            'routes' => $this->gatedRoutes([
                 'index'  => url('/api/mini-tasks'),
                 'store'  => url('/api/mini-tasks'),
                 'update' => url('/api/mini-tasks/__ID__'),
                 'show'   => url('/api/mini-tasks/__ID__'),
-            ],
+            ], 'mini_tasks'),
             'filterSchema' => [
                 ['key' => 'search', 'label' => 'Pesquisa', 'type' => 'text', 'placeholder' => 'Pesquisar mini-tarefas...'],
                 ['key' => 'status', 'label' => 'Estado',   'type' => 'select', 'options' => [

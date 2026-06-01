@@ -5,6 +5,7 @@ namespace App\Features\Equipments\Controllers\Web;
 use App\Core\Enums\EquipmentStatus;
 use App\Core\Services\FilterService;
 use App\Core\Traits\FiltersAdvancedRules;
+use App\Core\Traits\GatesRoutes;
 use App\Features\Equipments\Models\CountingType;
 use App\Features\Equipments\Models\Equipment;
 use App\Features\Equipments\Models\EquipmentType;
@@ -16,7 +17,7 @@ use Inertia\Inertia;
 
 class EquipmentPageController extends Controller
 {
-    use FiltersAdvancedRules;
+    use FiltersAdvancedRules, GatesRoutes;
 
     public function __construct(
         private FilterService $filterService
@@ -100,13 +101,13 @@ class EquipmentPageController extends Controller
             ],
             'formSchema' => $updateSchema->toArray(),
             'createFormSchema' => $createSchema->toArray(),
-            'routes' => [
-                'index' => url('/api/equipments'),
-                'store' => url('/api/equipments'),
-                'update' => url('/api/equipments/__ID__'),
+            'routes' => $this->gatedRoutes([
+                'index'   => url('/api/equipments'),
+                'store'   => url('/api/equipments'),
+                'update'  => url('/api/equipments/__ID__'),
                 'destroy' => url('/api/equipments/__ID__'),
-                'show' => url('/api/equipments/__ID__'),
-            ],
+                'show'    => url('/api/equipments/__ID__'),
+            ], 'equipments'),
             'formMeta' => [
                 'equipmentTypes' => $equipmentTypes,
                 'countingTypes' => $countingTypes,
