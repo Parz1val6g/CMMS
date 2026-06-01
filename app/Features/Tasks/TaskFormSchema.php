@@ -37,18 +37,12 @@ class TaskFormSchema
                     ->setRules('required|exists:sectors,id')
             )
             ->field(
-                DateRangeInput::make('start_date')
-                    ->setLabel(__('forms.tasks.start_date'))
+                DateRangeInput::make('date_range')
+                    ->setLabel(__('forms.tasks.date_range'))
                     ->setRequired()
-                    ->setDateMode('single')
+                    ->setStartName('start_date')
+                    ->setEndName('end_date')
                     ->setRules('required|date')
-            )
-            ->field(
-                DateRangeInput::make('end_date')
-                    ->setLabel(__('forms.tasks.end_date'))
-                    ->setRequired()
-                    ->setDateMode('single')
-                    ->setRules('required|date|after_or_equal:start_date')
             );
     }
 
@@ -84,16 +78,11 @@ class TaskFormSchema
                     ->setRules('sometimes|string')
             )
             ->field(
-                DateRangeInput::make('start_date')
-                    ->setLabel(__('forms.tasks.start_date'))
-                    ->setDateMode('single')
+                DateRangeInput::make('date_range')
+                    ->setLabel(__('forms.tasks.date_range'))
+                    ->setStartName('start_date')
+                    ->setEndName('end_date')
                     ->setRules('sometimes|date')
-            )
-            ->field(
-                DateRangeInput::make('end_date')
-                    ->setLabel(__('forms.tasks.end_date'))
-                    ->setDateMode('single')
-                    ->setRules('sometimes|date|after_or_equal:start_date')
             );
     }
 

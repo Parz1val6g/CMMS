@@ -3,6 +3,7 @@
 namespace App\Core\Forms;
 
 use App\Core\Forms\Fields\CheckboxInput;
+use App\Core\Forms\Fields\DateRangeInput;
 use App\Core\Forms\Fields\EmailInput;
 use App\Core\Forms\Fields\FileInput;
 use App\Core\Forms\Fields\MapInput;
@@ -65,6 +66,21 @@ class FormValidator
         $rules = [];
 
         foreach ($schema->getInputs() as $field) {
+            // DateRangeInput submits as two flat keys (startName / endName), not the composite key
+            if ($field instanceof DateRangeInput) {
+                $meta      = $field->getMetadata();
+                $startKey  = $meta['startName'] ?? ($field->getKey() . '_start');
+                $endKey    = $meta['endName']   ?? ($field->getKey() . '_end');
+                $baseRules = $field->getRules() ? explode('|', $field->getRules()) : [];
+                // Remove 'sometimes' from start — only applies to the overall field
+                $startRules = array_values(array_filter($baseRules));
+                $endRules   = array_merge($startRules, ["after_or_equal:{$startKey}"]);
+                $rules[$startKey] = $startRules;
+                $rules[$endKey]   = $endRules;
+                $this->log("DateRange '{$field->getKey()}' → '{$startKey}': [" . implode(', ', $startRules) . "], '{$endKey}': [" . implode(', ', $endRules) . ']');
+                continue;
+            }
+
             $fieldRules = $this->rulesForField($field, $data);
             $rules[$field->getKey()] = $fieldRules;
 

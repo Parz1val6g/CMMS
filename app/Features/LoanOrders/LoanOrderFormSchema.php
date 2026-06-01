@@ -5,7 +5,7 @@ namespace App\Features\LoanOrders;
 use App\Core\Enums\EquipmentStatus;
 use App\Core\Enums\LoanOrderStatus;
 use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, SectionHeader, MapInput, ToggleInput, RepeaterInput};
+use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, SectionHeader, MapInput, ToggleInput, RepeaterInput, DateRangeInput};
 use App\Core\Cache\RefCache;
 use App\Features\Equipments\Models\Equipment;
 use App\Shared\Models\User;
@@ -104,14 +104,11 @@ class LoanOrderFormSchema
                         ToggleInput::make('needs_operator')
                             ->setLabel(__('forms.loan_orders.needs_operator'))
                             ->setRules('nullable|boolean'),
-                        TextInput::make('start_date')
-                            ->setLabel(__('forms.loan_orders.start_date'))
-                            ->setType('date-picker')
+                        DateRangeInput::make('date_range')
+                            ->setLabel(__('forms.loan_orders.date_range'))
+                            ->setStartName('start_date')
+                            ->setEndName('end_date')
                             ->setRules('nullable|date'),
-                        TextInput::make('end_date')
-                            ->setLabel(__('forms.loan_orders.end_date'))
-                            ->setType('date-picker')
-                            ->setRules('nullable|date|after_or_equal:start_date'),
                     ])
             )
             // ── Full-width: Map ──
@@ -191,14 +188,11 @@ class LoanOrderFormSchema
                         ToggleInput::make('needs_operator')
                             ->setLabel(__('forms.loan_orders.needs_operator'))
                             ->setRules('nullable|boolean'),
-                        TextInput::make('start_date')
-                            ->setLabel(__('forms.loan_orders.start_date'))
-                            ->setType('date-picker')
+                        DateRangeInput::make('date_range')
+                            ->setLabel(__('forms.loan_orders.date_range'))
+                            ->setStartName('start_date')
+                            ->setEndName('end_date')
                             ->setRules('nullable|date'),
-                        TextInput::make('end_date')
-                            ->setLabel(__('forms.loan_orders.end_date'))
-                            ->setType('date-picker')
-                            ->setRules('nullable|date|after_or_equal:start_date'),
                     ])
             )
             ->field(
@@ -245,14 +239,11 @@ class LoanOrderFormSchema
                         ToggleInput::make('needs_operator')
                             ->setLabel(__('forms.loan_orders.needs_operator'))
                             ->setRules('nullable|boolean'),
-                        TextInput::make('start_date')
-                            ->setLabel(__('forms.loan_orders.start_date'))
-                            ->setType('date-picker')
+                        DateRangeInput::make('date_range')
+                            ->setLabel(__('forms.loan_orders.date_range'))
+                            ->setStartName('start_date')
+                            ->setEndName('end_date')
                             ->setRules('nullable|date'),
-                        TextInput::make('end_date')
-                            ->setLabel(__('forms.loan_orders.end_date'))
-                            ->setType('date-picker')
-                            ->setRules('nullable|date|after_or_equal:start_date'),
                     ])
             )
             ->field(
