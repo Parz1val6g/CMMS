@@ -7,7 +7,7 @@ use App\Core\Enums\TaskStatus;
 use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextAreaInput, SelectInput, DateRangeInput};
 use App\Features\ServiceOrders\Models\ServiceOrder;
-use App\Features\Sectors\Models\Sector;
+use App\Core\Cache\RefCache;
 
 class TaskFormSchema
 {
@@ -111,8 +111,6 @@ class TaskFormSchema
 
     private static function sectorOptions(): array
     {
-        return Sector::orderBy('name')->get(['id', 'name'])
-            ->map(fn($s) => ['value' => $s->id, 'label' => $s->name])
-            ->toArray();
+        return RefCache::sectors();
     }
 }

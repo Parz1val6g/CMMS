@@ -75,15 +75,50 @@ class AvailabilityService
      */
     public function checkBulk(array $items, ?string $excludeLoanOrderId = null): array
     {
+        if (empty($items)) {
+            return [];
+        }
+
+        $equipmentIds = array_unique(array_column($items, 'equipment_id'));
+        $activeStatuses = [LoanOrderStatus::APPROVED->value, LoanOrderStatus::CHECKED_OUT->value];
+
+        // Collect all date ranges per equipment_id keyed for fast lookup
+        $rangesByEquipment = [];
+        foreach ($items as $item) {
+            $rangesByEquipment[$item['equipment_id']][] = [
+                'start' => $item['start_date'],
+                'end'   => $item['end_date'],
+            ];
+        }
+
+        // Single query: load all conflicting loan orders for all equipment IDs at once
+        $conflictingEquipmentIds = LoanOrder::whereIn('status', $activeStatuses)
+            ->when($excludeLoanOrderId, fn($q, $id) => $q->where('id', '!=', $id))
+            ->whereHas('equipments', fn($q) => $q->whereIn('equipments.id', $equipmentIds))
+            ->with(['equipments' => fn($q) => $q
+                ->whereIn('equipments.id', $equipmentIds)
+                ->withPivot(['start_date', 'end_date'])
+            ])
+            ->get()
+            ->flatMap(function ($loan) use ($rangesByEquipment) {
+                return $loan->equipments->filter(function ($eq) use ($rangesByEquipment) {
+                    foreach ($rangesByEquipment[$eq->id] ?? [] as $range) {
+                        if ($eq->pivot->start_date <= $range['end'] && $eq->pivot->end_date >= $range['start']) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })->pluck('id');
+            })
+            ->unique()
+            ->flip()
+            ->toArray();
+
         $results = [];
         foreach ($items as $item) {
-            $results[$item['equipment_id']] = $this->isAvailable(
-                $item['equipment_id'],
-                $item['start_date'],
-                $item['end_date'],
-                $excludeLoanOrderId
-            );
+            $results[$item['equipment_id']] = !isset($conflictingEquipmentIds[$item['equipment_id']]);
         }
+
         return $results;
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Features\Teams\Services;
 
+use App\Core\Cache\RefCache;
 use App\Core\Services\TransactionHandler;
 use App\Features\Teams\Models\Team;
 use App\Features\Workers\Models\Worker;
@@ -18,6 +19,7 @@ class TeamService
     public function create(array $data): Team
     {
         return $this->transactions->execute(function () use ($data) {
+            RefCache::flushTeams();
             $responsibleId = $data['responsible_id'] ?? null;
 
             if ($responsibleId) {
@@ -46,6 +48,7 @@ class TeamService
     public function update(Team $team, array $data): Team
     {
         return $this->transactions->execute(function () use ($team, $data) {
+            RefCache::flushTeams();
             $newResponsibleId = $data['responsible_id'] ?? $team->responsible_id;
 
             if ($newResponsibleId && $newResponsibleId !== $team->responsible_id) {
@@ -60,7 +63,9 @@ class TeamService
     public function delete(Team $team): ?bool
     {
         return $this->transactions->execute(function () use ($team) {
-            return $team->delete();
+            $result = $team->delete();
+            RefCache::flushTeams();
+            return $result;
         });
     }
 

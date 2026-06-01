@@ -4,7 +4,7 @@ namespace App\Features\Materials;
 
 use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextInput, SelectInput, NumberInput};
-use App\Shared\Models\Unit;
+use App\Core\Cache\RefCache;
 
 class MaterialFormSchema
 {
@@ -64,8 +64,6 @@ class MaterialFormSchema
 
     private static function unitOptions(): array
     {
-        return Unit::all()
-            ->map(fn($u) => ['value' => $u->id, 'label' => $u->name . ' (' . $u->abbreviation . ')'])
-            ->toArray();
+        return RefCache::units();
     }
 }

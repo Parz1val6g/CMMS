@@ -2,6 +2,7 @@
 
 namespace App\Features\ServiceTypes\Services;
 
+use App\Core\Cache\RefCache;
 use App\Core\Services\TransactionHandler;
 use App\Features\ServiceTypes\Models\ServiceType;
 
@@ -14,10 +15,12 @@ class ServiceTypeService
     public function create(array $data): ServiceType
     {
         return $this->transactions->execute(function () use ($data) {
-            return ServiceType::create([
+            $serviceType = ServiceType::create([
                 'name' => $data['name'],
                 'description' => $data['description'] ?? null,
             ]);
+            RefCache::flushServiceTypes();
+            return $serviceType;
         });
     }
 
@@ -25,6 +28,7 @@ class ServiceTypeService
     {
         return $this->transactions->execute(function () use ($serviceType, $data) {
             $serviceType->update($data);
+            RefCache::flushServiceTypes();
             return $serviceType;
         });
     }
@@ -32,7 +36,9 @@ class ServiceTypeService
     public function delete(ServiceType $serviceType): ?bool
     {
         return $this->transactions->execute(function () use ($serviceType) {
-            return $serviceType->delete();
+            $result = $serviceType->delete();
+            RefCache::flushServiceTypes();
+            return $result;
         });
     }
 }

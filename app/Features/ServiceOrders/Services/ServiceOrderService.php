@@ -14,6 +14,7 @@ use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\Tasks\Models\Task;
 use App\Features\WorkLogs\Models\WorkLog;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use InvalidArgumentException;
 class ServiceOrderService
 {
@@ -102,6 +103,7 @@ class ServiceOrderService
 
             $fresh->update(['status' => ServiceOrderStatus::IN_PROGRESS->value]);
 
+            Cache::tags(["user:{$fresh->manager_id}"])->flush();
             return $fresh;
         });
     }
@@ -220,6 +222,7 @@ class ServiceOrderService
     {
         return $this->transactions->execute(function () use ($serviceOrder) {
             $serviceOrder->update(['status' => ServiceOrderStatus::AWAITING_APPROVAL->value]);
+            Cache::tags(["user:{$serviceOrder->manager_id}"])->flush();
             return $serviceOrder;
         });
     }
@@ -234,6 +237,7 @@ class ServiceOrderService
         }
         return $this->transactions->execute(function () use ($serviceOrder) {
             $serviceOrder->update(['status' => ServiceOrderStatus::CANCELLED->value]);
+            Cache::tags(["user:{$serviceOrder->manager_id}"])->flush();
             return $serviceOrder;
         });
     }
@@ -288,6 +292,7 @@ class ServiceOrderService
         return $this->transactions->execute(function () use ($serviceOrder) {
             $serviceOrder->update(['status' => ServiceOrderStatus::COMPLETED->value]);
             ServiceOrderCompletedEvent::dispatch($serviceOrder);
+            Cache::tags(["user:{$serviceOrder->manager_id}"])->flush();
             return $serviceOrder;
         });
     }

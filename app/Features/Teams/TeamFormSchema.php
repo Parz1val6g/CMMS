@@ -3,7 +3,7 @@
 namespace App\Features\Teams;
 
 use App\Core\Enums\RoleName;
-use App\Features\Sectors\Models\Sector;
+use App\Core\Cache\RefCache;
 use App\Shared\Models\User;
 use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextInput, SelectInput};
@@ -59,9 +59,7 @@ class TeamFormSchema
 
     private static function sectorOptions(): array
     {
-        return Sector::orderBy('name')->get(['id', 'name'])
-            ->map(fn($s) => ['value' => $s->id, 'label' => $s->name])
-            ->toArray();
+        return RefCache::sectors();
     }
 
     private static function responsibleOptions(): array

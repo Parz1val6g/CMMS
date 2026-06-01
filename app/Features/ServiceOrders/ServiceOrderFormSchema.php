@@ -6,11 +6,9 @@ use App\Core\Enums\Priority;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, FileInput, SectionHeader, MapInput, DateRangeInput};
+use App\Core\Cache\RefCache;
 use App\Core\LocationCascadeOptions;
 use App\Features\Clients\Models\Client;
-use App\Features\Sectors\Models\Sector;
-use App\Features\ServiceTypes\Models\ServiceType;
-use App\Shared\Models\Parish;
 use App\Shared\Models\User;
 
 class ServiceOrderFormSchema
@@ -252,9 +250,7 @@ class ServiceOrderFormSchema
 
     private static function sectorOptions(): array
     {
-        return Sector::orderBy('name')->get(['id', 'name'])
-            ->map(fn($s) => ['value' => $s->id, 'label' => $s->name])
-            ->toArray();
+        return RefCache::sectors();
     }
 
     private static function clientOptions(): array
@@ -271,16 +267,12 @@ class ServiceOrderFormSchema
 
     private static function serviceTypeOptions(): array
     {
-        return ServiceType::orderBy('name')->get(['id', 'name'])
-            ->map(fn($st) => ['value' => $st->id, 'label' => $st->name])
-            ->toArray();
+        return RefCache::serviceTypes();
     }
 
     private static function parishOptions(): array
     {
-        return Parish::orderBy('name')->get(['id', 'name'])
-            ->map(fn($p) => ['value' => $p->id, 'label' => $p->name])
-            ->toArray();
+        return RefCache::parishes();
     }
 
     private static function managerOptions(): array

@@ -8,6 +8,7 @@ use App\Features\Tasks\Events\TaskCompletedEvent;
 use App\Features\Tasks\Models\Task;
 use App\Features\Tasks\Models\TaskRejection;
 use App\Shared\Models\User;
+use Illuminate\Support\Facades\Cache;
 use InvalidArgumentException;
 class TaskService
 {
@@ -65,6 +66,7 @@ class TaskService
     {
         return $this->transactions->execute(function () use ($task) {
             $task->update(['status' => TaskStatus::AWAITING_APPROVAL->value]);
+            Cache::tags(["user:{$task->manager_id}"])->flush();
             return $task;
         });
     }
@@ -79,22 +81,24 @@ class TaskService
         }
         return $this->transactions->execute(function () use ($task) {
             $task->update(['status' => TaskStatus::CANCELLED->value]);
+            Cache::tags(["user:{$task->manager_id}"])->flush();
             return $task;
         });
     }
     public function complete(Task $task): Task
     {
         if ($task->status === TaskStatus::COMPLETED) {
-            return $task; 
+            return $task;
         }
 
         if ($task->status !== TaskStatus::AWAITING_APPROVAL) {
             throw new InvalidArgumentException('Task must be in awaiting approval status to complete.');
         }
-        
+
         return $this->transactions->execute(function () use ($task) {
             $task->update(['status' => TaskStatus::COMPLETED->value]);
             TaskCompletedEvent::dispatch($task);
+            Cache::tags(["user:{$task->manager_id}"])->flush();
             return $task;
         });
     }
@@ -113,6 +117,7 @@ class TaskService
             ]);
 
             $task->update(['status' => TaskStatus::IN_PROGRESS->value]);
+            Cache::tags(["user:{$task->manager_id}"])->flush();
 
             $this->notifications->create(
                 $task->manager_id,

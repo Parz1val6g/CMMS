@@ -4,7 +4,7 @@ namespace App\Features\Workers;
 
 use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextInput, SelectInput, EmailInput, NumberInput};
-use App\Features\Teams\Models\Team;
+use App\Core\Cache\RefCache;
 
 class WorkerFormSchema
 {
@@ -102,8 +102,6 @@ class WorkerFormSchema
 
     private static function teamOptions(): array
     {
-        return Team::orderBy('name')->get(['id', 'name'])
-            ->map(fn($t) => ['value' => $t->id, 'label' => $t->name])
-            ->toArray();
+        return RefCache::teams();
     }
 }

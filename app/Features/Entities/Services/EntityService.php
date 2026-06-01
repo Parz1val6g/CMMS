@@ -2,6 +2,7 @@
 
 namespace App\Features\Entities\Services;
 
+use App\Core\Cache\RefCache;
 use App\Core\Services\TransactionHandler;
 use App\Features\Entities\Models\Entity;
 
@@ -14,7 +15,7 @@ class EntityService
     public function create(array $data): Entity
     {
         return $this->transactions->execute(function () use ($data) {
-            return Entity::create([
+            $entity = Entity::create([
                 'user_id'     => $data['user_id'],
                 'entity_type' => $data['entity_type'],
                 'nif'         => $data['nif'] ?? null,
@@ -22,6 +23,8 @@ class EntityService
                 'phone'       => $data['phone'] ?? null,
                 'location_id' => $data['location_id'] ?? null,
             ]);
+            RefCache::flushEntities();
+            return $entity;
         });
     }
 
@@ -35,6 +38,7 @@ class EntityService
                 $entity->update($updateData);
             }
 
+            RefCache::flushEntities();
             return $entity->fresh();
         });
     }
@@ -43,6 +47,7 @@ class EntityService
     {
         $this->transactions->execute(function () use ($entity) {
             $entity->delete();
+            RefCache::flushEntities();
         });
     }
 }

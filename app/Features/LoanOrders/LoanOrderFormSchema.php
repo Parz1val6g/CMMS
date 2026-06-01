@@ -6,9 +6,8 @@ use App\Core\Enums\EquipmentStatus;
 use App\Core\Enums\LoanOrderStatus;
 use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, SectionHeader, MapInput, ToggleInput, RepeaterInput};
-use App\Features\Entities\Models\Entity;
+use App\Core\Cache\RefCache;
 use App\Features\Equipments\Models\Equipment;
-use App\Shared\Models\Parish;
 use App\Shared\Models\User;
 
 class LoanOrderFormSchema
@@ -349,16 +348,12 @@ class LoanOrderFormSchema
 
     private static function entityOptions(): array
     {
-        return Entity::orderBy('name')->get(['id', 'name'])
-            ->map(fn($e) => ['value' => $e->id, 'label' => $e->name])
-            ->toArray();
+        return RefCache::entities();
     }
 
     private static function parishOptions(): array
     {
-        return Parish::orderBy('name')->get(['id', 'name'])
-            ->map(fn($p) => ['value' => $p->id, 'label' => $p->name])
-            ->toArray();
+        return RefCache::parishes();
     }
 
     private static function managerOptions(): array

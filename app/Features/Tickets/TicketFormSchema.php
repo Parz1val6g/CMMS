@@ -6,8 +6,7 @@ use App\Core\Enums\TicketPriority;
 use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextAreaInput, SelectInput, TextInput, SectionHeader, MapInput};
 use App\Features\Clients\Models\Client;
-use App\Features\ServiceTypes\Models\ServiceType;
-use App\Shared\Models\Parish;
+use App\Core\Cache\RefCache;
 
 class TicketFormSchema
 {
@@ -139,15 +138,11 @@ class TicketFormSchema
 
     private static function serviceTypeOptions(): array
     {
-        return ServiceType::orderBy('name')->get(['id', 'name'])
-            ->map(fn($st) => ['value' => $st->id, 'label' => $st->name])
-            ->toArray();
+        return RefCache::serviceTypes();
     }
 
     private static function parishOptions(): array
     {
-        return Parish::orderBy('name')->get(['id', 'name'])
-            ->map(fn($p) => ['value' => $p->id, 'label' => $p->name])
-            ->toArray();
+        return RefCache::parishes();
     }
 }
