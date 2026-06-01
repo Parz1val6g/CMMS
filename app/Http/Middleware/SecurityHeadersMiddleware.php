@@ -28,7 +28,7 @@ class SecurityHeadersMiddleware
             $response->header('Content-Security-Policy', "default-src *; script-src * 'unsafe-inline' 'unsafe-eval' blob:; style-src * 'unsafe-inline'; img-src * data: blob:; connect-src * ws: wss:; worker-src * blob:;");
         } else {
             // Production: strict CSP
-            $response->header('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.bunny.net; img-src 'self' data: https:; connect-src 'self'");
+            $response->header('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.bunny.net https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://maps.googleapis.com https://maps.gstatic.com; worker-src blob:;");
         }
 
         // Prevent referrer leakage
