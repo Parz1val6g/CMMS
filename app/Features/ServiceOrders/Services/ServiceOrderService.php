@@ -13,13 +13,15 @@ use App\Features\ServiceOrders\Events\ServiceOrderCreatedEvent;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\Tasks\Models\Task;
 use App\Features\WorkLogs\Models\WorkLog;
+use App\Shared\Services\SandboxScanService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use InvalidArgumentException;
 class ServiceOrderService
 {
     public function __construct(
-        private TransactionHandler $transactions
+        private TransactionHandler $transactions,
+        private SandboxScanService $scanner,
     ) {}
     
     public function create(array $data, string $managerId, ?string $createdById = null): ServiceOrder
@@ -42,6 +44,7 @@ class ServiceOrderService
             // 2. Handle photo upload
             $photoPath = null;
             if (isset($data['photo']) && $data['photo'] instanceof UploadedFile) {
+                $this->scanner->scan($data['photo']->getRealPath());
                 $photoPath = $data['photo']->store('service-orders', 'public');
             }
 
@@ -125,6 +128,7 @@ class ServiceOrderService
             ])->toArray();
 
             if (isset($data['photo']) && $data['photo'] instanceof UploadedFile) {
+                $this->scanner->scan($data['photo']->getRealPath());
                 $soFields['photo_path'] = $data['photo']->store('service-orders', 'public');
             }
 

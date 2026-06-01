@@ -10,15 +10,8 @@ use InvalidArgumentException;
 
 class AttachmentService
 {
-    /**
-     * Upload and attach a file to any attachable entity.
-     *
-     * @param  UploadedFile       $file
-     * @param  string|null        $attachableType  Morph type (ServiceOrder::class, MiniTask::class, Equipment::class)
-     * @param  string|null        $attachableId    Morph ID
-     * @param  string|null        $equipmentId     Direct FK to equipment (optional, for convenience)
-     * @return Attachment
-     */
+    public function __construct(private SandboxScanService $scanner) {}
+
     public function upload(
         UploadedFile $file,
         ?string $attachableType = null,
@@ -28,6 +21,8 @@ class AttachmentService
         if (($attachableType && !$attachableId) || (!$attachableType && $attachableId)) {
             throw new InvalidArgumentException('Both attachable_type and attachable_id must be provided together.');
         }
+
+        $this->scanner->scan($file->getRealPath());
 
         $short = $attachableType ? class_basename($attachableType) : 'orphan';
         $folder = $equipmentId ? "equipment/{$equipmentId}" : Str::plural(strtolower($short)) . "/{$attachableId}";
