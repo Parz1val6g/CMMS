@@ -2,42 +2,33 @@
 
 namespace App\Shared\Services;
 
+use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class SandboxScanService
 {
-    private string $binaryPath;
+    private string $url;
 
     public function __construct()
     {
-        $this->binaryPath = env('SANDBOX_BINARY_PATH', '/var/www/sandbox/sandbox/sandbox_engine');
+        $this->url = env('SANDBOX_SCANNER_URL', 'http://scanner:8765/scan');
     }
 
     public function scan(string $filePath): void
     {
-        if (!is_executable($this->binaryPath)) {
+        if (!env('SANDBOX_ENABLED', false)) {
             return;
         }
 
-        $descriptors = [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
-        ];
+        $response = Http::timeout(35)
+            ->withBody(file_get_contents($filePath), 'application/octet-stream')
+            ->post($this->url);
 
-        $process = proc_open([$this->binaryPath, $filePath], $descriptors, $pipes);
-
-        if (!is_resource($process)) {
-            throw new \RuntimeException('Failed to launch sandbox scanner.');
+        if ($response->failed()) {
+            throw new \RuntimeException('Sandbox scanner unreachable.');
         }
 
-        fclose($pipes[0]);
-        $stdout = stream_get_contents($pipes[1]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        proc_close($process);
-
-        $result = json_decode($stdout, true);
+        $result = $response->json();
 
         if (!$result || !isset($result['status'])) {
             throw new \RuntimeException('Sandbox scanner returned invalid output.');
