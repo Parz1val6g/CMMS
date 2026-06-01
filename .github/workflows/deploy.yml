@@ -23,8 +23,8 @@ jobs:
             cd /var/www/CMMS
 
             echo "--- pull ---"
-            git reset --hard
-            git pull origin main
+            git fetch origin
+            git reset --hard origin/main
 
             echo "--- composer ---"
             docker exec cmms_app composer install \
