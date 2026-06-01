@@ -39,8 +39,10 @@ jobs:
             docker exec cmms_app php artisan config:cache
             docker exec cmms_app php artisan route:cache
             docker exec cmms_app php artisan view:cache
+            docker exec cmms_app php artisan event:cache
 
-            echo "--- reload php-fpm ---"
-            docker exec cmms_app kill -USR2 1
+            echo "--- restart php-fpm ---"
+            docker restart cmms_app
+            sleep 3
 
             echo "--- done ---"
