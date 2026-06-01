@@ -22,17 +22,18 @@ class WorkLogSeeder extends Seeder
      */
     public function run(): void
     {
-        $miniTasks = MiniTask::all();
-        $workers = Worker::all();
-        $materials = Material::all();
-        $admin = User::whereHas('roles', fn($q) => $q->where('name', 'admin'))->first();
-        $manager = User::whereHas('roles', fn($q) => $q->where('name', 'manager'))->first();
+        $miniTasks   = MiniTask::all();
+        $workers     = Worker::all();
+        $materials   = Material::all();
+        $taskManager = User::whereHas('roles', fn($q) => $q->where('name', 'task_manager'))->first();
+        $manager     = User::whereHas('roles', fn($q) => $q->where('name', 'manager'))->first();
 
         if ($miniTasks->isEmpty() || $workers->isEmpty()) {
             return;
         }
 
-        $reviewerPool = collect(array_filter([$admin, $manager]));
+        // Per UC1, work log approval is the task_manager's responsibility
+        $reviewerPool = collect(array_filter([$taskManager, $manager]));
 
         $workLogDescriptions = [
             'Execução dos trabalhos conforme planeado e dentro do prazo estipulado',
@@ -133,10 +134,11 @@ class WorkLogSeeder extends Seeder
 
         foreach ($assignedWorkers as $worker) {
             DB::table('work_logs_workers')->insert([
-                'work_log_id' => $workLog->id,
-                'worker_id'   => $worker->id,
-                'created_at'  => $startedAt,
-                'updated_at'  => $startedAt,
+                'work_log_id'  => $workLog->id,
+                'worker_id'    => $worker->id,
+                'cost_per_hour'=> $worker->cost_per_hour ?? 0.00,
+                'created_at'   => $startedAt,
+                'updated_at'   => $startedAt,
             ]);
         }
     }

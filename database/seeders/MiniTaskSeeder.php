@@ -15,52 +15,52 @@ class MiniTaskSeeder extends Seeder
 {
     /**
      * Create mini-tasks covering every MiniTaskStatus.
-     * Each mini-task gets deterministic resource assignments.
+     * supervisor_id points to the task_manager (Gestor de Tarefa) per UC1.
      */
     public function run(): void
     {
-        $tasks = Task::all();
-        $supervisor = User::whereHas('roles', fn($q) => $q->where('name', 'supervisor'))->first();
-        $manager = User::whereHas('roles', fn($q) => $q->where('name', 'manager'))->first();
-        $workers = Worker::all();
-        $teams = Team::all();
+        $tasks       = Task::all();
+        $taskManager = User::whereHas('roles', fn($q) => $q->where('name', 'task_manager'))->first();
+        $manager     = User::whereHas('roles', fn($q) => $q->where('name', 'manager'))->first();
+        $workers     = Worker::all();
+        $teams       = Team::all();
 
-        if ($tasks->isEmpty() || (!$supervisor && !$manager)) {
+        if ($tasks->isEmpty() || (!$taskManager && !$manager)) {
             return;
         }
 
-        $supervisorId = $supervisor?->id ?? $manager->id;
+        $supervisorId = $taskManager?->id ?? $manager->id;
 
         $miniTaskPool = [
             'Transportar materiais e equipamentos para o local de intervenção',
-            'Preparar e organizar a zona de trabalho com delimitação de segurança',
-            'Executar corte e demolição necessária conforme especificações técnicas',
-            'Aplicar camada de base e nivelamento para preparação da superfície',
-            'Realizar medições e marcações de acordo com o projeto',
-            'Efetuar ligações elétricas e testes de continuidade',
-            'Testar funcionamento do sistema e verificar parâmetros',
+            'Preparar e delimitar a zona de trabalho com sinalização de segurança',
+            'Executar corte e demolição conforme especificações técnicas do projeto',
+            'Aplicar camada de base e proceder ao nivelamento da superfície',
+            'Realizar medições e marcações de acordo com o projeto aprovado',
+            'Efetuar ligações e testes de funcionamento do sistema instalado',
             'Instalar equipamentos e acessórios conforme manual técnico',
-            'Efetuar reparação localizada de danos identificados',
-            'Fazer limpeza final da área e remoção de resíduos',
+            'Verificar parâmetros e validar conformidade com as especificações',
+            'Efetuar reparação localizada dos danos identificados na inspeção',
+            'Fazer limpeza final da área e remoção de resíduos de obra',
         ];
 
         /**
-         * For each task status, we create mini-tasks that represent valid child states.
-         * This ensures every MiniTaskStatus appears at least once.
+         * UC1 mini-task statuses: pending, in_progress, completed.
+         * Maps each task status to a realistic set of child mini-task statuses.
          */
         $statusMap = [
-            TaskStatus::PENDING->value     => [MiniTaskStatus::PENDING],
-            TaskStatus::IN_PROGRESS->value => [MiniTaskStatus::COMPLETED, MiniTaskStatus::IN_PROGRESS, MiniTaskStatus::PENDING],
-            TaskStatus::COMPLETED->value   => [MiniTaskStatus::COMPLETED, MiniTaskStatus::COMPLETED, MiniTaskStatus::COMPLETED],
-            TaskStatus::BLOCKED->value     => [MiniTaskStatus::BLOCKED, MiniTaskStatus::PENDING],
-            TaskStatus::CANCELLED->value   => [MiniTaskStatus::CANCELLED],
+            TaskStatus::PENDING->value            => [MiniTaskStatus::PENDING],
+            TaskStatus::IN_PROGRESS->value        => [MiniTaskStatus::COMPLETED, MiniTaskStatus::IN_PROGRESS, MiniTaskStatus::PENDING],
+            TaskStatus::AWAITING_APPROVAL->value  => [MiniTaskStatus::COMPLETED, MiniTaskStatus::COMPLETED, MiniTaskStatus::COMPLETED],
+            TaskStatus::COMPLETED->value          => [MiniTaskStatus::COMPLETED, MiniTaskStatus::COMPLETED, MiniTaskStatus::COMPLETED],
+            TaskStatus::CANCELLED->value          => [MiniTaskStatus::CANCELLED],
         ];
 
         foreach ($tasks as $task) {
             $mStatuses = $statusMap[$task->status->value] ?? [MiniTaskStatus::PENDING];
 
             foreach ($mStatuses as $i => $mStatus) {
-                $desc = $miniTaskPool[$i] ?? $miniTaskPool[array_rand($miniTaskPool)];
+                $desc      = $miniTaskPool[$i] ?? $miniTaskPool[array_rand($miniTaskPool)];
                 $createdAt = (clone $task->created_at)->modify('+' . ($i + 1) . ' days');
 
                 $miniTask = MiniTask::create([
@@ -79,16 +79,14 @@ class MiniTaskSeeder extends Seeder
 
     private function assignResources(MiniTask $miniTask, $workers, $teams): void
     {
-        // Alternate: odd-indexed mini-tasks get workers, even-indexed get teams
-        $assignWorkers = $miniTask->status === MiniTaskStatus::COMPLETED->value || (bool)($miniTask->id && ord($miniTask->id[0]) % 2 === 0);
+        $assignWorkers = $miniTask->status === MiniTaskStatus::COMPLETED->value
+            || (bool)($miniTask->id && ord($miniTask->id[0]) % 2 === 0);
 
         if ($assignWorkers && $workers->isNotEmpty()) {
             $numWorkers = min(3, $workers->count());
-            $assignedWorkers = $workers->random($numWorkers);
-            $miniTask->workers()->sync($assignedWorkers->pluck('id')->toArray());
+            $miniTask->workers()->sync($workers->random($numWorkers)->pluck('id')->toArray());
         } elseif ($teams->isNotEmpty()) {
-            $assignedTeam = $teams->random();
-            $miniTask->teams()->sync([$assignedTeam->id]);
+            $miniTask->teams()->sync([$teams->random()->id]);
         }
     }
 }

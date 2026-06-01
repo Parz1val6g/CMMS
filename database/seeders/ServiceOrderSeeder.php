@@ -28,6 +28,7 @@ class ServiceOrderSeeder extends Seeder
         $clients      = Client::with('clientLocations')->get();
         $admin        = User::whereHas('roles', fn($q) => $q->where('name', 'admin'))->first();
         $manager      = User::whereHas('roles', fn($q) => $q->where('name', 'manager'))->first();
+        $attendant    = User::whereHas('roles', fn($q) => $q->where('name', 'attendant'))->first();
         $locations    = Location::whereDoesntHave('clientLocations')->get(); // standalone SO locations
         $serviceTypes = ServiceType::all();
         $sectors      = Sector::all();
@@ -54,22 +55,22 @@ class ServiceOrderSeeder extends Seeder
          */
         $orders = [
             // ── Standard workflow — all statuses × all priorities ──
-            ['status' => SOStatus::PENDING,     'priority' => Priority::LOW,     'manager' => $manager, 'st' => 'Aprovação de Projetos',   'desc' => 'Análise de projeto de construção civil para edifício habitacional de 4 pisos',                          'cl' => null],
-            ['status' => SOStatus::PENDING,     'priority' => Priority::NORMAL,  'manager' => $manager, 'st' => 'Emissão de Licenças',     'desc' => 'Processamento de licença comercial para novo estabelecimento na Rua Direita',                          'cl' => $primaryLocation],
-            ['status' => SOStatus::IN_PROGRESS, 'priority' => Priority::HIGH,    'manager' => $admin,   'st' => 'Iluminação Pública',     'desc' => 'Substituição de luminárias fundidas na Av. Principal por LED de baixo consumo',                          'cl' => $secondaryLocation],
-            ['status' => SOStatus::IN_PROGRESS, 'priority' => Priority::URGENT,  'manager' => $admin,   'st' => 'Abastecimento de Água',  'desc' => 'Reparação de rotura na conduta principal de água com escavação e soldadura urgente',                    'cl' => $primaryLocation],
-            ['status' => SOStatus::COMPLETED,   'priority' => Priority::NORMAL,  'manager' => $manager, 'st' => 'Pavimentação',            'desc' => 'Reparação de piso danificado na Rua Nova com aplicação de nova camada de asfalto',                       'cl' => null],
-            ['status' => SOStatus::COMPLETED,   'priority' => Priority::HIGH,    'manager' => $admin,   'st' => 'Sinalização de Trânsito', 'desc' => 'Pintura de passadeiras na Av. Central com tinta termoplástica — concluída',                            'cl' => null],
-            ['status' => SOStatus::CANCELLED,   'priority' => Priority::LOW,     'manager' => $manager, 'st' => 'Vistoria de Imóveis',     'desc' => 'Vistoria para licença de habitação cancelada por falta de documentação',                               'cl' => null],
-            ['status' => SOStatus::CANCELLED,   'priority' => Priority::NORMAL,  'manager' => $admin,   'st' => 'Limpeza Urbana',          'desc' => 'Limpeza extraordinária cancelada devido a condições meteorológicas adversas',                          'cl' => null],
-            // ── Standard — additional edge cases ──
-            ['status' => SOStatus::IN_PROGRESS, 'priority' => Priority::LOW,     'manager' => $manager, 'st' => 'Manutenção de Jardins',  'desc' => 'Manutenção de canteiros na Praça Municipal com corte de ervas e fertilização',                         'cl' => $secondaryLocation],
-            ['status' => SOStatus::PENDING,     'priority' => Priority::URGENT,  'manager' => $admin,   'st' => 'Saneamento',             'desc' => 'Desobstrução urgente de coletor entupido na Rua do Mercado',                                           'cl' => null],
+            ['status' => SOStatus::PENDING,            'priority' => Priority::LOW,     'manager' => $manager, 'st' => 'Aprovação de Projetos',   'desc' => 'Análise de projeto de construção civil para edifício habitacional de 4 pisos na Rua da Igreja',          'cl' => null],
+            ['status' => SOStatus::PENDING,            'priority' => Priority::NORMAL,  'manager' => $manager, 'st' => 'Emissão de Licenças',     'desc' => 'Processamento de licença comercial para novo estabelecimento na Rua Direita, Mangualde',                  'cl' => $primaryLocation],
+            ['status' => SOStatus::IN_PROGRESS,        'priority' => Priority::HIGH,    'manager' => $admin,   'st' => 'Iluminação Pública',      'desc' => 'Substituição de luminárias fundidas na Avenida dos Combatentes por LED de baixo consumo',                  'cl' => $secondaryLocation],
+            ['status' => SOStatus::IN_PROGRESS,        'priority' => Priority::URGENT,  'manager' => $admin,   'st' => 'Abastecimento de Água',   'desc' => 'Reparação de rotura na conduta principal de água na Rua do Mercado — intervenção urgente',                'cl' => $primaryLocation],
+            ['status' => SOStatus::AWAITING_APPROVAL,  'priority' => Priority::NORMAL,  'manager' => $manager, 'st' => 'Pavimentação',            'desc' => 'Reparação de pavimento danificado na Rua da Paz — trabalhos concluídos, aguarda revisão do gestor',      'cl' => null],
+            ['status' => SOStatus::COMPLETED,          'priority' => Priority::HIGH,    'manager' => $admin,   'st' => 'Sinalização de Trânsito', 'desc' => 'Pintura de passadeiras na Avenida dos Combatentes com tinta termoplástica — concluída e aprovada',       'cl' => null],
+            ['status' => SOStatus::CANCELLED,          'priority' => Priority::LOW,     'manager' => $manager, 'st' => 'Vistoria de Imóveis',     'desc' => 'Vistoria para licença de habitação cancelada por falta de documentação pelo requerente',                 'cl' => null],
+            ['status' => SOStatus::CANCELLED,          'priority' => Priority::NORMAL,  'manager' => $admin,   'st' => 'Limpeza Urbana',          'desc' => 'Limpeza extraordinária na Praça do Município cancelada por condições meteorológicas adversas',           'cl' => null],
+            // ── Standard — additional coverage ──
+            ['status' => SOStatus::IN_PROGRESS,        'priority' => Priority::LOW,     'manager' => $manager, 'st' => 'Manutenção de Jardins',   'desc' => 'Manutenção de canteiros no Jardim Público com corte de relva e fertilização dos arbustos',              'cl' => $secondaryLocation],
+            ['status' => SOStatus::PENDING,            'priority' => Priority::URGENT,  'manager' => $admin,   'st' => 'Saneamento Básico',       'desc' => 'Desobstrução urgente de coletor entupido na Rua do Mercado após colapso da tampa',                      'cl' => null],
             // ── Loan workflow ──
-            ['status' => SOStatus::PENDING,     'priority' => Priority::NORMAL,  'manager' => $manager, 'st' => null, 'desc' => 'Pedido de empréstimo de compressor Atlas Copco para obra na Zona Industrial',    'cl' => $primaryLocation,  'loan' => true],
-            ['status' => SOStatus::IN_PROGRESS, 'priority' => Priority::HIGH,    'manager' => $admin,   'st' => null, 'desc' => 'Empréstimo de martelo pneumático Bosch para demolição em obra municipal',       'cl' => $secondaryLocation, 'loan' => true],
-            ['status' => SOStatus::COMPLETED,   'priority' => Priority::NORMAL,  'manager' => $manager, 'st' => null, 'desc' => 'Devolução de bomba de água Diesel após período de empréstimo de 15 dias',       'cl' => null,               'loan' => true],
-            ['status' => SOStatus::CANCELLED,   'priority' => Priority::LOW,     'manager' => $admin,   'st' => null, 'desc' => 'Pedido de empréstimo cancelado por desistência do requerente',                   'cl' => null,               'loan' => true],
+            ['status' => SOStatus::PENDING,     'priority' => Priority::NORMAL,  'manager' => $manager, 'st' => null, 'desc' => 'Pedido de empréstimo de compressor Atlas Copco para obra na Zona Industrial de Mangualde', 'cl' => $primaryLocation,  'loan' => true],
+            ['status' => SOStatus::IN_PROGRESS, 'priority' => Priority::HIGH,    'manager' => $admin,   'st' => null, 'desc' => 'Empréstimo de martelo pneumático para demolição em obra municipal na Rua Direita',    'cl' => $secondaryLocation, 'loan' => true],
+            ['status' => SOStatus::COMPLETED,   'priority' => Priority::NORMAL,  'manager' => $manager, 'st' => null, 'desc' => 'Devolução de bomba de água Diesel após período de empréstimo de 15 dias — concluído',  'cl' => null,               'loan' => true],
+            ['status' => SOStatus::CANCELLED,   'priority' => Priority::LOW,     'manager' => $admin,   'st' => null, 'desc' => 'Pedido de empréstimo de vibrador de placas cancelado por desistência do requerente',   'cl' => null,               'loan' => true],
         ];
 
         $counter = 0;
@@ -81,10 +82,11 @@ class ServiceOrderSeeder extends Seeder
 
             $createdAt = (clone $twoMonthsAgo)->modify('+' . (($counter - 1) * 4) . ' days');
             $endDate = match ($def['status']) {
-                SOStatus::COMPLETED   => (clone $createdAt)->modify('+5 days'),
-                SOStatus::IN_PROGRESS => (clone $createdAt)->modify('+2 days'),
-                SOStatus::PENDING     => (clone $createdAt)->modify('+30 days'),
-                SOStatus::CANCELLED   => (clone $createdAt)->modify('+10 days'),
+                SOStatus::COMPLETED          => (clone $createdAt)->modify('+5 days'),
+                SOStatus::AWAITING_APPROVAL  => (clone $createdAt)->modify('+4 days'),
+                SOStatus::IN_PROGRESS        => (clone $createdAt)->modify('+2 days'),
+                SOStatus::PENDING            => (clone $createdAt)->modify('+30 days'),
+                SOStatus::CANCELLED          => (clone $createdAt)->modify('+10 days'),
             };
 
             // Resolve client: prefer the one whose client location is being used
@@ -116,6 +118,7 @@ class ServiceOrderSeeder extends Seeder
                 'client_id'          => $client->id,
                 'client_location_id' => $def['cl']?->id,
                 'manager_id'         => $def['manager']->id,
+                'created_by'         => $attendant?->id,
                 'location_id'        => $locationId,
                 'service_type_id'    => $serviceType?->id,
                 'priority'           => $def['priority']->value,

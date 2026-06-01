@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Core\Enums\ServiceOrderStatus as SOStatus;
+use App\Core\Enums\MiniTaskStatus;
 use App\Core\Enums\Priority;
 use App\Core\Enums\TaskStatus;
+use App\Core\Enums\WorkLogStatus;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\Tasks\Models\Task;
 use App\Features\MiniTasks\Models\MiniTask;
@@ -54,13 +56,14 @@ class DevelopmentTestSeeder extends Seeder
     public function run(): void
     {
         // ── Bail if reference data is missing ──
-        $client = Client::inRandomOrder()->first();
-        $manager = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'manager']))->inRandomOrder()->first();
-        $location = Location::inRandomOrder()->first();
-        $workers = Worker::inRandomOrder()->take(4)->get();
-        $materials = Material::inRandomOrder()->take(4)->get();
+        $client      = Client::inRandomOrder()->first();
+        $manager     = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'manager']))->inRandomOrder()->first();
+        $taskManager = User::whereHas('roles', fn($q) => $q->where('name', 'task_manager'))->first() ?? $manager;
+        $location    = Location::inRandomOrder()->first();
+        $workers     = Worker::inRandomOrder()->take(4)->get();
+        $materials   = Material::inRandomOrder()->take(4)->get();
         $loanableEquipments = Equipment::where('is_loanable', true)->inRandomOrder()->take(2)->get();
-        $reviewer = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'manager']))->inRandomOrder()->first();
+        $reviewer    = $taskManager;
 
         if (!$client || !$manager || !$location || $workers->count() < 2 || $materials->count() < 2 || $loanableEquipments->count() < 1 || !$reviewer) {
             $this->command->error('❌ Missing reference data. Run DatabaseSeeder first.');
@@ -159,7 +162,7 @@ class DevelopmentTestSeeder extends Seeder
 
                 $mt = MiniTask::create([
                     'task_id'       => $task->id,
-                    'supervisor_id' => $manager->id,
+                    'supervisor_id' => $taskManager->id,
                     'description'   => $desc,
                     'status'        => $statuses[$i]->value,
                 ]);
