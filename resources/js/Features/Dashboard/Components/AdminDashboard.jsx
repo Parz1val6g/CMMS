@@ -1,5 +1,6 @@
 import { Users, Shield, UserPlus } from 'lucide-react';
 import KpiCard from '@/Components/Common/KpiCard';
+import DateDisplay from '@/Components/Common/DateDisplay';
 import RefreshIndicator from './RefreshIndicator';
 
 export default function AdminDashboard({ kpis, recentUsers = [], countdown, onRefresh }) {
@@ -40,7 +41,7 @@ export default function AdminDashboard({ kpis, recentUsers = [], countdown, onRe
                   <p className="text-xs text-brand-mid truncate">{u.email}</p>
                 </div>
                 <span className="text-xs text-brand-mid shrink-0">{u.roles}</span>
-                <span className="text-xs text-brand-mid shrink-0 tabular-nums">{u.created_at}</span>
+                <span className="text-xs text-brand-mid shrink-0 tabular-nums"><DateDisplay value={u.created_at} relative /></span>
               </div>
             ))
           )}

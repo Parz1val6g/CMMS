@@ -1,5 +1,6 @@
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
 import BaseField from '@/Components/Shared/Drawer/BaseField';
+import DateDisplay from '@/Components/Common/DateDisplay';
 import { t } from '@/utils/i18n';
 
 function StatusBadge({ status }) {
@@ -33,16 +34,7 @@ function SectionTitle({ children }) {
     );
 }
 
-function formatDate(dateStr) {
-    if (!dateStr) return null;
-    return new Date(dateStr + 'T00:00:00').toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
-
 function GeneralTab({ item }) {
-    const createdAt = item.created_at
-        ? new Date(item.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
-        : null;
-
     return (
         <div className="grid grid-cols-2 gap-6">
             <BaseField label={t('pages.mini_tasks.drawer.field_task')}>
@@ -52,13 +44,13 @@ function GeneralTab({ item }) {
                 {item.supervisor?.name ?? null}
             </BaseField>
             <BaseField label={t('pages.mini_tasks.drawer.field_start_date')}>
-                {formatDate(item.start_date)}
+                <DateDisplay value={item.start_date} />
             </BaseField>
             <BaseField label={t('pages.mini_tasks.drawer.field_end_date')}>
-                {formatDate(item.end_date)}
+                <DateDisplay value={item.end_date} />
             </BaseField>
             <BaseField label={t('pages.mini_tasks.drawer.field_created_at')}>
-                {createdAt}
+                <DateDisplay value={item.created_at} />
             </BaseField>
             <div className="col-span-2">
                 <BaseField label={t('pages.mini_tasks.drawer.field_description')}>

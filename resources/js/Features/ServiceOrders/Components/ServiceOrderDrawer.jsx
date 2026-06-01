@@ -5,6 +5,7 @@ import { Check, ExternalLink, Play } from 'lucide-react';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
 import BaseField from '@/Components/Shared/Drawer/BaseField';
 import LocationMap from '@/Components/Shared/LocationMap';
+import DateDisplay from '@/Components/Common/DateDisplay';
 import { t } from '@/utils/i18n';
 import { csrfHeader } from '@/utils/csrf';
 
@@ -88,25 +89,13 @@ function ConfirmDialog({ open, onConfirm, onCancel, loading, error }) {
 }
 
 function DetailTab({ order }) {
-  const createdAt = order?.created_at
-    ? new Date(order.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
-    : null;
-
-  const startDate = order?.start_date
-    ? new Date(order.start_date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
-    : null;
-
-  const endDate = order?.end_date
-    ? new Date(order.end_date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
-    : null;
-
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-x-6 gap-y-5">
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_manager')}>{order?.manager?.name}</BaseField>
-        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_created_at')}>{createdAt}</BaseField>
-        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_start_date')}>{startDate}</BaseField>
-        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_end_date')}>{endDate}</BaseField>
+        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_created_at')}><DateDisplay value={order?.created_at} /></BaseField>
+        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_start_date')}><DateDisplay value={order?.start_date} /></BaseField>
+        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_end_date')}><DateDisplay value={order?.end_date} /></BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_service_type')}>{order?.service_type?.name}</BaseField>
       </div>
 

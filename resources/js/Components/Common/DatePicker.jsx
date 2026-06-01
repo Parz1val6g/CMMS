@@ -219,6 +219,8 @@ export default function DatePicker({
   maxDate,
   label,
   name,
+  startName,
+  endName,
   error,
   required,
 }) {
@@ -592,8 +594,8 @@ export default function DatePicker({
       )}
       {mode !== 'single' && (
         <>
-          <input type="hidden" name={name ? `${name}_start` : undefined} value={startKey ?? ''} readOnly />
-          <input type="hidden" name={name ? `${name}_end`   : undefined} value={endKey   ?? ''} readOnly />
+          <input type="hidden" name={startName || (name ? `${name}_start` : undefined)} value={startKey ?? ''} readOnly />
+          <input type="hidden" name={endName   || (name ? `${name}_end`   : undefined)} value={endKey   ?? ''} readOnly />
         </>
       )}
 

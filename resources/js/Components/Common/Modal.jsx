@@ -63,6 +63,17 @@ function collectFormData(form, fields, formValues) {
     } else if (f.type === 'checkbox' || f.type === 'toggle') {
       // Boolean toggles use React state — DOM el.value is always "on"/"off"
       data[name] = formValues[name] ?? false;
+    } else if (f.type === 'date-picker' && (f.dateMode === 'range' || f.metadata?.dateMode === 'range')) {
+      const startFieldName = f.metadata?.startName ?? f.startName ?? `${name}_start`;
+      const endFieldName   = f.metadata?.endName   ?? f.endName   ?? `${name}_end`;
+      const rangeVal = formValues[name];
+      if (rangeVal && typeof rangeVal === 'object') {
+        data[startFieldName] = rangeVal.start ?? '';
+        data[endFieldName]   = rangeVal.end   ?? '';
+      } else {
+        data[startFieldName] = form.elements[startFieldName]?.value ?? '';
+        data[endFieldName]   = form.elements[endFieldName]?.value   ?? '';
+      }
     } else {
       const el = form.elements[name];
       if (!el) return;

@@ -421,6 +421,8 @@ export default function FormField({ field, value = '', error, onChange, lockedVa
         maxDate={meta.maxDate ?? field.max ?? undefined}
         label={label}
         name={field.name ?? field.key}
+        startName={meta.startName ?? field.startName ?? undefined}
+        endName={meta.endName ?? field.endName ?? undefined}
         error={error}
         required={field.required}
       />

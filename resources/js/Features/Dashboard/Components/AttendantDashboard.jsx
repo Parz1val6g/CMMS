@@ -1,5 +1,6 @@
 import { ClipboardList, Ticket, Plus } from 'lucide-react';
 import KpiCard from '@/Components/Common/KpiCard';
+import DateDisplay from '@/Components/Common/DateDisplay';
 import PeriodFilter from './PeriodFilter';
 import RefreshIndicator from './RefreshIndicator';
 
@@ -75,7 +76,7 @@ export default function AttendantDashboard({ kpis, recentOrders = [], period, on
                 <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide shrink-0 ${PRIORITY_COLOR[o.priority] ?? ''}`}>
                   {o.priority}
                 </span>
-                <span className="text-xs text-brand-mid shrink-0 tabular-nums">{o.created_at}</span>
+                <span className="text-xs text-brand-mid shrink-0 tabular-nums"><DateDisplay value={o.created_at} relative /></span>
               </div>
             ))
           )}

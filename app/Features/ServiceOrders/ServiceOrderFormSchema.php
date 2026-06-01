@@ -5,7 +5,7 @@ namespace App\Features\ServiceOrders;
 use App\Core\Enums\Priority;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Forms\FormSchema;
-use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, FileInput, SectionHeader, MapInput};
+use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, FileInput, SectionHeader, MapInput, DateRangeInput};
 use App\Core\LocationCascadeOptions;
 use App\Features\Clients\Models\Client;
 use App\Features\Sectors\Models\Sector;
@@ -31,18 +31,12 @@ class ServiceOrderFormSchema
                     ->setRules('nullable|string|max:2000')
             )
             ->field(
-                TextInput::make('start_date')
+                DateRangeInput::make('date_range')
                     ->setLabel(__('forms.service_orders.start_date'))
-                    ->setType('date-picker')
                     ->setRequired()
+                    ->setStartName('start_date')
+                    ->setEndName('end_date')
                     ->setRules('required|date')
-            )
-            ->field(
-                TextInput::make('end_date')
-                    ->setLabel(__('forms.service_orders.end_date'))
-                    ->setType('date-picker')
-                    ->setRequired()
-                    ->setRules('required|date|after_or_equal:start_date')
             )
             ->field(
                 SelectInput::make('sector_ids')
@@ -196,16 +190,11 @@ class ServiceOrderFormSchema
                     ->setRules('sometimes|string')
             )
             ->field(
-                TextInput::make('start_date')
+                DateRangeInput::make('date_range')
                     ->setLabel(__('forms.service_orders.start_date'))
-                    ->setType('date-picker')
+                    ->setStartName('start_date')
+                    ->setEndName('end_date')
                     ->setRules('nullable|date')
-            )
-            ->field(
-                TextInput::make('end_date')
-                    ->setLabel(__('forms.service_orders.end_date'))
-                    ->setType('date-picker')
-                    ->setRules('nullable|date|after_or_equal:start_date')
             )
             // ── Photo ──
             ->field(

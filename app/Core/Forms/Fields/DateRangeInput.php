@@ -34,4 +34,14 @@ class DateRangeInput extends FormField
     {
         return $this->meta('maxDate', $date);
     }
+
+    public function setStartName(string $name): static
+    {
+        return $this->meta('startName', $name);
+    }
+
+    public function setEndName(string $name): static
+    {
+        return $this->meta('endName', $name);
+    }
 }

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { router } from '@inertiajs/react';
 import BaseField from '@/Components/Shared/Drawer/BaseField';
+import DateRange from '@/Components/Common/DateRange';
 import { t } from '@/utils/i18n';
 import { labelFor } from '@/utils/enums';
 import { formatDate } from '@/utils/format';
@@ -137,10 +138,9 @@ function EquipmentCard({ eq }) {
           {eq.serial_number || '—'}
         </span>
         {eq.start_date && (
-          <span>
-            <span className="text-gray-400">{t('pages.loan_orders.period_label')}</span>{' '}
-            {formatDate(eq.start_date)}
-            {eq.end_date && ` — ${formatDate(eq.end_date)}`}
+          <span className="inline-flex items-center gap-1">
+            <span className="text-gray-400">{t('pages.loan_orders.period_label')}</span>
+            <DateRange start={eq.start_date} end={eq.end_date || undefined} className="text-xs" />
           </span>
         )}
       </div>

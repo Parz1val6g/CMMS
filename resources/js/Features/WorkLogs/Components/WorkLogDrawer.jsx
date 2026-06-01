@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
 import BaseField from '@/Components/Shared/Drawer/BaseField';
+import DateDisplay from '@/Components/Common/DateDisplay';
 import { t } from '@/utils/i18n';
 
 function StatusBadge({ status }) {
@@ -34,13 +35,6 @@ function SectionTitle({ children }) {
     );
 }
 
-function formatDateTime(iso) {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleString('pt-PT', {
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit',
-    });
-}
 
 function formatDuration(minutes) {
     if (minutes == null) return '—';
@@ -74,17 +68,13 @@ function ElapsedTimer({ startedAt }) {
 }
 
 function GeneralTab({ item }) {
-    const createdAt = item.created_at
-        ? new Date(item.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
-        : null;
-
     return (
         <div className="grid grid-cols-2 gap-6">
             <BaseField label={t('pages.work_logs.drawer.field_mini_task')}>
                 <span className="font-mono text-brand-accent">{item.mini_task?.reference ?? null}</span>
             </BaseField>
             <BaseField label={t('pages.work_logs.drawer.field_created_at')}>
-                {createdAt}
+                <DateDisplay value={item.created_at} />
             </BaseField>
             <div className="col-span-2">
                 <BaseField label={t('pages.work_logs.drawer.field_description')}>
@@ -167,10 +157,10 @@ function TimeTab({ startedAt, completedAt, durationMinutes }) {
         <div className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
                 <BaseField label={t('pages.work_logs.drawer.field_start')}>
-                    {formatDateTime(startedAt)}
+                    <DateDisplay value={startedAt} showTime />
                 </BaseField>
                 <BaseField label={t('pages.work_logs.drawer.field_end')}>
-                    {isFinished ? formatDateTime(completedAt) : <span className="text-amber-400 text-sm">{t('pages.work_logs.drawer.in_progress_label')}</span>}
+                    {isFinished ? <DateDisplay value={completedAt} showTime /> : <span className="text-amber-400 text-sm">{t('pages.work_logs.drawer.in_progress_label')}</span>}
                 </BaseField>
             </div>
 

@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
+import DateDisplay from '@/Components/Common/DateDisplay';
 import { t } from '@/utils/i18n';
 import { labelFor, badgeStyle } from '@/utils/enums';
 
@@ -89,7 +90,7 @@ export default function EntityDashboard({ entity, loan_orders, stats, routes }) 
                         <td className="text-brand-mid small">
                           {lo.equipments?.map((eq) => eq.name).join(', ') || '-'}
                         </td>
-                        <td className="text-brand-mid small">{lo.created_at}</td>
+                        <td className="text-brand-mid small"><DateDisplay value={lo.created_at} /></td>
                       </tr>
                     ))}
                   </tbody>
