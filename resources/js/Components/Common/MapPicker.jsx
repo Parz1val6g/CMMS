@@ -60,7 +60,7 @@ export default function MapPicker({ latFieldName = 'latitude', lngFieldName = 'l
       const m = new window.google.maps.Map(mapRef.current, {
         center,
         zoom: 17,
-        mapTypeId: 'hybrid',
+        mapTypeId: 'satellite',
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,

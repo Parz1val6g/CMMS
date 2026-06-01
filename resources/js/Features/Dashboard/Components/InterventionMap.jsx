@@ -45,9 +45,8 @@ function MapInner({ gmapsKey, orders }) {
   const mapRef = useRef(null);
 
   const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
+    id: 'google-maps-script',
     googleMapsApiKey: gmapsKey,
-    mapIds: ['INTERVENTION_MAP'],
   });
 
   const markers = useMemo(() => {
@@ -88,7 +87,7 @@ function MapInner({ gmapsKey, orders }) {
       onLoad={onLoad}
       onUnmount={onUnmount}
       options={{
-        mapTypeId: 'hybrid',
+        mapTypeId: 'satellite',
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,

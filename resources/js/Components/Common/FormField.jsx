@@ -90,7 +90,7 @@ function MapPicker({ field, value }) {
     const m = new window.google.maps.Map(mapRef.current, {
       center: startPos,
       zoom: 17,
-      mapTypeId: 'hybrid',
+      mapTypeId: 'satellite',
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: false,

@@ -50,7 +50,7 @@ function MapInner({ gmapsKey, latitude, longitude, location }) {
   const center = { lat: parseFloat(latitude), lng: parseFloat(longitude) };
 
   const { isLoaded } = useJsApiLoader({
-    id: 'location-map-script',
+    id: 'google-maps-script',
     googleMapsApiKey: gmapsKey,
   });
 
@@ -84,7 +84,7 @@ function MapInner({ gmapsKey, latitude, longitude, location }) {
         onLoad={onLoad}
         onUnmount={onUnmount}
         options={{
-          mapTypeId: 'roadmap',
+          mapTypeId: 'satellite',
           mapTypeControl: false,
           streetViewControl: false,
           fullscreenControl: false,
