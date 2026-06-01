@@ -720,6 +720,8 @@
             "field_manager": "Manager",
             "field_sectors": "Sector(s)",
             "field_created_at": "Created at",
+            "field_start_date": "Start Date",
+            "field_end_date": "End Date",
             "field_description": "Description",
             "th_reference": "Reference",
             "th_status": "Status",

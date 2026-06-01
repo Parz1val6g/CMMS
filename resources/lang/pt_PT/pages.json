@@ -769,6 +769,8 @@
             "field_manager": "Gestor",
             "field_sectors": "Sector(es)",
             "field_created_at": "Criado em",
+            "field_start_date": "Data de Início",
+            "field_end_date": "Data de Fim",
             "field_description": "Descrição",
             "th_reference": "Referência",
             "th_status": "Estado",

@@ -85,6 +85,7 @@ return [
     'service_order_status' => [
         'pending' => 'Pendente',
         'in_progress' => 'Em Progresso',
+        'awaiting_approval' => 'A Aguardar Aprovação',
         'completed' => 'Concluída',
         'cancelled' => 'Cancelada',
     ],
@@ -99,6 +100,7 @@ return [
     'task_status' => [
         'pending' => 'Pendente',
         'in_progress' => 'Em Progresso',
+        'awaiting_approval' => 'A Aguardar Aprovação',
         'completed' => 'Concluída',
         'blocked' => 'Bloqueada',
         'cancelled' => 'Cancelada',

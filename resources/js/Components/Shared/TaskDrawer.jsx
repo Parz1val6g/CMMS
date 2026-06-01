@@ -77,10 +77,10 @@ function GeneralTab({ item, canViewServiceOrders, onOpenServiceOrder }) {
             <BaseField label={t('pages.tasks.drawer.field_created_at')}>
                 {createdAt}
             </BaseField>
-            <BaseField label={t('forms.tasks.start_date')}>
+            <BaseField label={t('pages.tasks.drawer.field_start_date')}>
                 {startDate}
             </BaseField>
-            <BaseField label={t('forms.tasks.end_date')}>
+            <BaseField label={t('pages.tasks.drawer.field_end_date')}>
                 {endDate}
             </BaseField>
             <div className="col-span-2">
