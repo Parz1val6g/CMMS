@@ -34,6 +34,7 @@ class UpdateServiceOrderRequest extends FormRequest
             'postal_code'        => ['nullable', 'string', 'max:20'],
             'latitude'           => ['nullable', 'numeric', 'between:-90,90'],
             'longitude'          => ['nullable', 'numeric', 'between:-180,180'],
+            'photo'              => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:5120'],
         ];
     }
 

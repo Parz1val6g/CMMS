@@ -42,6 +42,34 @@ function resolveFieldValue(field, item) {
     const fieldName = field.name ?? field.key;
     const raw = item[fieldName];
 
+    // date-picker range: build { start, end } from the named sub-fields on the item
+    if (field.type === 'date-picker' && (field.metadata?.dateMode === 'range' || field.dateMode === 'range')) {
+        const startKey = field.metadata?.startName ?? field.startName ?? `${fieldName}_start`;
+        const endKey   = field.metadata?.endName   ?? field.endName   ?? `${fieldName}_end`;
+        return {
+            start: item[startKey] ?? raw?.start ?? null,
+            end:   item[endKey]   ?? raw?.end   ?? null,
+        };
+    }
+
+    // repeater: transform each item's date-range sub-fields to { start, end }
+    if (field.type === 'repeater' && Array.isArray(raw)) {
+        const drSubs = (field.subFields ?? []).filter(
+            sf => sf.type === 'date-picker' && (sf.metadata?.dateMode === 'range' || sf.dateMode === 'range')
+        );
+        if (drSubs.length === 0) return raw;
+        return raw.map(rowItem => {
+            const next = { ...rowItem };
+            drSubs.forEach(sf => {
+                const sfName   = sf.name ?? sf.key;
+                const startKey = sf.metadata?.startName ?? sf.startName ?? `${sfName}_start`;
+                const endKey   = sf.metadata?.endName   ?? sf.endName   ?? `${sfName}_end`;
+                next[sfName] = { start: rowItem[startKey] ?? null, end: rowItem[endKey] ?? null };
+            });
+            return next;
+        });
+    }
+
     // 1. Direct field access (covers most cases)
     if (raw !== undefined && raw !== null) return raw;
 
@@ -104,31 +132,50 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
     /* ── Controlled form values — keyed by field name (#4) ───────── */
     const [formValues, setFormValues] = useState({});
 
-    /* ── Seed formValues whenever selectedItem changes only ─── */
-    /* Only re-seed when the selected item changes, not on every fields array recreation */
-    useEffect(() => {
-        if (!selectedItem) return;
+    /* ── Seed helper — builds the controlled-state map from any item object ── */
+    const seedFromItem = useCallback((item) => {
+        if (!item) return;
         const initial = {};
         fields.forEach((f) => {
             const fieldName = f.name ?? f.key;
-            initial[fieldName] = resolveFieldValue(f, selectedItem);
-
-            // Map fields need lat/lng available in formValues for MapPicker
+            initial[fieldName] = resolveFieldValue(f, item);
             const isMap = f.type === 'map' || f.type === 'map-picker';
-            if (isMap && selectedItem) {
+            if (isMap) {
                 const latField = f.metadata?.latField ?? 'latitude';
                 const lngField = f.metadata?.lngField ?? 'longitude';
-                if (selectedItem[latField] !== undefined) initial[latField] = selectedItem[latField];
-                if (selectedItem[lngField] !== undefined) initial[lngField] = selectedItem[lngField];
+                if (item[latField] !== undefined) initial[latField] = item[latField];
+                if (item[lngField] !== undefined) initial[lngField] = item[lngField];
             }
         });
         setFormValues(initial);
-        setErrors({});
-
-        // Seed workflowType so visibleFields filters correctly for this item's type
-        const wt = selectedItem.workflow_type;
+        const wt = item.workflow_type;
         setWorkflowType(typeof wt === 'string' ? wt : (wt?.value ?? ''));
-    }, [selectedItem?.id]); // Remove fields from dependency - only seed when item ID changes
+    }, [fields]);
+
+    /* ── Fetch full item from routes.show, fall back to selectedItem row data ── */
+    /* The paginated row only carries display columns; show returns every field    */
+    useEffect(() => {
+        if (!selectedItem) return;
+        setErrors({});
+        setFormValues({});
+
+        if (!routes.show) {
+            seedFromItem(selectedItem);
+            return;
+        }
+
+        const url = replaceId(routes.show, selectedItem.id);
+        fetch(url, {
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                ...csrfHeader(),
+            },
+        })
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(data => seedFromItem(data.data ?? data))
+            .catch(() => seedFromItem(selectedItem)); // fallback to partial row data
+    }, [selectedItem?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     /* ── Track workflow_type changes via custom toggle-change event ── */
     useEffect(() => {
@@ -237,20 +284,69 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
                 if (latInput) data[latField] = latInput.value;
                 if (lngInput) data[lngField] = lngInput.value;
                 delete data[fieldName];
+                return;
+            }
+            // Flatten date-picker range field → startName / endName
+            if (f.type === 'date-picker' && (f.metadata?.dateMode === 'range' || f.dateMode === 'range')) {
+                const startKey = f.metadata?.startName ?? f.startName ?? `${fieldName}_start`;
+                const endKey   = f.metadata?.endName   ?? f.endName   ?? `${fieldName}_end`;
+                const rangeVal = data[fieldName];
+                if (rangeVal && typeof rangeVal === 'object') {
+                    data[startKey] = rangeVal.start ?? '';
+                    data[endKey]   = rangeVal.end   ?? '';
+                }
+                delete data[fieldName];
+                return;
+            }
+            // Flatten date-range sub-fields inside repeater items
+            if (f.type === 'repeater') {
+                const drSubs = (f.subFields ?? []).filter(
+                    sf => sf.type === 'date-picker' && (sf.metadata?.dateMode === 'range' || sf.dateMode === 'range')
+                );
+                if (drSubs.length > 0 && Array.isArray(data[fieldName])) {
+                    data[fieldName] = data[fieldName].map(rowItem => {
+                        const next = { ...rowItem };
+                        drSubs.forEach(sf => {
+                            const sfName   = sf.name ?? sf.key;
+                            const startKey = sf.metadata?.startName ?? sf.startName ?? `${sfName}_start`;
+                            const endKey   = sf.metadata?.endName   ?? sf.endName   ?? `${sfName}_end`;
+                            const rangeVal = next[sfName];
+                            if (rangeVal && typeof rangeVal === 'object') {
+                                next[startKey] = rangeVal.start ?? '';
+                                next[endKey]   = rangeVal.end   ?? '';
+                            }
+                            delete next[sfName];
+                        });
+                        return next;
+                    });
+                }
             }
         });
 
         try {
             const url = replaceId(routes.update, selectedItem.id);
+            const hasFiles = Object.values(data).some(v => v instanceof File);
+            let reqBody, reqMethod, reqHeaders;
+            if (hasFiles) {
+                const fd = new FormData();
+                fd.append('_method', 'PUT');
+                Object.entries(data).forEach(([k, v]) => {
+                    if (v instanceof File) { fd.append(k, v); }
+                    else if (Array.isArray(v)) { v.forEach(item => fd.append(`${k}[]`, item ?? '')); }
+                    else if (v !== null && v !== undefined) { fd.append(k, String(v)); }
+                });
+                reqBody = fd;
+                reqMethod = 'POST';
+                reqHeaders = { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() };
+            } else {
+                reqBody = JSON.stringify(data);
+                reqMethod = 'PUT';
+                reqHeaders = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() };
+            }
             const res = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    ...csrfHeader(),
-                },
-                body: JSON.stringify(data),
+                method: reqMethod,
+                headers: reqHeaders,
+                body: reqBody,
             });
             const resData = await res.json();
 

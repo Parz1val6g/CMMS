@@ -54,7 +54,29 @@ function collectFormData(form, fields, formValues) {
     if (f.multiple || f.type === 'multiselect') {
       data[name] = formValues[name] ?? [];
     } else if (f.type === 'repeater') {
-      data[name] = formValues[name] ?? [];
+      const repeaterItems = formValues[name] ?? [];
+      const drSubs = (f.subFields ?? []).filter(
+        sf => sf.type === 'date-picker' && (sf.metadata?.dateMode === 'range' || sf.dateMode === 'range')
+      );
+      if (drSubs.length === 0) {
+        data[name] = repeaterItems;
+      } else {
+        data[name] = repeaterItems.map(rowItem => {
+          const next = { ...rowItem };
+          drSubs.forEach(sf => {
+            const sfName   = sf.name ?? sf.key;
+            const startKey = sf.metadata?.startName ?? sf.startName ?? `${sfName}_start`;
+            const endKey   = sf.metadata?.endName   ?? sf.endName   ?? `${sfName}_end`;
+            const rangeVal = next[sfName];
+            if (rangeVal && typeof rangeVal === 'object') {
+              next[startKey] = rangeVal.start ?? '';
+              next[endKey]   = rangeVal.end   ?? '';
+            }
+            delete next[sfName];
+          });
+          return next;
+        });
+      }
     } else if (f.type === 'map' || f.type === 'map-picker') {
       const latField = f.metadata?.latField ?? 'latitude';
       const lngField = f.metadata?.lngField ?? 'longitude';
@@ -74,6 +96,8 @@ function collectFormData(form, fields, formValues) {
         data[startFieldName] = form.elements[startFieldName]?.value ?? '';
         data[endFieldName]   = form.elements[endFieldName]?.value   ?? '';
       }
+    } else if (f.type === 'file') {
+      data[name] = formValues[name] ?? null;
     } else {
       const el = form.elements[name];
       if (!el) return;
@@ -217,15 +241,25 @@ export default function Modal({ entityName = t('common.entity_name'), title, for
     const data = collectFormData(e.currentTarget, fields, formValues);
 
     try {
+      const hasFiles = Object.values(data).some(v => v instanceof File);
+      let reqBody, reqHeaders;
+      if (hasFiles) {
+        const fd = new FormData();
+        Object.entries(data).forEach(([k, v]) => {
+          if (v instanceof File) { fd.append(k, v); }
+          else if (Array.isArray(v)) { v.forEach(item => fd.append(`${k}[]`, item ?? '')); }
+          else if (v !== null && v !== undefined) { fd.append(k, String(v)); }
+        });
+        reqBody = fd;
+        reqHeaders = { 'Accept': 'application/json', ...csrfHeader(), 'X-Requested-With': 'XMLHttpRequest' };
+      } else {
+        reqBody = JSON.stringify(data);
+        reqHeaders = { 'Content-Type': 'application/json', 'Accept': 'application/json', ...csrfHeader(), 'X-Requested-With': 'XMLHttpRequest' };
+      }
       const res = await fetch(routes.store, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          ...csrfHeader(),
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        body: JSON.stringify(data),
+        headers: reqHeaders,
+        body: reqBody,
       });
 
       const body = await res.json();

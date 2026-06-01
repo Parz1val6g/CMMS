@@ -121,8 +121,12 @@ class ServiceOrderService
             $soFields = collect($data)->except([
                 'parish_id', 'street', 'reference_point', 'postal_code',
                 'latitude', 'longitude', 'location_id',
-                'sector_ids',
+                'sector_ids', 'photo',
             ])->toArray();
+
+            if (isset($data['photo']) && $data['photo'] instanceof UploadedFile) {
+                $soFields['photo_path'] = $data['photo']->store('service-orders', 'public');
+            }
 
             $serviceOrder->update($soFields);
 
