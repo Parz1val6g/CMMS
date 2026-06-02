@@ -10,10 +10,10 @@ use App\Features\Locations\Models\Location;
 use App\Features\MiniTasks\Models\MiniTask;
 use App\Features\ServiceOrders\Events\ServiceOrderCompletedEvent;
 use App\Features\ServiceOrders\Events\ServiceOrderCreatedEvent;
+use App\Features\ServiceOrders\Jobs\ScanServiceOrderPhoto;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\Tasks\Models\Task;
 use App\Features\WorkLogs\Models\WorkLog;
-use App\Shared\Services\SandboxScanService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use InvalidArgumentException;
@@ -21,7 +21,6 @@ class ServiceOrderService
 {
     public function __construct(
         private TransactionHandler $transactions,
-        private SandboxScanService $scanner,
     ) {}
     
     public function create(array $data, string $managerId, ?string $createdById = null): ServiceOrder
@@ -44,7 +43,6 @@ class ServiceOrderService
             // 2. Handle photo upload
             $photoPath = null;
             if (isset($data['photo']) && $data['photo'] instanceof UploadedFile) {
-                $this->scanner->scan($data['photo']->getRealPath());
                 $photoPath = $data['photo']->store('service-orders', 'public');
             }
 
@@ -71,6 +69,14 @@ class ServiceOrderService
             }
 
             ServiceOrderCreatedEvent::dispatch($serviceOrder);
+
+            if ($photoPath) {
+                ScanServiceOrderPhoto::dispatch(
+                    $serviceOrder->id,
+                    $photoPath,
+                    $createdById,
+                );
+            }
 
             return $serviceOrder;
         });
@@ -127,15 +133,24 @@ class ServiceOrderService
                 'sector_ids', 'photo',
             ])->toArray();
 
+            $newPhotoPath = null;
             if (isset($data['photo']) && $data['photo'] instanceof UploadedFile) {
-                $this->scanner->scan($data['photo']->getRealPath());
-                $soFields['photo_path'] = $data['photo']->store('service-orders', 'public');
+                $newPhotoPath = $data['photo']->store('service-orders', 'public');
+                $soFields['photo_path'] = $newPhotoPath;
             }
 
             $serviceOrder->update($soFields);
 
             if (array_key_exists('sector_ids', $data)) {
                 $this->syncSectors($serviceOrder, $data['sector_ids']);
+            }
+
+            if ($newPhotoPath) {
+                ScanServiceOrderPhoto::dispatch(
+                    $serviceOrder->id,
+                    $newPhotoPath,
+                    $serviceOrder->created_by,
+                );
             }
 
             return $serviceOrder;

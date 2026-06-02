@@ -34,6 +34,10 @@ return [
             'task_rejected_body' => 'A tarefa foi rejeitada. Motivo: :reason',
             'service_order_start_title' => 'Lembrete de Execução de Ordem de Serviço',
             'service_order_start_message' => 'A Ordem de Serviço :process está agendada para execução hoje.',
+            'photo_scan_failed_title' => 'Fotografia Rejeitada — Falha na Verificação de Segurança',
+            'photo_scan_failed_message' => 'A fotografia anexada à Ordem de Serviço :process foi removida por não ter passado na verificação de segurança. Motivo: :reason. Pode adicionar uma nova fotografia editando a ordem de serviço.',
+            'attachment_scan_failed_title' => 'Anexo Rejeitado — Falha na Verificação de Segurança',
+            'attachment_scan_failed_message' => 'O ficheiro ":file" foi removido por não ter passado na verificação de segurança. Motivo: :reason.',
         ],
         'ticket' => [
             'cannot_update_terminal' => 'Não é possível atualizar um ticket convertido ou cancelado.',

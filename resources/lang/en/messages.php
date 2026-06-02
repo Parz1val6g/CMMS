@@ -34,6 +34,10 @@ return [
             'task_rejected_body' => 'The task was rejected. Reason: :reason',
             'service_order_start_title' => 'Service Order Execution Reminder',
             'service_order_start_message' => 'Service Order :process is scheduled for execution today.',
+            'photo_scan_failed_title' => 'Photo Rejected — Security Scan Failed',
+            'photo_scan_failed_message' => 'The photo attached to Service Order :process was removed because it failed the security scan. Reason: :reason. You can add a new photo by editing the service order.',
+            'attachment_scan_failed_title' => 'Attachment Rejected — Security Scan Failed',
+            'attachment_scan_failed_message' => 'The file ":file" was removed because it failed the security scan. Reason: :reason.',
         ],
         'ticket' => [
             'cannot_update_terminal' => 'Cannot update a converted or cancelled ticket.',

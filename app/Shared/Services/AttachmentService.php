@@ -2,6 +2,7 @@
 
 namespace App\Shared\Services;
 
+use App\Shared\Jobs\ScanAttachment;
 use App\Shared\Models\Attachment;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -10,19 +11,16 @@ use InvalidArgumentException;
 
 class AttachmentService
 {
-    public function __construct(private SandboxScanService $scanner) {}
-
     public function upload(
         UploadedFile $file,
         ?string $attachableType = null,
         ?string $attachableId = null,
         ?string $equipmentId = null,
+        ?string $uploadedById = null,
     ): Attachment {
         if (($attachableType && !$attachableId) || (!$attachableType && $attachableId)) {
             throw new InvalidArgumentException('Both attachable_type and attachable_id must be provided together.');
         }
-
-        $this->scanner->scan($file->getRealPath());
 
         $short = $attachableType ? class_basename($attachableType) : 'orphan';
         $folder = $equipmentId ? "equipment/{$equipmentId}" : Str::plural(strtolower($short)) . "/{$attachableId}";
@@ -31,19 +29,20 @@ class AttachmentService
         $ext = $file->getClientOriginalExtension();
         $safeName = Str::uuid() . '.' . $ext;
 
-        return Attachment::create([
-            'equipment_id' => $equipmentId,
+        $attachment = Attachment::create([
+            'equipment_id'    => $equipmentId,
             'attachable_type' => $attachableType,
-            'attachable_id' => $attachableId,
-            'file_path' => $path,
-            'file_name' => $safeName,
-            'mime_type' => $file->getMimeType(),
+            'attachable_id'   => $attachableId,
+            'file_path'       => $path,
+            'file_name'       => $safeName,
+            'mime_type'       => $file->getMimeType(),
         ]);
+
+        ScanAttachment::dispatch($attachment->id, $uploadedById);
+
+        return $attachment;
     }
 
-    /**
-     * Safely delete the file from disk and the database record.
-     */
     public function delete(Attachment $attachment): bool
     {
         Storage::disk('public')->delete($attachment->file_path);

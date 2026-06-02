@@ -38,6 +38,7 @@ class AttachmentController extends Controller
             $request->attachable_type,
             $request->attachable_id,
             $request->equipment_id,
+            $request->user()?->id,
         );
 
         return response()->json([
