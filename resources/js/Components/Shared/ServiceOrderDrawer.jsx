@@ -7,7 +7,7 @@ import BaseField from '@/Components/Shared/Drawer/BaseField';
 import LocationMap from '@/Components/Shared/LocationMap';
 import { badgeStyle, labelFor } from '@/utils/enums';
 import { t } from '@/utils/i18n';
-import { csrfHeader } from '@/utils/csrf';
+import { useOptimisticMutation } from '@/composables/useOptimisticMutation';
 
 function Badge({ value }) {
   return (
@@ -17,7 +17,7 @@ function Badge({ value }) {
   );
 }
 
-function ConfirmDialog({ open, onConfirm, onCancel, loading, error }) {
+function ConfirmDialog({ open, onConfirm, onCancel }) {
   if (!open) return null;
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -28,27 +28,20 @@ function ConfirmDialog({ open, onConfirm, onCancel, loading, error }) {
         <p className="text-sm text-gray-600 mb-5">
           {t('pages.service_orders.activate_confirm_body')}
         </p>
-        {error && (
-          <p className="text-sm text-red-600 mb-4">
-            {t('pages.service_orders.activate_failed')}
-          </p>
-        )}
         <div className="flex justify-end gap-3">
           <button
             type="button"
             onClick={onCancel}
-            disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             {t('pages.service_orders.activate_confirm_cancel')}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-white bg-brand-accent rounded-lg hover:opacity-90 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-white bg-brand-accent rounded-lg hover:opacity-90"
           >
-            {loading ? '…' : t('pages.service_orders.activate_confirm_ok')}
+            {t('pages.service_orders.activate_confirm_ok')}
           </button>
         </div>
       </div>
@@ -112,58 +105,44 @@ function DetailTab({ order }) {
 export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, onActivated, onCompleted, stacked = false }) {
   const { props: { auth, can } } = usePage();
   const authUser = auth?.user;
+  const { mutate } = useOptimisticMutation();
 
   const [showConfirm, setShowConfirm] = useState(false);
-  const [activating, setActivating] = useState(false);
-  const [activateError, setActivateError] = useState(false);
-  const [completing, setCompleting] = useState(false);
+  const [optimisticStatus, setOptimisticStatus] = useState(null);
 
-  const status = order?.status?.value ?? order?.status;
+  const rawStatus = order?.status?.value ?? order?.status;
+  const effectiveStatus = optimisticStatus ?? rawStatus;
   const isManager = authUser?.id && order?.manager?.id && String(authUser.id) === String(order.manager.id);
-  const canActivate = status === 'pending' && (can?.activateServiceOrder || isManager);
-  const canComplete = status === 'awaiting_approval' && (can?.completeServiceOrder || isManager);
+  const canActivate = effectiveStatus === 'pending' && (can?.activateServiceOrder || isManager);
+  const canComplete = effectiveStatus === 'awaiting_approval' && (can?.completeServiceOrder || isManager);
 
   const handleActivate = async () => {
-    setActivating(true);
-    setActivateError(false);
-    try {
-      const res = await fetch(`/api/service-orders/${order.id}/activate`, {
-        method: 'POST',
-        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
-      });
-      if (!res.ok) throw new Error();
-      setShowConfirm(false);
-      onActivated?.();
-    } catch {
-      setActivateError(true);
-    } finally {
-      setActivating(false);
-    }
-  };
-
-  const handleOpenConfirm = () => {
-    setActivateError(false);
-    setShowConfirm(true);
+    const prev = rawStatus;
+    setShowConfirm(false);
+    setOptimisticStatus('in_progress');
+    await mutate({
+      url: `/api/service-orders/${order.id}/activate`,
+      onSuccess: () => { setOptimisticStatus(null); onActivated?.(); },
+      onError: () => setOptimisticStatus(prev),
+      errorMessage: t('pages.service_orders.activate_failed'),
+    });
   };
 
   const handleComplete = async () => {
-    setCompleting(true);
-    try {
-      const res = await fetch(`/api/service-orders/${order.id}/complete`, {
-        method: 'POST',
-        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
-      });
-      if (!res.ok) throw new Error();
-      onCompleted?.();
-    } finally {
-      setCompleting(false);
-    }
+    const prev = rawStatus;
+    setOptimisticStatus('completed');
+    await mutate({
+      url: `/api/service-orders/${order.id}/complete`,
+      onSuccess: () => { setOptimisticStatus(null); onCompleted?.(); },
+      onError: () => setOptimisticStatus(prev),
+      errorMessage: t('pages.service_orders.complete_failed'),
+    });
   };
 
   const activateButton = canActivate ? (
     <button
       type="button"
-      onClick={handleOpenConfirm}
+      onClick={() => setShowConfirm(true)}
       className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-brand-accent hover:opacity-90 transition-opacity"
     >
       <Play size={12} />
@@ -175,11 +154,10 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
     <button
       type="button"
       onClick={handleComplete}
-      disabled={completing}
-      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors disabled:opacity-50"
+      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors"
     >
       <Check size={12} />
-      {completing ? '…' : t('pages.service_orders.btn_complete')}
+      {t('pages.service_orders.btn_complete')}
     </button>
   ) : null;
 
@@ -195,7 +173,7 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
         title={order?.process ?? ''}
         subtitle={order ? (
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge value={order.status?.value ?? order.status} />
+            <Badge value={effectiveStatus} />
             <Badge value={order.priority?.value ?? order.priority} />
           </div>
         ) : ''}
@@ -207,8 +185,6 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
         open={showConfirm}
         onConfirm={handleActivate}
         onCancel={() => setShowConfirm(false)}
-        loading={activating}
-        error={activateError}
       />
     </>
   );

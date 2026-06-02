@@ -4,8 +4,9 @@ import { csrfHeader } from '@/utils/csrf';
 import { buildCreatePayload } from '@/utils/serviceOrderPayload';
 import { labelFor, badgeStyle } from '@/utils/enums';
 import { formatDate } from '@/utils/format';
-import { usePage } from '@inertiajs/react';
+import { usePage, router } from '@inertiajs/react';
 import { useToast } from '@/Components/Toast/ToastContext';
+import { useOptimisticMutation } from '@/composables/useOptimisticMutation';
 import { MapPin, Clock, Loader2, AlertCircle, Play, Check } from 'lucide-react';
 import { t } from '@/utils/i18n';
 import AppLayout from '@/Layouts/AppLayout';
@@ -31,12 +32,10 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
   const [soDetail, setSoDetail] = useState(null);
   const [soLoading, setSoLoading] = useState(false);
   const [soError, setSoError] = useState(null);
-  const [toast, setToast] = useState(null);
   const savingRef = useRef(false);
-  const { flash, can } = usePage().props;
+  const { can } = usePage().props;
   const globalToast = useToast();
-  const [activating, setActivating] = useState(false);
-  const [completing, setCompleting] = useState(false);
+  const { mutate } = useOptimisticMutation();
 
   const breadcrumbs = [
     { name: t('pages.sidebar.dashboard'), url: '/dashboard' },
@@ -47,15 +46,6 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
   useEffect(() => {
     setServiceOrdersState(service_orders);
   }, [service_orders]);
-
-  /* ── Flash message auto-dismiss ───────────────────────────── */
-  useEffect(() => {
-    if (flash?.success || flash?.error) {
-      setToast(flash);
-      const t = setTimeout(() => setToast(null), 4000);
-      return () => clearTimeout(t);
-    }
-  }, [flash]);
 
   /* ── Track client_id changes for ClientLocationSelector ──── */
   useEffect(() => {
@@ -122,7 +112,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         setPhotoPreview(null);
         setClientLocationId(null);
         setLocationsDirty(false);
-        window.location.reload();
+        router.reload();
       } else {
         if (body.errors) setFormErrors(body.errors);
         else globalToast.error(body.message ?? body.error ?? t('pages.service_orders.create_failed'));
@@ -200,16 +190,12 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         // Rollback on error
         setServiceOrdersState(originalState);
         const body = await res.json();
-        setToast({
-          error: body.error || t('pages.service_orders.status_update_failed'),
-        });
+        globalToast.error(body.error || t('pages.service_orders.status_update_failed'));
       }
     } catch {
       // Rollback on network error
       setServiceOrdersState(originalState);
-      setToast({
-        error: t('pages.service_orders.network_error'),
-      });
+      globalToast.error(t('pages.service_orders.network_error'));
     }
   }, [serviceOrdersState, routes.update]);
 
@@ -257,39 +243,33 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
   /* ── Activate / Complete handlers ─────────────────────────── */
   const handleActivate = useCallback(async () => {
     if (!selectedServiceOrder) return;
-    setActivating(true);
-    try {
-      const res = await fetch(`/api/service-orders/${selectedServiceOrder.id}/activate`, {
-        method: 'POST',
-        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
-      });
-      if (!res.ok) throw new Error();
-      handleCloseDrawer();
-      window.location.reload();
-    } catch {
-      globalToast.error(t('pages.service_orders.activate_failed'));
-    } finally {
-      setActivating(false);
-    }
-  }, [selectedServiceOrder, handleCloseDrawer, globalToast]);
+    const id = selectedServiceOrder.id;
+    const prevState = serviceOrdersState;
+    handleCloseDrawer();
+    await mutate({
+      url: `/api/service-orders/${id}/activate`,
+      applyOptimistic: () => {
+        setServiceOrdersState(s => applyStatusUpdate(s, id, 'in_progress'));
+        return () => setServiceOrdersState(prevState);
+      },
+      errorMessage: t('pages.service_orders.activate_failed'),
+    });
+  }, [selectedServiceOrder, serviceOrdersState, handleCloseDrawer, mutate]);
 
   const handleComplete = useCallback(async () => {
     if (!selectedServiceOrder) return;
-    setCompleting(true);
-    try {
-      const res = await fetch(`/api/service-orders/${selectedServiceOrder.id}/complete`, {
-        method: 'POST',
-        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
-      });
-      if (!res.ok) throw new Error();
-      handleCloseDrawer();
-      window.location.reload();
-    } catch {
-      globalToast.error(t('pages.service_orders.complete_failed'));
-    } finally {
-      setCompleting(false);
-    }
-  }, [selectedServiceOrder, handleCloseDrawer, globalToast]);
+    const id = selectedServiceOrder.id;
+    const prevState = serviceOrdersState;
+    handleCloseDrawer();
+    await mutate({
+      url: `/api/service-orders/${id}/complete`,
+      applyOptimistic: () => {
+        setServiceOrdersState(s => applyStatusUpdate(s, id, 'completed'));
+        return () => setServiceOrdersState(prevState);
+      },
+      errorMessage: t('pages.service_orders.complete_failed'),
+    });
+  }, [selectedServiceOrder, serviceOrdersState, handleCloseDrawer, mutate]);
 
   /* ── Build tabs array for WorkspaceDrawer ─────────────────── */
   const soTabs = useMemo(() => {
@@ -348,28 +328,26 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         {showActivate && (
           <button
             type="button"
-            disabled={activating}
             onClick={handleActivate}
-            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-brand-accent hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-brand-accent hover:opacity-90 transition-opacity"
           >
             <Play size={12} />
-            {activating ? '…' : t('pages.service_orders.btn_activate')}
+            {t('pages.service_orders.btn_activate')}
           </button>
         )}
         {showComplete && (
           <button
             type="button"
-            disabled={completing}
             onClick={handleComplete}
-            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors"
           >
             <Check size={12} />
-            {completing ? '…' : t('pages.service_orders.btn_complete')}
+            {t('pages.service_orders.btn_complete')}
           </button>
         )}
       </>
     );
-  }, [soDetail, selectedServiceOrder, can, activating, completing, handleActivate, handleComplete]);
+  }, [soDetail, selectedServiceOrder, can, handleActivate, handleComplete]);
 
   /* ── Drawer title with SO context ─────────────────────────── */
   const drawerTitle = useMemo(() => {
@@ -457,25 +435,6 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
 
   return (
     <AppLayout title={t('pages.service_orders.page_title')} breadcrumbs={breadcrumbs}>
-      {/* Flash Toast */}
-      {toast && (
-        <div
-          className={`mb-4 rounded-lg px-4 py-3 text-sm shadow-sm ${toast.success
-            ? 'bg-green-50 text-green-700'
-            : 'bg-red-50 text-red-700'
-            }`}
-        >
-          {toast.success ?? toast.error}
-          <button
-            type="button"
-            className="ml-3 font-medium underline"
-            onClick={() => setToast(null)}
-          >
-            {t('pages.service_orders.dismiss')}
-          </button>
-        </div>
-      )}
-
       <Modal
         formSchema={createFormSchema}
         routes={routes}
@@ -539,6 +498,14 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
       />
     </AppLayout>
   );
+}
+
+function applyStatusUpdate(state, id, newStatus) {
+  const items = Array.isArray(state) ? state : (state?.data ?? []);
+  const updated = items.map(so =>
+    String(so.id) === String(id) ? { ...so, status: newStatus } : so
+  );
+  return Array.isArray(state) ? updated : { ...state, data: updated };
 }
 
 /* ── Details tab content for Service Order (no created_at) ──── */

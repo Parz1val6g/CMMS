@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { usePage } from '@inertiajs/react';
 import { Check, XCircle, Plus, X as XIcon, ExternalLink } from 'lucide-react';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
@@ -9,6 +9,7 @@ import FormField from '@/Components/Common/FormField';
 import { t } from '@/utils/i18n';
 import { csrfHeader } from '@/utils/csrf';
 import { useToast } from '@/Components/Toast/ToastContext';
+import { useOptimisticMutation } from '@/composables/useOptimisticMutation';
 
 function StatusBadge({ status }) {
     const map = {
@@ -191,12 +192,14 @@ function MaterialQuantityInput({ options = [], value = [], onChange, stockMap = 
 
 export function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPeriod = true, taskStartDate, taskEndDate }) {
     const [showForm, setShowForm] = useState(false);
-    const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState({});
     const [formValues, setFormValues] = useState({});
     const [availability, setAvailability] = useState(null);
     const [availabilityLoading, setAvailabilityLoading] = useState(false);
+    const [optimisticItems, setOptimisticItems] = useState([]);
+    const savedFormRef = useRef(null);
     const toast = useToast();
+    const { mutate } = useOptimisticMutation();
 
     // Fields from schema, excluding task_id and material_ids (handled separately)
     const allFields = useMemo(() => {
@@ -263,6 +266,11 @@ export function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPer
         });
     }, [fields, availability]);
 
+    // Reset optimistic items when task changes
+    useEffect(() => {
+        setOptimisticItems([]);
+    }, [taskId]);
+
     const handleOpen = () => {
         setShowForm(true);
         setErrors({});
@@ -279,42 +287,49 @@ export function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPer
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSaving(true);
         setErrors({});
-        try {
-            const res = await fetch('/api/mini-tasks', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    ...csrfHeader(),
-                },
-                body: JSON.stringify((() => {
-                                    // eslint-disable-next-line no-unused-vars
-                                    const { date_range: _dr, ...rest } = formValues;
-                                    return {
-                                        ...rest,
-                                        task_id: taskId,
-                                        materials: (formValues.materials ?? [])
-                                            .map(m => ({ material_id: m.material_id, planned_quantity: parseFloat(m.planned_quantity) || 0 }))
-                                            .filter(m => m.planned_quantity > 0),
-                                    };
-                                })()),
-            });
-            const body = await res.json();
-            if (res.ok) {
-                handleClose();
+
+        // eslint-disable-next-line no-unused-vars
+        const { date_range: _dr, ...rest } = formValues;
+        const payload = {
+            ...rest,
+            task_id: taskId,
+            materials: (formValues.materials ?? [])
+                .map(m => ({ material_id: m.material_id, planned_quantity: parseFloat(m.planned_quantity) || 0 }))
+                .filter(m => m.planned_quantity > 0),
+        };
+
+        const tempId = `optimistic-${Date.now()}`;
+        savedFormRef.current = { ...formValues };
+        setOptimisticItems(prev => [...prev, { id: tempId, reference: '…', status: 'pending', _optimistic: true }]);
+        handleClose();
+
+        await mutate({
+            url: '/api/mini-tasks',
+            body: payload,
+            onSuccess: () => {
+                setOptimisticItems(prev => prev.filter(i => i.id !== tempId));
+                savedFormRef.current = null;
                 onCreated?.();
-            } else {
-                if (body.errors) setErrors(body.errors);
-                else toast.error(body.message ?? t('pages.tasks.drawer.mini_task_create_error'));
-            }
-        } catch {
-            toast.error(t('pages.tasks.drawer.mini_task_create_error'));
-        } finally {
-            setSaving(false);
-        }
+            },
+            onError: (responseBody) => {
+                setOptimisticItems(prev => prev.filter(i => i.id !== tempId));
+                const saved = savedFormRef.current;
+                savedFormRef.current = null;
+                if (responseBody?.errors && saved) {
+                    setErrors(responseBody.errors);
+                    setFormValues(saved);
+                    setShowForm(true);
+                }
+            },
+            errorMessage: (responseBody) => {
+                if (responseBody?.errors) {
+                    const first = Object.values(responseBody.errors)[0];
+                    return Array.isArray(first) ? first[0] : first;
+                }
+                return responseBody?.message ?? t('pages.tasks.drawer.mini_task_create_error');
+            },
+        });
     };
 
     return (
@@ -385,10 +400,9 @@ export function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPer
                     <div className="flex gap-2 pt-1">
                         <button
                             type="submit"
-                            disabled={saving}
-                            className="flex-1 rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50 transition-opacity"
+                            className="flex-1 rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
                         >
-                            {saving ? '…' : t('pages.tasks.drawer.save_mini_task')}
+                            {t('pages.tasks.drawer.save_mini_task')}
                         </button>
                         <button
                             type="button"
@@ -402,11 +416,11 @@ export function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPer
             )}
 
             {/* List */}
-            {miniTasks.length === 0 && !showForm ? (
+            {miniTasks.length === 0 && optimisticItems.length === 0 && !showForm ? (
                 <p className="text-sm text-brand-mid text-center py-8">
                     {t('pages.tasks.drawer.no_mini_tasks')}
                 </p>
-            ) : miniTasks.length > 0 ? (
+            ) : (miniTasks.length > 0 || optimisticItems.length > 0) ? (
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
@@ -419,6 +433,12 @@ export function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPer
                             {miniTasks.map(mt => (
                                 <tr key={mt.id} className="hover:bg-brand-light transition-colors">
                                     <td className="py-2.5 pr-4 font-mono text-brand-accent">{mt.reference}</td>
+                                    <td className="py-2.5"><StatusBadge status={mt.status} /></td>
+                                </tr>
+                            ))}
+                            {optimisticItems.map(mt => (
+                                <tr key={mt.id} className="opacity-50">
+                                    <td className="py-2.5 pr-4 font-mono text-brand-mid italic">…</td>
                                     <td className="py-2.5"><StatusBadge status={mt.status} /></td>
                                 </tr>
                             ))}
@@ -495,11 +515,15 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
     const { props: { auth, can } } = usePage();
     const authUser = auth?.user;
     const toast = useToast();
+    const { mutate } = useOptimisticMutation();
 
-    const [completing, setCompleting] = useState(false);
+    const [optimisticStatus, setOptimisticStatus] = useState(null);
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [rejectReason, setRejectReason] = useState('');
-    const [rejecting, setRejecting] = useState(false);
+
+    useEffect(() => {
+        setOptimisticStatus(null);
+    }, [item?.id]);
 
     const [soDrawerOpen, setSoDrawerOpen] = useState(false);
     const [soOrder, setSoOrder] = useState(null);
@@ -533,46 +557,33 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
         return new Date(dateStr + 'T00:00:00').toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
     };
 
-    const status = item?.status?.value ?? item?.status;
+    const effectiveStatus = optimisticStatus ?? (item?.status?.value ?? item?.status);
     const isManager = authUser?.id && item?.manager?.id && String(authUser.id) === String(item.manager.id);
-    const canComplete = status === 'awaiting_approval' && (can?.completeTask || isManager);
-    const canReject = status === 'awaiting_approval' && (can?.completeTask || isManager);
+    const canComplete = effectiveStatus === 'awaiting_approval' && (can?.completeTask || isManager);
+    const canReject = effectiveStatus === 'awaiting_approval' && (can?.completeTask || isManager);
 
-    const handleComplete = async () => {
-        setCompleting(true);
-        try {
-            const res = await fetch(`/api/tasks/${item.id}/complete`, {
-                method: 'POST',
-                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
-            });
-            if (!res.ok) throw new Error();
-            onCompleted?.();
-        } finally {
-            setCompleting(false);
-        }
-    };
+    const handleComplete = useCallback(async () => {
+        const prevStatus = item?.status?.value ?? item?.status;
+        setOptimisticStatus('completed');
+        await mutate({
+            url: `/api/tasks/${item.id}/complete`,
+            onSuccess: () => { setOptimisticStatus(null); onCompleted?.(); },
+            onError: () => setOptimisticStatus(prevStatus),
+            errorMessage: t('pages.tasks.drawer.reject_error'),
+        });
+    }, [item, mutate, onCompleted]);
 
-    const handleReject = async () => {
-        setRejecting(true);
-        try {
-            const res = await fetch(`/api/tasks/${item.id}/reject`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
-                body: JSON.stringify({ reason: rejectReason }),
-            });
-            if (!res.ok) {
-                const body = await res.json().catch(() => ({}));
-                throw new Error(body.message || t('pages.tasks.drawer.reject_error'));
-            }
-            setShowRejectModal(false);
-            setRejectReason('');
-            onCompleted?.();
-        } catch (err) {
-            toast.error(err.message || t('pages.tasks.drawer.reject_error'));
-        } finally {
-            setRejecting(false);
-        }
-    };
+    const handleReject = useCallback(async () => {
+        const reason = rejectReason;
+        setShowRejectModal(false);
+        setRejectReason('');
+        await mutate({
+            url: `/api/tasks/${item.id}/reject`,
+            body: { reason },
+            onSuccess: () => onCompleted?.(),
+            errorMessage: (body) => body?.message ?? t('pages.tasks.drawer.reject_error'),
+        });
+    }, [item, rejectReason, mutate, onCompleted]);
 
     const rejectButton = canReject ? (
         <button
@@ -589,11 +600,10 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
         <button
             type="button"
             onClick={handleComplete}
-            disabled={completing}
-            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-brand-accent hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-brand-accent hover:opacity-90 transition-opacity"
         >
             <Check size={12} />
-            {completing ? '…' : t('pages.tasks.drawer.btn_complete')}
+            {t('pages.tasks.drawer.btn_complete')}
         </button>
     ) : null;
 
@@ -616,7 +626,7 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
                 isOpen={isOpen}
                 onClose={onClose}
                 title={item?.reference ?? ''}
-                subtitle={loading ? t('pages.common.loading') : item ? <StatusBadge status={item.status} /> : undefined}
+                subtitle={loading ? t('pages.common.loading') : item ? <StatusBadge status={effectiveStatus} /> : undefined}
                 tabs={tabs}
                 headerActions={headerActions}
             />
@@ -629,13 +639,13 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
             />
             <DialogModal
                 open={showRejectModal}
-                onClose={() => { if (!rejecting) { setShowRejectModal(false); setRejectReason(''); } }}
+                onClose={() => { setShowRejectModal(false); setRejectReason(''); }}
                 type="confirm"
                 title={t('pages.tasks.drawer.reject_title')}
                 description={t('pages.tasks.drawer.reject_description')}
                 buttons={[
-                    { label: t('pages.datamanager.cancel_btn'), onClick: () => { setShowRejectModal(false); setRejectReason(''); }, variant: 'secondary', disabled: rejecting },
-                    { label: rejecting ? t('pages.tasks.drawer.btn_rejecting') : t('pages.tasks.drawer.btn_reject'), onClick: handleReject, variant: 'primary', disabled: !rejectReason.trim() || rejecting },
+                    { label: t('pages.datamanager.cancel_btn'), onClick: () => { setShowRejectModal(false); setRejectReason(''); }, variant: 'secondary' },
+                    { label: t('pages.tasks.drawer.btn_reject'), onClick: handleReject, variant: 'primary', disabled: !rejectReason.trim() },
                 ]}
             >
                 <label className="flex flex-col gap-1.5">
@@ -646,7 +656,6 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
                         placeholder={t('pages.tasks.drawer.reject_reason_placeholder')}
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
-                        disabled={rejecting}
                         autoFocus
                     />
                 </label>
