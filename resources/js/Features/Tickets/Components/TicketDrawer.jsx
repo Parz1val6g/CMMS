@@ -159,36 +159,6 @@ function TicketDetailsTab({ ticket, canCancel, canConvert, cancelling, convertin
         <p className="text-sm text-brand-darkest whitespace-pre-wrap">{ticket.description}</p>
       </section>
 
-      {/* Status & Priority */}
-      <div className="grid grid-cols-2 gap-4">
-        <section>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">
-            {t('pages.tickets.section_status')}
-          </h4>
-          <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${STATUS_BADGE[ticket.status?.value] ?? 'bg-brand-mid/20 text-brand-mid'}`}>
-            {ticket.status?.label}
-          </span>
-        </section>
-        <section>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">
-            {t('pages.tickets.section_priority')}
-          </h4>
-          <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${PRIORITY_BADGE[ticket.priority?.value] ?? 'bg-brand-mid/20 text-brand-mid'}`}>
-            {ticket.priority?.label}
-          </span>
-        </section>
-      </div>
-
-      {/* Client */}
-      {ticket.client && (
-        <section>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">
-            {t('pages.tickets.section_client')}
-          </h4>
-          <p className="text-sm text-brand-darkest">{ticket.client.name}</p>
-        </section>
-      )}
-
       {/* Service Type */}
       {ticket.service_type && (
         <section>

@@ -90,10 +90,10 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     savingRef.current = true;
     setFormErrors({});
 
+    // Capture FormData synchronously before closing the modal
     const form = e.target;
     const formData = new FormData(form);
 
-    // Append sector_configs from SectorConfigPanel state
     sectorConfigs.forEach((config, i) => {
       formData.append(`sector_configs[${i}][sector_id]`, config.sector_id);
       if (config.priority) {
@@ -104,9 +104,16 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
       });
     });
 
-    // Scenario A/B/C: client location logic
     const LOCATION_FIELDS = ['parish_id', 'street', 'reference_point', 'postal_code', 'latitude', 'longitude'];
     buildCreatePayload(formData, clientLocationId, locationsDirty, LOCATION_FIELDS);
+
+    // Close modal and give immediate feedback — errors will arrive as a toast
+    setShowModal(false);
+    setPhotoPreview(null);
+    setClientLocationId(null);
+    setLocationsDirty(false);
+    setSectorConfigs([]);
+    globalToast.success(t('pages.service_orders.create_success'));
 
     try {
       const res = await fetch(routes.store, {
@@ -121,24 +128,12 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
       const body = await res.json();
 
       if (res.ok) {
-        setShowModal(false);
-        setPhotoPreview(null);
-        setClientLocationId(null);
-        setLocationsDirty(false);
-        setSectorConfigs([]);
         setRefreshKey(k => k + 1);
       } else {
-        if (body.errors) {
-          // Map sector_configs errors to sector_ids so they appear on the visible field
-          const errors = { ...body.errors };
-          if (errors.sector_configs) {
-            errors.sector_ids = errors.sector_ids ?? errors.sector_configs;
-            delete errors.sector_configs;
-          }
-          setFormErrors(errors);
-        } else {
-          globalToast.error(body.message ?? body.error ?? t('pages.service_orders.create_failed'));
-        }
+        const errorMsg = body.errors
+          ? Object.values(body.errors).flat().join(' ')
+          : (body.message ?? body.error ?? t('pages.service_orders.create_failed'));
+        globalToast.error(errorMsg);
       }
     } catch {
       globalToast.error(t('pages.service_orders.unexpected_error'));
@@ -555,28 +550,11 @@ function SODetailsTab({ serviceOrder }) {
 
   return (
     <div className="space-y-6">
-      {/* Title */}
-      {so.title && (
-        <section>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_title')}</h4>
-          <p className="text-sm text-brand-darkest">{so.title}</p>
-        </section>
-      )}
-
       {/* Description */}
       {so.description && (
         <section>
           <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_description')}</h4>
           <p className="text-sm text-brand-darkest">{so.description}</p>
-        </section>
-      )}
-
-      {/* Client */}
-      {so.client && (
-        <section>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_client')}</h4>
-          <p className="text-sm text-brand-darkest">{so.client.name}</p>
-          {so.client.nif && <p className="text-xs text-brand-mid mt-0.5">{t('pages.service_orders.drawer.nif_prefix')}{so.client.nif}</p>}
         </section>
       )}
 

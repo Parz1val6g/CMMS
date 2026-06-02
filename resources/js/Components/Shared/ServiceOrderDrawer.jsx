@@ -59,7 +59,6 @@ function DetailTab({ order }) {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_client')}>{order?.client?.name}</BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_manager')}>{order?.manager?.name}</BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_created_at')}>{createdAt}</BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_start_date')}>{startDate}</BaseField>

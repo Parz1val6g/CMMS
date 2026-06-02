@@ -226,6 +226,7 @@
         "breadcrumb": "Ordens de Serviço",
         "dm_title": "Ordens de Serviço",
         "dm_entity_name": "Ordem de Serviço",
+        "create_success": "Ordem de serviço criada com sucesso.",
         "create_failed": "Falha ao criar ordem de serviço.",
         "unexpected_error": "Ocorreu um erro inesperado.",
         "status_update_failed": "Falha ao atualizar o estado da ordem de serviço. Alterações revertidas.",

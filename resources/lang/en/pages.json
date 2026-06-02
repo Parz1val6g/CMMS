@@ -226,6 +226,7 @@
         "breadcrumb": "Service Orders",
         "dm_title": "Service Orders",
         "dm_entity_name": "Service Order",
+        "create_success": "Service order created successfully.",
         "create_failed": "Failed to create service order.",
         "unexpected_error": "An unexpected error occurred.",
         "status_update_failed": "Failed to update service order status. Changes reverted.",
