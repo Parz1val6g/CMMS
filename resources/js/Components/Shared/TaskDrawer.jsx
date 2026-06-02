@@ -7,6 +7,7 @@ import DialogModal from '@/Components/Common/DialogModal';
 import BaseField from '@/Components/Shared/Drawer/BaseField';
 import FormField from '@/Components/Common/FormField';
 import { t } from '@/utils/i18n';
+import { formatAbsolute, formatDateTime } from '@/utils/format';
 import { csrfHeader } from '@/utils/csrf';
 import { useToast } from '@/Components/Toast/ToastContext';
 import { useOptimisticMutation } from '@/composables/useOptimisticMutation';
@@ -39,15 +40,9 @@ function StatusBadge({ status }) {
 
 function GeneralTab({ item, canViewServiceOrders, onOpenServiceOrder }) {
     const sectors = item.sectors?.map(s => s.name).join(', ') || null;
-    const createdAt = item.created_at
-        ? new Date(item.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
-        : null;
-    const startDate = item.start_date
-        ? new Date(item.start_date + 'T00:00:00').toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
-        : null;
-    const endDate = item.end_date
-        ? new Date(item.end_date + 'T00:00:00').toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
-        : null;
+    const createdAt = formatAbsolute(item.created_at) || null;
+    const startDate = formatAbsolute(item.start_date) || null;
+    const endDate = formatAbsolute(item.end_date) || null;
 
     const soProcess = item.service_order?.process;
     const soId = item.service_order?.id;
@@ -479,13 +474,7 @@ function RejectionsTab({ taskId }) {
         );
     }
 
-    const formatDate = (iso) => {
-        if (!iso) return '—';
-        return new Date(iso).toLocaleDateString('pt-PT', {
-            day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit',
-        });
-    };
+    const formatDate = (iso) => formatDateTime(iso) || '—';
 
     return (
         <div className="overflow-x-auto">
@@ -552,10 +541,7 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
         setSoDrawerOpen(false);
     }, []);
 
-    const formatDate = (dateStr) => {
-        if (!dateStr) return null;
-        return new Date(dateStr + 'T00:00:00').toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    };
+    const formatDate = (dateStr) => formatAbsolute(dateStr) || null;
 
     const effectiveStatus = optimisticStatus ?? (item?.status?.value ?? item?.status);
     const isManager = authUser?.id && item?.manager?.id && String(authUser.id) === String(item.manager.id);

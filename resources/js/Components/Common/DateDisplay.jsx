@@ -4,13 +4,13 @@ import { formatAbsolute, formatDateTime, formatRelative } from '@/utils/format';
  * Renders a single date with pt-PT formatting.
  *
  *   <DateDisplay value="2026-06-12" />
- *     → "12 jun 2026"
+ *     → "12-06-2026"
  *
  *   <DateDisplay value="2026-06-12T08:14" showTime />
- *     → "12 jun 2026, 08:14"
+ *     → "12-06-2026, 08:14"
  *
  *   <DateDisplay value="2026-06-10" relative />
- *     → "Há 2 dias" (with tooltip showing "12 jun 2026")
+ *     → "Há 2 dias" (with tooltip showing "12-06-2026")
  *
  * Golden rule: relative mode always wraps in a tooltip with the absolute date.
  */

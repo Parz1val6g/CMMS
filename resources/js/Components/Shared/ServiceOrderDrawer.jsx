@@ -7,6 +7,7 @@ import BaseField from '@/Components/Shared/Drawer/BaseField';
 import LocationMap from '@/Components/Shared/LocationMap';
 import { badgeStyle, labelFor } from '@/utils/enums';
 import { t } from '@/utils/i18n';
+import { formatAbsolute } from '@/utils/format';
 import { useOptimisticMutation } from '@/composables/useOptimisticMutation';
 
 function Badge({ value }) {
@@ -51,21 +52,14 @@ function ConfirmDialog({ open, onConfirm, onCancel }) {
 }
 
 function DetailTab({ order }) {
-  const createdAt = order?.created_at
-    ? new Date(order.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
-    : null;
-
-  const startDate = order?.start_date
-    ? new Date(order.start_date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
-    : null;
-
-  const endDate = order?.end_date
-    ? new Date(order.end_date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
-    : null;
+  const createdAt = formatAbsolute(order?.created_at) || null;
+  const startDate = formatAbsolute(order?.start_date) || null;
+  const endDate = formatAbsolute(order?.end_date) || null;
 
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+        <BaseField variant="gray" label={t('pages.service_orders.drawer.field_client')}>{order?.client?.name}</BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_manager')}>{order?.manager?.name}</BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_created_at')}>{createdAt}</BaseField>
         <BaseField variant="gray" label={t('pages.service_orders.drawer.field_start_date')}>{startDate}</BaseField>
@@ -172,9 +166,14 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
         onClose={onClose}
         title={order?.process ?? ''}
         subtitle={order ? (
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge value={effectiveStatus} />
-            <Badge value={order.priority?.value ?? order.priority} />
+          <div>
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <Badge value={effectiveStatus} />
+              <Badge value={order.priority?.value ?? order.priority} />
+            </div>
+            {order.client?.name && (
+              <span className="text-sm text-brand-mid">{t('pages.service_orders.drawer_client_label')} {order.client.name}</span>
+            )}
           </div>
         ) : ''}
         tabs={tabs}

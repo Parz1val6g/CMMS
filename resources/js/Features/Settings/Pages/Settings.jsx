@@ -7,6 +7,7 @@ import DialogModal from '@/Components/Common/DialogModal';
 import Badge from '@/Components/Common/Badge';
 import SearchableSelect from '@/Components/Common/SearchableSelect';
 import { t } from '@/utils/i18n';
+import { formatAbsolute } from '@/utils/format';
 import { submitForm } from '@/utils/form';
 import { useToast } from '@/Components/Toast/ToastContext';
 
@@ -54,8 +55,7 @@ function StatCard({ label, value, icon }) {
 }
 
 function formatDate(iso) {
-  if (!iso) return null;
-  return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+  return formatAbsolute(iso) || null;
 }
 
 

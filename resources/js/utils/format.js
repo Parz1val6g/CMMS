@@ -1,20 +1,13 @@
 /**
- * Shared formatting utilities — pt-PT locale.
+ * Shared formatting utilities.
  *
- *   formatDate(raw)           — absolute "12 jun 2026"  (backward-compat alias)
- *   formatAbsolute(raw)       — absolute "12 jun 2026"
- *   formatDateTime(raw)       — absolute "12 jun 2026, 08:14"
- *   formatRelative(raw)       — relative "Há 2 horas" / "Em 3 dias" (tooltip-ready)
- *   formatDateRange(start, end) — smart range string with deduplication
+ *   formatDate(raw)             — absolute "dd-mm-yyyy"  (backward-compat alias)
+ *   formatAbsolute(raw)         — absolute "dd-mm-yyyy"
+ *   formatDateTime(raw)         — absolute "dd-mm-yyyy, HH:MM"
+ *   formatRelative(raw)         — relative "Há 2 horas" / "Em 3 dias" (tooltip-ready)
+ *   formatDateRange(start, end) — "dd-mm-yyyy – dd-mm-yyyy"
  */
 
-const FMT_DATE_PARTS = new Intl.DateTimeFormat('pt-PT', {
-  day: 'numeric', month: 'short', year: 'numeric',
-});
-const FMT_DATETIME_PARTS = new Intl.DateTimeFormat('pt-PT', {
-  day: 'numeric', month: 'short', year: 'numeric',
-  hour: '2-digit', minute: '2-digit',
-});
 const RTF = new Intl.RelativeTimeFormat('pt-PT', { numeric: 'auto' });
 
 function parseDate(raw) {
@@ -23,28 +16,22 @@ function parseDate(raw) {
   return isNaN(d.getTime()) ? null : d;
 }
 
-function toParts(fmt, date) {
-  return fmt.formatToParts(date).reduce((acc, p) => ({ ...acc, [p.type]: p.value }), {});
-}
+function pad(n) { return String(n).padStart(2, '0'); }
 
-function stripDot(s) { return s.replace(/\./g, ''); }
-
-/** "12 jun 2026" */
+/** "dd-mm-yyyy" */
 export function formatAbsolute(raw) {
   if (!raw) return '';
   const d = parseDate(raw);
   if (!d) return String(raw);
-  const p = toParts(FMT_DATE_PARTS, d);
-  return `${p.day} ${stripDot(p.month)} ${p.year}`;
+  return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
 }
 
-/** "12 jun 2026, 08:14" */
+/** "dd-mm-yyyy, HH:MM" */
 export function formatDateTime(raw) {
   if (!raw) return '';
   const d = parseDate(raw);
   if (!d) return String(raw);
-  const p = toParts(FMT_DATETIME_PARTS, d);
-  return `${p.day} ${stripDot(p.month)} ${p.year}, ${p.hour}:${p.minute}`;
+  return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 /**
@@ -74,30 +61,12 @@ export function formatRelative(raw) {
   return rel.charAt(0).toUpperCase() + rel.slice(1);
 }
 
-/**
- * Smart range string with deduplication:
- *   Same month+year:      "12–15 jun 2026"
- *   Diff month, same year: "28 jun – 3 jul 2026"
- *   Diff years:           "28 dez 2026 – 5 jan 2027"
- */
+/** "dd-mm-yyyy – dd-mm-yyyy" */
 export function formatDateRange(start, end) {
   if (!start && !end) return '';
   if (!start) return formatAbsolute(end);
   if (!end)   return formatAbsolute(start);
-  const s = parseDate(start);
-  const e = parseDate(end);
-  if (!s || !e) return `${formatAbsolute(start)} – ${formatAbsolute(end)}`;
-  const sp = toParts(FMT_DATE_PARTS, s);
-  const ep = toParts(FMT_DATE_PARTS, e);
-  const sm = stripDot(sp.month);
-  const em = stripDot(ep.month);
-  if (sp.year === ep.year && sp.month === ep.month) {
-    return `${sp.day}–${ep.day} ${sm} ${sp.year}`;
-  }
-  if (sp.year === ep.year) {
-    return `${sp.day} ${sm} – ${ep.day} ${em} ${sp.year}`;
-  }
-  return `${sp.day} ${sm} ${sp.year} – ${ep.day} ${em} ${ep.year}`;
+  return `${formatAbsolute(start)} – ${formatAbsolute(end)}`;
 }
 
 /** @deprecated Use formatAbsolute(). */

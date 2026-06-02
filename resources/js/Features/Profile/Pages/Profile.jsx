@@ -1,6 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Link } from '@inertiajs/react';
 import { t } from '@/utils/i18n';
+import { formatAbsolute } from '@/utils/format';
 import Badge from '@/Components/Common/Badge';
 
 const ROLE_VARIANT = {
@@ -57,12 +58,7 @@ function StatCard({ label, value, icon }) {
 }
 
 function formatDate(iso) {
-  if (!iso) return null;
-  return new Date(iso).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  return formatAbsolute(iso) || null;
 }
 
 function statusConfig(status) {
