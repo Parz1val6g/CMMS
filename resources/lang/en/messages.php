@@ -19,6 +19,8 @@ return [
             'already_completed' => 'This service order is already completed.',
             'incomplete_tasks' => 'Manager Approval Denied: Not all tasks are completed yet.',
             'cannot_activate_non_pending' => 'Only pending service orders can be activated.',
+            'cannot_remove_sector_with_tasks' => 'Cannot remove a sector that already has tasks assigned.',
+            'cannot_cancel_awaiting_approval' => 'Cannot cancel a service order that is awaiting approval.',
         ],
         'equipment' => [
             'invalid_status' => "Invalid status value ':value'.",
@@ -60,6 +62,7 @@ return [
     'controllers' => [
         'service_orders' => [
             'col_process' => 'Process',
+            'col_title' => 'Title',
             'col_description' => 'Description',
             'col_client' => 'Client',
             'col_priority' => 'Priority',

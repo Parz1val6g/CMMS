@@ -19,6 +19,8 @@ return [
             'already_completed' => 'Esta ordem de serviço já está concluída.',
             'incomplete_tasks' => 'Aprovação do Gestor Negada: Nem todas as tarefas estão concluídas.',
             'cannot_activate_non_pending' => 'Apenas ordens de serviço pendentes podem ser ativadas.',
+            'cannot_remove_sector_with_tasks' => 'Não é possível remover um setor que já tem tarefas associadas.',
+            'cannot_cancel_awaiting_approval' => 'Não é possível cancelar uma ordem de serviço que aguarda aprovação.',
         ],
         'equipment' => [
             'invalid_status' => "Valor de estado inválido ':value'.",
@@ -60,6 +62,7 @@ return [
     'controllers' => [
         'service_orders' => [
             'col_process' => 'Processo',
+            'col_title' => 'Título',
             'col_description' => 'Descrição',
             'col_client' => 'Cliente',
             'col_priority' => 'Prioridade',

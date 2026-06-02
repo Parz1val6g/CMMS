@@ -185,7 +185,8 @@
         "btn_activate": "Activate",
         "btn_complete": "Complete",
         "btn_cancel": "Cancel",
-        "action_error": "Error executing action"
+        "action_error": "Error executing action",
+        "create_failed": "Failed to create service order."
     },
     "entities": {
         "page_title": "Entities",
@@ -198,7 +199,8 @@
         "kpi_completed": "Completed",
         "loan_orders_title": "Loan Orders",
         "no_loans": "No loan orders.",
-        "col_equipment": "Equipment"
+        "col_equipment": "Equipment",
+        "create_failed": "Failed to create entity."
     },
     "entity_portal": {
         "page_title": "Loan Portal",
@@ -244,6 +246,7 @@
         "dismiss": "Dismiss",
         "photo_preview_alt": "Photo preview",
         "drawer_client_label": "Client:",
+        "section_title": "Title",
         "section_description": "Description",
         "section_location": "Location",
         "section_start_date": "Start Date",
@@ -256,6 +259,11 @@
         "section_workflow": "Workflow",
         "section_client": "Client",
         "section_sectors": "Sectors",
+        "sectors_label": "Sectors",
+        "add_sector": "Add Sector",
+        "priority_placeholder": "— Priority —",
+        "service_types_for_sector": "Service Types",
+        "no_service_types_for_sector": "No types",
         "section_photo": "Photo",
         "section_equipment": "Equipment",
         "section_brand": "Brand",
@@ -293,6 +301,7 @@
             "status_cancelled": "Cancelled",
             "field_status": "Status",
             "field_priority": "Priority",
+            "field_client": "Client",
             "field_manager": "Manager",
             "field_created_at": "Created at",
             "field_start_date": "Start Date",
@@ -799,5 +808,10 @@
         "delete_title": "Delete",
         "assigned_to_aria": "Assigned to: :name",
         "select_row_aria": "Select :name"
+    },
+    "validation": {
+        "required": "This field is required",
+        "required_select": "Please select an option",
+        "required_date": "Please fill in both dates"
     }
 }

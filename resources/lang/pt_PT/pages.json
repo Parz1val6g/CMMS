@@ -185,7 +185,8 @@
         "btn_activate": "Ativar",
         "btn_complete": "Concluir",
         "btn_cancel": "Cancelar",
-        "action_error": "Erro ao executar ação"
+        "action_error": "Erro ao executar ação",
+        "create_failed": "Falha ao criar ordem de serviço."
     },
     "entities": {
         "page_title": "Entidades",
@@ -198,7 +199,8 @@
         "kpi_completed": "Concluídos",
         "loan_orders_title": "Empréstimos",
         "no_loans": "Nenhum empréstimo.",
-        "col_equipment": "Equipamento"
+        "col_equipment": "Equipamento",
+        "create_failed": "Falha ao criar entidade."
     },
     "entity_portal": {
         "page_title": "Portal de Empréstimos",
@@ -244,6 +246,7 @@
         "dismiss": "Dispensar",
         "photo_preview_alt": "Pré-visualização da foto",
         "drawer_client_label": "Cliente:",
+        "section_title": "Título",
         "section_description": "Descrição",
         "section_location": "Localização",
         "section_start_date": "Data de Início",
@@ -256,6 +259,11 @@
         "section_workflow": "Fluxo",
         "section_client": "Cliente",
         "section_sectors": "Setores",
+        "sectors_label": "Setores",
+        "add_sector": "Adicionar Setor",
+        "priority_placeholder": "— Prioridade —",
+        "service_types_for_sector": "Tipos de Serviço",
+        "no_service_types_for_sector": "Sem tipos",
         "section_photo": "Foto",
         "section_equipment": "Equipamento",
         "section_brand": "Marca",
@@ -293,6 +301,7 @@
             "status_cancelled": "Cancelado",
             "field_status": "Estado",
             "field_priority": "Prioridade",
+            "field_client": "Cliente",
             "field_manager": "Gestor",
             "field_created_at": "Criado em",
             "field_start_date": "Data de Início",
@@ -848,5 +857,10 @@
         "delete_title": "Eliminar",
         "assigned_to_aria": "Atribuído a: :name",
         "select_row_aria": "Selecionar :name"
+    },
+    "validation": {
+        "required": "Este campo é obrigatório",
+        "required_select": "Por favor selecione uma opção",
+        "required_date": "Por favor preencha as datas"
     }
 }

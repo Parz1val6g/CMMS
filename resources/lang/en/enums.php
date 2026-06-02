@@ -82,6 +82,17 @@ return [
         'urgent' => 'Urgent',
     ],
 
+    'service_order_category' => [
+        'repair'       => 'Repair',
+        'maintenance'  => 'Maintenance',
+        'installation' => 'Installation',
+        'event'        => 'Event',
+        'inspection'   => 'Inspection',
+        'cleaning'     => 'Cleaning',
+        'construction' => 'Construction',
+        'emergency'    => 'Emergency',
+    ],
+
     'service_order_status' => [
         'pending' => 'Pending',
         'in_progress' => 'In Progress',
