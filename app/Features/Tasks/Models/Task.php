@@ -1,5 +1,6 @@
 <?php
 namespace App\Features\Tasks\Models;
+use App\Core\Enums\Priority;
 use App\Core\Enums\TaskStatus;
 use App\Core\Traits\Base;
 use App\Core\Traits\HasAutoReference;
@@ -27,10 +28,12 @@ class Task extends Model
         'manager_id',
         'description',
         'status',
+        'priority',
         'start_date',
         'end_date',
     ];
     protected $casts = [
+        'priority' => Priority::class,
         'status' => TaskStatus::class,
         'start_date' => 'date',
         'end_date' => 'date',
