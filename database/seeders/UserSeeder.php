@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Shared\Models\User;
 use App\Shared\Models\Role;
+use App\Features\Workers\Models\Worker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -83,6 +84,14 @@ class UserSeeder extends Seeder
                 'phone'      => '+351912345706',
                 'email'      => 'filipe.santos@cm-mangualde.pt',
             ],
+            // ── UC1 work log approval ──
+            [
+                'roles'      => ['work_log_manager'],
+                'first_name' => 'Rita',
+                'last_name'  => 'Silva',
+                'phone'      => '+351912345707',
+                'email'      => 'rita.silva@cm-mangualde.pt',
+            ],
             // ── Non-UC1 feature roles ──
             [
                 'roles'      => ['equipment_manager'],
@@ -117,6 +126,14 @@ class UserSeeder extends Seeder
                 if ($roleId && !$user->roles()->where('role_id', $roleId)->exists()) {
                     $user->roles()->attach($roleId);
                 }
+            }
+
+            // Ensure António Ferreira (the E2E worker user) has a Worker record
+            if ($data['email'] === 'antonio.ferreira@cm-mangualde.pt') {
+                Worker::firstOrCreate(
+                    ['user_id' => $user->id],
+                    ['cost_per_hour' => 12.00]
+                );
             }
         }
     }

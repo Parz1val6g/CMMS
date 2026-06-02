@@ -1,0 +1,13 @@
+{
+  "soReference": "OS202600000002",
+  "soDescription": "OS E2E 1780414729769",
+  "taskCount": 1,
+  "miniTaskIds": [
+    "019e88fa-a0bc-71a4-94bf-3dfb458a8579"
+  ],
+  "antonioWorkerId": "019e88f9-aef1-73c2-a05c-e4e0ec64ba9e",
+  "workLogId": "019e88fd-897e-717e-8794-b74f664a21bd",
+  "taskIds": [
+    "019e88fa-6ccf-73ef-b11b-29fa926575c8"
+  ]
+}
