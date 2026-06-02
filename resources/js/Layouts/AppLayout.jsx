@@ -1,7 +1,20 @@
-import { Head } from '@inertiajs/react';
+import { useEffect } from 'react';
+import { Head, usePage } from '@inertiajs/react';
 import Sidebar from '@/Components/SideBar';
-import TopBar from '@/Components/TopBar';
+import { useToast } from '@/Components/Toast/ToastContext';
 import { t } from '@/utils/i18n';
+
+function FlashToast() {
+  const { flash } = usePage().props;
+  const toast = useToast();
+
+  useEffect(() => {
+    if (flash?.success) toast.success(flash.success);
+    if (flash?.error)   toast.error(flash.error);
+  }, [flash]);
+
+  return null;
+}
 
 export default function AppLayout({ title, children }) {
   return (
@@ -9,7 +22,7 @@ export default function AppLayout({ title, children }) {
       <Head title={title} />
 
       <div className="h-screen w-screen flex flex-col overflow-hidden bg-brand-light">
-        <TopBar />
+        <FlashToast />
 
         {/* Top section: Sidebar + Main Canvas */}
         <div className="flex-1 flex flex-row overflow-hidden">
