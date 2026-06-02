@@ -85,7 +85,7 @@ class WorkLogService
      */
     public function approve(WorkLog $workLog, string $reviewerId): WorkLog
     {
-        if ($workLog->status !== WorkLogStatus::SUBMITTED->value) {
+        if ($workLog->status !== WorkLogStatus::SUBMITTED) {
             throw new InvalidArgumentException('Only submitted work logs can be approved.');
         }
         return $this->transactions->execute(function () use ($workLog, $reviewerId) {
@@ -121,7 +121,7 @@ class WorkLogService
      */
     public function reject(WorkLog $workLog, string $reviewerId): WorkLog
     {
-        if ($workLog->status !== WorkLogStatus::SUBMITTED->value) {
+        if ($workLog->status !== WorkLogStatus::SUBMITTED) {
             throw new InvalidArgumentException('Only submitted work logs can be rejected.');
         }
         return $this->transactions->execute(function () use ($workLog, $reviewerId) {

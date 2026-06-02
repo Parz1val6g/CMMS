@@ -143,7 +143,7 @@ class DashboardService
                     ],
                 ];
 
-                $recentOrders = ServiceOrder::with(['serviceType', 'location.parish'])
+                $recentOrders = ServiceOrder::with(['location.parish'])
                     ->latest()
                     ->take(8)
                     ->get()
@@ -152,8 +152,7 @@ class DashboardService
                         'process'      => $o->process,
                         'description'  => $o->description,
                         'status'       => $o->status->value,
-                        'priority'     => $o->priority->value,
-                        'service_type' => $o->serviceType?->name,
+                        'priority'     => $o->priority?->value,
                         'location'     => $o->location?->parish?->name,
                         'created_at'   => $o->created_at->format('Y-m-d'),
                     ]);
