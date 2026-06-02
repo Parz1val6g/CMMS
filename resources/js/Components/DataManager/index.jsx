@@ -37,6 +37,7 @@ export default function DataManager({
     viewMode = 'table',
     onViewModeChange = null,
     supportKanban = false,
+    refreshKey = 0,
     children = null
 }) {
     const [editItem, setEditItem] = useState(null);
@@ -63,9 +64,24 @@ export default function DataManager({
 
     /* ── Advanced filter builder state ───────────────────────────── */
     const [advFilters, setAdvFilters] = useState([]);   // Rule[]
+
+    /* ── Sync parent optimistic updates when no active filters ───── */
+    const filtersRef = useRef(filters);
+    const advFiltersRef = useRef(advFilters);
+    useEffect(() => { filtersRef.current = filters; }, [filters]);
+    useEffect(() => { advFiltersRef.current = advFilters; }, [advFilters]);
+    useEffect(() => {
+        if (initialItems === initialItemsRef.current) return;
+        initialItemsRef.current = initialItems;
+        const hasFilters = Object.values(filtersRef.current).some(v => v !== null && v !== undefined)
+            || advFiltersRef.current.length > 0;
+        if (!hasFilters) setItems(initialItems);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialItems]);
     const [advLogic, setAdvLogic]     = useState('and'); // 'and' | 'or'
 
     const abortRef = useRef(null);
+    const refetchRef = useRef(null);
 
     const { props: { activeRole } } = usePage();
 
@@ -89,6 +105,15 @@ export default function DataManager({
             .catch(() => setItems(initialItemsRef.current))
             .finally(() => setLoading(false));
     }, [routes.index, filters, advFilters, advLogic, activeRole]);
+
+    refetchRef.current = refetch;
+
+    /* ── Refresh table when parent signals (refreshKey increment) ── */
+    useEffect(() => {
+        if (refreshKey > 0 && refetchRef.current) {
+            refetchRef.current();
+        }
+    }, [refreshKey]);
 
     /* ── Fetch data from API when filters change ──────────────────── */
     useEffect(() => {

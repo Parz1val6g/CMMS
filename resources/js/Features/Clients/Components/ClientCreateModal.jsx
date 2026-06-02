@@ -11,7 +11,8 @@ import CascadingParishSelect from '@/Components/Common/CascadingParishSelect';
 const inputClass =
     'w-full rounded-lg bg-brand-white border border-brand-mid/20 text-brand-darkest px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent placeholder-brand-mid';
 const labelClass = 'block text-xs font-medium text-brand-mid mb-1';
-const errClass   = 'mt-1 text-xs text-red-400';
+const errClass   = 'mt-1 text-xs text-red-500';
+const errMsg = (e) => Array.isArray(e) ? e[0] : e;
 
 function emptyLocation() {
     return {
@@ -50,7 +51,7 @@ function LocationRow({ loc, index, districts, municipalities, parishes, onChange
                         required
                     />
                     {errors?.[`locations.${index}.name`] && (
-                        <p className={errClass}>{errors[`locations.${index}.name`][0]}</p>
+                        <p className={errClass}>{errMsg(errors[`locations.${index}.name`])}</p>
                     )}
                 </div>
 
@@ -112,7 +113,7 @@ function LocationRow({ loc, index, districts, municipalities, parishes, onChange
                 parishes={parishes}
                 value={loc.parish_id}
                 onChange={parishId => set('parish_id', parishId)}
-                error={errors?.[`locations.${index}.parish_id`]?.[0]}
+                error={errors?.[`locations.${index}.parish_id`] ? errMsg(errors[`locations.${index}.parish_id`]) : undefined}
             />
 
             <div>
@@ -190,8 +191,22 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
         e.preventDefault();
         if (saving) return;
 
+        const newErrors = {};
+        const req = t('pages.validation.required');
+        if (!client.nif.trim())        newErrors.nif        = req;
+        if (!client.first_name.trim()) newErrors.first_name = req;
+        if (!client.last_name.trim())  newErrors.last_name  = req;
+        if (!client.email.trim())      newErrors.email      = req;
+        locations.forEach((loc, i) => {
+            if (!loc.name.trim()) newErrors[`locations.${i}.name`] = req;
+        });
+
         if (!hasSede) {
-            setErrors(prev => ({ ...prev, locations: [t('pages.client_create.hq_required_error')] }));
+            newErrors.locations = t('pages.client_create.hq_required_error');
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
             return;
         }
 
@@ -250,7 +265,7 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+                <form onSubmit={handleSubmit} noValidate className="flex flex-col flex-1 overflow-hidden">
                     <div className="overflow-y-auto px-6 py-5 space-y-6 flex-1">
 
                         {/* ── Section 1: Client Info ── */}
@@ -268,7 +283,7 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                                         placeholder="500 123 456"
                                         required
                                     />
-                                    {errors.nif && <p className={errClass}>{errors.nif[0]}</p>}
+                                    {errors.nif && <p className={errClass}>{errMsg(errors.nif)}</p>}
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3">
@@ -280,7 +295,7 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                                             onChange={e => setField('first_name', e.target.value)}
                                             required
                                         />
-                                        {errors.first_name && <p className={errClass}>{errors.first_name[0]}</p>}
+                                        {errors.first_name && <p className={errClass}>{errMsg(errors.first_name)}</p>}
                                     </div>
                                     <div>
                                         <label className={labelClass}>{t('pages.client_create.label_last_name')} *</label>
@@ -290,7 +305,7 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                                             onChange={e => setField('last_name', e.target.value)}
                                             required
                                         />
-                                        {errors.last_name && <p className={errClass}>{errors.last_name[0]}</p>}
+                                        {errors.last_name && <p className={errClass}>{errMsg(errors.last_name)}</p>}
                                     </div>
                                 </div>
 
@@ -303,7 +318,7 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                                         onChange={e => setField('email', e.target.value)}
                                         required
                                     />
-                                    {errors.email && <p className={errClass}>{errors.email[0]}</p>}
+                                    {errors.email && <p className={errClass}>{errMsg(errors.email)}</p>}
                                 </div>
 
                                 <div>
@@ -314,7 +329,7 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                                         onChange={e => setField('phone', e.target.value)}
                                         placeholder="+351 910 000 000"
                                     />
-                                    {errors.phone && <p className={errClass}>{errors.phone[0]}</p>}
+                                    {errors.phone && <p className={errClass}>{errMsg(errors.phone)}</p>}
                                 </div>
                             </div>
                         </section>
@@ -349,7 +364,7 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                             )}
 
                             {errors.locations && (
-                                <p className={errClass + ' mb-2'}>{errors.locations[0]}</p>
+                                <p className={errClass + ' mb-2'}>{errMsg(errors.locations)}</p>
                             )}
 
                             <div className="space-y-3">

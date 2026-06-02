@@ -9,6 +9,7 @@ import { useFocusTrap } from '@/Hooks/useFocusTrap';
 import { useBodyLock } from '@/Hooks/useBodyLock';
 
 import { csrfHeader } from '@/utils/csrf';
+import { validateRequired } from '@/utils/validateRequired';
 
 /* ── Fields to hide per workflow type ────────────────────────── */
 // BACKEND: StoreServiceOrderRequest — prohibited fields for workflow_type=loan
@@ -108,7 +109,7 @@ function collectFormData(form, fields, formValues) {
   return data;
 }
 
-export default function Modal({ entityName = t('common.entity_name'), title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit, children, injectAfterField, externalErrors = {} }) {
+export default function Modal({ entityName = t('common.entity_name'), title, formSchema = [], routes = {}, size = '', open, onClose, onSubmit: externalSubmit, children, injectAfterField, externalErrors = {}, onSuccess }) {
   const formRef = useRef(null);
   const containerRef = useRef(null);
   const [saving, setSaving] = useState(false);
@@ -230,8 +231,15 @@ export default function Modal({ entityName = t('common.entity_name'), title, for
     e.preventDefault();
     if (!routes.store) return;
 
+    const clientErrors = validateRequired(visibleFields, formValues);
+    if (Object.keys(clientErrors).length > 0) {
+      setErrors(clientErrors);
+      return;
+    }
+
     // If an external onSubmit was provided, delegate to it
     if (externalSubmit) {
+      setErrors({});
       externalSubmit(e, formValues);
       return;
     }
@@ -268,7 +276,11 @@ export default function Modal({ entityName = t('common.entity_name'), title, for
       if (res.ok) {
         toast.success(t('pages.modal.save_success', { name: entityName }));
         onClose?.();
-        router.reload();
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          router.reload();
+        }
       } else {
         if (body.errors) {
           setErrors(body.errors);
@@ -425,11 +437,7 @@ export default function Modal({ entityName = t('common.entity_name'), title, for
               </>
             ) : (
               <div>
-                {visibleFields.map((field, i) => (
-                  <div key={i}>
-                    {renderFieldContent(field)}
-                  </div>
-                ))}
+                {visibleFields.map((field, i) => renderFieldBlock(field, i))}
               </div>
             )}
 

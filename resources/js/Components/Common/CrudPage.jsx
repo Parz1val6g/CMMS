@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { t } from '@/utils/i18n';
 import DataManager from '@/Components/DataManager';
@@ -18,9 +18,15 @@ export default function CrudPage({
   modalSize = '',
   entityName,
   onRowClick,
+  refreshKey = 0,
   children,
 }) {
   const [showModal, setShowModal] = useState(false);
+  const [internalKey, setInternalKey] = useState(0);
+
+  const handleModalSuccess = useCallback(() => {
+    setInternalKey(k => k + 1);
+  }, []);
 
   const resolvedBreadcrumbs = breadcrumbs ?? (baseRoute
     ? [
@@ -41,6 +47,7 @@ export default function CrudPage({
         size={modalSize}
         open={showModal}
         onClose={() => setShowModal(false)}
+        onSuccess={handleModalSuccess}
       />
 
       <DataManager
@@ -54,6 +61,7 @@ export default function CrudPage({
         advancedFilterFields={advancedFilterFields}
         onNew={() => setShowModal(true)}
         onRowClick={onRowClick}
+        refreshKey={refreshKey + internalKey}
       />
 
       {children}

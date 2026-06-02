@@ -5,7 +5,7 @@ export default function FormInput({
     value = '',
     onChange,
     onBlur,
-    error: serverError,
+    error,
     fieldConfig = {},
 }) {
     const {
@@ -15,7 +15,7 @@ export default function FormInput({
         type = field?.type || fieldConfig?.type || 'text',
     } = field || fieldConfig;
 
-    const hasError = !!serverError;
+    const hasError = !!error;
 
     const handleBlur = useCallback((e) => {
         onBlur?.(e);
@@ -52,8 +52,8 @@ export default function FormInput({
                 max={field?.max ?? fieldConfig?.max ?? undefined}
             />
 
-            {serverError && (
-                <p className="text-xs text-red-500 mt-1.5">{serverError}</p>
+            {error && (
+                <p className="text-xs text-red-500 mt-1.5">{error}</p>
             )}
         </div>
     );

@@ -90,9 +90,11 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
       {/* Drawer Panel */}
       <div
         ref={panelRef}
+        role="dialog"
+        aria-modal="true"
         style={{ width: `${width}px` }}
         className={`fixed inset-y-0 right-0 ${panelZ} flex flex-col bg-brand-white shadow-2xl border-l border-brand-mid/20 overflow-hidden transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+          isOpen ? 'translate-x-0' : 'translate-x-full invisible'
         }`}
       >
         {/* Resize handle */}

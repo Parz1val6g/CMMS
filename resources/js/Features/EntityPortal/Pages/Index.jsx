@@ -54,6 +54,7 @@ function EquipmentPills({ equipments }) {
 
 export default function EntityPortalIndex({ loan_orders, createFormSchema, routes }) {
   const [createOpen, setCreateOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
   const [drawer, setDrawer] = useState({ open: false, loanOrder: null, loading: false, error: null });
 
   const orders = loan_orders?.data ?? [];
@@ -90,9 +91,11 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
       body: JSON.stringify(formData),
     });
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ message: t('pages.entity_portal.submit_failed') }));
-      throw err;
+      const err = await res.json().catch(() => ({}));
+      setFormErrors(err.errors ?? { _general: err.message ?? t('pages.entity_portal.submit_failed') });
+      return;
     }
+    setFormErrors({});
     setCreateOpen(false);
     router.reload();
   }, [routes.store]);
@@ -108,7 +111,7 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
             <p className="text-gray-500 text-sm mt-1">{t('pages.entity_portal.subtitle')}</p>
           </div>
           <button
-            onClick={() => setCreateOpen(true)}
+            onClick={() => { setFormErrors({}); setCreateOpen(true); }}
             className="flex items-center gap-2 bg-brand-accent hover:bg-brand-accent/90 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors whitespace-nowrap"
           >
             <Plus size={16} strokeWidth={2.5} />
@@ -180,8 +183,9 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
         formSchema={createFormSchema}
         routes={routes}
         open={createOpen}
-        onClose={() => setCreateOpen(false)}
+        onClose={() => { setFormErrors({}); setCreateOpen(false); }}
         onSubmit={handleCreate}
+        externalErrors={formErrors}
       />
 
       {/* Detail drawer */}

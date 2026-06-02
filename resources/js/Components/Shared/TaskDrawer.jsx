@@ -44,9 +44,11 @@ function GeneralTab({ item, canViewServiceOrders, onOpenServiceOrder }) {
     const startDate = formatAbsolute(item.start_date) || null;
     const endDate = formatAbsolute(item.end_date) || null;
 
-    const soProcess = item.service_order?.process;
-    const soId = item.service_order?.id;
+    const so = item.service_order;
+    const soId = so?.id;
     const canViewSO = canViewServiceOrders && soId;
+    const soLabel = so?.title || so?.process || null;
+    const soDescription = so?.description || null;
 
     return (
         <div className="grid grid-cols-2 gap-6">
@@ -55,13 +57,16 @@ function GeneralTab({ item, canViewServiceOrders, onOpenServiceOrder }) {
                     <button
                         type="button"
                         onClick={() => onOpenServiceOrder(soId)}
-                        className="inline-flex items-center gap-1 font-mono text-brand-accent hover:text-brand-darkest hover:underline transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 text-brand-accent hover:text-brand-darkest hover:underline transition-colors cursor-pointer text-left"
                     >
-                        {soProcess}
-                        <ExternalLink size={13} />
+                        <span className="font-medium">{soLabel}</span>
+                        <ExternalLink size={13} className="shrink-0" />
                     </button>
                 ) : (
-                    soProcess ?? null
+                    soLabel ?? null
+                )}
+                {soDescription && (
+                    <p className="mt-1 text-xs text-brand-mid leading-relaxed">{soDescription}</p>
                 )}
             </BaseField>
             <BaseField label={t('pages.tasks.drawer.field_manager')}>

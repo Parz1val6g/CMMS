@@ -18,6 +18,7 @@ export default function EntitiesIndex({
   entityTypeOptions = [],
 }) {
   const [createOpen, setCreateOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
 
   const breadcrumbs = [
     { label: t('pages.sidebar.dashboard'), href: '/dashboard' },
@@ -48,9 +49,11 @@ export default function EntitiesIndex({
       body: JSON.stringify(formData),
     });
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ message: 'Failed to create' }));
-      throw err;
+      const err = await res.json().catch(() => ({}));
+      setFormErrors(err.errors ?? { _general: err.message ?? t('pages.entities.create_failed') });
+      return;
     }
+    setFormErrors({});
     setCreateOpen(false);
     router.reload();
   }, [routes.store]);
@@ -66,15 +69,16 @@ export default function EntitiesIndex({
         routes={routes}
         filterSchema={filterSchema}
         advancedFilterFields={advancedFilterFields}
-        onNew={() => setCreateOpen(true)}
+        onNew={() => { setFormErrors({}); setCreateOpen(true); }}
       >
         <Modal
           entityName={t('pages.entities.dm_entity_name')}
           formSchema={createFormSchema}
           routes={routes}
           open={createOpen}
-          onClose={() => setCreateOpen(false)}
+          onClose={() => { setFormErrors({}); setCreateOpen(false); }}
           onSubmit={handleCreate}
+          externalErrors={formErrors}
         />
       </DataManager>
     </AppLayout>

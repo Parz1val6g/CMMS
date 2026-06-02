@@ -197,6 +197,7 @@ const COLUMNS = [
 /* ── Main page ────────────────────────────────────────────────────────── */
 export default function ManagerPortalIndex({ service_orders, stats, createFormSchema, filterSchema, routes }) {
   const [createOpen, setCreateOpen]         = useState(false);
+  const [formErrors, setFormErrors]             = useState({});
   const [clientLocationId, setClientLocationId] = useState(null);
   const [locationsDirty, setLocationsDirty]     = useState(false);
   const [currentClientId, setCurrentClientId]   = useState(null);
@@ -254,9 +255,11 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw body;
+      setFormErrors(body.errors ?? { _general: body.message ?? t('pages.manager_portal.create_failed') });
+      return;
     }
 
+    setFormErrors({});
     setCreateOpen(false);
     setClientLocationId(null);
     setLocationsDirty(false);
@@ -282,7 +285,7 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
             <p className="text-gray-500 text-sm mt-1">{t('pages.manager_portal.subtitle')}</p>
           </div>
           <button
-            onClick={() => setCreateOpen(true)}
+            onClick={() => { setFormErrors({}); setCreateOpen(true); }}
             className="flex items-center gap-2 bg-brand-accent hover:bg-brand-accent/90 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors whitespace-nowrap"
           >
             <Plus size={16} strokeWidth={2.5} />
@@ -321,7 +324,7 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
               <FileText size={40} className="mb-3 opacity-30" />
               <p className="text-sm font-medium text-gray-500">{t('pages.manager_portal.empty_title')}</p>
               <button
-                onClick={() => setCreateOpen(true)}
+                onClick={() => { setFormErrors({}); setCreateOpen(true); }}
                 className="flex items-center gap-1.5 text-brand-accent text-sm font-medium hover:underline mt-4"
               >
                 <Plus size={14} /> {t('pages.manager_portal.empty_btn')}
@@ -374,9 +377,10 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
         routes={routes}
         size="lg"
         open={createOpen}
-        onClose={() => setCreateOpen(false)}
+        onClose={() => { setFormErrors({}); setCreateOpen(false); }}
         onSubmit={handleCreate}
         injectAfterField="client_id"
+        externalErrors={formErrors}
       >
         <ClientLocationSelector
           isOpen={createOpen}
@@ -390,7 +394,7 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
       <WorkspaceDrawer
         isOpen={drawer.open}
         onClose={closeDrawer}
-        title={drawer.so?.process ?? ''}
+        title={drawer.so ? (drawer.so.title || drawer.so.process) : ''}
         subtitle={drawer.so ? labelFor(drawer.so.status) : ''}
         tabs={drawer.so ? [
           {

@@ -4,6 +4,7 @@ import FormField from '@/Components/Common/FormField';
 import { replaceId } from '@/utils/url';
 import { t } from '@/utils/i18n';
 import { csrfHeader } from '@/utils/csrf';
+import { validateRequired } from '@/utils/validateRequired';
 
 /* ── Fields to hide per workflow type ────────────────────────── */
 // BACKEND: UpdateServiceOrderRequest — prohibited fields for workflow_type=loan
@@ -22,7 +23,7 @@ function evalCondition({ operator, value }, fieldValue) {
 }
 
 const LOAN_HIDDEN = new Set([
-    'service_type_id', 'sector_ids',
+    'sector_ids',
 ]);
 // BACKEND: UpdateServiceOrderRequest — prohibited fields for workflow_type=regular
 const REGULAR_HIDDEN = new Set([
@@ -266,6 +267,13 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!routes.update || !selectedItem) return;
+
+        const clientErrors = validateRequired(visibleFields, formValues);
+        if (Object.keys(clientErrors).length > 0) {
+            setErrors(clientErrors);
+            return;
+        }
+
         setSaving(true);
 
         // Build payload from controlled state (#4)
@@ -396,11 +404,9 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
                 <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content ?? ''} />
 
                 <div className="flex-1 overflow-y-auto p-4">
-                    {Object.keys(errors).length > 0 && (
+                    {errors._general && (
                         <div className="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-                            {Object.entries(errors).map(([field, msgs]) => (
-                                <p key={field}>{(Array.isArray(msgs) ? msgs : [msgs]).join(', ')}</p>
-                            ))}
+                            {errors._general}
                         </div>
                     )}
 

@@ -100,7 +100,7 @@ export default function TicketsIndex({ tickets, columns, formSchema, createFormS
         open={showModal}
         onClose={() => setShowModal(false)}
         onSubmit={handleCreate}
-        errors={formErrors}
+        externalErrors={formErrors}
       />
 
       <DataManager

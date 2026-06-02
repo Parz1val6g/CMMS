@@ -17,6 +17,7 @@ export default function LoanOrdersIndex({ loan_orders, columns, formSchema, crea
 
   const [drawer, setDrawer] = useState({ open: false, loanOrder: null, loading: false, error: null });
   const [createOpen, setCreateOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
 
   const openDrawer = useCallback(async (item) => {
     setDrawer({ open: true, loanOrder: null, loading: true, error: null });
@@ -62,9 +63,11 @@ export default function LoanOrdersIndex({ loan_orders, columns, formSchema, crea
       body: JSON.stringify(formData),
     });
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ message: t('pages.loan_orders.create_failed') }));
-      throw err;
+      const err = await res.json().catch(() => ({}));
+      setFormErrors(err.errors ?? { _general: err.message ?? t('pages.loan_orders.create_failed') });
+      return;
     }
+    setFormErrors({});
     setCreateOpen(false);
     router.reload();
   }, [routes.store]);
@@ -81,15 +84,16 @@ export default function LoanOrdersIndex({ loan_orders, columns, formSchema, crea
         filterSchema={filterSchema}
         advancedFilterFields={advancedFilterFields}
         onRowClick={openDrawer}
-        onNew={() => setCreateOpen(true)}
+        onNew={() => { setFormErrors({}); setCreateOpen(true); }}
       >
         <Modal
           entityName={t('pages.loan_orders.dm_entity_name')}
           formSchema={createFormSchema}
           routes={routes}
           open={createOpen}
-          onClose={() => setCreateOpen(false)}
+          onClose={() => { setFormErrors({}); setCreateOpen(false); }}
           onSubmit={handleCreate}
+          externalErrors={formErrors}
         />
         <WorkspaceDrawer
           isOpen={drawer.open}
