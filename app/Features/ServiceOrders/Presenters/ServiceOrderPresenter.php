@@ -18,26 +18,23 @@ class ServiceOrderPresenter
         return [
             'id'            => $o->id,
             'process'       => $o->process,
+            'title'         => $o->title,
             'description'   => $o->description,
             'workflow_type' => $o->workflow_type,
             'client_id'     => $o->client_id,
             'location_id'   => $o->location_id,
-            'service_type_id' => $o->service_type_id,
             'manager_id'    => $o->manager_id,
-            'priority'      => $o->priority,
+            'category_id'   => $o->category_id,
+            'category'      => $o->category ? ['id' => $o->category->id, 'name' => $o->category->name] : null,
             'status'        => $o->status,
             'start_date'    => $o->start_date?->format('Y-m-d'),
             'end_date'      => $o->end_date?->format('Y-m-d'),
             'created_at'    => $o->created_at->format('Y-m-d'),
             'photo_url'     => $o->photo_url,
-            'sectors'       => $o->sectors->map(fn($s) => [
-                'id'   => $s->id,
-                'name' => $s->name,
-            ])->toArray(),
+            'sectors'       => self::shapeSectors($o),
             'client'        => self::shapeClient($o),
             'manager'       => self::shapeUser($o->manager),
             'location'      => self::shapeLocation($o),
-            'service_type'  => $o->serviceType ? ['name' => $o->serviceType->name] : null,
             // Flatten location fields for edit form pre-fill
             'parish_id'       => $o->location?->parish_id,
             'street'          => $o->location?->street_address,
@@ -58,26 +55,23 @@ class ServiceOrderPresenter
         $data = [
             'id'            => $so->id,
             'process'       => $so->process,
+            'title'         => $so->title,
             'description'   => $so->description,
             'workflow_type' => $so->workflow_type,
             'client_id'     => $so->client_id,
             'location_id'   => $so->location_id,
-            'service_type_id' => $so->service_type_id,
             'manager_id'    => $so->manager_id,
-            'priority'      => $so->priority,
+            'category_id'   => $so->category_id,
+            'category'      => $so->category ? ['id' => $so->category->id, 'name' => $so->category->name] : null,
             'status'        => $so->status,
             'start_date'    => $so->start_date?->format('Y-m-d'),
             'end_date'      => $so->end_date?->format('Y-m-d'),
             'created_at'    => $so->created_at->format('Y-m-d'),
             'photo_url'     => $so->photo_url,
-            'sectors'       => $so->sectors->map(fn($s) => [
-                'id'   => $s->id,
-                'name' => $s->name,
-            ])->toArray(),
+            'sectors'       => self::shapeSectors($so),
             'client'        => self::shapeClient($so),
             'manager'       => self::shapeUser($so->manager),
             'location'      => self::shapeLocation($so),
-            'service_type'  => $so->serviceType ? ['name' => $so->serviceType->name] : null,
             // Flatten location fields for edit form pre-fill
             'parish_id'       => $so->location?->parish_id,
             'street'          => $so->location?->street_address,
@@ -95,6 +89,17 @@ class ServiceOrderPresenter
     }
 
     // ── Private shape helpers ──────────────────────────────────────────
+
+    private static function shapeSectors(ServiceOrder $so): array
+    {
+        $serviceTypesBySector = $so->serviceTypesBySector();
+        return $so->sectors->map(fn($s) => [
+            'id'            => $s->id,
+            'name'          => $s->name,
+            'priority'      => $s->pivot->priority ?? null,
+            'service_types' => $serviceTypesBySector[$s->id] ?? [],
+        ])->toArray();
+    }
 
     private static function shapeClient(ServiceOrder $o): ?array
     {

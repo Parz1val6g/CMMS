@@ -2,6 +2,7 @@
 namespace App\Features\ServiceOrders\Models;
 use App\Core\Enums\Priority;
 use App\Core\Enums\ServiceOrderStatus;
+use App\Features\ServiceOrderCategories\Models\ServiceOrderCategory;
 use App\Core\Traits\Base;
 use App\Core\Traits\HasAutoReference;
 use App\Core\Traits\LogsAuditTrail;
@@ -16,6 +17,7 @@ use App\Features\ServiceTypes\Models\ServiceType;
 use App\Features\Sectors\Models\Sector;
 use App\Features\Tasks\Models\Task;
 use App\Shared\Models\Attachment;
+use Illuminate\Support\Facades\DB;
 
 class ServiceOrder extends Model
 {
@@ -32,14 +34,15 @@ class ServiceOrder extends Model
     }
     protected $fillable = [
         'process',
+        'title',
         'client_id',
         'client_location_id',
         'manager_id',
         'created_by',
         'location_id',
-        'service_type_id',
         'migrated_to_loan_id',
         'priority',
+        'category_id',
         'start_date',
         'end_date',
         'status',
@@ -68,6 +71,11 @@ class ServiceOrder extends Model
         return Storage::disk('public')->url($this->photo_path);
     }
 
+    public function category()
+    {
+        return $this->belongsTo(ServiceOrderCategory::class, 'category_id');
+    }
+
     public function client()
     {
         return $this->belongsTo(Client::class);
@@ -88,14 +96,31 @@ class ServiceOrder extends Model
     {
         return $this->belongsTo(Location::class);
     }
-    public function serviceType()
-    {
-        return $this->belongsTo(ServiceType::class);
-    }
-
     public function sectors()
     {
-        return $this->belongsToMany(Sector::class, 'service_order_sector', 'service_order_id', 'sector_id');
+        return $this->belongsToMany(Sector::class, 'service_order_sector', 'service_order_id', 'sector_id')
+            ->withPivot('priority');
+    }
+
+    public function serviceTypes()
+    {
+        return $this->belongsToMany(ServiceType::class, 'service_order_sector_service_type', 'service_order_id', 'service_type_id')
+            ->withPivot('sector_id');
+    }
+
+    public function serviceTypesBySector(): array
+    {
+        $rows = DB::table('service_order_sector_service_type as sost')
+            ->join('service_types as st', 'st.id', '=', 'sost.service_type_id')
+            ->where('sost.service_order_id', $this->id)
+            ->select('sost.sector_id', 'st.id as service_type_id', 'st.name as service_type_name')
+            ->get();
+
+        $grouped = [];
+        foreach ($rows as $row) {
+            $grouped[$row->sector_id][] = ['id' => $row->service_type_id, 'name' => $row->service_type_name];
+        }
+        return $grouped;
     }
 
     public function tasks()

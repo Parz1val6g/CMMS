@@ -2,7 +2,6 @@
 
 namespace App\Features\ServiceOrders;
 
-use App\Core\Enums\Priority;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Forms\FormSchema;
 use App\Core\Forms\Fields\{TextInput, TextAreaInput, SelectInput, FileInput, SectionHeader, MapInput, DateRangeInput};
@@ -22,6 +21,12 @@ class ServiceOrderFormSchema
                     ->setLabel(__('forms.service_orders.section_core'))
             )
             ->field(
+                TextInput::make('title')
+                    ->setLabel(__('forms.service_orders.title'))
+                    ->helperText(__('forms.service_orders.title_helper'))
+                    ->setRules('nullable|string|max:255')
+            )
+            ->field(
                 TextAreaInput::make('description')
                     ->setLabel(__('forms.service_orders.description'))
                     ->helperText(__('forms.service_orders.description_helper'))
@@ -35,15 +40,6 @@ class ServiceOrderFormSchema
                     ->setStartName('start_date')
                     ->setEndName('end_date')
                     ->setRules('required|date')
-            )
-            ->field(
-                SelectInput::make('sector_ids')
-                    ->setLabel(__('forms.service_orders.sectors'))
-                    ->setRequired()
-                    ->helperText(__('forms.service_orders.sectors_helper'))
-                    ->setOptions(self::sectorOptions())
-                    ->multiple()
-                    ->setRules('required|array|min:1')
             )
             ->field(
                 SelectInput::make('manager_id')
@@ -60,18 +56,11 @@ class ServiceOrderFormSchema
                     ->setRules('nullable|exists:clients,id')
             )
             ->field(
-                SelectInput::make('service_type_id')
-                    ->setLabel(__('forms.service_orders.service_type'))
-                    ->helperText(__('forms.service_orders.service_type_helper'))
-                    ->setOptions(self::serviceTypeOptions())
-                    ->setRules('nullable|exists:service_types,id')
-            )
-            ->field(
-                SelectInput::make('priority')
-                    ->setLabel(__('forms.service_orders.priority'))
-                    ->helperText(__('forms.service_orders.priority_helper'))
-                    ->setOptions(Priority::options())
-                    ->setRules('nullable|string')
+                SelectInput::make('category_id')
+                    ->setLabel(__('forms.service_orders.category'))
+                    ->helperText(__('forms.service_orders.category_helper'))
+                    ->setOptions(RefCache::serviceOrderCategories())
+                    ->setRules('nullable|uuid')
             )
             // ── Photo ──
             ->field(
@@ -144,18 +133,15 @@ class ServiceOrderFormSchema
                     ->setLabel(__('forms.service_orders.section_core'))
             )
             ->field(
+                TextInput::make('title')
+                    ->setLabel(__('forms.service_orders.title'))
+                    ->setRules('nullable|string|max:255')
+            )
+            ->field(
                 TextAreaInput::make('description')
                     ->setLabel(__('forms.service_orders.description'))
                     ->setRows(3)
                     ->setRules('nullable|string|max:2000')
-            )
-            ->field(
-                SelectInput::make('sector_ids')
-                    ->setLabel(__('forms.service_orders.sectors'))
-                    ->helperText(__('forms.service_orders.sectors_helper'))
-                    ->setOptions(self::sectorOptions())
-                    ->multiple()
-                    ->setRules('sometimes|array|min:1')
             )
             ->field(
                 SelectInput::make('manager_id')
@@ -170,16 +156,10 @@ class ServiceOrderFormSchema
                     ->setRules('nullable|exists:clients,id')
             )
             ->field(
-                SelectInput::make('service_type_id')
-                    ->setLabel(__('forms.service_orders.service_type'))
-                    ->setOptions(self::serviceTypeOptions())
-                    ->setRules('nullable|exists:service_types,id')
-            )
-            ->field(
-                SelectInput::make('priority')
-                    ->setLabel(__('forms.service_orders.priority'))
-                    ->setOptions(Priority::options())
-                    ->setRules('nullable|string')
+                SelectInput::make('category_id')
+                    ->setLabel(__('forms.service_orders.category'))
+                    ->setOptions(RefCache::serviceOrderCategories())
+                    ->setRules('nullable|uuid')
             )
             ->field(
                 SelectInput::make('status')
@@ -248,11 +228,6 @@ class ServiceOrderFormSchema
             );
     }
 
-    private static function sectorOptions(): array
-    {
-        return RefCache::sectors();
-    }
-
     private static function clientOptions(): array
     {
         return Client::join('users', 'users.id', '=', 'clients.user_id')
@@ -263,11 +238,6 @@ class ServiceOrderFormSchema
                 'label' => trim("{$c->first_name} {$c->last_name}"),
             ])
             ->toArray();
-    }
-
-    private static function serviceTypeOptions(): array
-    {
-        return RefCache::serviceTypes();
     }
 
     private static function parishOptions(): array

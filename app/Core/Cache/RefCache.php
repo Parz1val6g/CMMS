@@ -3,6 +3,7 @@
 namespace App\Core\Cache;
 
 use App\Features\Entities\Models\Entity;
+use App\Features\ServiceOrderCategories\Models\ServiceOrderCategory;
 use App\Shared\Models\Unit;
 use App\Features\Sectors\Models\Sector;
 use App\Features\ServiceTypes\Models\ServiceType;
@@ -24,10 +25,23 @@ class RefCache
     public static function serviceTypes(): array
     {
         return Cache::tags(['ref', 'service_types'])->remember('ref:service_types', now()->addHour(), fn() =>
-            ServiceType::orderBy('name')->get(['id', 'name'])
-                ->map(fn($s) => ['value' => $s->id, 'label' => $s->name])
+            ServiceType::orderBy('name')->get(['id', 'name', 'sector_id'])
+                ->map(fn($s) => ['value' => $s->id, 'label' => $s->name, 'sector_id' => $s->sector_id])
                 ->toArray()
         );
+    }
+
+    public static function serviceTypesBySector(): array
+    {
+        return Cache::tags(['ref', 'service_types', 'sectors'])->remember('ref:service_types_by_sector', now()->addHour(), function () {
+            $sectors = Sector::with(['serviceTypes' => fn($q) => $q->orderBy('name')])->orderBy('name')->get();
+            return $sectors->mapWithKeys(fn($s) => [
+                $s->id => [
+                    'name'          => $s->name,
+                    'service_types' => $s->serviceTypes->map(fn($t) => ['id' => $t->id, 'name' => $t->name])->toArray(),
+                ],
+            ])->toArray();
+        });
     }
 
     public static function parishes(): array
@@ -64,6 +78,20 @@ class RefCache
                 ->map(fn($e) => ['value' => $e->id, 'label' => $e->name])
                 ->toArray()
         );
+    }
+
+    public static function serviceOrderCategories(): array
+    {
+        return Cache::tags(['ref', 'service_order_categories'])->remember('ref:service_order_categories', now()->addHour(), fn() =>
+            ServiceOrderCategory::orderBy('name')->get(['id', 'name'])
+                ->map(fn($c) => ['value' => $c->id, 'label' => $c->name])
+                ->toArray()
+        );
+    }
+
+    public static function flushServiceOrderCategories(): void
+    {
+        Cache::tags(['ref', 'service_order_categories'])->flush();
     }
 
     public static function flushSectors(): void

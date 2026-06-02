@@ -2,6 +2,7 @@
 
 namespace App\Features\ServiceOrders\Controllers\Web;
 
+use App\Core\Cache\RefCache;
 use App\Core\Enums\Priority;
 use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Traits\GatesRoutes;
@@ -23,7 +24,7 @@ class ServiceOrderPageController extends Controller
         $user = $request->user();
         $activeRole = $request->session()->get('active_role');
 
-        $orders = ServiceOrder::with(['client.user', 'manager', 'location.parish', 'serviceType', 'sectors'])
+        $orders = ServiceOrder::with(['client.user', 'manager', 'location.parish', 'sectors', 'category'])
             ->when($activeRole === 'attendant', fn($q) => $q->where('created_by', $user->id))
             ->when($activeRole === 'sector_manager', fn($q) => $q->whereHas('sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id'))))
             ->when($activeRole === 'manager', fn($q) => $q->where('manager_id', $user->id))
@@ -38,6 +39,7 @@ class ServiceOrderPageController extends Controller
             'service_orders'   => $orders,
             'columns'          => [
                 ['key' => 'process',    'label' => __('messages.controllers.service_orders.col_process'),    'sortable' => true],
+                ['key' => 'title',      'label' => __('messages.controllers.service_orders.col_title')],
                 ['key' => 'description','label' => __('messages.controllers.service_orders.col_description')],
                 ['key' => 'client.name','label' => __('messages.controllers.service_orders.col_client')],
                 ['key' => 'status',     'label' => __('messages.controllers.service_orders.col_status'),     'sortable' => true],
@@ -53,8 +55,10 @@ class ServiceOrderPageController extends Controller
                 'destroy' => url('/api/service-orders/:id'),
                 'show'    => url('/api/service-orders/:id'),
             ], 'service_orders'),
+            'serviceTypesBySector'  => RefCache::serviceTypesBySector(),
             'advancedFilterFields' => [
                 ['value' => 'process',     'label' => __('messages.controllers.service_orders.col_process')],
+                ['value' => 'title',       'label' => __('messages.controllers.service_orders.col_title')],
                 ['value' => 'description', 'label' => __('messages.controllers.service_orders.col_description')],
                 ['value' => 'priority',    'label' => __('messages.controllers.service_orders.col_priority'), 'type' => 'select', 'options' => Priority::options()],
                 ['value' => 'status',      'label' => __('messages.controllers.service_orders.col_status'),   'type' => 'select', 'options' => ServiceOrderStatus::options()],
@@ -71,7 +75,7 @@ class ServiceOrderPageController extends Controller
     public function show(Request $request, $id)
     {
         $only  = array_values(array_filter(explode(',', $request->query('only', ''))));
-        $query = ServiceOrder::with(['client.user', 'manager', 'location.parish', 'serviceType', 'sectors']);
+        $query = ServiceOrder::with(['client.user', 'manager', 'location.parish', 'sectors', 'category']);
 
         if (empty($only) || in_array('tasks', $only)) {
             $query->with([

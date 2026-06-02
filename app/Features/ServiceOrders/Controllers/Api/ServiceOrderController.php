@@ -28,9 +28,9 @@ class ServiceOrderController extends Controller
         $user = $request->user();
 
         $query = $this->filterService->apply(
-            ServiceOrder::with(['client.user', 'manager', 'location', 'serviceType', 'sectors']),
+            ServiceOrder::with(['client.user', 'manager', 'location', 'sectors', 'category']),
             $request->only(['search', 'status', 'priority', 'from_date', 'to_date', 'sort']),
-            ['process', 'description', 'priority', 'status']
+            ['process', 'title', 'description', 'priority', 'status']
         );
 
         // Search across relationship columns
@@ -43,7 +43,7 @@ class ServiceOrderController extends Controller
 
         $this->applyAdvancedFilters(
             $request, $query, $this->filterService,
-            ['process', 'description', 'priority', 'status', 'created_at']
+            ['process', 'title', 'description', 'priority', 'status', 'created_at']
         );
 
         $user = $request->user();
@@ -64,7 +64,7 @@ class ServiceOrderController extends Controller
         $managerId = $request->validated('manager_id');
         $serviceOrder = $this->serviceOrderService->create($request->validated(), $managerId, $request->user()->id);
 
-        $serviceOrder->load(['client.user', 'manager', 'location', 'serviceType']);
+        $serviceOrder->load(['client.user', 'manager', 'location', 'sectors', 'category']);
 
         session()->flash('success', 'Service order created successfully.');
         return new ServiceOrderResource($serviceOrder);
@@ -79,7 +79,6 @@ class ServiceOrderController extends Controller
             'clientLocation.location.parish',
             'manager',
             'location.parish.municipality.district',
-            'serviceType',
             'sectors',
             'tasks' => fn($q) => $q->with([
                 'sectors',
@@ -97,7 +96,7 @@ class ServiceOrderController extends Controller
         Gate::authorize('update', $serviceOrder);
 
         $updatedOrder = $this->serviceOrderService->update($serviceOrder, $request->validated());
-        $updatedOrder->load(['client.user', 'manager', 'location', 'serviceType', 'sectors']);
+        $updatedOrder->load(['client.user', 'manager', 'location', 'sectors', 'category']);
 
         session()->flash('success', 'Service order updated successfully.');
         return new ServiceOrderResource($updatedOrder);
@@ -108,7 +107,7 @@ class ServiceOrderController extends Controller
         Gate::authorize('cancel', $serviceOrder);
 
         $cancelledOrder = $this->serviceOrderService->cancel($serviceOrder);
-        $cancelledOrder->load(['client.user', 'manager', 'location', 'serviceType', 'sectors']);
+        $cancelledOrder->load(['client.user', 'manager', 'location', 'sectors', 'category']);
         return new ServiceOrderResource($cancelledOrder);
     }
 
@@ -117,7 +116,7 @@ class ServiceOrderController extends Controller
         Gate::authorize('activate', $serviceOrder);
 
         $activatedOrder = $this->serviceOrderService->activate($serviceOrder);
-        $activatedOrder->load(['client.user', 'manager', 'location', 'serviceType', 'sectors']);
+        $activatedOrder->load(['client.user', 'manager', 'location', 'sectors', 'category']);
         return new ServiceOrderResource($activatedOrder);
     }
 
@@ -126,7 +125,7 @@ class ServiceOrderController extends Controller
         Gate::authorize('complete', $serviceOrder);
 
         $completedOrder = $this->serviceOrderService->complete($serviceOrder);
-        $completedOrder->load(['client.user', 'manager', 'location', 'serviceType', 'sectors']);
+        $completedOrder->load(['client.user', 'manager', 'location', 'sectors', 'category']);
         return new ServiceOrderResource($completedOrder);
     }
 

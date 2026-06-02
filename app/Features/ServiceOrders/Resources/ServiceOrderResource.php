@@ -10,8 +10,14 @@ class ServiceOrderResource extends JsonResource
         return [
             'id' => $this->id,
             'process' => $this->process,
+            'title' => $this->title,
             'description' => $this->description,
             'priority' => $this->priority,
+            'category_id' => $this->category_id,
+            'category' => $this->whenLoaded('category', fn() => [
+                'id'   => $this->category->id,
+                'name' => $this->category->name,
+            ]),
             'start_date' => $this->start_date ? $this->start_date->format('Y-m-d') : null,
             'end_date' => $this->end_date ? $this->end_date->format('Y-m-d') : null,
             'status' => $this->status,
@@ -48,13 +54,14 @@ class ServiceOrderResource extends JsonResource
             'postal_code' => $this->whenLoaded('location', fn() => $this->location->postal_code),
             'latitude' => $this->whenLoaded('location', fn() => $this->location->latitude),
             'longitude' => $this->whenLoaded('location', fn() => $this->location->longitude),
-            'service_type' => $this->whenLoaded('serviceType'),
-
-            // Sectors (many-to-many)
+            // Sectors with per-sector priority and service types
             'sectors' => $this->whenLoaded('sectors', function () {
+                $serviceTypesBySector = $this->serviceTypesBySector();
                 return $this->sectors->map(fn($s) => [
-                    'id'   => $s->id,
-                    'name' => $s->name,
+                    'id'           => $s->id,
+                    'name'         => $s->name,
+                    'priority'     => $s->pivot->priority ?? null,
+                    'service_types' => $serviceTypesBySector[$s->id] ?? [],
                 ]);
             }),
 

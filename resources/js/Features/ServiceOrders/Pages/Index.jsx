@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import ClientLocationSelector from '@/Components/Shared/ClientLocationSelector';
+import SectorConfigPanel from '../Components/SectorConfigPanel';
 import { csrfHeader } from '@/utils/csrf';
 import { buildCreatePayload } from '@/utils/serviceOrderPayload';
 import { labelFor, badgeStyle } from '@/utils/enums';
 import { formatDate } from '@/utils/format';
-import { usePage, router } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { useToast } from '@/Components/Toast/ToastContext';
 import { useOptimisticMutation } from '@/composables/useOptimisticMutation';
 import { MapPin, Clock, Loader2, AlertCircle, Play, Check } from 'lucide-react';
@@ -18,14 +19,16 @@ import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
 import SOTasksTree from '../Components/DrawerTabs/TasksTree';
 import LocationMap from '@/Components/Shared/LocationMap';
 
-export default function ServiceOrdersIndex({ service_orders, columns, formSchema, createFormSchema, routes, filterSchema, advancedFilterFields}) {
+export default function ServiceOrdersIndex({ service_orders, columns, formSchema, createFormSchema, routes, filterSchema, advancedFilterFields, serviceTypesBySector = {} }) {
   const [showModal, setShowModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [photoPreview, setPhotoPreview] = useState(null);
   const [clientLocationId, setClientLocationId] = useState(null);
   const [locationsDirty, setLocationsDirty] = useState(false);
   const [currentClientId, setCurrentClientId] = useState(null);
+  const [sectorConfigs, setSectorConfigs] = useState([]);
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'kanban'
+  const [refreshKey, setRefreshKey] = useState(0);
   const [serviceOrdersState, setServiceOrdersState] = useState(service_orders);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedServiceOrder, setSelectedServiceOrder] = useState(null);
@@ -53,6 +56,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
       setCurrentClientId(null);
       setClientLocationId(null);
       setLocationsDirty(false);
+      setSectorConfigs([]);
       return;
     }
 
@@ -77,18 +81,27 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
   const handleCreate = useCallback(async (e, formValues = {}) => {
     e.preventDefault();
     if (!routes.store || savingRef.current) return;
+
+    if (sectorConfigs.length === 0) {
+      setFormErrors({ sector_ids: [t('pages.validation.required_select')] });
+      return;
+    }
+
     savingRef.current = true;
     setFormErrors({});
 
     const form = e.target;
     const formData = new FormData(form);
 
-    // Append React-controlled multi-select values (not captured by FormData)
-    ['sector_ids'].forEach((key) => {
-      const vals = formValues[key];
-      if (Array.isArray(vals) && vals.length > 0) {
-        vals.forEach((v) => formData.append(`${key}[]`, v));
+    // Append sector_configs from SectorConfigPanel state
+    sectorConfigs.forEach((config, i) => {
+      formData.append(`sector_configs[${i}][sector_id]`, config.sector_id);
+      if (config.priority) {
+        formData.append(`sector_configs[${i}][priority]`, config.priority);
       }
+      (config.service_type_ids ?? []).forEach(typeId => {
+        formData.append(`sector_configs[${i}][service_type_ids][]`, typeId);
+      });
     });
 
     // Scenario A/B/C: client location logic
@@ -112,17 +125,27 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         setPhotoPreview(null);
         setClientLocationId(null);
         setLocationsDirty(false);
-        router.reload();
+        setSectorConfigs([]);
+        setRefreshKey(k => k + 1);
       } else {
-        if (body.errors) setFormErrors(body.errors);
-        else globalToast.error(body.message ?? body.error ?? t('pages.service_orders.create_failed'));
+        if (body.errors) {
+          // Map sector_configs errors to sector_ids so they appear on the visible field
+          const errors = { ...body.errors };
+          if (errors.sector_configs) {
+            errors.sector_ids = errors.sector_ids ?? errors.sector_configs;
+            delete errors.sector_configs;
+          }
+          setFormErrors(errors);
+        } else {
+          globalToast.error(body.message ?? body.error ?? t('pages.service_orders.create_failed'));
+        }
       }
     } catch {
       globalToast.error(t('pages.service_orders.unexpected_error'));
     } finally {
       savingRef.current = false;
     }
-  }, [routes.store, globalToast, clientLocationId, locationsDirty]);
+  }, [routes.store, globalToast, clientLocationId, locationsDirty, sectorConfigs]);
 
   /* ── Open modal for create ────────────────────────────────── */
   const openCreate = useCallback(() => {
@@ -351,12 +374,12 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
 
   /* ── Drawer title with SO context ─────────────────────────── */
   const drawerTitle = useMemo(() => {
-    const so = selectedServiceOrder;
+    const so = soDetail ?? selectedServiceOrder;
     if (!so) return null;
 
     return (
       <div className="flex items-center gap-4">
-        <span>{so.process || `${t('pages.service_orders.drawer.os_prefix')}${so.id}`}</span>
+        <span>{so.title || so.process || `${t('pages.service_orders.drawer.os_prefix')}${so.id}`}</span>
         <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full ${badgeStyle(so.status, { border: true })}`}>
           {labelFor(so.status)}
         </span>
@@ -365,7 +388,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         </span>
       </div>
     );
-  }, [selectedServiceOrder]);
+  }, [selectedServiceOrder, soDetail]);
 
   /* ── Kanban Card Content Renderer ─────────────────────────── */
   const renderCardContent = useCallback((item) => {
@@ -378,10 +401,10 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
           {item.process}
         </p>
 
-        {/* Title/Description */}
-        {item.description && item.description.trim() && (
+        {/* Title / Description */}
+        {(item.title || item.description) && (
           <h4 className="text-sm font-semibold text-brand-darkest mb-2 line-clamp-2">
-            {item.description}
+            {item.title || item.description}
           </h4>
         )}
 
@@ -442,16 +465,32 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         open={showModal}
         onClose={() => setShowModal(false)}
         onSubmit={handleCreate}
-        injectAfterField="client_id"
+        injectAfterField={[
+          {
+            fieldKey: 'client_id',
+            content: (
+              <ClientLocationSelector
+                isOpen={showModal}
+                clientId={currentClientId}
+                onClientLocationChange={setClientLocationId}
+                onDirtyChange={setLocationsDirty}
+              />
+            ),
+          },
+          {
+            fieldKey: 'manager_id',
+            content: (
+              <SectorConfigPanel
+                isOpen={showModal}
+                serviceTypesBySector={serviceTypesBySector}
+                onChange={(configs) => { setSectorConfigs(configs); if (configs.length > 0) setFormErrors(prev => { const { sector_ids, ...rest } = prev; return rest; }); }}
+                error={formErrors.sector_ids ? (Array.isArray(formErrors.sector_ids) ? formErrors.sector_ids[0] : formErrors.sector_ids) : undefined}
+              />
+            ),
+          },
+        ]}
         externalErrors={formErrors}
-      >
-        <ClientLocationSelector
-          isOpen={showModal}
-          clientId={currentClientId}
-          onClientLocationChange={setClientLocationId}
-          onDirtyChange={setLocationsDirty}
-        />
-      </Modal>
+      />
 
       {/* Hidden file change handler — wire via DOM delegation */}
       {showModal && (
@@ -462,7 +501,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
       <DataManager
         title={t('pages.service_orders.dm_title')}
         entityName={t('pages.service_orders.dm_entity_name')}
-        items={service_orders}
+        items={serviceOrdersState}
         routes={routes}
         columns={columns}
         formSchema={formSchema}
@@ -473,6 +512,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         supportKanban={true}
+        refreshKey={refreshKey}
       >
         {/* Kanban Board (only render when in Kanban view) */}
         {viewMode === 'kanban' && (
@@ -492,7 +532,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
         isOpen={drawerOpen}
         onClose={handleCloseDrawer}
         title={drawerTitle}
-        subtitle={selectedServiceOrder?.client?.name ? `${t('pages.service_orders.drawer_client_label')} ${selectedServiceOrder.client.name}` : null}
+        subtitle={(soDetail ?? selectedServiceOrder)?.client?.name ? `${t('pages.service_orders.drawer_client_label')} ${(soDetail ?? selectedServiceOrder).client.name}` : null}
         tabs={soTabs}
         headerActions={drawerActions}
       />
@@ -515,6 +555,14 @@ function SODetailsTab({ serviceOrder }) {
 
   return (
     <div className="space-y-6">
+      {/* Title */}
+      {so.title && (
+        <section>
+          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_title')}</h4>
+          <p className="text-sm text-brand-darkest">{so.title}</p>
+        </section>
+      )}
+
       {/* Description */}
       {so.description && (
         <section>
@@ -548,14 +596,6 @@ function SODetailsTab({ serviceOrder }) {
         </section>
       )}
 
-      {/* Service Type */}
-      {so.service_type && (
-        <section>
-          <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_service_type')}</h4>
-          <p className="text-sm text-brand-darkest">{so.service_type.name || so.service_type}</p>
-        </section>
-      )}
-
       {/* Start Date */}
       {so.start_date && (
         <section>
@@ -572,15 +612,36 @@ function SODetailsTab({ serviceOrder }) {
         </section>
       )}
 
-      {/* Sectors */}
+      {/* Sectors with per-sector priority and service types */}
       {so.sectors?.length > 0 && (
         <section>
           <h4 className="text-sm font-semibold text-brand-mid uppercase tracking-wider mb-2">{t('pages.service_orders.section_sectors')}</h4>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="space-y-2">
             {so.sectors.map((s) => (
-              <span key={s.id} className="inline-flex items-center px-2 py-0.5 text-xs rounded-full bg-brand-mid/20 text-brand-mid border border-brand-mid/30">
-                {s.name}
-              </span>
+              <div key={s.id} className="rounded-md border border-brand-mid/20 px-3 py-2">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <span className="text-sm font-medium text-brand-darkest">{s.name}</span>
+                  {s.priority && (
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded ${{
+                      low:    'bg-blue-500/20 text-blue-300',
+                      normal: 'bg-brand-mid/20 text-brand-mid',
+                      high:   'bg-orange-500/20 text-orange-300',
+                      urgent: 'bg-red-500/20 text-red-300',
+                    }[s.priority] || 'bg-brand-mid/20 text-brand-mid'}`}>
+                      {labelFor(s.priority)}
+                    </span>
+                  )}
+                </div>
+                {s.service_types?.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {s.service_types.map(st => (
+                      <span key={st.id} className="text-xs px-1.5 py-0.5 rounded bg-brand-mid/10 text-brand-mid border border-brand-mid/20">
+                        {st.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </section>

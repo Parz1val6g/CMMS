@@ -8,6 +8,7 @@ use App\Core\Helpers\InputSanitizer;
 use App\Core\Services\TransactionHandler;
 use App\Features\Locations\Models\Location;
 use App\Features\MiniTasks\Models\MiniTask;
+use Illuminate\Support\Facades\DB;
 use App\Features\ServiceOrders\Events\ServiceOrderCompletedEvent;
 use App\Features\ServiceOrders\Events\ServiceOrderCreatedEvent;
 use App\Features\ServiceOrders\Jobs\ScanServiceOrderPhoto;
@@ -53,8 +54,8 @@ class ServiceOrderService
                 'manager_id'         => $managerId,
                 'created_by'         => $createdById,
                 'location_id'        => $locationId,
-                'service_type_id'    => $data['service_type_id'] ?? null,
-                'priority'           => $data['priority'] ?? null,
+                'category_id'        => $data['category_id'] ?? null,
+                'title'              => $data['title'] ?? null,
                 'description'        => $data['description'] ?? null,
                 'photo_path'         => $photoPath,
                 'start_date'         => $data['start_date'],
@@ -62,10 +63,10 @@ class ServiceOrderService
                 'status'             => ServiceOrderStatus::PENDING->value,
             ]);
 
-            // 4. Sync sectors (Tasks are created on activate, not on create)
-            $sectorIds = $data['sector_ids'] ?? [];
-            if (!empty($sectorIds)) {
-                $serviceOrder->sectors()->sync($sectorIds);
+            // 4. Sync sectors with per-sector priority and service types
+            $sectorConfigs = $data['sector_configs'] ?? [];
+            if (!empty($sectorConfigs)) {
+                $this->syncSectorConfigs($serviceOrder, $sectorConfigs);
             }
 
             ServiceOrderCreatedEvent::dispatch($serviceOrder);
@@ -103,8 +104,9 @@ class ServiceOrderService
             foreach ($sectors as $sector) {
                 $task = Task::create([
                     'service_order_id' => $fresh->id,
-                    'manager_id'       => $fresh->manager_id,
+                    'manager_id'       => $sector->head_id,
                     'description'      => $fresh->process . ' - ' . $sector->name,
+                    'priority'         => $sector->pivot->priority,
                     'status'           => TaskStatus::PENDING->value,
                 ]);
                 $task->sectors()->sync([$sector->id]);
@@ -130,7 +132,7 @@ class ServiceOrderService
             $soFields = collect($data)->except([
                 'parish_id', 'street', 'reference_point', 'postal_code',
                 'latitude', 'longitude', 'location_id',
-                'sector_ids', 'photo',
+                'sector_ids', 'sector_configs', 'photo',
             ])->toArray();
 
             $newPhotoPath = null;
@@ -141,8 +143,8 @@ class ServiceOrderService
 
             $serviceOrder->update($soFields);
 
-            if (array_key_exists('sector_ids', $data)) {
-                $this->syncSectors($serviceOrder, $data['sector_ids']);
+            if (array_key_exists('sector_configs', $data)) {
+                $this->syncSectorConfigs($serviceOrder, $data['sector_configs']);
             }
 
             if ($newPhotoPath) {
@@ -199,9 +201,10 @@ class ServiceOrderService
         }
     }
 
-    private function syncSectors(ServiceOrder $serviceOrder, array $incomingSectorIds): void
+    private function syncSectorConfigs(ServiceOrder $serviceOrder, array $sectorConfigs): void
     {
-        $currentSectorIds = $serviceOrder->sectors()->pluck('id')->all();
+        $incomingSectorIds = array_column($sectorConfigs, 'sector_id');
+        $currentSectorIds  = $serviceOrder->sectors()->pluck('sectors.id')->all();
 
         $removedSectorIds = array_diff($currentSectorIds, $incomingSectorIds);
 
@@ -217,7 +220,27 @@ class ServiceOrderService
             }
         }
 
-        $serviceOrder->sectors()->sync($incomingSectorIds);
+        // Build pivot data: sector_id => [priority]
+        $pivotData = [];
+        foreach ($sectorConfigs as $config) {
+            $pivotData[$config['sector_id']] = ['priority' => $config['priority'] ?? null];
+        }
+        $serviceOrder->sectors()->sync($pivotData);
+
+        // Sync service types per sector
+        DB::table('service_order_sector_service_type')
+            ->where('service_order_id', $serviceOrder->id)
+            ->delete();
+
+        foreach ($sectorConfigs as $config) {
+            foreach ($config['service_type_ids'] ?? [] as $typeId) {
+                DB::table('service_order_sector_service_type')->insert([
+                    'service_order_id' => $serviceOrder->id,
+                    'sector_id'        => $config['sector_id'],
+                    'service_type_id'  => $typeId,
+                ]);
+            }
+        }
 
         $newSectorIds = array_diff($incomingSectorIds, $currentSectorIds);
 
@@ -232,8 +255,9 @@ class ServiceOrderService
             foreach ($newSectors as $sector) {
                 $task = Task::create([
                     'service_order_id' => $serviceOrder->id,
-                    'manager_id'       => $serviceOrder->manager_id,
+                    'manager_id'       => $sector->head_id,
                     'description'      => $serviceOrder->process . ' - ' . $sector->name,
+                    'priority'         => $sector->pivot->priority,
                     'status'           => TaskStatus::PENDING->value,
                 ]);
                 $task->sectors()->sync([$sector->id]);
