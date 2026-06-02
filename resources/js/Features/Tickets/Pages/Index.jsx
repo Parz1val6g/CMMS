@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { t } from '@/utils/i18n';
-import { usePage } from '@inertiajs/react';
+import { usePage, router } from '@inertiajs/react';
 import { useToast } from '@/Components/Toast/ToastContext';
 import AppLayout from '@/Layouts/AppLayout';
 import DataManager from '@/Components/DataManager';
@@ -52,7 +52,7 @@ export default function TicketsIndex({ tickets, columns, formSchema, createFormS
 
       if (res.ok) {
         setShowModal(false);
-        window.location.reload();
+        router.reload();
       } else {
         if (body.errors) setFormErrors(body.errors);
         else globalToast.error(body.message ?? t('pages.tickets.create_failed'));
@@ -122,7 +122,7 @@ export default function TicketsIndex({ tickets, columns, formSchema, createFormS
           onClose={handleCloseDrawer}
           routes={routes}
           userRole={userRole}
-          onUpdated={() => window.location.reload()}
+          onUpdated={() => router.reload()}
         />
       )}
     </AppLayout>

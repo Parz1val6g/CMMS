@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import { router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import Modal from '@/Components/Common/Modal';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
@@ -229,7 +230,7 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
 
   const handleAction = useCallback(() => {
     closeDrawer();
-    window.location.reload();
+    router.reload();
   }, [closeDrawer]);
 
   /* ── Create submission ────────────────────────────────────── */
@@ -259,7 +260,7 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
     setCreateOpen(false);
     setClientLocationId(null);
     setLocationsDirty(false);
-    window.location.reload();
+    router.reload();
   }, [routes.store, clientLocationId, locationsDirty]);
 
   /* ── Stat cards config ────────────────────────────────────── */

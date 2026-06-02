@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
+import { router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import DataManager from '@/Components/DataManager';
 import Modal from '@/Components/Common/Modal';
@@ -51,7 +52,7 @@ export default function EntitiesIndex({
       throw err;
     }
     setCreateOpen(false);
-    window.location.reload();
+    router.reload();
   }, [routes.store]);
 
   return (

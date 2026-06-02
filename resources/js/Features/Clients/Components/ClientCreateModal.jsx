@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { router } from '@inertiajs/react';
 import { X, Plus, Trash2, Star, Loader2, AlertCircle } from 'lucide-react';
 import { t } from '@/utils/i18n';
 import { useToast } from '@/Components/Toast/ToastContext';
@@ -208,7 +209,7 @@ export default function ClientCreateModal({ open, onClose, storeUrl, districts =
                 toast.success(t('pages.client_create.success'));
                 onClose();
                 onCreated?.();
-                setTimeout(() => window.location.reload(), 300);
+                router.reload();
             },
             onError: (msg, errs) => {
                 if (errs) {

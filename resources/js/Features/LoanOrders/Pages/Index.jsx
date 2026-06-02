@@ -66,7 +66,7 @@ export default function LoanOrdersIndex({ loan_orders, columns, formSchema, crea
       throw err;
     }
     setCreateOpen(false);
-    window.location.reload();
+    router.reload();
   }, [routes.store]);
 
   return (

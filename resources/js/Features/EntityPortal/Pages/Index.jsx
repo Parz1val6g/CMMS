@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
+import { router } from '@inertiajs/react';
 import EntityLayout from '@/Layouts/EntityLayout';
 import Modal from '@/Components/Common/Modal';
 import WorkspaceDrawer from '@/Components/Drawer/WorkspaceDrawer';
@@ -93,7 +94,7 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
       throw err;
     }
     setCreateOpen(false);
-    window.location.reload();
+    router.reload();
   }, [routes.store]);
 
   return (

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import { router } from '@inertiajs/react';
 import FormField from '@/Components/Common/FormField';
 import FormInput from '@/Components/Common/FormInput';
 import { X } from 'lucide-react';
@@ -267,10 +268,7 @@ export default function Modal({ entityName = t('common.entity_name'), title, for
       if (res.ok) {
         toast.success(t('pages.modal.save_success', { name: entityName }));
         onClose?.();
-        // Small delay to let user see the toast before reload
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+        router.reload();
       } else {
         if (body.errors) {
           setErrors(body.errors);

@@ -1,4 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
+import { router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import Tabs from '@/Components/Common/Tabs';
 import FormSection from '@/Components/Common/FormSection';
@@ -87,7 +88,7 @@ export default function Settings({ user, preferences, appSettings, isAdmin, loca
       if (langAfter && langAfter !== langBefore) {
         window.__LOCALE__ = langAfter === 'en' ? 'en' : 'pt_PT';
         toast.success(t('pages.settings.success_updated'));
-        setTimeout(() => window.location.reload(), 500);
+        setTimeout(() => router.reload(), 500);
       } else {
         toast.success(t('pages.settings.success_updated'));
       }
