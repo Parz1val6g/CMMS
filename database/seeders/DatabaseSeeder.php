@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             EntitySeeder::class,             // municipal and parish councils with entidade users
 
                 // ── Layer 3: Configuration ──
-            ServiceTypeSeeder::class,
+            ServiceOrderCategorySeeder::class,
             UnitSeeder::class,
             MaterialSeeder::class,
             EquipmentTypeSeeder::class,      // predefined equipment types
@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
 
                 // ── Layer 4: Organisation ──
             SectorSeeder::class,             // references users (heads)
+            ServiceTypeSeeder::class,        // references sectors (moved after SectorSeeder)
             TeamSeeder::class,               // references sectors
             WorkerSeeder::class,             // references users + teams
 

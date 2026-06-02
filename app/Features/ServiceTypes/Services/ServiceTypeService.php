@@ -16,7 +16,8 @@ class ServiceTypeService
     {
         return $this->transactions->execute(function () use ($data) {
             $serviceType = ServiceType::create([
-                'name' => $data['name'],
+                'sector_id'   => $data['sector_id'],
+                'name'        => $data['name'],
                 'description' => $data['description'] ?? null,
             ]);
             RefCache::flushServiceTypes();

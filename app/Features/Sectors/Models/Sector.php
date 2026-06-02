@@ -6,6 +6,7 @@ use App\Core\Traits\Base;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Shared\Models\User;
+use App\Features\ServiceTypes\Models\ServiceType;
 use App\Features\Teams\Models\Team;
 use App\Features\Tasks\Models\Task;
 
@@ -24,6 +25,11 @@ class Sector extends Model
 
     public function teams(){
         return $this->hasMany(Team::class);
+    }
+
+    public function serviceTypes()
+    {
+        return $this->hasMany(ServiceType::class);
     }
 
     public function tasks() {
