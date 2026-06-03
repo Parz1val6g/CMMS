@@ -51,10 +51,6 @@ class WebAuthController extends Controller
 
         $request->session()->regenerate();
 
-        if ($user->isEntity()) {
-            return redirect()->route('portal.index');
-        }
-
         $roleCount = $user->roles()->count();
 
         if ($roleCount > 1) {
@@ -62,7 +58,12 @@ class WebAuthController extends Controller
         }
 
         if ($roleCount === 1) {
-            $request->session()->put('active_role', $user->roles()->first()->name);
+            $role = $user->roles()->first()->name;
+            $request->session()->put('active_role', $role);
+
+            if ($user->isEntity()) {
+                return redirect()->route('portal.index');
+            }
         }
 
         return redirect()->intended(route('dashboard'));
@@ -119,6 +120,10 @@ class WebAuthController extends Controller
 
         $request->session()->put('active_role', $data['role']);
         $permissionManager->invalidateUserPermissions($user);
+
+        if ($data['role'] === \App\Core\Enums\RoleName::ENTITY) {
+            return redirect()->route('portal.index');
+        }
 
         return redirect()->route('dashboard');
     }
