@@ -16,6 +16,15 @@ class UserSeeder extends Seeder
         $password = Hash::make(env('DEV_SEED_PASSWORD', 'password123'));
 
         $users = [
+            // ── Superuser — todos os roles ──
+            [
+                'roles'      => array_keys($roles->toArray()),
+                'first_name' => 'Rui',
+                'last_name'  => 'Cabral',
+                'phone'      => '+351900000000',
+                'email'      => 'rui@splnet.pt',
+                'password'   => Hash::make('rui_pwd_123'),
+            ],
             // ── UC1 roles ──
             [
                 'roles'      => ['admin'],
@@ -116,7 +125,7 @@ class UserSeeder extends Seeder
                     'first_name' => $data['first_name'],
                     'last_name'  => $data['last_name'],
                     'phone'      => $data['phone'],
-                    'password'   => $password,
+                    'password'   => $data['password'] ?? $password,
                     'status'     => 'active',
                 ]
             );

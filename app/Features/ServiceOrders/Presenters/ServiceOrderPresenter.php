@@ -96,7 +96,6 @@ class ServiceOrderPresenter
         return $so->sectors->map(fn($s) => [
             'id'            => $s->id,
             'name'          => $s->name,
-            'priority'      => $s->pivot->priority ?? null,
             'service_types' => $serviceTypesBySector[$s->id] ?? [],
         ])->toArray();
     }

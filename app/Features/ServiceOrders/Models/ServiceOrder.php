@@ -98,8 +98,7 @@ class ServiceOrder extends Model
     }
     public function sectors()
     {
-        return $this->belongsToMany(Sector::class, 'service_order_sector', 'service_order_id', 'sector_id')
-            ->withPivot('priority');
+        return $this->belongsToMany(Sector::class, 'service_order_sector', 'service_order_id', 'sector_id');
     }
 
     public function serviceTypes()
@@ -113,12 +112,12 @@ class ServiceOrder extends Model
         $rows = DB::table('service_order_sector_service_type as sost')
             ->join('service_types as st', 'st.id', '=', 'sost.service_type_id')
             ->where('sost.service_order_id', $this->id)
-            ->select('sost.sector_id', 'st.id as service_type_id', 'st.name as service_type_name')
+            ->select('sost.sector_id', 'st.id as service_type_id', 'st.name as service_type_name', 'sost.priority')
             ->get();
 
         $grouped = [];
         foreach ($rows as $row) {
-            $grouped[$row->sector_id][] = ['id' => $row->service_type_id, 'name' => $row->service_type_name];
+            $grouped[$row->sector_id][] = ['id' => $row->service_type_id, 'name' => $row->service_type_name, 'priority' => $row->priority];
         }
         return $grouped;
     }

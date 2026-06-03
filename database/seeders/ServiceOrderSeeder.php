@@ -120,7 +120,6 @@ class ServiceOrderSeeder extends Seeder
                 'manager_id'         => $def['manager']->id,
                 'created_by'         => $attendant?->id,
                 'location_id'        => $locationId,
-                'service_type_id'    => $serviceType?->id,
                 'priority'           => $def['priority']->value,
                 'start_date'         => $createdAt,
                 'end_date'           => $endDate,
@@ -130,8 +129,24 @@ class ServiceOrderSeeder extends Seeder
                 'updated_at'         => $createdAt,
             ]);
 
-            // Link sectors for all orders
-            if ($sectors->isNotEmpty()) {
+            // Link a random sector with service types for non-loan orders
+            if ($sectors->isNotEmpty() && !$isLoan) {
+                $sector = $sectors->random();
+                $so->sectors()->sync([$sector->id]);
+
+                $typesForSector = $serviceType
+                    ? $serviceTypes->where('sector_id', $sector->id)->first() ?? $serviceType
+                    : $serviceTypes->where('sector_id', $sector->id)->first();
+
+                if ($typesForSector) {
+                    \Illuminate\Support\Facades\DB::table('service_order_sector_service_type')->insert([
+                        'service_order_id' => $so->id,
+                        'sector_id'        => $sector->id,
+                        'service_type_id'  => $typesForSector->id,
+                        'priority'         => $def['priority']->value,
+                    ]);
+                }
+            } elseif ($sectors->isNotEmpty() && $isLoan) {
                 $so->sectors()->sync([$sectors->random()->id]);
             }
         }

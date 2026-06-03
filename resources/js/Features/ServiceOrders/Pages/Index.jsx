@@ -96,11 +96,11 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
 
     sectorConfigs.forEach((config, i) => {
       formData.append(`sector_configs[${i}][sector_id]`, config.sector_id);
-      if (config.priority) {
-        formData.append(`sector_configs[${i}][priority]`, config.priority);
-      }
-      (config.service_type_ids ?? []).forEach(typeId => {
-        formData.append(`sector_configs[${i}][service_type_ids][]`, typeId);
+      (config.service_types ?? []).forEach((st, j) => {
+        formData.append(`sector_configs[${i}][service_types][${j}][id]`, st.id);
+        if (st.priority) {
+          formData.append(`sector_configs[${i}][service_types][${j}][priority]`, st.priority);
+        }
       });
     });
 

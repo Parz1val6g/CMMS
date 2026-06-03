@@ -101,12 +101,14 @@ class ServiceOrderService
                 ->whereNotIn('sectors.id', $existingSectorIds)
                 ->get();
 
+            $dominantPriorities = $this->computeDominantPriorities($fresh->id, $sectors->pluck('id')->all());
+
             foreach ($sectors as $sector) {
                 $task = Task::create([
                     'service_order_id' => $fresh->id,
                     'manager_id'       => $sector->head_id,
                     'description'      => $fresh->process . ' - ' . $sector->name,
-                    'priority'         => $sector->pivot->priority,
+                    'priority'         => $dominantPriorities[$sector->id] ?? null,
                     'status'           => TaskStatus::PENDING->value,
                 ]);
                 $task->sectors()->sync([$sector->id]);
@@ -220,24 +222,23 @@ class ServiceOrderService
             }
         }
 
-        // Build pivot data: sector_id => [priority]
         $pivotData = [];
         foreach ($sectorConfigs as $config) {
-            $pivotData[$config['sector_id']] = ['priority' => $config['priority'] ?? null];
+            $pivotData[$config['sector_id']] = [];
         }
         $serviceOrder->sectors()->sync($pivotData);
 
-        // Sync service types per sector
         DB::table('service_order_sector_service_type')
             ->where('service_order_id', $serviceOrder->id)
             ->delete();
 
         foreach ($sectorConfigs as $config) {
-            foreach ($config['service_type_ids'] ?? [] as $typeId) {
+            foreach ($config['service_types'] ?? [] as $st) {
                 DB::table('service_order_sector_service_type')->insert([
                     'service_order_id' => $serviceOrder->id,
                     'sector_id'        => $config['sector_id'],
-                    'service_type_id'  => $typeId,
+                    'service_type_id'  => $st['id'],
+                    'priority'         => $st['priority'] ?? null,
                 ]);
             }
         }
@@ -251,13 +252,14 @@ class ServiceOrderService
 
         if (!empty($newSectorIds) && $canAutoCreate) {
             $newSectors = $serviceOrder->sectors()->whereIn('sectors.id', $newSectorIds)->get();
+            $dominantPriorities = $this->computeDominantPriorities($serviceOrder->id, $newSectorIds);
 
             foreach ($newSectors as $sector) {
                 $task = Task::create([
                     'service_order_id' => $serviceOrder->id,
                     'manager_id'       => $sector->head_id,
                     'description'      => $serviceOrder->process . ' - ' . $sector->name,
-                    'priority'         => $sector->pivot->priority,
+                    'priority'         => $dominantPriorities[$sector->id] ?? null,
                     'status'           => TaskStatus::PENDING->value,
                 ]);
                 $task->sectors()->sync([$sector->id]);
@@ -342,5 +344,25 @@ class ServiceOrderService
             Cache::tags(["user:{$serviceOrder->manager_id}"])->flush();
             return $serviceOrder;
         });
+    }
+
+    private function computeDominantPriorities(string $serviceOrderId, array $sectorIds): array
+    {
+        $order = ['urgent' => 4, 'high' => 3, 'normal' => 2, 'low' => 1];
+
+        $rows = DB::table('service_order_sector_service_type')
+            ->where('service_order_id', $serviceOrderId)
+            ->whereIn('sector_id', $sectorIds)
+            ->select('sector_id', 'priority')
+            ->get();
+
+        $result = [];
+        foreach ($rows->groupBy('sector_id') as $sectorId => $entries) {
+            $result[$sectorId] = $entries
+                ->filter(fn($r) => $r->priority !== null)
+                ->sortByDesc(fn($r) => $order[$r->priority] ?? 0)
+                ->first()?->priority;
+        }
+        return $result;
     }
 }
