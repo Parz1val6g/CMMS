@@ -24,6 +24,11 @@ enum TicketStatus: string
         return in_array($this, [self::CONVERTED, self::CANCELLED]);
     }
 
+    public static function sortOrder(): array
+    {
+        return ['open', 'in_progress', 'converted', 'cancelled'];
+    }
+
     public static function options(): array
     {
         return array_map(

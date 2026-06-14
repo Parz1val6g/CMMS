@@ -11,7 +11,7 @@ export default function MiniTasksIndex({ mini_tasks, columns, formSchema, create
         setViewItem(item);
         try {
             const url = routes.show.replace('__ID__', item.id);
-            const res = await fetch(url, { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
+            const res = await fetch(url, { credentials: 'include', headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
             const json = await res.json();
             setViewItem(json.data);
         } finally {

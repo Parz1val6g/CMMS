@@ -41,6 +41,7 @@ export default function EntitiesIndex({
   const handleCreate = useCallback(async (e, formData) => {
     const res = await fetch(routes.store, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

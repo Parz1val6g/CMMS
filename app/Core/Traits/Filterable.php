@@ -42,7 +42,18 @@ trait Filterable
         $column = in_array($column, $allowed, true) ? $column : 'created_at';
         $direction = in_array($direction, ['asc', 'desc'], true) ? $direction : 'asc';
 
+        $enumOrders = $this->getEnumOrders();
+        if (isset($enumOrders[$column])) {
+            $values = implode("','", $enumOrders[$column]);
+            return $query->orderByRaw("FIELD($column, '$values') $direction");
+        }
+
         return $query->orderBy($column, $direction);
+    }
+
+    protected function getEnumOrders(): array
+    {
+        return [];
     }
 
     protected function getSearchableColumns(): array

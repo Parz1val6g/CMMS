@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->foreignUuid('service_order_id')->constrained('service_orders')->cascadeOnDelete();
             $table->foreignUuid('sector_id')->constrained('sectors')->cascadeOnDelete();
             $table->foreignUuid('service_type_id')->constrained('service_types')->cascadeOnDelete();
+            $table->string('priority')->nullable();
 
             $table->primary(['service_order_id', 'sector_id', 'service_type_id']);
         });

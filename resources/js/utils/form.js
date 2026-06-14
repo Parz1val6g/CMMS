@@ -15,6 +15,7 @@ export async function submitForm(formEl, endpoint) {
     const fd = new FormData(formEl);
     const res = await fetch(endpoint, {
       method: 'POST',
+      credentials: 'include',
       body: fd,
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
     });

@@ -138,7 +138,7 @@ function MaterialQuantityInput({ options = [], value = [], onChange, stockMap = 
 
             {availableToAdd.length > 0 && (
                 <select
-                    className="block w-full rounded-lg border border-brand-mid/20 bg-brand-white px-3 py-2 text-sm text-brand-darkest focus:ring-1 focus:border-brand-accent focus:ring-brand-accent mb-2"
+                    className="block w-full rounded-xl border border-brand-mid/20 bg-brand-white px-3 py-2 text-sm text-brand-darkest focus:ring-1 focus:border-brand-accent focus:ring-brand-accent mb-2"
                     defaultValue=""
                     onChange={handleAdd}
                 >
@@ -154,7 +154,7 @@ function MaterialQuantityInput({ options = [], value = [], onChange, stockMap = 
                 if (!opt) return null;
                 const stock = stockMap[item.material_id] ?? opt.stock;
                 return (
-                    <div key={item.material_id} className="flex items-center gap-2 rounded-lg border border-brand-mid/20 bg-brand-white px-3 py-2 mb-1.5">
+                    <div key={item.material_id} className="flex items-center gap-2 rounded-xl border border-brand-mid/20 bg-brand-white px-3 py-2 mb-1.5">
                         <span className="flex-1 text-sm text-brand-darkest truncate">{opt.label}</span>
                         {stock != null && (
                             <span className="shrink-0 text-xs text-brand-mid">max: {stock}{opt.unit ? ' ' + opt.unit : ''}</span>
@@ -345,7 +345,7 @@ export function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPer
                         onClick={showForm ? handleClose : handleOpen}
                         disabled={!hasPeriod}
                         title={!hasPeriod ? t('pages.tasks.drawer.no_period_tooltip') : undefined}
-                        className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold text-brand-accent border border-brand-accent/30 hover:bg-brand-accent/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex items-center gap-1 rounded-xl px-2.5 py-1 text-xs font-semibold text-brand-accent border border-brand-accent/30 hover:bg-brand-accent/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {showForm ? <XIcon size={12} /> : <Plus size={12} />}
                         {showForm ? t('pages.tasks.drawer.cancel') : t('pages.tasks.drawer.new_mini_task')}
@@ -355,14 +355,14 @@ export function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPer
 
             {/* Inline create form */}
             {showForm && (
-                <form onSubmit={handleSubmit} className="rounded-lg border border-brand-mid/20 bg-brand-light/40 p-4 space-y-3">
+                <form onSubmit={handleSubmit} className="rounded-xl border border-brand-mid/20 bg-brand-light/40 p-4 space-y-3">
                     {taskStartDate && taskEndDate && (
                         <p className="text-xs text-brand-mid">
                             {t('pages.tasks.drawer.task_period_label')}: {taskStartDate} – {taskEndDate}
                         </p>
                     )}
                     {Object.keys(errors).length > 0 && (
-                        <div className="rounded-lg bg-red-50 p-3 text-xs text-red-600">
+                        <div className="rounded-xl bg-red-50 p-3 text-xs text-red-600">
                             {Object.entries(errors).map(([k, msgs]) => (
                                 <p key={k}>{(Array.isArray(msgs) ? msgs : [msgs]).join(', ')}</p>
                             ))}
@@ -400,14 +400,14 @@ export function MiniTasksTab({ miniTasks = [], taskId, schema, onCreated, hasPer
                     <div className="flex gap-2 pt-1">
                         <button
                             type="submit"
-                            className="flex-1 rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
+                            className="flex-1 rounded-xl bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
                         >
                             {t('pages.tasks.drawer.save_mini_task')}
                         </button>
                         <button
                             type="button"
                             onClick={handleClose}
-                            className="rounded-lg border border-brand-mid/20 px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-light transition-colors"
+                            className="rounded-xl border border-brand-mid/20 px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-light transition-colors"
                         >
                             {t('pages.tasks.drawer.cancel')}
                         </button>
@@ -529,6 +529,7 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
         setSoOrder(null);
         try {
             const res = await fetch(`/api/service-orders/${serviceOrderId}`, {
+                credentials: 'include',
                 headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
             });
             if (!res.ok) throw new Error();
@@ -580,7 +581,7 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
         <button
             type="button"
             onClick={() => { setRejectReason(''); setShowRejectModal(true); }}
-            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 transition-colors"
         >
             <XCircle size={12} />
             {t('pages.tasks.drawer.btn_reject')}
@@ -591,7 +592,7 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
         <button
             type="button"
             onClick={handleComplete}
-            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-brand-accent hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white bg-brand-accent hover:opacity-90 transition-opacity"
         >
             <Check size={12} />
             {t('pages.tasks.drawer.btn_complete')}
@@ -642,7 +643,7 @@ export default function TaskDrawer({ isOpen, onClose, item, loading, onCompleted
                 <label className="flex flex-col gap-1.5">
                     <span className="text-xs font-medium text-brand-darkest">{t('pages.tasks.drawer.reject_reason_label')}</span>
                     <textarea
-                        className="w-full rounded-lg border border-brand-mid/20 bg-brand-light/30 px-3 py-2 text-sm text-brand-darkest placeholder:text-brand-mid focus:outline-none focus:ring-2 focus:ring-brand-accent/30"
+                        className="w-full rounded-xl border border-brand-mid/20 bg-brand-light/30 px-3 py-2 text-sm text-brand-darkest placeholder:text-brand-mid focus:outline-none focus:ring-2 focus:ring-brand-accent/30"
                         rows={4}
                         placeholder={t('pages.tasks.drawer.reject_reason_placeholder')}
                         value={rejectReason}

@@ -32,7 +32,7 @@ class LoanOrderFormSchema
                     ->setOptions(self::entityOptions())
                     ->setColumn(1)
                     ->setRequired(true)
-                    ->setRules('required|uuid|exists:entities,id')
+                    ->setRules('uuid|exists:entities,id')
             )
             // ── Column 1: Manager ──
             ->field(
@@ -47,7 +47,7 @@ class LoanOrderFormSchema
                     ->setOptions(self::managerOptions())
                     ->setColumn(1)
                     ->setRequired(true)
-                    ->setRules('required|uuid|exists:users,id')
+                    ->setRules('uuid|exists:users,id')
             )
             // ── Column 2: Address ──
             ->field(
@@ -61,7 +61,7 @@ class LoanOrderFormSchema
                     ->helperText(__('forms.loan_orders.parish_helper'))
                     ->setOptions(self::parishOptions())
                     ->setColumn(2)
-                    ->setRules('nullable|exists:parishes,id')
+                    ->setRules('exists:parishes,id')
                     ->meta('useCascade', true)
                     ->meta('districts', LocationCascadeOptions::all()['districts'])
                     ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
@@ -72,14 +72,14 @@ class LoanOrderFormSchema
                     ->setLabel(__('forms.loan_orders.street'))
                     ->helperText(__('forms.loan_orders.street_helper'))
                     ->setColumn(2)
-                    ->setRules('nullable|string|max:255')
+                    ->setRules('string|max:255')
             )
             ->field(
                 TextInput::make('reference_point')
                     ->setLabel(__('forms.loan_orders.reference_point'))
                     ->helperText(__('forms.loan_orders.reference_point_helper'))
                     ->setColumn(2)
-                    ->setRules('nullable|string|max:255')
+                    ->setRules('string|max:255')
             )
             ->field(
                 TextInput::make('postal_code')
@@ -87,7 +87,7 @@ class LoanOrderFormSchema
                     ->helperText(__('forms.loan_orders.postal_code_helper'))
                     ->helpExamples(['1000-001', '4000-001'])
                     ->setColumn(2)
-                    ->setRules('nullable|string|max:20')
+                    ->setRules('string|max:20')
             )
             // ── Full-width: Equipment ──
             ->field(
@@ -105,15 +105,15 @@ class LoanOrderFormSchema
                             ->setLabel(__('forms.loan_orders.equipment'))
                             ->setOptions($equipmentOpts)
                             ->setRequired(true)
-                            ->setRules('required|uuid|exists:equipments,id'),
+                            ->setRules('uuid|exists:equipments,id'),
                         ToggleInput::make('needs_operator')
                             ->setLabel(__('forms.loan_orders.needs_operator'))
-                            ->setRules('nullable|boolean'),
+                            ->setRules('boolean'),
                         DateRangeInput::make('date_range')
                             ->setLabel(__('forms.loan_orders.date_range'))
                             ->setStartName('start_date')
                             ->setEndName('end_date')
-                            ->setRules('nullable|date'),
+                            ->setRules('date'),
                     ])
             )
             // ── Full-width: Map ──
@@ -126,7 +126,7 @@ class LoanOrderFormSchema
                 MapInput::make('location')
                     ->setLabel(__('forms.loan_orders.coordinates'))
                     ->coordinates('latitude', 'longitude')
-                    ->setRules('nullable|numeric|between:-90,90')
+                    ->setRules('numeric|between:-90,90')
             )
             // ── Full-width: Description ──
             ->field(
@@ -139,7 +139,7 @@ class LoanOrderFormSchema
                     ->setLabel(__('forms.loan_orders.description'))
                     ->helperText(__('forms.loan_orders.description_helper'))
                     ->setRows(3)
-                    ->setRules('nullable|string|max:2000')
+                    ->setRules('string|max:2000')
             );
     }
 
@@ -160,7 +160,7 @@ class LoanOrderFormSchema
                     ->helperText(__('forms.loan_orders.parish_helper'))
                     ->setOptions(self::parishOptions())
                     ->setColumn(1)
-                    ->setRules('nullable|exists:parishes,id')
+                    ->setRules('exists:parishes,id')
                     ->meta('useCascade', true)
                     ->meta('districts', LocationCascadeOptions::all()['districts'])
                     ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
@@ -170,13 +170,13 @@ class LoanOrderFormSchema
                 TextInput::make('street')
                     ->setLabel(__('forms.loan_orders.street'))
                     ->setColumn(1)
-                    ->setRules('nullable|string|max:255')
+                    ->setRules('string|max:255')
             )
             ->field(
                 TextInput::make('postal_code')
                     ->setLabel(__('forms.loan_orders.postal_code'))
                     ->setColumn(1)
-                    ->setRules('nullable|string|max:20')
+                    ->setRules('string|max:20')
             )
             ->field(
                 SectionHeader::make('section-equipment')
@@ -193,15 +193,15 @@ class LoanOrderFormSchema
                             ->setLabel(__('forms.loan_orders.equipment'))
                             ->setOptions($equipmentOpts)
                             ->setRequired(true)
-                            ->setRules('required|uuid|exists:equipments,id'),
+                            ->setRules('uuid|exists:equipments,id'),
                         ToggleInput::make('needs_operator')
                             ->setLabel(__('forms.loan_orders.needs_operator'))
-                            ->setRules('nullable|boolean'),
+                            ->setRules('boolean'),
                         DateRangeInput::make('date_range')
                             ->setLabel(__('forms.loan_orders.date_range'))
                             ->setStartName('start_date')
                             ->setEndName('end_date')
-                            ->setRules('nullable|date'),
+                            ->setRules('date'),
                     ])
             )
             ->field(
@@ -214,7 +214,7 @@ class LoanOrderFormSchema
                     ->setLabel(__('forms.loan_orders.description'))
                     ->helperText(__('forms.loan_orders.description_helper'))
                     ->setRows(3)
-                    ->setRules('nullable|string|max:2000')
+                    ->setRules('string|max:2000')
             );
     }
 
@@ -229,7 +229,7 @@ class LoanOrderFormSchema
                 SelectInput::make('entity_id')
                     ->setLabel(__('forms.loan_orders.entity'))
                     ->setOptions(self::entityOptions())
-                    ->setRules('sometimes|nullable|uuid|exists:entities,id')
+                    ->setRules('sometimes|uuid|exists:entities,id')
             )
             ->field(
                 SectionHeader::make('section-equipment')
@@ -244,15 +244,15 @@ class LoanOrderFormSchema
                             ->setLabel(__('forms.loan_orders.equipment'))
                             ->setOptions(self::editEquipmentOptions())
                             ->setRequired(true)
-                            ->setRules('required|uuid|exists:equipments,id'),
+                            ->setRules('uuid|exists:equipments,id'),
                         ToggleInput::make('needs_operator')
                             ->setLabel(__('forms.loan_orders.needs_operator'))
-                            ->setRules('nullable|boolean'),
+                            ->setRules('boolean'),
                         DateRangeInput::make('date_range')
                             ->setLabel(__('forms.loan_orders.date_range'))
                             ->setStartName('start_date')
                             ->setEndName('end_date')
-                            ->setRules('nullable|date'),
+                            ->setRules('date'),
                     ])
             )
             ->field(
@@ -279,7 +279,7 @@ class LoanOrderFormSchema
                 SelectInput::make('parish_id')
                     ->setLabel(__('forms.loan_orders.parish'))
                     ->setOptions(self::parishOptions())
-                    ->setRules('nullable|exists:parishes,id')
+                    ->setRules('exists:parishes,id')
                     ->meta('useCascade', true)
                     ->meta('districts', LocationCascadeOptions::all()['districts'])
                     ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
@@ -288,17 +288,17 @@ class LoanOrderFormSchema
             ->field(
                 TextInput::make('street')
                     ->setLabel(__('forms.loan_orders.street'))
-                    ->setRules('nullable|string|max:255')
+                    ->setRules('string|max:255')
             )
             ->field(
                 TextInput::make('reference_point')
                     ->setLabel(__('forms.loan_orders.reference_point'))
-                    ->setRules('nullable|string|max:255')
+                    ->setRules('string|max:255')
             )
             ->field(
                 TextInput::make('postal_code')
                     ->setLabel(__('forms.loan_orders.postal_code'))
-                    ->setRules('nullable|string|max:20')
+                    ->setRules('string|max:20')
             )
             ->field(
                 SectionHeader::make('section-map')
@@ -308,7 +308,7 @@ class LoanOrderFormSchema
                 MapInput::make('location')
                     ->setLabel(__('forms.loan_orders.coordinates'))
                     ->coordinates('latitude', 'longitude')
-                    ->setRules('nullable|numeric|between:-90,90')
+                    ->setRules('numeric|between:-90,90')
             )
             ->field(
                 SectionHeader::make('section-description')
@@ -318,7 +318,7 @@ class LoanOrderFormSchema
                 TextAreaInput::make('description')
                     ->setLabel(__('forms.loan_orders.description'))
                     ->setRows(3)
-                    ->setRules('nullable|string|max:2000')
+                    ->setRules('string|max:2000')
             );
     }
 

@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->string('name', 50);
             $table->string('abbreviation', 10)->unique();
+            $table->decimal('step', 5, 2)->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

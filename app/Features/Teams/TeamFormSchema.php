@@ -17,20 +17,22 @@ class TeamFormSchema
                 TextInput::make('name')
                     ->setLabel(__('forms.teams.name'))
                     ->setRequired()
-                    ->setRules('required|string|max:100')
+                    ->setRules('string|max:100')
             )
             ->field(
                 SelectInput::make('sector_id')
                     ->setLabel(__('forms.teams.sector'))
+                    ->setRequired()
                     ->setOptions(self::sectorOptions())
-                    ->setRules('required|exists:sectors,id')
+                    ->setRules('exists:sectors,id')
             )
             ->field(
                 SelectInput::make('responsible_id')
                     ->setLabel(__('forms.teams.responsible'))
+                    ->setRequired()
                     ->helperText(__('forms.teams.responsible_helper'))
                     ->setOptions(self::responsibleOptions())
-                    ->setRules('required|exists:users,id')
+                    ->setRules('exists:users,id')
             );
     }
 

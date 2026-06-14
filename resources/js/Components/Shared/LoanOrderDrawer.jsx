@@ -270,7 +270,7 @@ function HistoryTab({ lo }) {
         { key: 'notes_return',   label: t('pages.loan_orders.section_notes_return') },
       ].map(({ key, label }) =>
         lo[key] ? (
-          <div key={key} className="mt-5 rounded-lg bg-gray-50 border border-gray-100 px-4 py-3">
+          <div key={key} className="mt-5 rounded-xl bg-brand-light border border-brand-mid/10 px-4 py-3">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{label}</p>
             <p className="text-sm text-gray-700 leading-relaxed">{lo[key]}</p>
           </div>
@@ -308,7 +308,7 @@ function ActionButtons({ lo, onAction, entityMode = false }) {
             onClick={() => act('cancel', `/api/loan-orders/${lo.id}/cancel`,
               t('pages.loan_orders.action_cancel_confirm'), t('pages.loan_orders.action_cancel_failed'))}
             disabled={loading.cancel}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white hover:bg-red-50 hover:border-red-300 hover:text-red-700 disabled:opacity-60 text-gray-700 text-sm font-medium px-4 py-2 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white hover:bg-red-50 hover:border-red-300 hover:text-red-700 disabled:opacity-60 text-red-600 text-sm font-medium px-4 py-2 transition-colors"
           >
             {loading.cancel ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />}
             {t('pages.loan_orders.action_cancel')}
@@ -330,7 +330,7 @@ function ActionButtons({ lo, onAction, entityMode = false }) {
             onClick={() => act('approve', `/api/loan-orders/${lo.id}/approve`,
               t('pages.loan_orders.action_approve_confirm'), t('pages.loan_orders.action_approve_failed'))}
             disabled={loading.approve}
-            className="inline-flex items-center gap-2 rounded-lg bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition-colors"
           >
             {loading.approve ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
             {t('pages.loan_orders.action_approve')}
@@ -342,7 +342,7 @@ function ActionButtons({ lo, onAction, entityMode = false }) {
             onClick={() => act('checkout', `/api/loan-orders/${lo.id}/checkout`,
               t('pages.loan_orders.action_checkout_confirm'), t('pages.loan_orders.action_checkout_failed'))}
             disabled={loading.checkout}
-            className="inline-flex items-center gap-2 rounded-lg bg-brand-accent hover:bg-brand-accent/90 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-accent hover:bg-brand-accent/90 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition-colors"
           >
             {loading.checkout ? <Loader2 size={14} className="animate-spin" /> : <LogOut size={14} />}
             {t('pages.loan_orders.action_checkout')}
@@ -354,7 +354,7 @@ function ActionButtons({ lo, onAction, entityMode = false }) {
             onClick={() => act('return', `/api/loan-orders/${lo.id}/return`,
               t('pages.loan_orders.action_initiate_return_confirm'), t('pages.loan_orders.action_initiate_return_failed'))}
             disabled={loading.return}
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-sky-600 hover:bg-sky-700 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition-colors"
           >
             {loading.return ? <Loader2 size={14} className="animate-spin" /> : <RotateCcw size={14} />}
             {t('pages.loan_orders.action_initiate_return')}
@@ -366,7 +366,7 @@ function ActionButtons({ lo, onAction, entityMode = false }) {
             onClick={() => act('cancel', `/api/loan-orders/${lo.id}/cancel`,
               t('pages.loan_orders.action_cancel_confirm'), t('pages.loan_orders.action_cancel_failed'))}
             disabled={loading.cancel}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-60 text-gray-700 text-sm font-medium px-4 py-2 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl border border-brand-mid/20 bg-white hover:bg-brand-light disabled:opacity-60 text-brand-darkest text-sm font-medium px-4 py-2 transition-colors"
           >
             {loading.cancel ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />}
             {t('pages.loan_orders.action_cancel')}

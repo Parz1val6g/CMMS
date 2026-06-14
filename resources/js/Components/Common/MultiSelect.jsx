@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, X, Search } from 'lucide-react';
+import Checkbox from '@/Components/Common/Checkbox';
 import { t } from '@/utils/i18n';
 
 /**
@@ -228,11 +229,9 @@ export default function MultiSelect({ name, options = [], value = [], onChange, 
                   role="option"
                   aria-selected={isChecked}
                 >
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={isChecked}
                     readOnly
-                    className="h-4 w-4 rounded border-brand-mid/20 bg-brand-white text-brand-accent focus:ring-brand-accent"
                   />
                   <span className="flex-1">{opt.label}</span>
                   {isUnavailable && !isChecked && (

@@ -41,6 +41,11 @@ enum LoanOrderStatus: string
         return !$this->isTerminal();
     }
 
+    public static function sortOrder(): array
+    {
+        return ['pending', 'approved', 'checked_out', 'returned', 'cancelled'];
+    }
+
     public static function options(): array
     {
         return array_map(fn(self $c) => ['value' => $c->value, 'label' => $c->label()], self::cases());

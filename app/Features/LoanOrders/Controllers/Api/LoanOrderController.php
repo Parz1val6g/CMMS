@@ -2,6 +2,8 @@
 
 namespace App\Features\LoanOrders\Controllers\Api;
 
+use App\Core\Enums\LoanOrderStatus;
+use App\Core\Services\FilterService;
 use App\Features\LoanOrders\Models\LoanOrder;
 use App\Features\LoanOrders\Requests\CancelLoanOrderRequest;
 use App\Features\LoanOrders\Requests\StoreLoanOrderRequest;
@@ -20,7 +22,8 @@ class LoanOrderController extends Controller
 {
     public function __construct(
         private LoanOrderService $loanOrderService,
-        private AvailabilityService $availabilityService
+        private AvailabilityService $availabilityService,
+        private FilterService $filterService,
     ) {}
 
     public function index(Request $request): AnonymousResourceCollection
@@ -28,13 +31,18 @@ class LoanOrderController extends Controller
         $user = $request->user();
         $activeRole = $request->input('active_role');
 
-        $orders = LoanOrder::with(['entity', 'manager', 'location', 'equipments', 'tasks'])
-            ->when($activeRole === 'entity', fn($q) =>
-                $q->whereHas('entity', fn($eq) => $eq->where('user_id', $user->id))
-            )
-            ->when($activeRole === 'manager', fn($q) => $q->where('manager_id', $user->id))
-            ->latest()
-            ->paginate(15);
+        $query = $this->filterService->apply(
+            LoanOrder::with(['entity', 'manager', 'location', 'equipments', 'tasks'])
+                ->when($activeRole === 'entity', fn($q) =>
+                    $q->whereHas('entity', fn($eq) => $eq->where('user_id', $user->id))
+                )
+                ->when($activeRole === 'manager', fn($q) => $q->where('manager_id', $user->id)),
+            $request->only(['search', 'status', 'sort']),
+            ['reference', 'description'],
+            ['status' => LoanOrderStatus::sortOrder()]
+        );
+
+        $orders = $query->when(!$request->filled('sort'), fn($q) => $q->latest())->paginate(15);
 
         return LoanOrderResource::collection($orders);
     }

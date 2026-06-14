@@ -37,6 +37,11 @@ enum WorkLogStatus: string
             default => false,
         };
     }
+    public static function sortOrder(): array
+    {
+        return ['in_progress', 'submitted', 'approved', 'rejected'];
+    }
+
     public static function options(): array
     {
         return array_map(fn(self $c) => ['value' => $c->value, 'label' => $c->label()], self::cases());

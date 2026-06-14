@@ -22,6 +22,7 @@ Route::prefix('locations')->group(base_path('app/Features/Locations/Routes/api.p
 Route::prefix('clients')->group(base_path('app/Features/Clients/Routes/api.php'));
 Route::prefix('materials')->group(base_path('app/Features/Materials/Routes/api.php'));
 Route::prefix('service-types')->group(base_path('app/Features/ServiceTypes/Routes/api.php'));
+Route::prefix('service-order-categories')->group(base_path('app/Features/ServiceOrderCategories/Routes/api.php'));
 Route::prefix('attachments')->group(base_path('routes/api/attachments.php'));
 
 // Register Notifications Routes
@@ -35,6 +36,9 @@ Route::prefix('exports')->group(base_path('app/Features/Export/Routes/api.php'))
 
 // Register Equipments Routes
 Route::prefix('equipments')->group(base_path('app/Features/Equipments/Routes/api.php'));
+Route::prefix('equipment-types')->group(base_path('app/Features/Equipments/Routes/equipment_types_api.php'));
+Route::prefix('counting-types')->group(base_path('app/Features/Equipments/Routes/counting_types_api.php'));
+Route::prefix('equipment-revisions')->group(base_path('app/Features/Equipments/Routes/equipment_revisions_api.php'));
 
 // Register Tickets Routes
 Route::prefix('tickets')->group(base_path('app/Features/Tickets/Routes/api.php'));

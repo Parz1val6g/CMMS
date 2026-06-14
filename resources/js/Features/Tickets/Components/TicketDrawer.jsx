@@ -36,6 +36,7 @@ export default function TicketDrawer({ ticket, isOpen, onClose, routes, userRole
     try {
       const res = await fetch(routes.destroy.replace(':id', ticket.id), {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
           Accept: 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
@@ -75,6 +76,7 @@ export default function TicketDrawer({ ticket, isOpen, onClose, routes, userRole
     try {
       const res = await fetch(routes.convert.replace(':id', ticket.id), {
         method: 'POST',
+        credentials: 'include',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',

@@ -73,6 +73,10 @@ return [
         'notifications' => 'Notificações',
         'equipment_types' => 'Tipos de Equipamento',
         'counting_types' => 'Tipos de Contagem',
+        'service_order_categories' => 'Categorias de OS',
+        'districts' => 'Distritos',
+        'municipalities' => 'Municípios',
+        'parishes' => 'Freguesias',
     ],
 
     'priority' => [

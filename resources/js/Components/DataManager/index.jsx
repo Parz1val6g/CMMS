@@ -99,7 +99,7 @@ export default function DataManager({
         const qs = toQueryString(params);
         const url = routes.index + (qs ? `?${qs}` : '');
         setLoading(true);
-        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' } })
+        fetch(url, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' } })
             .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
             .then((data) => setItems(normalizeResponse(data)))
             .catch(() => setItems(initialItemsRef.current))
@@ -146,6 +146,7 @@ export default function DataManager({
         setLoading(true);
         fetch(url, {
             signal: controller.signal,
+            credentials: 'include',
             headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
         })
             .then((r) => {
@@ -223,6 +224,7 @@ export default function DataManager({
             ids.map(id =>
                 fetch(replaceId(routes.destroy, id), {
                     method: 'DELETE',
+                    credentials: 'include',
                     headers: { 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
                 })
             )
@@ -253,6 +255,7 @@ export default function DataManager({
             const url = replaceId(routes.destroy, deleteTarget);
             const res = await fetch(url, {
                 method: 'DELETE',
+                credentials: 'include',
                 headers: { 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
             });
             if (res.ok) {
@@ -333,10 +336,10 @@ export default function DataManager({
 
             {/* Table Container (only show in table view) */}
             {viewMode !== 'kanban' && (
-                <div className="relative flex-1 flex flex-col overflow-hidden bg-brand-white rounded-lg shadow-xl">
+                <div className="relative flex-1 flex flex-col overflow-hidden bg-brand-white rounded-2xl shadow-md border border-brand-mid/10">
                     {/* Loading overlay — `relative` on parent contains this correctly (#2) */}
                     {loading && (
-                        <div className="absolute inset-0 z-20 flex items-center justify-center bg-brand-darkest/10 rounded-lg">
+                        <div className="absolute inset-0 z-20 flex items-center justify-center bg-brand-darkest/10 rounded-2xl">
                             <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-accent border-t-transparent" />
                         </div>
                     )}
@@ -353,7 +356,7 @@ export default function DataManager({
                                         type="button"
                                         onClick={() => setBatchConfirm(true)}
                                         disabled={batchDeleting}
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-red-800/50 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                                        className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
                                     >
                                         <Trash2 className="h-3.5 w-3.5" />
                                         {batchDeleting ? t('pages.datamanager.deleting_btn') : t('pages.datamanager.batch_delete_btn', { count: selectedIds.size })}

@@ -10,21 +10,24 @@ return new class extends Migration {
     {
         Schema::create('attachments', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('service_order_id')->nullable()->constrained('service_orders')->cascadeOnDelete();
-            $table->foreignUuid('mini_task_id')->nullable()->constrained('mini_tasks')->cascadeOnDelete();
+            $table->uuid('equipment_id')->nullable();
             $table->string('file_path', 250);
             $table->string('file_name', 250);
             $table->string('mime_type', 50)->nullable();
+            $table->string('attachable_type', 255)->nullable();
+            $table->uuid('attachable_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index('service_order_id');
-            $table->index('mini_task_id');
+            $table->index('equipment_id');
+            $table->index(['attachable_type', 'attachable_id']);
         });
 
-        // SQLite does not support ALTER TABLE ADD CONSTRAINT
         if (DB::getDriverName() !== 'sqlite') {
-            DB::statement('ALTER TABLE attachments ADD CONSTRAINT check_attachment_entity CHECK ((service_order_id IS NOT NULL AND mini_task_id IS NULL) OR (service_order_id IS NULL AND mini_task_id IS NOT NULL))');
+            DB::statement("ALTER TABLE attachments ADD CONSTRAINT attachments_attachable_check CHECK (
+                (attachable_type IS NOT NULL AND attachable_id IS NOT NULL) OR
+                (attachable_type IS NULL AND attachable_id IS NULL)
+            )");
         }
     }
 

@@ -73,6 +73,10 @@ return [
         'notifications' => 'Notifications',
         'equipment_types' => 'Equipment Types',
         'counting_types' => 'Counting Types',
+        'service_order_categories' => 'Service Order Categories',
+        'districts' => 'Districts',
+        'municipalities' => 'Municipalities',
+        'parishes' => 'Parishes',
     ],
 
     'priority' => [

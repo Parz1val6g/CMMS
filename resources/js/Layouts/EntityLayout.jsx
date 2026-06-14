@@ -52,7 +52,7 @@ export default function EntityLayout({ title, children }) {
   return (
     <>
       <Head title={title} />
-      <div className="h-screen w-screen flex flex-col overflow-hidden bg-gray-50">
+      <div className="h-screen w-screen flex flex-col overflow-hidden bg-brand-light">
         <EntityHeader user={auth?.user} />
         <main className="flex-1 overflow-auto p-6 lg:p-8">
           {children}

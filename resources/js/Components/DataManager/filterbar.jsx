@@ -125,7 +125,7 @@ export default function FilterBar({
                         name="search"
                         value={search}
                         onChange={handleSearchChange}
-                        className="block w-full rounded-lg border border-brand-mid/20 bg-brand-white py-2 pl-9 pr-3 text-sm text-brand-darkest placeholder:text-brand-mid focus:border-brand-accent focus:ring-0"
+                        className="block w-full rounded-xl border border-brand-mid/20 bg-brand-white py-2 pl-9 pr-3 text-sm text-brand-darkest placeholder:text-brand-mid focus:border-brand-accent focus:ring-1 focus:ring-brand-accent"
                         placeholder={t('pages.datamanager.search_placeholder')}
                         aria-label={t('pages.datamanager.search_aria')}
                     />
@@ -135,7 +135,7 @@ export default function FilterBar({
                     <button
                         type="button"
                         onClick={toggleBuilder}
-                        className={`relative inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm transition-all ${
+                        className={`relative inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm transition-all ${
                             builderOpen || activeRuleCount > 0
                                 ? 'border-brand-accent bg-brand-accent/15 text-brand-accent'
                                 : 'border-brand-mid/20 bg-brand-white text-brand-mid hover:bg-brand-light'
@@ -156,7 +156,7 @@ export default function FilterBar({
                     <button
                         type="button"
                         onClick={handleExport}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-brand-mid/20 bg-brand-white px-3 py-2 text-sm text-brand-mid hover:bg-brand-light transition-colors"
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-brand-mid/20 bg-brand-white px-3 py-2 text-sm text-brand-mid hover:bg-brand-light transition-colors"
                         title={t('pages.datamanager.export_title')}
                     >
                         <Download className="h-3.5 w-3.5" />
@@ -166,7 +166,7 @@ export default function FilterBar({
                     {routes.store && (
                         <button
                             type="button"
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-brand-accent px-3 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 transition-colors"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-brand-accent px-3 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 transition-colors"
                             onClick={onNew}
                             title={t('pages.datamanager.new_title')}
                         >
@@ -179,19 +179,19 @@ export default function FilterBar({
 
             {search && (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1 rounded bg-blue-500/10 px-2 py-0.5 text-xs font-medium text-blue-300">
+                    <span className="inline-flex items-center gap-1 rounded-xl bg-brand-accent/10 px-2 py-0.5 text-xs font-medium text-brand-accent">
                         {t('pages.datamanager.label_search')} <strong>{search}</strong>
                     </span>
                 </div>
             )}
 
             {hasBuilder && builderOpen && (
-                <div className="mt-3 rounded-lg border border-brand-mid/20 bg-brand-light p-4">
+                <div className="mt-3 rounded-xl border border-brand-mid/20 bg-brand-light p-4">
                     <div className="mb-3 flex items-center gap-3">
                         <span className="text-xs font-semibold uppercase tracking-wide text-brand-mid">
                             {t('pages.datamanager.filter_builder_match')}
                         </span>
-                        <div className="flex overflow-hidden rounded-lg border border-brand-mid/20 text-xs font-medium">
+                        <div className="flex overflow-hidden rounded-xl border border-brand-mid/20 text-xs font-medium">
                             {['and', 'or'].map((l) => (
                                 <button
                                     key={l}
@@ -228,7 +228,7 @@ export default function FilterBar({
                                             i === idx ? { ...r, field: newField, value: '' } : r
                                         ));
                                     }}
-                                    className="min-w-[130px] rounded-lg border border-brand-mid/20 bg-brand-white px-2 py-1.5 text-sm text-brand-darkest focus:border-brand-accent focus:ring-0"
+                                    className="min-w-[130px] rounded-xl border border-brand-mid/20 bg-brand-white px-2 py-1.5 text-sm text-brand-darkest focus:border-brand-accent focus:ring-1 focus:ring-brand-accent"
                                 >
                                     {advancedFilterFields.map((f) => (
                                         <option key={f.value} value={f.value}>{f.label}</option>
@@ -237,7 +237,7 @@ export default function FilterBar({
                                 <select
                                     value={rule.operator}
                                     onChange={(e) => updateRule(idx, 'operator', e.target.value)}
-                                    className="min-w-[160px] rounded-lg border border-brand-mid/20 bg-brand-white px-2 py-1.5 text-sm text-brand-darkest focus:border-brand-accent focus:ring-0"
+                                    className="min-w-[160px] rounded-xl border border-brand-mid/20 bg-brand-white px-2 py-1.5 text-sm text-brand-darkest focus:border-brand-accent focus:ring-1 focus:ring-brand-accent"
                                 >
                                     {OPERATOR_KEYS.map((op) => (
                                         <option key={op.value} value={op.value}>
@@ -253,7 +253,7 @@ export default function FilterBar({
                                         <select
                                             value={rule.value}
                                             onChange={(e) => updateRule(idx, 'value', e.target.value)}
-                                            className="flex-1 rounded-lg border border-brand-mid/20 bg-brand-white px-2 py-1.5 text-sm text-brand-darkest focus:border-brand-accent focus:ring-0"
+                                            className="flex-1 rounded-xl border border-brand-mid/20 bg-brand-white px-2 py-1.5 text-sm text-brand-darkest focus:border-brand-accent focus:ring-1 focus:ring-brand-accent"
                                         >
                                             <option value="">{t('pages.datamanager.filter_builder_value_placeholder')}</option>
                                             {fieldDef.options.map(opt => (
@@ -268,14 +268,14 @@ export default function FilterBar({
                                             onChange={(e) => updateRule(idx, 'value', e.target.value)}
                                             onKeyDown={(e) => e.key === 'Enter' && handleApply()}
                                             placeholder={t('pages.datamanager.filter_builder_value_placeholder')}
-                                            className="flex-1 rounded-lg border border-brand-mid/20 bg-brand-white px-2 py-1.5 text-sm text-brand-darkest placeholder:text-brand-mid focus:border-brand-accent focus:ring-0"
+                                            className="flex-1 rounded-xl border border-brand-mid/20 bg-brand-white px-2 py-1.5 text-sm text-brand-darkest placeholder:text-brand-mid focus:border-brand-accent focus:ring-1 focus:ring-brand-accent"
                                         />
                                     );
                                 })()}
                                 <button
                                     type="button"
                                     onClick={() => removeRule(idx)}
-                                    className="shrink-0 rounded-lg border border-brand-mid/20 p-1.5 text-brand-mid transition-colors hover:border-red-600 hover:bg-red-600/20 hover:text-red-400"
+                                    className="shrink-0 rounded-xl border border-brand-mid/20 p-1.5 text-brand-mid transition-colors hover:border-red-600 hover:bg-red-600/20 hover:text-red-400"
                                     title={t('pages.datamanager.filter_builder_remove_rule')}
                                 >
                                     <Trash2 className="h-3.5 w-3.5" />
@@ -288,7 +288,7 @@ export default function FilterBar({
                         <button
                             type="button"
                             onClick={addRule}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-brand-mid/20 bg-brand-light px-3 py-1.5 text-xs font-medium text-brand-darkest transition-colors hover:bg-brand-mid/10"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-brand-mid/20 bg-brand-light px-3 py-1.5 text-xs font-medium text-brand-darkest transition-colors hover:bg-brand-mid/10"
                         >
                             <Plus className="h-3 w-3" />
                             {t('pages.datamanager.filter_builder_add_rule')}
@@ -297,14 +297,14 @@ export default function FilterBar({
                             <button
                                 type="button"
                                 onClick={handleClearBuilder}
-                                className="rounded-lg border border-brand-mid/20 px-3 py-1.5 text-xs font-medium text-brand-mid transition-colors hover:bg-brand-light"
+                                className="rounded-xl border border-brand-mid/20 px-3 py-1.5 text-xs font-medium text-brand-mid transition-colors hover:bg-brand-light"
                             >
                                 {t('pages.datamanager.filter_builder_clear')}
                             </button>
                             <button
                                 type="button"
                                 onClick={handleApply}
-                                className="rounded-lg bg-brand-accent px-4 py-1.5 text-xs font-medium text-brand-white shadow-sm transition-colors hover:bg-brand-accent/90"
+                                className="rounded-xl bg-brand-accent px-4 py-1.5 text-xs font-medium text-brand-white shadow-sm transition-colors hover:bg-brand-accent/90"
                             >
                                 {t('pages.datamanager.filter_builder_apply')}
                             </button>

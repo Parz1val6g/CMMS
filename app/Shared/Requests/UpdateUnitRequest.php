@@ -14,8 +14,9 @@ class UpdateUnitRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes', 'string', 'max:50'],
+            'name'         => ['sometimes', 'string', 'max:50'],
             'abbreviation' => ['sometimes', 'string', 'max:10', 'unique:units,abbreviation,' . $this->route('unit')->id],
+            'step'         => ['sometimes', 'numeric', 'min:0.01'],
         ];
     }
 }

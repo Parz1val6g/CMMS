@@ -50,7 +50,7 @@ export default function Topbar({ breadcrumbs = [] }) {
           href="/profile"
           className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-brand-darkest hover:bg-brand-light transition-colors"
         >
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-accent text-xs font-bold text-white">
             U
           </div>
           <span className="hidden sm:inline">{t('pages.profile.page_title')}</span>

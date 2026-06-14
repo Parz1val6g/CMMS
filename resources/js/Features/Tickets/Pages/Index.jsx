@@ -40,6 +40,7 @@ export default function TicketsIndex({ tickets, columns, formSchema, createFormS
     try {
       const res = await fetch(routes.store, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
@@ -74,6 +75,7 @@ export default function TicketsIndex({ tickets, columns, formSchema, createFormS
     try {
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
       const res = await fetch(`/api/tickets/${item.id}`, {
+        credentials: 'include',
         headers: { Accept: 'application/json', 'X-CSRF-TOKEN': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

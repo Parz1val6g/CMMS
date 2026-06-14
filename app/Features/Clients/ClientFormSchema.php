@@ -16,35 +16,36 @@ class ClientFormSchema
                     ->setRequired()
                     ->helperText(__('forms.clients.nif_helper'))
                     ->helpExamples(['123456789', '987654321'])
-                    ->setRules('required|string|max:20|unique:clients,nif')
+                    ->setRules('string|max:20|unique:clients,nif')
             )
             ->field(
                 TextInput::make('first_name')
                     ->setLabel(__('forms.clients.first_name'))
                     ->setRequired()
                     ->helperText(__('forms.clients.first_name_helper'))
-                    ->setRules('required|string|max:250')
+                    ->setRules('string|max:250')
             )
             ->field(
                 TextInput::make('last_name')
                     ->setLabel(__('forms.clients.last_name'))
                     ->setRequired()
                     ->helperText(__('forms.clients.last_name_helper'))
-                    ->setRules('required|string|max:250')
+                    ->setRules('string|max:250')
             )
             ->field(
                 EmailInput::make('email')
                     ->setLabel(__('forms.clients.email'))
                     ->setRequired()
-                    ->setRules('required|email|max:255|unique:users,email')
+                    ->setRules('email|max:255|unique:users,email')
             )
             ->field(
                 TextInput::make('phone')
                     ->setLabel(__('forms.clients.phone'))
+                    ->setRequired()
                     ->setPlaceholder(__('forms.clients.phone_placeholder'))
                     ->helperText(__('forms.clients.phone_helper'))
                     ->helpExamples(['+351 910 000 000', '+351 212 345 678'])
-                    ->setRules('nullable|string|max:20')
+                    ->setRules('string|max:20')
             );
     }
 
@@ -81,7 +82,7 @@ class ClientFormSchema
                     ->setPlaceholder(__('forms.clients.phone_placeholder'))
                     ->helperText(__('forms.clients.phone_helper'))
                     ->helpExamples(['+351 910 000 000', '+351 212 345 678'])
-                    ->setRules('nullable|string|max:20')
+                    ->setRules('string|max:20')
             );
     }
 }

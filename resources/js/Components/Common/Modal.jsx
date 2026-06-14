@@ -267,6 +267,7 @@ export default function Modal({ entityName = t('common.entity_name'), title, for
       }
       const res = await fetch(routes.store, {
         method: 'POST',
+        credentials: 'include',
         headers: reqHeaders,
         body: reqBody,
       });
@@ -382,14 +383,14 @@ export default function Modal({ entityName = t('common.entity_name'), title, for
         role="dialog"
         aria-modal="true"
         aria-label={title ?? schemaTitle ?? t('pages.modal.create_title', { name: entityName })}
-        className={`relative w-full ${sizeClass} max-h-[85vh] overflow-hidden rounded-xl bg-brand-white shadow-2xl border border-brand-mid/20`}
+        className={`relative w-full ${sizeClass} max-h-[85vh] overflow-hidden rounded-xl bg-brand-white shadow-xl border border-brand-mid/20`}
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-brand-mid/20 px-6 py-4">
           <h3 className="text-lg font-semibold text-brand-darkest">{modalTitle}</h3>
           <button
             type="button"
-            className="rounded-lg p-1.5 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors"
+              className="rounded-xl p-1.5 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors"
             onClick={onClose}
             aria-label={t('pages.datamanager.close_aria')}
           >
@@ -406,7 +407,7 @@ export default function Modal({ entityName = t('common.entity_name'), title, for
           {/* Global error */}
           {errors._general && (
             <div className="px-6 pt-2">
-              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{errors._general}</div>
+              <div className="rounded-xl bg-red-50 p-3 text-sm text-red-600">{errors._general}</div>
             </div>
           )}
 
@@ -447,7 +448,7 @@ export default function Modal({ entityName = t('common.entity_name'), title, for
           <div className="flex items-center justify-end gap-3 border-t border-brand-mid/20 px-6 py-4">
             <button
               type="button"
-              className="rounded-lg border border-brand-mid/20 bg-brand-white px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-light transition-colors"
+              className="rounded-xl border border-brand-mid/20 bg-brand-white px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-light transition-colors"
               onClick={onClose}
               disabled={saving}
             >
@@ -456,7 +457,7 @@ export default function Modal({ entityName = t('common.entity_name'), title, for
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 disabled:opacity-50 transition-colors"
+              className="rounded-xl bg-brand-accent px-4 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 disabled:opacity-50 transition-colors"
             >
               {saving ? t('pages.datamanager.saving_btn') : t('pages.modal.save_entity_btn', { name: entityName })}
             </button>

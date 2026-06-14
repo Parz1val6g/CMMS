@@ -73,6 +73,7 @@ function DrawerDetails({ so, routes, onAction }) {
     try {
       const res = await fetch(endpoint, {
         method,
+        credentials: 'include',
         headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
       });
       if (!res.ok) {
@@ -249,6 +250,7 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
 
     const res = await fetch(routes.store, {
       method: 'POST',
+      credentials: 'include',
       headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
       body: formData,
     });
@@ -333,7 +335,7 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
+                <tr className="border-b border-brand-mid/10 bg-brand-light">
                   {COLUMNS.map(col => (
                     <th key={col.key} className="text-left text-gray-600 font-semibold px-5 py-3.5 text-xs uppercase tracking-wider">
                       {col.label}
@@ -346,7 +348,7 @@ export default function ManagerPortalIndex({ service_orders, stats, createFormSc
                   <tr
                     key={so.id}
                     onClick={() => openDrawer(so)}
-                    className="hover:bg-gray-50 cursor-pointer transition-colors group"
+                    className="hover:bg-brand-light cursor-pointer transition-colors group"
                   >
                     <td className="px-5 py-4 font-semibold text-gray-900">{so.process}</td>
                     <td className="px-5 py-4"><StatusBadge value={so.status} /></td>

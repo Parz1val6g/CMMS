@@ -1,5 +1,6 @@
 <?php
 namespace App\Features\MiniTasks\Controllers\Api;
+use App\Core\Enums\MiniTaskStatus;
 use App\Core\Services\FilterService;
 use App\Core\Traits\FiltersAdvancedRules;
 use App\Features\MiniTasks\Models\MiniTask;
@@ -40,7 +41,8 @@ class MiniTaskController extends Controller
         $query = $this->filterService->apply(
             $base,
             $request->only(['search', 'status', 'sort']),
-            ['description', 'status']
+            ['description', 'status'],
+            ['status' => MiniTaskStatus::sortOrder()]
         );
 
         $this->applyAdvancedFilters(

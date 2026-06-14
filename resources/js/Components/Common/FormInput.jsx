@@ -25,7 +25,7 @@ export default function FormInput({
         onChange?.(e);
     }, [onChange]);
 
-    const baseInputClass = `block w-full rounded-lg border bg-brand-white px-3 py-2 text-sm text-brand-darkest placeholder:text-brand-mid focus:ring-1 transition-colors ${hasError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-brand-mid/20 focus:border-brand-accent focus:ring-brand-accent'
+    const baseInputClass = `block w-full rounded-xl border bg-brand-white px-3 py-2.5 text-sm text-brand-darkest placeholder:text-brand-mid focus:ring-1 transition-colors ${hasError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-brand-mid/20 focus:border-brand-accent focus:ring-brand-accent'
         }`;
 
     return (

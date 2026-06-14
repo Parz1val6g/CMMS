@@ -17,6 +17,12 @@ import {
   BarChart3,
   Shield,
   Ticket,
+  Tags,
+  Ruler,
+  Map,
+  Landmark,
+  Flag,
+  ClipboardCheck,
 } from 'lucide-react';
 import { t } from '@/utils/i18n';
 
@@ -54,8 +60,9 @@ export function getSections() {
     {
       label: t('pages.sidebar.section_assets'),
       items: [
-        { label: t('pages.sidebar.equipments'),  icon: Wrench,    href: '/equipments',  dev: false, can: 'viewEquipments' },
-        { label: t('pages.sidebar.loan_orders'), icon: Handshake, href: '/loan-orders', dev: false, can: 'viewLoanOrders' },
+        { label: t('pages.sidebar.equipments'),          icon: Wrench,    href: '/equipments',           dev: false, can: 'viewEquipments' },
+        { label: t('pages.sidebar.loan_orders'),         icon: Handshake, href: '/loan-orders',          dev: false, can: 'viewLoanOrders' },
+        { label: t('pages.sidebar.equipment_revisions'), icon: ClipboardCheck, href: '/equipment-revisions', dev: false, can: 'manageUsers' },
       ],
     },
 
@@ -92,10 +99,15 @@ export function getSections() {
     {
       label: t('pages.sidebar.section_settings'),
       items: [
-        { label: t('pages.sidebar.service_types'),   icon: Package, href: '/service-types',   dev: false, can: 'createServiceTypes' },
-        { label: t('pages.sidebar.equipment_types'), icon: Wrench,  href: '/equipment-types', dev: false, can: 'viewEquipmentTypes' },
-        { label: t('pages.sidebar.counting_types'),  icon: Wrench,  href: '/counting-types',  dev: false, can: 'viewCountingTypes' },
-        { label: t('pages.sidebar.materials'),       icon: Package, href: '/materials',        dev: false, can: 'viewMaterials' },
+        { label: t('pages.sidebar.service_types'),            icon: Package, href: '/service-types',             dev: false, can: 'createServiceTypes' },
+        { label: t('pages.sidebar.service_order_categories'), icon: Tags,     href: '/service-order-categories', dev: false, can: 'manageUsers' },
+        { label: t('pages.sidebar.equipment_types'),          icon: Wrench,  href: '/equipment-types',          dev: false, can: 'viewEquipmentTypes' },
+        { label: t('pages.sidebar.counting_types'),           icon: ListChecks, href: '/counting-types',        dev: false, can: 'viewCountingTypes' },
+        { label: t('pages.sidebar.materials'),                icon: Package, href: '/materials',                dev: false, can: 'viewMaterials' },
+        { label: t('pages.sidebar.units'),                    icon: Ruler,   href: '/units',                    dev: false, can: 'manageUsers' },
+        { label: t('pages.sidebar.districts'),                icon: Map,     href: '/admin/districts',          dev: false, can: 'manageUsers' },
+        { label: t('pages.sidebar.municipalities'),           icon: Landmark, href: '/admin/municipalities',   dev: false, can: 'manageUsers' },
+        { label: t('pages.sidebar.parishes'),                 icon: Flag,    href: '/admin/parishes',           dev: false, can: 'manageUsers' },
       ],
     },
 

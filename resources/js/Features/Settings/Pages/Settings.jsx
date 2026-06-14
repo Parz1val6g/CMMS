@@ -44,7 +44,7 @@ function UserAvatar({ name }) {
 
 function StatCard({ label, value, icon }) {
   return (
-    <div className="flex flex-col gap-1 rounded-xl border border-gray-100 bg-gray-50 p-4">
+    <div className="flex flex-col gap-1 rounded-xl border border-brand-mid/10 bg-brand-white p-4 shadow-sm">
       <div className="flex items-center gap-2 text-gray-400">
         <span className="text-base">{icon}</span>
         <span className="text-[10px] font-semibold uppercase tracking-wide">{label}</span>
@@ -149,7 +149,7 @@ export default function Settings({ user, preferences, appSettings, isAdmin, loca
       fd.append('_token', document.querySelector('input[name="_token"]')?.value ?? '');
 
       const res = await fetch(apiRoutes.deleteAccount, {
-        method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        method: 'POST', credentials: 'include', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' },
       });
       const data = await res.json();
 

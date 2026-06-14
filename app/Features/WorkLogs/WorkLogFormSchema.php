@@ -16,26 +16,27 @@ class WorkLogFormSchema
                     ->setLabel(__('forms.work_logs.description'))
                     ->setRows(3)
                     ->setRequired()
-                    ->setRules('required|string|max:250')
+                    ->setRules('string|max:250')
             )
             ->field(
                 SelectInput::make('mini_task_id')
                     ->setLabel(__('forms.work_logs.mini_task'))
+                    ->setRequired()
                     ->setOptions([])
-                    ->setRules('required|exists:mini_tasks,id')
+                    ->setRules('exists:mini_tasks,id')
             )
             ->field(
                 TextInput::make('started_at')
                     ->setLabel(__('forms.work_logs.started_at'))
                     ->setType('datetime-local')
                     ->setRequired()
-                    ->setRules('required|date')
+                    ->setRules('date')
             )
             ->field(
                 TextInput::make('completed_at')
                     ->setLabel(__('forms.work_logs.completed_at'))
                     ->setType('datetime-local')
-                    ->setRules('nullable|date|after:started_at')
+                    ->setRules('date|after:started_at')
             );
     }
 
@@ -64,7 +65,7 @@ class WorkLogFormSchema
                 TextInput::make('completed_at')
                     ->setLabel(__('forms.work_logs.completed_at'))
                     ->setType('datetime-local')
-                    ->setRules('nullable|date|after:started_at')
+                    ->setRules('date|after:started_at')
             )
             ->field(
                 SelectInput::make('status')

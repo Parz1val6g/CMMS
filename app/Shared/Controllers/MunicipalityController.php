@@ -4,9 +4,11 @@ namespace App\Shared\Controllers;
 
 use App\Shared\Models\Municipality;
 use App\Shared\Resources\MunicipalityResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 
 class MunicipalityController extends Controller
 {
@@ -27,9 +29,44 @@ class MunicipalityController extends Controller
         return MunicipalityResource::collection($query->orderBy('name')->get());
     }
 
+    public function store(Request $request): MunicipalityResource
+    {
+        Gate::authorize('create', Municipality::class);
+
+        $data = $request->validate([
+            'name'        => 'required|string|max:100',
+            'district_id' => 'required|uuid|exists:districts,id',
+        ]);
+        $municipality = Municipality::create($data);
+
+        return new MunicipalityResource($municipality);
+    }
+
     public function show(Municipality $municipality): MunicipalityResource
     {
         $municipality->load(['district', 'parishes']);
         return new MunicipalityResource($municipality);
+    }
+
+    public function update(Request $request, Municipality $municipality): MunicipalityResource
+    {
+        Gate::authorize('update', $municipality);
+
+        $data = $request->validate([
+            'name'        => 'sometimes|string|max:100',
+            'district_id' => 'sometimes|uuid|exists:districts,id',
+        ]);
+        $municipality->update($data);
+
+        return new MunicipalityResource($municipality);
+    }
+
+    public function destroy(Municipality $municipality): JsonResponse
+    {
+        Gate::authorize('delete', $municipality);
+
+        $municipality->delete();
+
+        return response()->json(['message' => 'Municipality deleted successfully.']);
     }
 }

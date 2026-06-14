@@ -63,11 +63,23 @@ class MiniTaskSeeder extends Seeder
                 $desc      = $miniTaskPool[$i] ?? $miniTaskPool[array_rand($miniTaskPool)];
                 $createdAt = (clone $task->created_at)->modify('+' . ($i + 1) . ' days');
 
+                // Datas coerentes com o estado da micro-tarefa (campos adicionados em 2026_05_16_000002)
+                $startDate = $mStatus !== MiniTaskStatus::PENDING
+                    ? $createdAt->format('Y-m-d')
+                    : null;
+
+                $endDate = match ($mStatus) {
+                    MiniTaskStatus::COMPLETED, MiniTaskStatus::CANCELLED => (clone $createdAt)->modify('+1 day')->format('Y-m-d'),
+                    default                                              => null,
+                };
+
                 $miniTask = MiniTask::create([
                     'task_id'       => $task->id,
                     'supervisor_id' => $supervisorId,
                     'description'   => $desc,
                     'status'        => $mStatus->value,
+                    'start_date'    => $startDate,
+                    'end_date'      => $endDate,
                     'created_at'    => $createdAt,
                     'updated_at'    => $createdAt,
                 ]);

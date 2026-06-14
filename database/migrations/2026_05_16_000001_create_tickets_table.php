@@ -15,6 +15,8 @@ return new class extends Migration {
             $table->enum('priority', ['low', 'normal', 'high', 'urgent'])->default('normal');
             $table->enum('status', ['open', 'in_progress', 'converted', 'cancelled'])->default('open');
             $table->foreignUuid('ticket_manager_id')->constrained('users')->cascadeOnDelete();
+            $table->char('location_id', 36)->nullable();
+            $table->foreign('location_id')->references('id')->on('locations')->nullOnDelete();
             $table->foreignUuid('service_order_id')->nullable()->constrained('service_orders')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();

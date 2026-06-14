@@ -34,6 +34,11 @@ enum Priority: string
         return in_array($this, [self::URGENT, self::HIGH]);
     }
 
+    public static function sortOrder(): array
+    {
+        return ['low', 'normal', 'high', 'urgent'];
+    }
+
     public static function options(): array
     {
         return array_map(

@@ -7,35 +7,35 @@ import { t } from '@/utils/i18n';
 const typeConfig = {
     success: {
         icon: CheckCircle,
-        bgColor: 'bg-green-500/10',
-        borderColor: 'border-green-500/30',
-        iconColor: 'text-green-400',
-        buttonColor: 'bg-green-600 hover:bg-green-700',
+        bgColor: 'bg-emerald-50',
+        borderColor: 'border-emerald-200',
+        iconColor: 'text-emerald-600',
+        buttonColor: 'bg-emerald-600 hover:bg-emerald-700',
     },
     error: {
         icon: AlertCircle,
-        bgColor: 'bg-red-500/10',
-        borderColor: 'border-red-500/30',
-        iconColor: 'text-red-400',
+        bgColor: 'bg-red-50',
+        borderColor: 'border-red-200',
+        iconColor: 'text-red-600',
         buttonColor: 'bg-red-600 hover:bg-red-700',
     },
     warning: {
         icon: AlertTriangle,
-        bgColor: 'bg-yellow-500/10',
-        borderColor: 'border-yellow-500/30',
-        iconColor: 'text-yellow-400',
-        buttonColor: 'bg-yellow-600 hover:bg-yellow-700',
+        bgColor: 'bg-amber-50',
+        borderColor: 'border-amber-200',
+        iconColor: 'text-amber-600',
+        buttonColor: 'bg-amber-600 hover:bg-amber-700',
     },
     info: {
         icon: Info,
-        bgColor: 'bg-blue-500/10',
-        borderColor: 'border-blue-500/30',
-        iconColor: 'text-blue-400',
-        buttonColor: 'bg-blue-600 hover:bg-blue-700',
+        bgColor: 'bg-sky-50',
+        borderColor: 'border-sky-200',
+        iconColor: 'text-sky-600',
+        buttonColor: 'bg-sky-600 hover:bg-sky-700',
     },
     confirm: {
         icon: AlertCircle,
-        bgColor: 'bg-brand-accent/10',
+        bgColor: 'bg-brand-accent/5',
         borderColor: 'border-brand-accent/30',
         iconColor: 'text-brand-accent',
         buttonColor: 'bg-brand-accent hover:bg-brand-accent/90',
@@ -98,11 +98,7 @@ export default function DialogModal({
             {/* Dialog */}
             <div
                 ref={contentRef}
-                className={`relative w-full max-w-md rounded-xl shadow-2xl border ${config.bgColor} ${config.borderColor}`}
-                style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    borderColor: 'rgba(101, 122, 129, 0.5)',
-                }}
+                className={`relative w-full max-w-md rounded-xl shadow-xl bg-white border ${config.borderColor}`}
             >
                 {/* Header with Icon */}
                 <div className="flex items-start justify-between px-6 py-5">
@@ -117,7 +113,7 @@ export default function DialogModal({
                     </div>
                     <button
                         type="button"
-                        className="rounded-lg p-1 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors shrink-0"
+                        className="rounded-xl p-1 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors shrink-0"
                         onClick={onClose}
                         aria-label={t('pages.datamanager.close_aria')}
                     >
@@ -135,7 +131,7 @@ export default function DialogModal({
                             key={idx}
                             type="button"
                             disabled={btn.disabled}
-                            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${btn.variant === 'primary'
+                            className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${btn.variant === 'primary'
                                     ? `${config.buttonColor} text-white shadow-sm`
                                     : 'border border-brand-mid/20 bg-brand-light/50 text-brand-mid hover:bg-brand-mid/10 hover:text-brand-darkest'
                                 }`}

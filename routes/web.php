@@ -41,6 +41,7 @@ Route::middleware(['auth', 'web.access'])->group(function () {
     require base_path('app/Features/Materials/Routes/web.php');
     require base_path('app/Features/Sectors/Routes/web.php');
     require base_path('app/Features/ServiceTypes/Routes/web.php');
+    require base_path('app/Features/ServiceOrderCategories/Routes/web.php');
     require base_path('app/Features/Teams/Routes/web.php');
     require base_path('app/Features/Workers/Routes/web.php');
 
@@ -83,4 +84,13 @@ Route::middleware(['auth', 'web.access'])->group(function () {
 
     // Counting Types
     require base_path('app/Features/Equipments/Routes/counting_types_web.php');
+
+    // Equipment Revisions
+    require base_path('app/Features/Equipments/Routes/equipment_revisions_web.php');
+
+    // Admin sub-pages
+    require base_path('app/Features/Admin/Routes/units_web.php');
+    require base_path('app/Features/Admin/Routes/districts_web.php');
+    require base_path('app/Features/Admin/Routes/municipalities_web.php');
+    require base_path('app/Features/Admin/Routes/parishes_web.php');
 });

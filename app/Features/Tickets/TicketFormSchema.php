@@ -20,21 +20,21 @@ class TicketFormSchema
                     ->helperText(__('forms.tickets.description_helper'))
                     ->setRows(4)
                     ->setRequired()
-                    ->setRules('required|string|max:5000')
+                    ->setRules('string|max:5000')
             )
             ->field(
                 SelectInput::make('client_id')
                     ->setLabel(__('forms.tickets.client'))
                     ->helperText(__('forms.tickets.client_helper'))
                     ->setOptions(self::clientOptions())
-                    ->setRules('nullable|exists:clients,id')
+                    ->setRules('exists:clients,id')
             )
             ->field(
                 SelectInput::make('service_type_id')
                     ->setLabel(__('forms.tickets.service_type'))
                     ->helperText(__('forms.tickets.service_type_helper'))
                     ->setOptions(self::serviceTypeOptions())
-                    ->setRules('nullable|exists:service_types,id')
+                    ->setRules('exists:service_types,id')
             )
             ->field(
                 SelectInput::make('priority')
@@ -42,7 +42,7 @@ class TicketFormSchema
                     ->helperText(__('forms.tickets.priority_helper'))
                     ->setOptions(TicketPriority::options())
                     ->setRequired()
-                    ->setRules('required|string')
+                    ->setRules('string')
             )
             ->field(
                 SectionHeader::make('section-location')
@@ -52,7 +52,7 @@ class TicketFormSchema
                 SelectInput::make('parish_id')
                     ->setLabel(__('forms.tickets.parish'))
                     ->setOptions(self::parishOptions())
-                    ->setRules('nullable|exists:parishes,id')
+                    ->setRules('exists:parishes,id')
                     ->meta('useCascade', true)
                     ->meta('districts', LocationCascadeOptions::all()['districts'])
                     ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
@@ -61,17 +61,17 @@ class TicketFormSchema
             ->field(
                 TextInput::make('street')
                     ->setLabel(__('forms.tickets.street'))
-                    ->setRules('nullable|string|max:255')
+                    ->setRules('string|max:255')
             )
             ->field(
                 TextInput::make('reference_point')
                     ->setLabel(__('forms.tickets.reference_point'))
-                    ->setRules('nullable|string|max:255')
+                    ->setRules('string|max:255')
             )
             ->field(
                 TextInput::make('postal_code')
                     ->setLabel(__('forms.tickets.postal_code'))
-                    ->setRules('nullable|string|max:20')
+                    ->setRules('string|max:20')
             );
     }
 
@@ -88,13 +88,13 @@ class TicketFormSchema
                 SelectInput::make('client_id')
                     ->setLabel(__('forms.tickets.client'))
                     ->setOptions(self::clientOptions())
-                    ->setRules('nullable|exists:clients,id')
+                    ->setRules('exists:clients,id')
             )
             ->field(
                 SelectInput::make('service_type_id')
                     ->setLabel(__('forms.tickets.service_type'))
                     ->setOptions(self::serviceTypeOptions())
-                    ->setRules('nullable|exists:service_types,id')
+                    ->setRules('exists:service_types,id')
             )
             ->field(
                 SelectInput::make('priority')
@@ -110,7 +110,7 @@ class TicketFormSchema
                 SelectInput::make('parish_id')
                     ->setLabel(__('forms.tickets.parish'))
                     ->setOptions(self::parishOptions())
-                    ->setRules('nullable|exists:parishes,id')
+                    ->setRules('exists:parishes,id')
                     ->meta('useCascade', true)
                     ->meta('districts', LocationCascadeOptions::all()['districts'])
                     ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
@@ -119,17 +119,17 @@ class TicketFormSchema
             ->field(
                 TextInput::make('street')
                     ->setLabel(__('forms.tickets.street'))
-                    ->setRules('nullable|string|max:255')
+                    ->setRules('string|max:255')
             )
             ->field(
                 TextInput::make('reference_point')
                     ->setLabel(__('forms.tickets.reference_point'))
-                    ->setRules('nullable|string|max:255')
+                    ->setRules('string|max:255')
             )
             ->field(
                 TextInput::make('postal_code')
                     ->setLabel(__('forms.tickets.postal_code'))
-                    ->setRules('nullable|string|max:20')
+                    ->setRules('string|max:20')
             );
     }
 

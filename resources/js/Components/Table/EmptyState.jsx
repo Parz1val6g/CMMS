@@ -25,7 +25,7 @@ export default function EmptyState({ title, description, icon, action, actionTex
       <p className="text-sm text-brand-mid">{description ?? t('pages.table.empty_desc')}</p>
 
       {action && actionText && (
-        <Link href={action} className="mt-3 inline-flex items-center rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 transition-colors">
+        <Link href={action} className="mt-3 inline-flex items-center rounded-xl bg-brand-accent px-4 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 transition-colors">
           {actionText}
         </Link>
       )}

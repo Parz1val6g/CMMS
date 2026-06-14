@@ -17,14 +17,15 @@ class MaterialFormSchema
                     ->setRequired()
                     ->helperText(__('forms.materials.name_helper'))
                     ->helpExamples(['Concrete Blocks', 'Copper Wire', 'Paint (Acrylic)'])
-                    ->setRules('required|string|max:100')
+                    ->setRules('string|max:100')
             )
             ->field(
                 SelectInput::make('unit_id')
                     ->setLabel(__('forms.materials.unit'))
+                    ->setRequired()
                     ->helperText(__('forms.materials.unit_helper'))
                     ->setOptions(self::unitOptions())
-                    ->setRules('required|exists:units,id')
+                    ->setRules('exists:units,id')
             )
             ->field(
                 NumberInput::make('stock_quantity')
@@ -32,7 +33,7 @@ class MaterialFormSchema
                     ->setRequired()
                     ->helperText(__('forms.materials.stock_quantity_helper'))
                     ->range(0, null)
-                    ->setRules('required|numeric|min:0')
+                    ->setRules('numeric|min:0')
             );
     }
 

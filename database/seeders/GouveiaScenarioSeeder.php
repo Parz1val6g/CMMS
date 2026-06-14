@@ -37,9 +37,9 @@ class GouveiaScenarioSeeder extends Seeder
                         $q2->select('id')->from('roles')->where('name', 'attendant');
                     });
             })->get();
-        $serviceTypes = DB::table('service_types')->get();
+        // service_type_id foi removido de service_orders — tipos de serviço já não são necessários aqui.
 
-        if (!$parish || $clients->isEmpty() || $managers->isEmpty() || $serviceTypes->isEmpty()) {
+        if (!$parish || $clients->isEmpty() || $managers->isEmpty()) {
             $this->command->warn('GouveiaScenarioSeeder: missing prerequisite data — skipping.');
             return;
         }
@@ -155,12 +155,16 @@ class GouveiaScenarioSeeder extends Seeder
             ]);
         }
 
+        // service_type_id foi removido da tabela pela migração 2026_06_02_100005;
+        // o tipo de serviço é agora associado via service_order_sector_service_type.
+        // Categorias para distribuição realista: urgentes → Emergência, normal → Manutenção, baixo → Reparação
+        $categoryMap = DB::table('service_order_categories')->pluck('id', 'name');
+
         foreach ($addresses as $i => $address) {
-            $client      = $clients->random();
-            $manager     = $managers->random();
-            $serviceType = $serviceTypes->random();
-            $locationId  = $locationIds[$i];
-            $priority    = $priorities[$i];
+            $client     = $clients->random();
+            $manager    = $managers->random();
+            $locationId = $locationIds[$i];
+            $priority   = $priorities[$i];
             $description = $allDescriptions[$i];
 
             $counter++;
@@ -168,21 +172,34 @@ class GouveiaScenarioSeeder extends Seeder
 
             $status = $priority === 'urgent' ? 'in_progress' : 'pending';
 
+            // Mapear prioridade para categoria realista
+            $categoryName = match ($priority) {
+                'urgent' => 'Emergência',
+                'high'   => 'Reparação',
+                'normal' => 'Manutenção',
+                default  => 'Reparação',
+            };
+            $categoryId = $categoryMap[$categoryName] ?? null;
+
+            // Gerar título curto a partir da descrição (primeiras 80 chars antes da vírgula)
+            $title = mb_substr(explode(',', $description)[0], 0, 80);
+
             DB::table('service_orders')->insert([
-                'id'              => Str::uuid(),
-                'process'         => $process,
-                'client_id'       => $client->id,
-                'manager_id'      => $manager->id,
-                'created_by'      => $attendant?->id,
-                'location_id'     => $locationId,
-                'service_type_id' => $serviceType->id,
-                'priority'        => $priority,
-                'start_date'      => $now->toDateString(),
-                'end_date'        => $now->copy()->addDays(30)->toDateString(),
-                'status'          => $status,
-                'description'     => $description,
-                'created_at'      => $now,
-                'updated_at'      => $now,
+                'id'          => Str::uuid(),
+                'process'     => $process,
+                'title'       => $title,
+                'category_id' => $categoryId,
+                'client_id'   => $client->id,
+                'manager_id'  => $manager->id,
+                'created_by'  => $attendant?->id,
+                'location_id' => $locationId,
+                'priority'    => $priority,
+                'start_date'  => $now->toDateString(),
+                'end_date'    => $now->copy()->addDays(30)->toDateString(),
+                'status'      => $status,
+                'description' => $description,
+                'created_at'  => $now,
+                'updated_at'  => $now,
             ]);
         }
 

@@ -353,6 +353,7 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
             }
             const res = await fetch(url, {
                 method: reqMethod,
+                credentials: 'include',
                 headers: reqHeaders,
                 body: reqBody,
             });
@@ -385,13 +386,13 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
                 <div className="w-1 h-12 rounded-full bg-brand-mid/30 group-hover:bg-brand-accent transition-colors" />
             </div>
 
-            <div className="flex flex-col overflow-y-auto rounded-lg border border-brand-mid/20 bg-brand-white shadow-xl w-full">
+            <div className="flex flex-col overflow-y-auto rounded-xl border border-brand-mid/20 bg-brand-white shadow-xl w-full">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-brand-mid/20 px-4 py-3">
                 <h6 className="text-sm font-bold text-brand-darkest">{t('pages.datamanager.edit_title', { name: entityName })}</h6>
                 <button
                     type="button"
-                    className="rounded-lg p-1 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors"
+                    className="rounded-xl p-1 text-brand-mid hover:bg-brand-light hover:text-brand-darkest transition-colors"
                     onClick={onClose}
                     aria-label={t('pages.datamanager.close_aria')}
                 >
@@ -405,7 +406,7 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
 
                 <div className="flex-1 overflow-y-auto p-4">
                     {errors._general && (
-                        <div className="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                        <div className="mb-3 rounded-xl bg-red-50 p-3 text-sm text-red-600">
                             {errors._general}
                         </div>
                     )}
@@ -435,14 +436,14 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
                         <button
                             type="submit"
                             disabled={saving}
-                            className="inline-flex items-center justify-center rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 disabled:opacity-50 transition-colors"
+                            className="inline-flex items-center justify-center rounded-xl bg-brand-accent px-4 py-2 text-sm font-medium text-brand-white shadow-sm hover:bg-brand-accent/90 disabled:opacity-50 transition-colors"
                         >
                             {saving ? t('pages.datamanager.saving_btn') : t('pages.datamanager.save_btn')}
                         </button>
                         <button
                             type="button"
                             onClick={onClose}
-                            className="inline-flex items-center justify-center rounded-lg border border-brand-mid/20 bg-brand-white px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-light transition-colors"
+                            className="inline-flex items-center justify-center rounded-xl border border-brand-mid/20 bg-brand-white px-4 py-2 text-sm font-medium text-brand-mid hover:bg-brand-light transition-colors"
                         >
                             {t('pages.datamanager.cancel_btn')}
                         </button>
@@ -450,7 +451,7 @@ export default function EditPanel({ entityName, formSchema, routes, selectedItem
                             <button
                                 type="button"
                                 onClick={() => onDelete(selectedItem.id)}
-                                className="inline-flex items-center justify-center rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                                className="inline-flex items-center justify-center rounded-xl border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
                             >
                                 {t('pages.datamanager.remove_btn')}
                             </button>

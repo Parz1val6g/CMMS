@@ -16,25 +16,25 @@ class EntityFormSchema
                 TextInput::make('name')
                     ->setLabel(__('forms.entities.name'))
                     ->setRequired()
-                    ->setRules('required|string|max:255')
+                    ->setRules('string|max:255')
             )
             ->field(
                 SelectInput::make('entity_type')
                     ->setLabel(__('forms.entities.entity_type'))
                     ->setRequired()
                     ->setOptions(EntityType::options())
-                    ->setRules('required|string')
+                    ->setRules('string')
             )
             ->field(
                 TextInput::make('nif')
                     ->setLabel(__('forms.entities.nif'))
                     ->helperText(__('forms.entities.nif_helper'))
-                    ->setRules('nullable|string|max:20|unique:entities,nif')
+                    ->setRules('string|max:20|unique:entities,nif')
             )
             ->field(
                 TextInput::make('phone')
                     ->setLabel(__('forms.entities.phone'))
-                    ->setRules('nullable|string|max:30')
+                    ->setRules('string|max:30')
             );
     }
 
@@ -56,12 +56,12 @@ class EntityFormSchema
                 TextInput::make('nif')
                     ->setLabel(__('forms.entities.nif'))
                     ->helperText(__('forms.entities.nif_helper'))
-                    ->setRules('sometimes|nullable|string|max:20')
+                    ->setRules('sometimes|string|max:20')
             )
             ->field(
                 TextInput::make('phone')
                     ->setLabel(__('forms.entities.phone'))
-                    ->setRules('sometimes|nullable|string|max:30')
+                    ->setRules('sometimes|string|max:30')
             );
     }
 }

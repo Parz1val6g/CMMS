@@ -14,8 +14,9 @@ class StoreUnitRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:50'],
+            'name'         => ['required', 'string', 'max:50'],
             'abbreviation' => ['required', 'string', 'max:10', 'unique:units,abbreviation'],
+            'step'         => ['sometimes', 'numeric', 'min:0.01'],
         ];
     }
 }

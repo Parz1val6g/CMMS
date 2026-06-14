@@ -213,30 +213,39 @@ class LoanOrderSeeder extends Seeder
                 ]);
             }
 
-            // Create checkout task for checked_out/returned loans
+            // Criar tarefa de entrega para empréstimos em curso ou devolvidos
+            // Os campos priority, start_date e end_date foram adicionados pelas migrações
+            // 2026_06_02_100002 e 2026_05_29_000002 respetivamente — são nullable para tarefas de empréstimo.
             if ($checkedOutAt) {
+                $checkoutStatus = $returnedAt ? 'completed' : 'in_progress';
                 DB::table('tasks')->insert([
-                    'id'               => Str::uuid(),
-                    'taskable_type'    => LoanOrder::class,
-                    'taskable_id'      => $loan->id,
-                    'manager_id'       => $def['manager']->id,
-                    'description'      => 'Entrega e verificação de equipamentos em regime de empréstimo',
-                    'status'           => $returnedAt ? 'completed' : 'in_progress',
-                    'created_at'       => $checkedOutAt,
-                    'updated_at'       => $checkedOutAt,
+                    'id'            => Str::uuid(),
+                    'taskable_type' => LoanOrder::class,
+                    'taskable_id'   => $loan->id,
+                    'manager_id'    => $def['manager']->id,
+                    'description'   => 'Entrega e verificação de equipamentos em regime de empréstimo',
+                    'status'        => $checkoutStatus,
+                    'priority'      => 'normal',
+                    'start_date'    => $checkedOutAt->toDateString(),
+                    'end_date'      => $returnedAt ? $returnedAt->toDateString() : (clone $checkedOutAt)->modify('+30 days')->toDateString(),
+                    'created_at'    => $checkedOutAt,
+                    'updated_at'    => $checkedOutAt,
                 ]);
 
-                // Create return task for returned loans
+                // Criar tarefa de devolução para empréstimos devolvidos
                 if ($returnedAt) {
                     DB::table('tasks')->insert([
-                        'id'               => Str::uuid(),
-                        'taskable_type'    => LoanOrder::class,
-                        'taskable_id'      => $loan->id,
-                        'manager_id'       => $def['manager']->id,
-                        'description'      => 'Devolução dos equipamentos e verificação de estado após período de empréstimo',
-                        'status'           => 'completed',
-                        'created_at'       => $returnedAt,
-                        'updated_at'       => $returnedAt,
+                        'id'            => Str::uuid(),
+                        'taskable_type' => LoanOrder::class,
+                        'taskable_id'   => $loan->id,
+                        'manager_id'    => $def['manager']->id,
+                        'description'   => 'Devolução dos equipamentos e verificação de estado após período de empréstimo',
+                        'status'        => 'completed',
+                        'priority'      => 'normal',
+                        'start_date'    => $returnedAt->toDateString(),
+                        'end_date'      => $returnedAt->toDateString(),
+                        'created_at'    => $returnedAt,
+                        'updated_at'    => $returnedAt,
                     ]);
                 }
             }

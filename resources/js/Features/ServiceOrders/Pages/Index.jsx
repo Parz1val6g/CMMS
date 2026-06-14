@@ -107,14 +107,6 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     const LOCATION_FIELDS = ['parish_id', 'street', 'reference_point', 'postal_code', 'latitude', 'longitude'];
     buildCreatePayload(formData, clientLocationId, locationsDirty, LOCATION_FIELDS);
 
-    // Close modal and give immediate feedback — errors will arrive as a toast
-    setShowModal(false);
-    setPhotoPreview(null);
-    setClientLocationId(null);
-    setLocationsDirty(false);
-    setSectorConfigs([]);
-    globalToast.success(t('pages.service_orders.create_success'));
-
     try {
       const res = await fetch(routes.store, {
         method: 'POST',
@@ -128,6 +120,12 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
       const body = await res.json();
 
       if (res.ok) {
+        setShowModal(false);
+        setPhotoPreview(null);
+        setClientLocationId(null);
+        setLocationsDirty(false);
+        setSectorConfigs([]);
+        globalToast.success(t('pages.service_orders.create_success'));
         setRefreshKey(k => k + 1);
       } else {
         const errorMsg = body.errors
@@ -195,6 +193,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
     try {
       const res = await fetch(`${routes.update.replace(':id', serviceOrderId)}`, {
         method: 'PATCH',
+        credentials: 'include',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
@@ -227,6 +226,7 @@ export default function ServiceOrdersIndex({ service_orders, columns, formSchema
 
     try {
       const res = await fetch(`/api/service-orders/${item.id}`, {
+        credentials: 'include',
         headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

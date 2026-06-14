@@ -14,12 +14,13 @@ class CountingTypeFormSchema
                 TextInput::make('name')
                     ->setLabel('Name')
                     ->setRequired()
-                    ->setRules('required|string|max:200')
+                    ->setRules('string|max:200')
             )
             ->field(
                 TextInput::make('value')
                     ->setLabel('Value')
-                    ->setRules('nullable|string|max:50')
+                    ->setRequired()
+                    ->setRules('string|max:50')
             )
             ->field(
                 ToggleInput::make('active')
@@ -39,7 +40,7 @@ class CountingTypeFormSchema
             ->field(
                 TextInput::make('value')
                     ->setLabel('Value')
-                    ->setRules('nullable|string|max:50')
+                    ->setRules('string|max:50')
             )
             ->field(
                 ToggleInput::make('active')

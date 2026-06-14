@@ -12,11 +12,12 @@ class UnitResource extends JsonResource
     {
         /** @var Unit $this */
         return [
-            'id' => $this->id,
-            'name' => $this->name,
+            'id'           => $this->id,
+            'name'         => $this->name,
             'abbreviation' => $this->abbreviation,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'step'         => $this->step,
+            'created_at'   => $this->created_at,
+            'updated_at'   => $this->updated_at,
         ];
     }
 }

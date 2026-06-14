@@ -15,14 +15,14 @@ class SectorFormSchema
                 TextInput::make('name')
                     ->setLabel(__('forms.sectors.name'))
                     ->setRequired()
-                    ->setRules('required|string|max:100')
+                    ->setRules('string|max:100')
             )
             ->field(
                 SelectInput::make('head_id')
                     ->setLabel(__('forms.sectors.head'))
                     ->setRequired()
                     ->setOptions(self::userOptions())
-                    ->setRules('required|exists:users,id')
+                    ->setRules('exists:users,id')
             );
     }
 
@@ -38,7 +38,7 @@ class SectorFormSchema
                 SelectInput::make('head_id')
                     ->setLabel(__('forms.sectors.head'))
                     ->setOptions(self::userOptions())
-                    ->setRules('nullable|exists:users,id')
+                    ->setRules('exists:users,id')
             );
     }
 

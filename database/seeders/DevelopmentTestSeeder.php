@@ -85,32 +85,34 @@ class DevelopmentTestSeeder extends Seeder
         $now = now();
         $this->command->info('🧹 Data cleaned — all target tables truncated.');
 
-        // ── SO #1: regular workflow ──
+        // ── SO #1: workflow regular ──
+        // service_type_id foi removido da tabela pela migração 2026_06_02_100005;
+        // o tipo de serviço é agora associado via service_order_sector_service_type.
         $so1 = ServiceOrder::create([
-            'process'         => 'OS/2026/DEV-001',
-            'client_id'       => $client->id,
-            'manager_id'      => $manager->id,
-            'location_id'     => $location->id,
-            'service_type_id' => null,
-            'priority'        => Priority::NORMAL->value,
-            'start_date'      => $now->copy(),
-            'end_date'        => $now->copy()->addDays(3),
-            'status'          => SOStatus::IN_PROGRESS->value,
-            'description'     => 'Reparação de piso danificado na via pública com aplicação de nova camada de asfalto',
+            'process'     => 'OS/2026/DEV-001',
+            'title'       => 'Reparação de pavimento — via pública (DEV)',
+            'client_id'   => $client->id,
+            'manager_id'  => $manager->id,
+            'location_id' => $location->id,
+            'priority'    => Priority::NORMAL->value,
+            'start_date'  => $now->copy(),
+            'end_date'    => $now->copy()->addDays(3),
+            'status'      => SOStatus::IN_PROGRESS->value,
+            'description' => 'Reparação de piso danificado na via pública com aplicação de nova camada de asfalto',
         ]);
 
-        // ── SO #2: loan workflow ──
+        // ── SO #2: workflow de empréstimo ──
         $so2 = ServiceOrder::create([
-            'process'         => 'OS/2026/DEV-002',
-            'client_id'       => $client->id,
-            'manager_id'      => $manager->id,
-            'location_id'     => $location->id,
-            'service_type_id' => null,
-            'priority'        => Priority::HIGH->value,
-            'start_date'      => $now->copy(),
-            'end_date'        => $now->copy()->addDays(1),
-            'status'          => SOStatus::IN_PROGRESS->value,
-            'description'     => 'Instalação de equipamento em regime de comodato na zona industrial',
+            'process'     => 'OS/2026/DEV-002',
+            'title'       => 'Empréstimo de equipamento — zona industrial (DEV)',
+            'client_id'   => $client->id,
+            'manager_id'  => $manager->id,
+            'location_id' => $location->id,
+            'priority'    => Priority::HIGH->value,
+            'start_date'  => $now->copy(),
+            'end_date'    => $now->copy()->addDays(1),
+            'status'      => SOStatus::IN_PROGRESS->value,
+            'description' => 'Instalação de equipamento em regime de comodato na zona industrial',
         ]);
 
         $this->command->info('✅ 2 Service Orders created (regular + loan).');
@@ -128,11 +130,24 @@ class DevelopmentTestSeeder extends Seeder
             $statuses = $taskStatusMap[$type];
 
             foreach ($names as $i => $name) {
+                $taskStatus = $statuses[$i];
+                // Campos adicionados pelas migrações:
+                // - taskable_id / taskable_type (2026_05_15_000003)
+                // - priority (2026_06_02_100002)
+                // - start_date / end_date (2026_05_29_000002)
+                $startDate = $taskStatus !== TaskStatus::PENDING ? $now->toDateString() : null;
+                $endDate   = $taskStatus === TaskStatus::COMPLETED ? $now->copy()->addDays(2)->toDateString() : null;
+
                 $task = Task::create([
                     'service_order_id' => $so->id,
+                    'taskable_id'      => $so->id,
+                    'taskable_type'    => ServiceOrder::class,
                     'manager_id'       => $manager->id,
                     'description'      => "Execução de {$name} conforme especificações técnicas do projeto.",
-                    'status'           => $statuses[$i]->value,
+                    'status'           => $taskStatus->value,
+                    'priority'         => $so->priority instanceof Priority ? $so->priority->value : $so->priority,
+                    'start_date'       => $startDate,
+                    'end_date'         => $endDate,
                 ]);
                 $allTasks[] = $task;
             }
@@ -147,7 +162,8 @@ class DevelopmentTestSeeder extends Seeder
 
         $allMiniTasks = [];
         foreach ($allTasks as $task) {
-            $statuses = $miniTaskStatusMap[$task->status];
+            // $task->status é um enum TaskStatus devido ao cast — usar ->value para aceder ao mapa
+            $statuses = $miniTaskStatusMap[$task->status->value] ?? [MiniTaskStatus::PENDING, MiniTaskStatus::PENDING];
             $pool = self::MINI_TASK_POOL;
             $chosen = [];
 
@@ -160,11 +176,18 @@ class DevelopmentTestSeeder extends Seeder
                 }
                 $chosen[] = $desc;
 
+                $mtStatus = $statuses[$i];
+                // Campos adicionados pela migração 2026_05_16_000002
+                $mtStartDate = $mtStatus !== MiniTaskStatus::PENDING ? $now->toDateString() : null;
+                $mtEndDate   = $mtStatus === MiniTaskStatus::COMPLETED ? $now->copy()->addDay()->toDateString() : null;
+
                 $mt = MiniTask::create([
                     'task_id'       => $task->id,
                     'supervisor_id' => $taskManager->id,
                     'description'   => $desc,
-                    'status'        => $statuses[$i]->value,
+                    'status'        => $mtStatus->value,
+                    'start_date'    => $mtStartDate,
+                    'end_date'      => $mtEndDate,
                 ]);
                 $allMiniTasks[] = $mt;
             }

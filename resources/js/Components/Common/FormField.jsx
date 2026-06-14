@@ -13,7 +13,7 @@ const SEARCH_THRESHOLD = 8;
 
 function SectionHeader({ label }) {
   return (
-    <h4 className="text-sm font-semibold text-gray-700 mt-6 mb-4 pb-2 border-b border-brand-mid/20">
+    <h4 className="text-sm font-semibold text-brand-darkest mt-6 mb-4 pb-2 border-b border-brand-mid/20">
       {label}
     </h4>
   );
@@ -128,7 +128,7 @@ function MapPicker({ field, value }) {
 
   if (!gmapsKey) {
     return (
-      <div className="mb-3 rounded-lg bg-yellow-50 p-3 text-sm text-yellow-700">
+      <div className="mb-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-700">
         {t('common.map_picker.missing_key')}
       </div>
     );
@@ -153,8 +153,8 @@ function MapPicker({ field, value }) {
       {/* Map canvas */}
       <div
         ref={mapRef}
-        className="mb-3 rounded-lg border border-brand-mid/20"
-        style={{ height: 260, background: '#e5e7eb' }}
+        className="mb-3 rounded-xl border border-brand-mid/20"
+        style={{ height: 260 }} className="rounded-lg bg-stone-200"
       >
         {!loaded && (
           <div className="flex h-full items-center justify-center text-sm text-brand-mid">
@@ -184,7 +184,7 @@ function StandardField({ field, value = '', error, onChange, lockedValues = [] }
   const options = field.options ?? null;
   const isMultiple = !!field.multiple;
 
-  const baseClass = `block w-full rounded-lg border bg-brand-white px-3 py-2 text-sm text-brand-darkest placeholder:text-brand-mid focus:ring-1 transition-colors ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-brand-mid/20 focus:border-brand-accent focus:ring-brand-accent'
+  const baseClass = `block w-full rounded-xl border bg-brand-white px-3 py-2.5 text-sm text-brand-darkest placeholder:text-brand-mid focus:ring-1 transition-colors ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-brand-mid/20 focus:border-brand-accent focus:ring-brand-accent'
     }`;
 
   /* Normalize select/multiselect options */
@@ -312,7 +312,7 @@ function ToggleField({ field, value = '', onChange }) {
   };
 
   return (
-    <div className="flex rounded-lg border border-brand-mid/20 bg-brand-light p-0.5">
+    <div className="flex rounded-xl border border-brand-mid/20 bg-brand-light p-0.5">
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -375,7 +375,7 @@ function FileDropzone({ name, required, error, onChange }) {
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors ${error
+        className={`relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-colors ${error
             ? 'border-red-500 bg-red-50'
             : dragOver
               ? 'border-brand-accent bg-brand-accent/10'

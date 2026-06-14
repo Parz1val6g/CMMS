@@ -14,6 +14,7 @@ export function useFetch(url, options = {}) {
 
         try {
             const res = await fetch(url, {
+                credentials: 'include',
                 headers: {
                     Accept: 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',

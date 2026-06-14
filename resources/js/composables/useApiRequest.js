@@ -22,6 +22,7 @@ export function useApiRequest() {
         try {
             const res = await fetch(url, {
                 method,
+                credentials: 'include',
                 headers,
                 body: body ? JSON.stringify(body) : undefined,
             });

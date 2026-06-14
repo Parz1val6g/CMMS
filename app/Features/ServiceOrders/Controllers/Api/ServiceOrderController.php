@@ -1,6 +1,8 @@
 <?php
 namespace App\Features\ServiceOrders\Controllers\Api;
 
+use App\Core\Enums\Priority;
+use App\Core\Enums\ServiceOrderStatus;
 use App\Core\Services\FilterService;
 use App\Features\ServiceOrders\Models\ServiceOrder;
 use App\Features\ServiceOrders\Requests\StoreServiceOrderRequest;
@@ -30,7 +32,11 @@ class ServiceOrderController extends Controller
         $query = $this->filterService->apply(
             ServiceOrder::with(['client.user', 'manager', 'location', 'sectors', 'category']),
             $request->only(['search', 'status', 'priority', 'from_date', 'to_date', 'sort']),
-            ['process', 'title', 'description', 'priority', 'status']
+            ['process', 'title', 'description', 'priority', 'status'],
+            [
+                'status'   => ServiceOrderStatus::sortOrder(),
+                'priority' => Priority::sortOrder(),
+            ]
         );
 
         // Search across relationship columns

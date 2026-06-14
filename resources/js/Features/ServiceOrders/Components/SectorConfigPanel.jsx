@@ -80,9 +80,9 @@ function AddSectorModal({ sectors, serviceTypesBySector, onAdd, onClose }) {
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div
         ref={modalRef}
-        className="relative bg-brand-white rounded-xl shadow-2xl border border-brand-mid/20 w-full max-w-sm z-[9999] overflow-hidden"
+        className="relative flex flex-col max-h-[85vh] bg-brand-white rounded-xl shadow-2xl border border-brand-mid/20 w-full max-w-sm z-[9999] overflow-hidden"
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-brand-mid/10">
+        <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-brand-mid/10">
           <h3 className="text-sm font-semibold text-brand-darkest">
             {t('pages.service_orders.add_sector')}
           </h3>
@@ -95,7 +95,7 @@ function AddSectorModal({ sectors, serviceTypesBySector, onAdd, onClose }) {
           </button>
         </div>
 
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4 overflow-y-auto">
           {/* Sector selection */}
           <div>
             <label className="block text-xs font-medium text-brand-mid mb-1.5">Setor</label>
@@ -181,7 +181,7 @@ function AddSectorModal({ sectors, serviceTypesBySector, onAdd, onClose }) {
           )}
         </div>
 
-        <div className="flex justify-end gap-2 px-4 py-3 border-t border-brand-mid/10">
+        <div className="flex-shrink-0 flex justify-end gap-2 px-4 py-3 border-t border-brand-mid/10">
           <button
             type="button"
             onClick={onClose}

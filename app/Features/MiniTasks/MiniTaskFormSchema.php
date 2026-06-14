@@ -22,13 +22,14 @@ class MiniTaskFormSchema
                     ->setLabel(__('forms.mini_tasks.description'))
                     ->setRows(3)
                     ->setRequired()
-                    ->setRules('required|string|max:250')
+                    ->setRules('string|max:250')
             )
             ->field(
                 SelectInput::make('task_id')
                     ->setLabel(__('forms.mini_tasks.task'))
+                    ->setRequired()
                     ->setOptions(self::taskOptions())
-                    ->setRules('required|exists:tasks,id')
+                    ->setRules('exists:tasks,id')
             )
             ->field(
                 DateRangeInput::make('date_range')
@@ -39,28 +40,28 @@ class MiniTaskFormSchema
                     ->setLabel(__('forms.mini_tasks.workers'))
                     ->setOptions(self::workerOptions())
                     ->multiple()
-                    ->setRules('nullable|array')
+                    ->setRules('array')
             )
             ->field(
                 SelectInput::make('team_ids')
                     ->setLabel(__('forms.mini_tasks.teams'))
                     ->setOptions(self::teamOptions())
                     ->multiple()
-                    ->setRules('nullable|array')
+                    ->setRules('array')
             )
             ->field(
                 SelectInput::make('material_ids')
                     ->setLabel(__('forms.mini_tasks.material_ids'))
                     ->setOptions(self::materialOptions())
                     ->multiple()
-                    ->setRules('nullable|array')
+                    ->setRules('array')
             )
             ->field(
                 SelectInput::make('equipment_ids')
                     ->setLabel(__('forms.mini_tasks.equipment_ids'))
                     ->setOptions(self::equipmentOptions())
                     ->multiple()
-                    ->setRules('nullable|array')
+                    ->setRules('array')
             );
     }
 
@@ -88,28 +89,28 @@ class MiniTaskFormSchema
                     ->setLabel(__('forms.mini_tasks.workers'))
                     ->setOptions(self::workerOptions())
                     ->multiple()
-                    ->setRules('nullable|array')
+                    ->setRules('array')
             )
             ->field(
                 SelectInput::make('team_ids')
                     ->setLabel(__('forms.mini_tasks.teams'))
                     ->setOptions(self::teamOptions())
                     ->multiple()
-                    ->setRules('nullable|array')
+                    ->setRules('array')
             )
             ->field(
                 SelectInput::make('material_ids')
                     ->setLabel(__('forms.mini_tasks.material_ids'))
                     ->setOptions(self::materialOptions())
                     ->multiple()
-                    ->setRules('nullable|array')
+                    ->setRules('array')
             )
             ->field(
                 SelectInput::make('equipment_ids')
                     ->setLabel(__('forms.mini_tasks.equipment_ids'))
                     ->setOptions(self::equipmentOptions())
                     ->multiple()
-                    ->setRules('nullable|array')
+                    ->setRules('array')
             );
     }
 

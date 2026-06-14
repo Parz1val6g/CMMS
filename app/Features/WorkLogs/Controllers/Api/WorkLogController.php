@@ -1,5 +1,6 @@
 <?php
 namespace App\Features\WorkLogs\Controllers\Api;
+use App\Core\Enums\WorkLogStatus;
 use App\Core\Services\FilterService;
 use App\Core\Traits\FiltersAdvancedRules;
 use App\Features\WorkLogs\Models\WorkLog;
@@ -37,7 +38,8 @@ class WorkLogController extends Controller
         $query = $this->filterService->apply(
             $base,
             $request->only(['search', 'status', 'sort']),
-            ['description', 'status']
+            ['description', 'status'],
+            ['status' => WorkLogStatus::sortOrder()]
         );
 
         $this->applyAdvancedFilters(

@@ -12,9 +12,9 @@ return new class extends Migration {
             $table->foreignUuid('parish_id')->constrained('parishes')->cascadeOnDelete();
             $table->string('postal_code', 8);
             $table->string('street_address', 100);
-            $table->string('landmark', 100);
+            $table->string('landmark', 100)->nullable();
             $table->decimal('latitude', 10, 8)->nullable();
-            $table->decimal('longitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -16,19 +16,20 @@ class ServiceTypeFormSchema
                     ->setLabel(__('forms.service_types.sector'))
                     ->setRequired()
                     ->setOptions(RefCache::sectors())
-                    ->setRules('required|uuid|exists:sectors,id')
+                    ->setRules('uuid|exists:sectors,id')
             )
             ->field(
                 TextInput::make('name')
                     ->setLabel(__('forms.service_types.name'))
                     ->setRequired()
-                    ->setRules('required|string|max:100')
+                    ->setRules('string|max:100')
             )
             ->field(
                 TextAreaInput::make('description')
                     ->setLabel(__('forms.service_types.description'))
+                    ->setRequired()
                     ->setRows(3)
-                    ->setRules('nullable|string|max:250')
+                    ->setRules('string|max:250')
             );
     }
 
@@ -50,7 +51,7 @@ class ServiceTypeFormSchema
                 TextAreaInput::make('description')
                     ->setLabel(__('forms.service_types.description'))
                     ->setRows(3)
-                    ->setRules('nullable|string|max:250')
+                    ->setRules('string|max:250')
             );
     }
 }

@@ -18,7 +18,7 @@ export default function TasksIndex({ tasks, columns, formSchema, createFormSchem
         setViewItem(item);
         try {
             const url = routes.show.replace('__ID__', item.id);
-            const res = await fetch(url, { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
+            const res = await fetch(url, { credentials: 'include', headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
             const json = await res.json();
             setViewItem(json.data);
         } finally {
@@ -32,6 +32,7 @@ export default function TasksIndex({ tasks, columns, formSchema, createFormSchem
         setSoOrder(null);
         try {
             const res = await fetch(`/api/service-orders/${soId}`, {
+                credentials: 'include',
                 headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
             });
             if (!res.ok) throw new Error();

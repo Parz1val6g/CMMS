@@ -45,6 +45,7 @@ export function useOptimisticMutation() {
         try {
             const res = await fetch(url, {
                 method,
+                credentials: 'include',
                 headers,
                 body: body !== null ? JSON.stringify(body) : undefined,
             });

@@ -19,6 +19,11 @@ enum TicketPriority: string
         };
     }
 
+    public static function sortOrder(): array
+    {
+        return ['low', 'normal', 'high', 'urgent'];
+    }
+
     public static function options(): array
     {
         return array_map(

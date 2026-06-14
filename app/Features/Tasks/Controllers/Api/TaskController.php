@@ -2,6 +2,8 @@
 
 namespace App\Features\Tasks\Controllers\Api;
 
+use App\Core\Enums\Priority;
+use App\Core\Enums\TaskStatus;
 use App\Core\Services\FilterService;
 use App\Features\Tasks\Models\Task;
 use App\Features\Tasks\Requests\RejectTaskRequest;
@@ -35,7 +37,11 @@ class TaskController extends Controller
                 ->when($activeRole === 'manager', fn($q) => $q->whereHas('serviceOrder', fn($sq) => $sq->where('manager_id', $user->id)))
                 ->when($activeRole === 'sector_manager', fn($q) => $q->whereHas('sectors', fn($sq) => $sq->whereIn('sectors.id', $user->headedSectors()->pluck('id')))),
             $request->only(['search', 'status', 'priority', 'from_date', 'to_date', 'sort']),
-            ['description', 'status']
+            ['description', 'status'],
+            [
+                'status'   => TaskStatus::sortOrder(),
+                'priority' => Priority::sortOrder(),
+            ]
         );
 
         // Search across relationship columns

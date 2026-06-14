@@ -12,7 +12,7 @@ export default function KanbanColumn({ column, items, renderCardContent, onCardC
     });
 
     return (
-        <div className="flex flex-col flex-1 min-w-[300px] rounded-lg bg-brand-white border border-brand-mid/20 overflow-hidden h-[calc(100vh-200px)]">
+        <div className="flex flex-col flex-1 min-w-[300px] rounded-2xl bg-brand-white shadow-sm border border-brand-mid/10 overflow-hidden h-[calc(100vh-200px)]">
             {/* Column Header */}
             <div className="shrink-0 px-4 py-3 border-b border-brand-mid/20 bg-brand-light">
                 <div className="flex items-center justify-between">

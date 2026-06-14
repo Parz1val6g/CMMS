@@ -16,20 +16,20 @@ class LocationFormSchema
                 TextInput::make('street_address')
                     ->setLabel(__('forms.locations.street_address'))
                     ->setRequired()
-                    ->setRules('required|string|max:100')
+                    ->setRules('string|max:100')
             )
             ->field(
                 TextInput::make('postal_code')
                     ->setLabel(__('forms.locations.postal_code'))
                     ->setRequired()
-                    ->setRules('required|string|max:8')
+                    ->setRules('string|max:8')
             )
             ->field(
                 SelectInput::make('parish_id')
                     ->setLabel(__('forms.locations.parish'))
                     ->setOptions(RefCache::parishes())
                     ->setRequired()
-                    ->setRules('required|exists:parishes,id')
+                    ->setRules('exists:parishes,id')
                     ->meta('useCascade', true)
                     ->meta('districts', LocationCascadeOptions::all()['districts'])
                     ->meta('municipalities', LocationCascadeOptions::all()['municipalities'])
@@ -38,13 +38,13 @@ class LocationFormSchema
             ->field(
                 TextInput::make('landmark')
                     ->setLabel(__('forms.locations.landmark'))
-                    ->setRules('nullable|string|max:100')
+                    ->setRules('string|max:100')
             )
             ->field(
                 MapInput::make('location')
                     ->setLabel(__('forms.locations.coordinates'))
                     ->coordinates('latitude', 'longitude')
-                    ->setRules('nullable|numeric|between:-90,90')
+                    ->setRules('numeric|between:-90,90')
             );
     }
 
@@ -75,13 +75,13 @@ class LocationFormSchema
             ->field(
                 TextInput::make('landmark')
                     ->setLabel(__('forms.locations.landmark'))
-                    ->setRules('nullable|string|max:100')
+                    ->setRules('string|max:100')
             )
             ->field(
                 MapInput::make('location')
                     ->setLabel(__('forms.locations.coordinates'))
                     ->coordinates('latitude', 'longitude')
-                    ->setRules('nullable|numeric|between:-90,90')
+                    ->setRules('numeric|between:-90,90')
             );
     }
 }

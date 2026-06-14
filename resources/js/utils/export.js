@@ -13,6 +13,7 @@ export async function exportCSV(model) {
 
   try {
     const res = await fetch(url.toString(), {
+      credentials: 'include',
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
     });
     if (!res.ok) throw new Error('Export failed');

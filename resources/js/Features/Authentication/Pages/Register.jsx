@@ -1,4 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import Checkbox from '@/Components/Common/Checkbox';
 import { t } from '@/utils/i18n';
 
 export default function Register() {
@@ -116,12 +117,10 @@ export default function Register() {
 
               {/* Terms */}
               <div className="mb-4 flex items-start gap-2">
-                <input
+                <Checkbox
                   id="accept_terms"
-                  type="checkbox"
                   checked={data.accept_terms}
                   onChange={(e) => setData('accept_terms', e.target.checked)}
-                  className="mt-0.5 rounded border-brand-mid/20 text-brand-accent focus:ring-brand-accent"
                 />
                 <label htmlFor="accept_terms" className="text-xs text-brand-mid">
                   {t('pages.auth.register.agree_terms')}{' '}

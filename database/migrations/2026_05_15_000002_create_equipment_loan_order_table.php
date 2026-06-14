@@ -10,6 +10,9 @@ return new class extends Migration {
         Schema::create('equipment_loan_order', function (Blueprint $table) {
             $table->foreignUuid('equipment_id')->constrained('equipments')->cascadeOnDelete();
             $table->foreignUuid('loan_order_id')->constrained('loan_orders')->cascadeOnDelete();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->boolean('needs_operator')->default(false);
             $table->timestamps();
 
             $table->primary(['equipment_id', 'loan_order_id']);

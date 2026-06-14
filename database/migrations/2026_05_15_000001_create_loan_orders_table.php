@@ -10,14 +10,18 @@ return new class extends Migration {
         Schema::create('loan_orders', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('reference', 20)->unique();
-            $table->foreignUuid('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->uuid('entity_id')->nullable();
             $table->foreignUuid('manager_id')->constrained('users')->cascadeOnDelete();
             $table->foreignUuid('location_id')->nullable()->constrained('locations')->nullOnDelete();
             $table->foreignUuid('migrated_from_so_id')->nullable()->constrained('service_orders')->nullOnDelete();
+            $table->foreignUuid('delivery_location_id')->nullable()->constrained('parishes')->nullOnDelete();
+            $table->foreignUuid('approved_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('approved_at')->nullable();
             $table->string('status', 20)->default('pending');
             $table->text('description')->nullable();
             $table->text('notes_checkout')->nullable();
             $table->text('notes_return')->nullable();
+            $table->text('notes_cancel')->nullable();
             $table->timestamp('checked_out_at')->nullable();
             $table->timestamp('returned_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();

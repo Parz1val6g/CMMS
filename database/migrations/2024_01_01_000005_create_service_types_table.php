@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::create('service_types', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('sector_id');
             $table->string('name', 100);
             $table->string('description', 250);
             $table->timestamps();

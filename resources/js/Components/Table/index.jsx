@@ -1,6 +1,7 @@
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import Row from './Row.jsx';
 import EmptyState from './EmptyState.jsx';
+import Checkbox from '@/Components/Common/Checkbox';
 import { t } from '@/utils/i18n';
 
 function SortIcon({ colKey, sortBy, sortDir }) {
@@ -43,11 +44,9 @@ export default function Table({
                     <tr>
                         {showCheckboxes && (
                             <th className="w-10 px-4 py-2" scope="col">
-                                <input
-                                    type="checkbox"
-                                    className="h-4 w-4 rounded border-brand-mid/20 bg-brand-white text-brand-accent focus:ring-brand-accent focus:ring-offset-brand-light"
+                                <Checkbox
                                     checked={allSelected}
-                                    ref={el => { if (el) el.indeterminate = someSelected; }}
+                                    indeterminate={someSelected && !allSelected}
                                     onChange={() => onToggleAll?.(dataToMap)}
                                     aria-label={t('pages.table.select_all')}
                                 />

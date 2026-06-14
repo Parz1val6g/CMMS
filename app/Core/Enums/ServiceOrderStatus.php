@@ -17,6 +17,11 @@ enum ServiceOrderStatus: string
             self::CANCELLED => __('enums.service_order_status.cancelled'),
         };
     }
+    public static function sortOrder(): array
+    {
+        return ['pending', 'in_progress', 'awaiting_approval', 'completed', 'cancelled'];
+    }
+
     public static function options(): array
     {
         return array_map(fn(self $c) => ['value' => $c->value, 'label' => $c->label()], self::cases());

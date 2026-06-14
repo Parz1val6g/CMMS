@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class FilterService
 {
-    public function apply(Builder $query, array $filters = [], array $searchColumns = []): Builder
+    public function apply(Builder $query, array $filters = [], array $searchColumns = [], array $enumOrders = []): Builder
     {
         return $query
             ->when($filters['search'] ?? null, fn($q, $search) => $this->search($q, $search, $searchColumns))
@@ -14,7 +14,7 @@ class FilterService
             ->when($filters['priority'] ?? null, fn($q, $priority) => $q->where('priority', $priority))
             ->when($filters['from_date'] ?? null, fn($q, $date) => $q->whereDate('created_at', '>=', $date))
             ->when($filters['to_date'] ?? null, fn($q, $date) => $q->whereDate('created_at', '<=', $date))
-            ->when($filters['sort'] ?? null, fn($q, $sort) => $this->sort($q, $sort));
+            ->when($filters['sort'] ?? null, fn($q, $sort) => $this->sort($q, $sort, $enumOrders));
     }
 
     public function search(Builder $query, string $term, array $columns = []): Builder
@@ -30,13 +30,20 @@ class FilterService
         });
     }
 
-    public function sort(Builder $query, string $sort): Builder
+    public function sort(Builder $query, string $sort, array $enumOrders = []): Builder
     {
         [$column, $direction] = str_contains($sort, ':')
             ? explode(':', $sort)
             : [$sort, 'asc'];
 
-        return $query->orderBy($column, in_array($direction, ['asc', 'desc']) ? $direction : 'asc');
+        $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'asc';
+
+        if (isset($enumOrders[$column])) {
+            $values = implode("','", $enumOrders[$column]);
+            return $query->orderByRaw("FIELD($column, '$values') $direction");
+        }
+
+        return $query->orderBy($column, $direction);
     }
 
     public function paginate(Builder $query, int $perPage = 15, int $page = 1)

@@ -33,14 +33,14 @@ function ConfirmDialog({ open, onConfirm, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="px-4 py-2 text-sm font-medium text-brand-darkest bg-white border border-brand-mid/20 rounded-xl hover:bg-brand-light"
           >
             {t('pages.service_orders.activate_confirm_cancel')}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="px-4 py-2 text-sm font-medium text-white bg-brand-accent rounded-lg hover:opacity-90"
+            className="px-4 py-2 text-sm font-medium text-white bg-brand-accent rounded-xl hover:opacity-90"
           >
             {t('pages.service_orders.activate_confirm_ok')}
           </button>
@@ -136,7 +136,7 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
     <button
       type="button"
       onClick={() => setShowConfirm(true)}
-      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-brand-accent hover:opacity-90 transition-opacity"
+      className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white bg-brand-accent hover:opacity-90 transition-opacity"
     >
       <Play size={12} />
       {t('pages.service_orders.btn_activate')}
@@ -147,7 +147,7 @@ export default function ServiceOrderDrawer({ order, isOpen, onClose, loading, on
     <button
       type="button"
       onClick={handleComplete}
-      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors"
+      className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors"
     >
       <Check size={12} />
       {t('pages.service_orders.btn_complete')}

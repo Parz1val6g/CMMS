@@ -20,21 +20,23 @@ class TaskFormSchema
                     ->setRequired()
                     ->helperText(__('forms.tasks.description_helper'))
                     ->setRows(3)
-                    ->setRules('required|string|max:1000')
+                    ->setRules('string|max:1000')
             )
             ->field(
                 SelectInput::make('service_order_id')
                     ->setLabel(__('forms.tasks.service_order'))
+                    ->setRequired()
                     ->helperText(__('forms.tasks.service_order_helper'))
                     ->setOptions(self::serviceOrderOptions())
-                    ->setRules('required|exists:service_orders,id')
+                    ->setRules('exists:service_orders,id')
             )
             ->field(
                 SelectInput::make('sector_id')
                     ->setLabel(__('forms.tasks.sectors'))
+                    ->setRequired()
                     ->helperText(__('forms.tasks.sectors_helper'))
                     ->setOptions(self::sectorOptions())
-                    ->setRules('required|exists:sectors,id')
+                    ->setRules('exists:sectors,id')
             )
             ->field(
                 DateRangeInput::make('date_range')
@@ -42,7 +44,7 @@ class TaskFormSchema
                     ->setRequired()
                     ->setStartName('start_date')
                     ->setEndName('end_date')
-                    ->setRules('required|date')
+                    ->setRules('date')
             );
     }
 

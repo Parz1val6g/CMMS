@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import { labelFor, badgeStyle } from '@/utils/enums';
 import { formatDate } from '@/utils/format';
+import Checkbox from '@/Components/Common/Checkbox';
 import { t } from '@/utils/i18n';
 
 // Helper to resolve nested object properties
@@ -148,9 +149,7 @@ function Row({ item, columns, hasEdit, onEdit, onDelete, onRowClick, selected = 
         >
             {showCheckbox && (
                 <td className="w-10 px-4 py-2" onClick={e => e.stopPropagation()}>
-                    <input
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-brand-mid/20 bg-brand-white text-brand-accent focus:ring-brand-accent focus:ring-offset-brand-light"
+                    <Checkbox
                         checked={selected}
                         onChange={() => onToggleSelect(item.id)}
                         aria-label={t('pages.table.select_row_aria', { name: item.process ?? item.name ?? item.id })}
@@ -180,7 +179,7 @@ function Row({ item, columns, hasEdit, onEdit, onDelete, onRowClick, selected = 
                         {onDelete && (
                             <button
                                 type="button"
-                                className="rounded-lg p-1.5 text-slate-500 hover:bg-red-500/20 hover:text-red-400 transition-colors"
+                                className="rounded-lg p-1.5 text-brand-mid/60 hover:bg-red-50 hover:text-red-600 transition-colors"
                                 onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
                                 title={t('pages.table.delete_title')}
                                 aria-label={t('pages.table.delete_aria', { name: item.process ?? item.name ?? '' })}

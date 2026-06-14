@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Core\Enums\Priority;
 use App\Core\Enums\TaskStatus;
 use App\Features\Tasks\Models\Task;
 use App\Features\ServiceOrders\Models\ServiceOrder;
@@ -29,15 +30,20 @@ class TaskSeeder extends Seeder
 
         /**
          * UC1 task statuses: pending, in_progress, awaiting_approval, completed, cancelled.
-         * Each SO status maps to a realistic set of child task statuses.
+         * Cada estado de OS mapeia para um conjunto realista de tarefas filho.
+         *
+         * Campos adicionados pelas migrações:
+         * - priority (2026_06_02_100002): nullable, herdado da prioridade da OS
+         * - start_date / end_date (2026_05_29_000002): nullable
+         * - taskable_id / taskable_type (2026_05_15_000003): morph polimórfico
          */
         $taskDefs = [
-            // PENDING SO → only pending tasks (manager hasn't activated yet)
+            // OS PENDENTE → só tarefas pendentes (gestor ainda não ativou)
             'pending' => [
                 ['description' => 'Inspeção e levantamento de necessidades no local',    'status' => TaskStatus::PENDING],
                 ['description' => 'Preparação do local e mobilização de recursos',       'status' => TaskStatus::PENDING],
             ],
-            // IN_PROGRESS SO → mix of completed, awaiting_approval, in_progress, pending
+            // OS EM CURSO → mix de completadas, em aprovação, em curso, pendentes
             'in_progress' => [
                 ['description' => 'Inspeção e levantamento de necessidades no local',    'status' => TaskStatus::COMPLETED],
                 ['description' => 'Preparação do local de intervenção',                  'status' => TaskStatus::COMPLETED],
@@ -45,7 +51,7 @@ class TaskSeeder extends Seeder
                 ['description' => 'Aplicação de materiais e revestimentos',              'status' => TaskStatus::PENDING],
                 ['description' => 'Sinalização e segurança do local',                   'status' => TaskStatus::AWAITING_APPROVAL],
             ],
-            // AWAITING_APPROVAL SO → all tasks completed (triggers SO cascade to awaiting_approval)
+            // OS AGUARDA APROVAÇÃO → todas as tarefas concluídas
             'awaiting_approval' => [
                 ['description' => 'Inspeção e levantamento de necessidades no local',    'status' => TaskStatus::COMPLETED],
                 ['description' => 'Preparação do local de intervenção',                  'status' => TaskStatus::COMPLETED],
@@ -53,7 +59,7 @@ class TaskSeeder extends Seeder
                 ['description' => 'Aplicação de materiais e revestimentos',              'status' => TaskStatus::COMPLETED],
                 ['description' => 'Sinalização temporária removida e local entregue',    'status' => TaskStatus::COMPLETED],
             ],
-            // COMPLETED SO → all tasks completed, one cancelled as edge case
+            // OS CONCLUÍDA → todas concluídas, uma cancelada como caso extremo
             'completed' => [
                 ['description' => 'Inspeção e levantamento de necessidades no local',    'status' => TaskStatus::COMPLETED],
                 ['description' => 'Preparação do local de intervenção',                  'status' => TaskStatus::COMPLETED],
@@ -63,7 +69,7 @@ class TaskSeeder extends Seeder
                 ['description' => 'Acabamentos e remates finais',                        'status' => TaskStatus::COMPLETED],
                 ['description' => 'Vistoria final e elaboração de relatório',            'status' => TaskStatus::CANCELLED],
             ],
-            // CANCELLED SO → all tasks cancelled
+            // OS CANCELADA → todas as tarefas canceladas
             'cancelled' => [
                 ['description' => 'Inspeção e levantamento de necessidades no local',    'status' => TaskStatus::CANCELLED],
                 ['description' => 'Preparação do local de intervenção',                  'status' => TaskStatus::CANCELLED],
@@ -80,22 +86,41 @@ class TaskSeeder extends Seeder
                 default              => 'pending',
             };
 
-            $defs         = $taskDefs[$key];
-            $sectorIds    = $order->sectors->pluck('id');
+            $defs      = $taskDefs[$key];
+            $sectorIds = $order->sectors->pluck('id');
+
+            // Herdar prioridade da OS para as tarefas (campo adicionado em 2026_06_02_100002)
+            $priority = $order->priority instanceof Priority
+                ? $order->priority->value
+                : $order->priority;
 
             foreach ($defs as $i => $def) {
                 $createdAt = (clone $order->created_at)->modify('+' . ($i + 1) . ' days');
 
+                $startDate = $createdAt->format('Y-m-d');
+
+                $endDate = match ($def['status']) {
+                    TaskStatus::COMPLETED, TaskStatus::CANCELLED  => (clone $createdAt)->modify('+2 days')->format('Y-m-d'),
+                    TaskStatus::AWAITING_APPROVAL                 => (clone $createdAt)->modify('+1 day')->format('Y-m-d'),
+                    default                                       => (clone $createdAt)->modify('+7 days')->format('Y-m-d'),
+                };
+
                 $task = Task::create([
                     'service_order_id' => $order->id,
+                    // Colunas polimórficas (adicionadas em 2026_05_15_000003)
+                    'taskable_id'      => $order->id,
+                    'taskable_type'    => ServiceOrder::class,
                     'manager_id'       => $assignee->id,
                     'description'      => $def['description'],
                     'status'           => $def['status']->value,
+                    'priority'         => $priority,
+                    'start_date'       => $startDate,
+                    'end_date'         => $endDate,
                     'created_at'       => $createdAt,
                     'updated_at'       => $createdAt,
                 ]);
 
-                // Link to sector — UC1: one task per sector on activation
+                // Ligar ao setor — UC1: uma tarefa por setor na ativação
                 if ($sectorIds->isNotEmpty()) {
                     $task->sectors()->sync([$sectorIds->first()]);
                 }

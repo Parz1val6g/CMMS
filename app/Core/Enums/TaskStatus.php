@@ -32,6 +32,11 @@ enum TaskStatus: string
     {
         return in_array($this, [self::COMPLETED, self::CANCELLED]);
     }
+    public static function sortOrder(): array
+    {
+        return ['pending', 'in_progress', 'blocked', 'awaiting_approval', 'completed', 'cancelled'];
+    }
+
     public static function options(): array
     {
         return array_map(fn(self $c) => ['value' => $c->value, 'label' => $c->label()], self::cases());

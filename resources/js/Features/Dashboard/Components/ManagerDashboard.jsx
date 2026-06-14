@@ -25,7 +25,7 @@ export default function ManagerDashboard({ kpis, attention, mapOrders, period, o
       : `/api/tasks/${item.id}`;
 
     try {
-      const res  = await fetch(url, { headers: { Accept: 'application/json', ...csrfHeader() } });
+      const res  = await fetch(url, { credentials: 'include', headers: { Accept: 'application/json', ...csrfHeader() } });
       const json = await res.json();
       const data = json.data ?? json;
       if (item.type === 'order') setDrawerOrder(data);

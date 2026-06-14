@@ -80,7 +80,7 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 ${overlayZ} bg-brand-darkest/80 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
+        className={`fixed inset-0 ${overlayZ} bg-brand-darkest/60 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
@@ -93,7 +93,7 @@ export default function WorkspaceDrawer({ isOpen, onClose, title, subtitle, tabs
         role="dialog"
         aria-modal="true"
         style={{ width: `${width}px` }}
-        className={`fixed inset-y-0 right-0 ${panelZ} flex flex-col bg-brand-white shadow-2xl border-l border-brand-mid/20 overflow-hidden transform transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 right-0 ${panelZ} flex flex-col bg-brand-white shadow-xl border-l border-brand-mid/20 overflow-hidden transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full invisible'
         }`}
       >

@@ -1,11 +1,12 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 const BORDER = {
-  blue:   'border-blue-500',
-  yellow: 'border-yellow-500',
-  green:  'border-green-500',
+  brand:  'border-brand-accent',
+  blue:   'border-sky-500',
+  yellow: 'border-amber-500',
+  green:  'border-emerald-500',
   indigo: 'border-indigo-500',
-  red:    'border-red-500',
+  red:    'border-rose-500',
   teal:   'border-teal-500',
 };
 
@@ -24,7 +25,7 @@ export default function KpiCard({ label, value, unit, color = 'blue', delta, del
   const borderColor = BORDER[color] ?? BORDER.blue;
 
   let DeltaIcon = Minus;
-  let deltaColor = 'text-gray-400';
+  let deltaColor = 'text-brand-mid/60';
 
   if (delta !== undefined && delta !== null) {
     const isPositive = delta > 0;
@@ -32,17 +33,17 @@ export default function KpiCard({ label, value, unit, color = 'blue', delta, del
 
     if (delta > 0) {
       DeltaIcon  = TrendingUp;
-      deltaColor = isGood ? 'text-green-600' : 'text-red-500';
+      deltaColor = isGood ? 'text-emerald-600' : 'text-rose-500';
     } else if (delta < 0) {
       DeltaIcon  = TrendingDown;
-      deltaColor = isGood ? 'text-green-600' : 'text-red-500';
+      deltaColor = isGood ? 'text-emerald-600' : 'text-rose-500';
     }
   }
 
   const showDelta = delta !== undefined && delta !== null;
 
   return (
-    <div className={`rounded-lg border-l-4 ${borderColor} bg-brand-white p-5 shadow-sm flex flex-col gap-2`}>
+    <div className={`rounded-2xl border-l-4 ${borderColor} bg-brand-white p-5 shadow-md flex flex-col gap-2`}>
       <h3 className="text-xs font-semibold uppercase tracking-wider text-brand-mid leading-tight">
         {label}
       </h3>
@@ -59,7 +60,7 @@ export default function KpiCard({ label, value, unit, color = 'blue', delta, del
           <DeltaIcon className="h-3.5 w-3.5 shrink-0" />
           <span>
             {delta > 0 ? '+' : ''}{delta}
-            {deltaLabel && <span className="text-gray-400 font-normal ml-1">{deltaLabel}</span>}
+            {deltaLabel && <span className="text-brand-mid/60 font-normal ml-1">{deltaLabel}</span>}
           </span>
         </div>
       )}

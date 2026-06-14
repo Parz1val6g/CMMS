@@ -32,6 +32,10 @@ enum PermissionResource: string
     case COUNTING_TYPES = 'counting_types';
     case TICKETS = 'tickets';
     case NOTIFICATIONS = 'notifications';
+    case SERVICE_ORDER_CATEGORIES = 'service_order_categories';
+    case DISTRICTS = 'districts';
+    case MUNICIPALITIES = 'municipalities';
+    case PARISHES = 'parishes';
 
     public function label(): string
     {
@@ -62,8 +66,12 @@ enum PermissionResource: string
             self::SETTINGS          => __('enums.permission_resource.settings'),
             self::EQUIPMENT_TYPES   => __('enums.permission_resource.equipment_types'),
             self::COUNTING_TYPES    => __('enums.permission_resource.counting_types'),
-            self::TICKETS           => __('enums.permission_resource.tickets'),
-            self::NOTIFICATIONS     => __('enums.permission_resource.notifications'),
+            self::TICKETS                  => __('enums.permission_resource.tickets'),
+            self::NOTIFICATIONS            => __('enums.permission_resource.notifications'),
+            self::SERVICE_ORDER_CATEGORIES => __('enums.permission_resource.service_order_categories'),
+            self::DISTRICTS                => __('enums.permission_resource.districts'),
+            self::MUNICIPALITIES           => __('enums.permission_resource.municipalities'),
+            self::PARISHES                 => __('enums.permission_resource.parishes'),
         };
     }
 }

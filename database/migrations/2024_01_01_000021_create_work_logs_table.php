@@ -11,6 +11,7 @@ return new class extends Migration {
         Schema::create('work_logs', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('mini_task_id')->constrained('mini_tasks')->cascadeOnDelete();
+            $table->string('reference', 20)->nullable()->unique();
             $table->timestamp('started_at');
             $table->timestamp('completed_at')->nullable();
             // SQLite does not support TIMESTAMPDIFF in generated columns

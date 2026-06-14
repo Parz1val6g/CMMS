@@ -47,12 +47,12 @@ function DetailField({ label, value }) {
 
 function StatCard({ label, value, icon }) {
   return (
-    <div className="flex flex-col gap-1 rounded-xl border border-gray-100 bg-gray-50 p-4">
-      <div className="flex items-center gap-2 text-gray-400">
+    <div className="flex flex-col gap-1 rounded-xl border border-brand-mid/10 bg-brand-white p-4 shadow-sm">
+      <div className="flex items-center gap-2 text-brand-mid/60">
         <span className="text-lg">{icon}</span>
         <span className="text-xs font-semibold uppercase tracking-wide">{label}</span>
       </div>
-      <span className="text-xl font-bold text-gray-800">{value ?? '—'}</span>
+      <span className="text-xl font-bold text-brand-darkest">{value ?? '—'}</span>
     </div>
   );
 }

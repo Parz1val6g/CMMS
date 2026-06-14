@@ -23,6 +23,7 @@ export default function LoanOrdersIndex({ loan_orders, columns, formSchema, crea
     setDrawer({ open: true, loanOrder: null, loading: true, error: null });
     try {
       const res = await fetch(`/api/loan-orders/${item.id}`, {
+        credentials: 'include',
         headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
       });
       if (!res.ok) throw new Error(t('pages.loan_orders.load_failed'));
@@ -55,6 +56,7 @@ export default function LoanOrdersIndex({ loan_orders, columns, formSchema, crea
   const handleCreate = useCallback(async (e, formData) => {
     const res = await fetch(routes.store, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

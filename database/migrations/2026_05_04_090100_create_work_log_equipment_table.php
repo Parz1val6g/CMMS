@@ -10,6 +10,7 @@ return new class extends Migration {
         Schema::create('work_log_equipment', function (Blueprint $table) {
             $table->foreignUuid('work_log_id')->constrained('work_logs')->cascadeOnDelete();
             $table->foreignUuid('equipment_id')->constrained('equipments')->cascadeOnDelete();
+            $table->decimal('cost_per_hour', 10, 2)->default(0.00);
             $table->timestamps();
             $table->softDeletes();
 

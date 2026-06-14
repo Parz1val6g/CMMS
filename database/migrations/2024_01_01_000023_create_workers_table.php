@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->foreignUuid('team_id')->nullable()->constrained('teams')->cascadeOnDelete();
+            $table->decimal('cost_per_hour', 10, 2)->default(0.00);
             $table->timestamps();
             $table->softDeletes();
         });

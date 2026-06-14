@@ -63,6 +63,7 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
     setDrawer({ open: true, loanOrder: null, loading: true, error: null });
     try {
       const res = await fetch(`/api/loan-orders/${item.id}`, {
+        credentials: 'include',
         headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...csrfHeader() },
       });
       if (!res.ok) throw new Error(t('pages.entity_portal.load_failed'));
@@ -87,6 +88,7 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
   const handleCreate = useCallback(async (e, formData) => {
     const res = await fetch(routes.store, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...csrfHeader() },
       body: JSON.stringify(formData),
     });
@@ -137,7 +139,7 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
+                <tr className="border-b border-brand-mid/10 bg-brand-light">
                   {COLUMNS.map((col) => (
                     <th
                       key={col.key}
@@ -153,7 +155,7 @@ export default function EntityPortalIndex({ loan_orders, createFormSchema, route
                   <tr
                     key={order.id}
                     onClick={() => openDrawer(order)}
-                    className="hover:bg-gray-50 cursor-pointer transition-colors group"
+                    className="hover:bg-brand-light cursor-pointer transition-colors group"
                   >
                     <td className="px-5 py-4 text-gray-900 font-semibold">{order.reference}</td>
                     <td className="px-5 py-4"><PortalStatusBadge value={order.status} /></td>

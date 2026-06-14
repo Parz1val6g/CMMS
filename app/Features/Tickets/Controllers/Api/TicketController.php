@@ -2,6 +2,9 @@
 
 namespace App\Features\Tickets\Controllers\Api;
 
+use App\Core\Enums\TicketPriority;
+use App\Core\Enums\TicketStatus;
+use App\Core\Services\FilterService;
 use App\Features\Tickets\Models\Ticket;
 use App\Features\Tickets\Requests\ConvertTicketRequest;
 use App\Features\Tickets\Requests\StoreTicketRequest;
@@ -19,6 +22,7 @@ class TicketController extends Controller
 {
     public function __construct(
         private TicketService $ticketService,
+        private FilterService $filterService,
     ) {}
 
     public function index(Request $request): AnonymousResourceCollection
@@ -26,10 +30,18 @@ class TicketController extends Controller
         $user = $request->user();
         $activeRole = $request->input('active_role');
 
-        $query = Ticket::with(['client.user', 'serviceType', 'ticketManager'])
-            ->when($activeRole === 'ticket_manager', fn($q) => $q->where('ticket_manager_id', $user->id));
+        $query = $this->filterService->apply(
+            Ticket::with(['client.user', 'serviceType', 'ticketManager'])
+                ->when($activeRole === 'ticket_manager', fn($q) => $q->where('ticket_manager_id', $user->id)),
+            $request->only(['search', 'status', 'priority', 'sort']),
+            ['title', 'description'],
+            [
+                'status'   => TicketStatus::sortOrder(),
+                'priority' => TicketPriority::sortOrder(),
+            ]
+        );
 
-        $tickets = $query->latest()->paginate(15);
+        $tickets = $query->when(!$request->filled('sort'), fn($q) => $q->latest())->paginate(15);
 
         return TicketResource::collection($tickets);
     }
