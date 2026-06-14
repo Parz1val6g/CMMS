@@ -12,7 +12,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -82,7 +81,6 @@ class SettingsPageController extends Controller
             'last_name'  => 'required|string|max:250',
             'email'      => 'required|email|max:250|unique:users,email,' . $request->user()->id,
             'phone'      => 'nullable|string|max:20',
-            'language'   => 'nullable|string|in:pt,en',
         ]);
 
         $user = $request->user();
@@ -98,16 +96,8 @@ class SettingsPageController extends Controller
                 $data['phone'] = InputSanitizer::sanitizePhone($validated['phone']);
             }
 
-            if (isset($validated['language'])) {
-                $data['locale'] = $validated['language'];
-            }
-
             $user->update($data);
         });
-
-        if (isset($validated['language'])) {
-            App::setLocale($validated['language'] === 'pt' ? 'pt_PT' : $validated['language']);
-        }
 
         if ($request->expectsJson()) {
             return response()->json(['message' => __('Profile updated successfully.')]);
@@ -125,7 +115,6 @@ class SettingsPageController extends Controller
 
         $validated = $request->validate([
             'company_name'               => 'nullable|string|max:250',
-            'default_language'           => 'nullable|string|in:PT,EN',
             'default_timezone'           => 'nullable|string|max:50',
             'currency'                   => 'nullable|string|max:3',
             'csv_enabled'                => 'nullable|boolean',

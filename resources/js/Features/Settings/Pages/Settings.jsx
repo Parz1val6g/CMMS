@@ -1,5 +1,4 @@
 import { useState, useRef, useMemo } from 'react';
-import { router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import Tabs from '@/Components/Common/Tabs';
 import FormSection from '@/Components/Common/FormSection';
@@ -80,19 +79,9 @@ export default function Settings({ user, preferences, appSettings, isAdmin, loca
   /* ── Form Handlers ──────────────────────────────────────────── */
   const handleDetailsSubmit = async (e) => {
     e.preventDefault();
-
-    const langBefore = preferences?.language ?? (window.__LOCALE__ === 'en' ? 'en' : 'pt');
-    const langAfter = e.target.language?.value;
     const r = await submitForm(e.target, apiRoutes.updateUser);
-    if (r.ok) {
-      if (langAfter && langAfter !== langBefore) {
-        window.__LOCALE__ = langAfter === 'en' ? 'en' : 'pt_PT';
-        toast.success(t('pages.settings.success_updated'));
-        setTimeout(() => router.reload(), 500);
-      } else {
-        toast.success(t('pages.settings.success_updated'));
-      }
-    } else toast.error(r.message);
+    if (r.ok) toast.success(t('pages.settings.success_updated'));
+    else toast.error(r.message);
   };
 
   const handlePasswordSubmit = async (e) => {
@@ -165,11 +154,6 @@ export default function Settings({ user, preferences, appSettings, isAdmin, loca
   };
 
   /* Supported locales */
-  const locales = [
-    { key: 'en', flag: '🇬🇧', name: 'English' },
-    { key: 'pt', flag: '🇵🇹', name: 'Português' },
-  ];
-
   const inputClass = 'block w-full rounded-lg border border-brand-mid/20 bg-brand-light px-3 py-2 text-sm shadow-none focus:border-brand-accent focus:ring-brand-accent';
 
   const tabs = [
@@ -193,15 +177,6 @@ export default function Settings({ user, preferences, appSettings, isAdmin, loca
               <div>
                 <label className="mb-1 block text-xs font-bold text-brand-mid">{t('pages.settings.label_email')} <span className="text-red-500">*</span></label>
                 <input type="email" name="email" defaultValue={user.email} className={inputClass} required />
-                <div className="form-feedback mt-1 hidden text-xs text-red-600" />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-bold text-brand-mid">{t('pages.settings.label_language')}</label>
-                <select name="language" defaultValue={preferences?.language ?? 'en'} className={inputClass}>
-                  {locales.map((l) => (
-                    <option key={l.key} value={l.key}>{l.flag} {l.name}</option>
-                  ))}
-                </select>
                 <div className="form-feedback mt-1 hidden text-xs text-red-600" />
               </div>
               <div>
@@ -339,14 +314,6 @@ export default function Settings({ user, preferences, appSettings, isAdmin, loca
                 <label className="mb-1 block text-xs font-bold text-brand-mid">{t('pages.settings.label_support_email')}</label>
                 <input type="email" name="support_email" defaultValue={appSettings?.support_email ?? ''} className={inputClass} disabled />
                 <p className="mt-1 text-xs text-brand-mid">{t('pages.settings.hint_email_soon')}</p>
-                <div className="form-feedback mt-1 hidden text-xs text-red-600" />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-bold text-brand-mid">{t('pages.settings.label_default_language')}</label>
-                <select name="default_language" defaultValue={appSettings?.default_language ?? 'PT'} className={inputClass}>
-                  <option value="PT">Português</option>
-                  <option value="EN">English</option>
-                </select>
                 <div className="form-feedback mt-1 hidden text-xs text-red-600" />
               </div>
               <div>

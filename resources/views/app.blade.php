@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="pt-PT" class="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,7 +8,7 @@
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
-    <script>window.__LOCALE__ = '{{ app()->getLocale() === 'pt' ? 'pt_PT' : app()->getLocale() }}';</script>
+    <script>window.__LOCALE__ = 'pt_PT';</script>
     @viteReactRefresh
     @vite(['resources/js/app.jsx', 'resources/css/app.css'])
 </head>
